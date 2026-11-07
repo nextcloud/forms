@@ -304,9 +304,11 @@ Follow-up questions (subquestions) are questions of their own with additional pr
 | `multiple_unique` | `option_selected` | Radio buttons - the selected option |
 | `dropdown`        | `option_selected` | Dropdown - the selected option      |
 | `multiple`        | `options_combination` | Checkboxes - all options of a combination |
+| `linearscale`     | `value_equals`, `value_not_equals`, `value_range`, `value_min`, `value_max` | Linear scale - numeric value matching |
 | `date`            | `date_range`      | Date - range including its bounds (`YYYY-MM-DD`) |
 | `datetime`        | `date_range`      | Deprecated date and time (`YYYY-MM-DD HH:mm`) |
 | `time`            | `date_range`      | Time - range including its bounds (`HH:mm`) |
+| `color`           | `value_equals`    | Color - exact value, ignoring case  |
 | `file`            | `file_uploaded`   | File - whether a file was uploaded  |
 
 A branch is shown when any of its conditions matches. Several branches can be shown at once.
@@ -356,6 +358,24 @@ Conditions determine when a branch is activated. The structure depends on the ty
 ```
 
 All options in `optionIds` must be selected for the condition to match.
+
+#### value_equals, value_not_equals (for linearscale), value_equals (for color)
+
+```json
+{ "type": "value_equals", "value": 3 }
+```
+
+```json
+{ "type": "value_equals", "value": "#ff0000" }
+```
+
+#### value_range, value_min, value_max (for linearscale)
+
+```json
+{ "type": "value_range", "min": 3, "max": 5 }
+```
+
+`value_min` only uses `min`, `value_max` only uses `max`.
 
 #### date_range (for date, datetime, time)
 

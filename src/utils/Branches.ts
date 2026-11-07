@@ -22,6 +22,8 @@ const BRANCH_MATCHERS: Record<string, BranchMatcher> = {
 	datetime: matchDateRange,
 	time: matchDateRange,
 	file: matchFileUploaded,
+	linearscale: matchValue,
+	color: matchColor,
 }
 
 /**
@@ -90,6 +92,58 @@ function matchFileUploaded(
 	const hasFile = values.length > 0 && values[0] !== ''
 	return conditions.some(
 		(condition) => (condition.fileUploaded ?? true) === hasFile,
+	)
+}
+
+/**
+ * Linear scales match if the value fits any condition
+ *
+ * @param conditions the conditions of the branch
+ * @param values the answer of the question
+ */
+function matchValue(
+	conditions: Record<string, unknown>[],
+	values: string[],
+): boolean {
+	const value = parseFloat(values[0]) || 0
+	const min = (condition: Record<string, unknown>) =>
+		condition.min ?? Number.MIN_SAFE_INTEGER
+	const max = (condition: Record<string, unknown>) =>
+		condition.max ?? Number.MAX_SAFE_INTEGER
+	return conditions.some((condition) => {
+		switch (condition.type ?? 'value_equals') {
+			case 'value_equals':
+				return value === parseFloat(String(condition.value))
+			case 'value_not_equals':
+				return value !== parseFloat(String(condition.value))
+			case 'value_min':
+				return value >= Number(min(condition))
+			case 'value_max':
+				return value <= Number(max(condition))
+			case 'value_range':
+				return (
+					value >= Number(min(condition))
+					&& value <= Number(max(condition))
+				)
+			default:
+				return false
+		}
+	})
+}
+
+/**
+ * Colors match if they equal the value of any condition, ignoring case
+ *
+ * @param conditions the conditions of the branch
+ * @param values the answer of the question
+ */
+function matchColor(
+	conditions: Record<string, unknown>[],
+	values: string[],
+): boolean {
+	const color = values[0].toLowerCase()
+	return conditions.some(
+		(condition) => color === String(condition.value ?? '').toLowerCase(),
 	)
 }
 
