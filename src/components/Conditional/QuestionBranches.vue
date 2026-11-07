@@ -416,8 +416,12 @@ export default defineComponent({
 				})
 			}
 
+			// Checkbox conditions hold a combination of options
 			const optionTexts = branch.conditions
-				.map((c) => this.options.find((o) => o.id === c.optionId)?.text)
+				.flatMap(
+					(c) => (c.optionIds as unknown[] | undefined) ?? [c.optionId],
+				)
+				.map((id) => this.options.find((o) => o.id === id)?.text)
 				.filter(Boolean)
 			if (optionTexts.length > 0) {
 				return optionTexts.join(' + ')

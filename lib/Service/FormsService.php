@@ -156,6 +156,9 @@ class FormsService {
 				if (isset($condition['optionId'])) {
 					$extraSettings['branches'][$branchIndex]['conditions'][$conditionIndex]['optionId'] = $optionIdMap[$condition['optionId']] ?? $condition['optionId'];
 				}
+				if (isset($condition['optionIds']) && is_array($condition['optionIds'])) {
+					$extraSettings['branches'][$branchIndex]['conditions'][$conditionIndex]['optionIds'] = array_map(static fn ($optionId) => $optionIdMap[$optionId] ?? $optionId, $condition['optionIds']);
+				}
 			}
 		}
 		return $extraSettings;
@@ -979,6 +982,10 @@ class FormsService {
 				return false;
 			}
 			if (isset($condition['optionId']) && !is_int($condition['optionId'])) {
+				return false;
+			}
+			if (isset($condition['optionIds'])
+				&& (!is_array($condition['optionIds']) || array_filter($condition['optionIds'], static fn ($id) => !is_int($id)) !== [])) {
 				return false;
 			}
 			foreach (['value', 'min', 'max'] as $key) {

@@ -1915,6 +1915,16 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
 				'expected' => true
 			],
+			'valid-branches-checkbox-combination' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'options_combination', 'optionIds' => [1, 2]]]]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => true
+			],
+			'invalid-branch-option-ids-not-numbers' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'options_combination', 'optionIds' => [1, 'two']]]]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => false
+			],
 			'valid-branches-with-own-settings' => [
 				'extraSettings' => ['shuffleOptions' => true, 'branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
 				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
