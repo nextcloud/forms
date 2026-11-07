@@ -1711,6 +1711,50 @@ file2.txt"
 				// Expected Result
 				'Answer for non-existent question with ID 101.',
 			],
+			'invalid-branch-date-range-includes-its-bounds' => [
+				// Questions - date range of a single day
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DATE,
+						'text' => 'Date Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'branches' => [[
+								'id' => 'branch-day',
+								'conditions' => [['type' => 'date_range', 'min' => '2026-11-04', 'max' => '2026-11-04']],
+								'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'On that day', 'isRequired' => true]],
+							]],
+						],
+					],
+				],
+				// Answers - the day itself, required subquestion not answered
+				['100' => ['2026-11-04']],
+				// Expected Result
+				'Question "On that day" is required.',
+			],
+			'valid-branch-date-outside-range' => [
+				// Questions - the follow-up question of a range the date is outside of is not required
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DATE,
+						'text' => 'Date Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'branches' => [[
+								'id' => 'branch-day',
+								'conditions' => [['type' => 'date_range', 'min' => '2026-11-04', 'max' => '2026-11-04']],
+								'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'On that day', 'isRequired' => true]],
+							]],
+						],
+					],
+				],
+				// Answers
+				['100' => ['2026-11-05']],
+				// Expected Result
+				null,
+			],
 			'invalid-branch-unknown-option' => [
 				// Questions - The question is validated like any other question
 				[
