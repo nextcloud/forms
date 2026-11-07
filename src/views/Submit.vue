@@ -150,7 +150,20 @@
 						:values="answers[question.id]"
 						@keydown.enter="onKeydownEnter"
 						@keydown.ctrl.enter="onKeydownCtrlEnter"
-						@update:values="onUpdate(question, $event)" />
+						@update:values="onUpdate(question, $event)">
+						<template v-if="canHaveBranches(question.type)" #branches>
+							<ActiveSubQuestions
+								ref="subQuestionRefs"
+								:subQuestions="visibleSubQuestions(question)"
+								:index="index + 1"
+								:formId="form.id"
+								:answers="answers"
+								:maxStringLengths="maxStringLengths"
+								@keydown.enter="onKeydownEnter"
+								@keydown.ctrl.enter="onKeydownCtrlEnter"
+								@update:values="onUpdate" />
+						</template>
+					</component>
 				</ul>
 				<div class="form-buttons">
 					<NcButton
@@ -262,6 +275,7 @@ import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
+import ActiveSubQuestions from '../components/Conditional/ActiveSubQuestions.vue'
 import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
@@ -275,18 +289,18 @@ import {
 	QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 } from '../models/Constants.ts'
 import { PERMISSION_TYPES } from '../models/Permissions.ts'
+import {
+	canHaveBranches,
+	getBranches,
+	getVisibleSubQuestions,
+} from '../utils/Branches.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 const formsAppName = 'forms'
 
-interface ConditionalAnswerValue {
-	trigger: string[]
-	subQuestions: Record<number, string[]>
-}
-
-type AnswerValue = string[] | GridQuestionValues | ConditionalAnswerValue
+type AnswerValue = string[] | GridQuestionValues
 type AnswersMap = Record<number, AnswerValue>
 
 interface StoredAnswerState {
@@ -332,6 +346,7 @@ export default defineComponent({
 	name: 'Submit',
 
 	components: {
+		ActiveSubQuestions,
 		NcAppContent,
 		NcButton,
 		NcDialog,
@@ -389,6 +404,9 @@ export default defineComponent({
 		const questionRefs = ref<
 			QuestionComponentRef[] | QuestionComponentRef | null
 		>(null)
+		const subQuestionRefs = ref<
+			QuestionComponentRef[] | QuestionComponentRef | null
+		>(null)
 		const viewForm = useViewForm({
 			form: () => props.form,
 			emit,
@@ -406,28 +424,62 @@ export default defineComponent({
 		const showClearFormDueToChangeDialog = ref(false)
 		const confirmButtonCallback = ref<(val: boolean) => void>(() => {})
 
-		const validQuestions = computed<FormsQuestion[]>(() => {
-			return props.form.questions.filter((question: FormsQuestion) => {
-				// All questions must have a valid title
-				if (question.text?.trim() === '') {
-					return false
-				}
+		/**
+		 * Questions are only shown with a title and valid content
+		 *
+		 * @param question the question
+		 */
+		function isShownQuestion(question: FormsQuestion): boolean {
+			if (!question.text?.trim()) {
+				return false
+			}
+			return answerTypes[question.type]?.validate?.(question) ?? true
+		}
 
-				// If specific conditions provided, test against them
-				const answerType = answerTypes[question.type]
-				if (typeof answerType.validate === 'function') {
-					return answerType.validate(question)
-				}
-				return true
-			}) as FormsQuestion[]
-		})
+		const validQuestions = computed<FormsQuestion[]>(() =>
+			props.form.questions.filter(isShownQuestion),
+		)
+
+		// Questions that can be answered, with the subquestions of all branches
+		const answerableQuestions = computed<FormsQuestion[]>(() =>
+			validQuestions.value.flatMap((question) => [
+				question,
+				...getBranches(question)
+					.flatMap((branch) => branch.subQuestions ?? [])
+					.filter(isShownQuestion),
+			]),
+		)
 
 		const validQuestionsIds = computed<Set<number>>(() => {
-			return new Set(validQuestions.value.map((question) => question.id))
+			return new Set(answerableQuestions.value.map((question) => question.id))
+		})
+
+		/**
+		 * @param question a question with branches
+		 */
+		function visibleSubQuestions(question: FormsQuestion): FormsQuestion[] {
+			return getVisibleSubQuestions(
+				question,
+				answers.value[question.id],
+				isShownQuestion,
+			)
+		}
+
+		// The answers to send, answers of hidden subquestions are kept for when they are shown again
+		const visibleAnswers = computed<AnswersMap>(() => {
+			const visible: AnswersMap = {}
+			for (const question of validQuestions.value) {
+				for (const { id } of [question, ...visibleSubQuestions(question)]) {
+					if (answers.value[id] !== undefined) {
+						visible[id] = answers.value[id]
+					}
+				}
+			}
+			return visible
 		})
 
 		const isRequiredUsed = computed<boolean>(() => {
-			return props.form.questions.some((question: FormsQuestion) =>
+			return answerableQuestions.value.some((question) =>
 				Boolean(question.isRequired),
 			)
 		})
@@ -589,7 +641,7 @@ export default defineComponent({
 		})
 
 		const hasAnswers = computed<boolean>(() => {
-			return Object.keys(answers.value).length > 0
+			return Object.keys(visibleAnswers.value).length > 0
 		})
 
 		const submissionId = computed<number | null>(() => {
@@ -640,18 +692,6 @@ export default defineComponent({
 					&& Array.isArray(answer.value)
 				) {
 					localAnswers[parseInt(questionId, 10)] = answer.value.map(String)
-				} else if (answer.type === 'QuestionConditional') {
-					// Restore conditional answer structure with proper type conversions
-					const value = Array.isArray(answer.value)
-						? undefined
-						: (answer.value as Partial<ConditionalAnswerValue>)
-					localAnswers[parseInt(questionId, 10)] = {
-						trigger: Array.isArray(value?.trigger)
-							? value.trigger.map(String)
-							: [],
-
-						subQuestions: value?.subQuestions || {},
-					}
 				} else {
 					localAnswers[parseInt(questionId, 10)] = answer.value
 				}
@@ -691,7 +731,7 @@ export default defineComponent({
 				return
 			}
 			const state: StoredAnswersMap = {}
-			for (const question of validQuestions.value) {
+			for (const question of answerableQuestions.value) {
 				const value = answers.value[question.id]
 				if (
 					value === undefined
@@ -746,29 +786,9 @@ export default defineComponent({
 					OcsResponse2Data<LoadedSubmissionResponse>(response).answers
 
 				/**
-				 * Reuse conditional state regardless of trigger/subquestion answer order.
-				 *
-				 * @param questionId The conditional question ID.
-				 */
-				function getConditionalAnswer(
-					questionId: number,
-				): ConditionalAnswerValue {
-					const value = loaded[questionId]
-					if (value && !Array.isArray(value) && 'trigger' in value) {
-						return value as ConditionalAnswerValue
-					}
-					const conditionalAnswer: ConditionalAnswerValue = {
-						trigger: [],
-						subQuestions: {},
-					}
-					loaded[questionId] = conditionalAnswer
-					return conditionalAnswer
-				}
-
-				/**
 				 * Restore a stored answer text to the values the question component expects
 				 *
-				 * @param question The question, the trigger of a conditional question with the trigger type
+				 * @param question The question
 				 * @param text The stored answer text
 				 * @param values The values restored so far for this question
 				 * @return The values of the question
@@ -890,44 +910,11 @@ export default defineComponent({
 					return questionAnswers
 				}
 
-				// Build a map of subquestion ID → subquestion and its conditional question ID
-				const subQuestions = new Map<
-					number,
-					{ conditionalId: number; subQuestion: FormsQuestion }
-				>()
-				for (const question of props.form.questions as FormsQuestion[]) {
-					if (question.type === 'conditional') {
-						const branches = question.extraSettings?.branches || []
-						for (const branch of branches) {
-							for (const subQuestion of branch.subQuestions || []) {
-								subQuestions.set(subQuestion.id, {
-									conditionalId: question.id,
-									subQuestion,
-								})
-							}
-						}
-					}
-				}
-
 				for (const answer of loadedAnswers) {
 					const questionId = Number(answer.questionId)
 					const text = answer.text
 
 					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
-
-					// Answers of subquestions are part of the answer of their conditional question
-					const subQuestionEntry = subQuestions.get(questionId)
-					if (subQuestionEntry) {
-						const conditionalAnswer = getConditionalAnswer(
-							subQuestionEntry.conditionalId,
-						)
-						conditionalAnswer.subQuestions[questionId] = restoreAnswer(
-							subQuestionEntry.subQuestion,
-							text,
-							conditionalAnswer.subQuestions[questionId],
-						) as string[]
-						continue
-					}
 
 					// Clean up answers for questions that do not exist anymore
 					if (!validQuestionsIds.value.has(questionId)) {
@@ -938,24 +925,10 @@ export default defineComponent({
 						continue
 					}
 
-					const question = props.form.questions.find(
-						(question: FormsQuestion) => question.id === questionId,
-					) as FormsQuestion | undefined
+					const question = answerableQuestions.value.find(
+						(question) => question.id === questionId,
+					)
 					if (!question) {
-						continue
-					}
-
-					if (question.type === 'conditional') {
-						// The trigger is answered like a question of the trigger type
-						const conditionalAnswer = getConditionalAnswer(questionId)
-						conditionalAnswer.trigger = restoreAnswer(
-							{
-								...question,
-								type: question.extraSettings?.triggerType ?? '',
-							},
-							text,
-							conditionalAnswer.trigger,
-						) as string[]
 						continue
 					}
 
@@ -1091,9 +1064,12 @@ export default defineComponent({
 			const rawQuestionRefs = Array.isArray(questionRefs.value)
 				? questionRefs.value
 				: [questionRefs.value].filter(Boolean)
-			const validation = (rawQuestionRefs as QuestionComponentRef[]).map(
-				async (question) => await question.validate(),
-			)
+			const rawSubQuestionRefs = Array.isArray(subQuestionRefs.value)
+				? subQuestionRefs.value
+				: [subQuestionRefs.value].filter(Boolean)
+			const validation = (
+				[...rawQuestionRefs, ...rawSubQuestionRefs] as QuestionComponentRef[]
+			).map(async (question) => await question.validate())
 
 			try {
 				// wait for all to be validated
@@ -1104,8 +1080,8 @@ export default defineComponent({
 
 				// in case no answer is set or all are empty show the confirmation dialog
 				if (
-					Object.keys(answers.value).length === 0
-					|| Object.values(answers.value).every((localAnswers) =>
+					Object.keys(visibleAnswers.value).length === 0
+					|| Object.values(visibleAnswers.value).every((localAnswers) =>
 						Array.isArray(localAnswers)
 							? localAnswers.length === 0
 							: Object.keys(localAnswers).length === 0,
@@ -1140,7 +1116,7 @@ export default defineComponent({
 							},
 						),
 						{
-							answers: answers.value,
+							answers: visibleAnswers.value,
 						},
 					)
 				} else {
@@ -1149,7 +1125,7 @@ export default defineComponent({
 							id: props.form.id,
 						}),
 						{
-							answers: answers.value,
+							answers: visibleAnswers.value,
 							shareHash: props.shareHash,
 						},
 					)
@@ -1335,6 +1311,9 @@ export default defineComponent({
 			onSubmit,
 			onUpdate,
 			questionRefs,
+			subQuestionRefs,
+			canHaveBranches,
+			visibleSubQuestions,
 			showClearFormDialog,
 			showClearFormDueToChangeDialog,
 			showConfirmEmptyModal,

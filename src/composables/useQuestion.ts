@@ -14,6 +14,7 @@ import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import { computed, nextTick, ref } from 'vue'
 import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
+import { persistedSettings } from '../utils/Branches.ts'
 import logger from '../utils/Logger.ts'
 
 export const QUESTION_EMITS = [
@@ -75,10 +76,6 @@ export const QUESTION_PROPS = {
 		type: String,
 		required: true,
 	},
-	isTriggerQuestion: {
-		type: Boolean,
-		default: false,
-	},
 	isRequired: {
 		type: Boolean,
 		required: true,
@@ -87,7 +84,7 @@ export const QUESTION_PROPS = {
 		type: Number,
 		required: true,
 	},
-	// Position of a subquestion within its branch, `index` is then the one of the conditional question
+	// Position of a subquestion within its branch, `index` is then the one of its parent question
 	subIndex: {
 		type: Number,
 		default: null,
@@ -173,7 +170,6 @@ interface QuestionPropsLike {
 	subIndex?: number | null
 	text: string
 	description: string
-	isTriggerQuestion: boolean
 	isRequired: boolean
 	readOnly: boolean
 	name: string
@@ -190,7 +186,6 @@ interface QuestionForwardedProps {
 	subIndex: number | null
 	text: string
 	description: string
-	isTriggerQuestion: boolean
 	isRequired: boolean
 	readOnly: boolean
 	maxStringLengths: Record<string, number>
@@ -213,7 +208,6 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		subIndex: props.subIndex ?? null,
 		text: props.text,
 		description: props.description,
-		isTriggerQuestion: props.isTriggerQuestion,
 		isRequired: props.isRequired,
 		readOnly: props.readOnly,
 		maxStringLengths: props.maxStringLengths,
@@ -239,11 +233,11 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 	})
 
 	const errorId = computed(() => {
-		return `${questionIdPrefix(props)}${props.isTriggerQuestion ? '_trigger' : ''}_error`
+		return `${questionIdPrefix(props)}_error`
 	})
 
 	const infoId = computed(() => {
-		return `${questionIdPrefix(props)}${props.isTriggerQuestion ? '_trigger' : ''}_info`
+		return `${questionIdPrefix(props)}_info`
 	})
 
 	const onTitleChange = debounce(function (text: string) {
@@ -266,23 +260,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 	) {
 		const newExtraSettings = { ...props.extraSettings, ...newSettings }
 		options.emit('update:extraSettings', newExtraSettings)
-		const persistedExtraSettings =
-			props.type === 'conditional'
-				? {
-						...newExtraSettings,
-						branches: Array.isArray(newExtraSettings.branches)
-							? newExtraSettings.branches.map((branch) => {
-									const settings = { ...branch }
-									delete settings.subQuestions
-									return settings
-								})
-							: [],
-					}
-				: newExtraSettings
-		// Embedded triggers share their parent's ID; the parent owns persistence.
-		if (!props.isTriggerQuestion) {
-			saveQuestionProperty('extraSettings', persistedExtraSettings)
-		}
+		saveQuestionProperty('extraSettings', persistedSettings(newExtraSettings))
 	}, INPUT_DEBOUNCE_MS)
 
 	const onNameChange = debounce(function (name: string) {

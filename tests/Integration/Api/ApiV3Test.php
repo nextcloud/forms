@@ -1070,27 +1070,27 @@ class ApiV3Test extends IntegrationBase {
 	}
 
 	/**
-	 * Test creating a conditional question with trigger options
+	 * Test creating a question with branches of follow-up questions
 	 */
-	public function testCreateConditionalQuestion(): void {
-		// First create the conditional question
+	public function testCreateQuestionWithBranches(): void {
+		// First create the question
 		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
 			'json' => [
-				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'text' => 'Conditional Question'
+				'type' => Constants::ANSWER_TYPE_DROPDOWN,
+				'text' => 'Question with branches'
 			]
 		]);
-		$conditionalQuestion = $this->OcsResponse2Data($resp);
-		$this->testForms[0]['questions'][] = $conditionalQuestion;
+		$triggerQuestion = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $triggerQuestion;
 
 		$this->assertEquals(201, $resp->getStatusCode());
-		$this->assertEquals(Constants::ANSWER_TYPE_CONDITIONAL, $conditionalQuestion['type']);
-		$this->assertEquals('Conditional Question', $conditionalQuestion['text']);
-		$this->assertNull($conditionalQuestion['parentQuestionId']);
-		$this->assertNull($conditionalQuestion['branchId']);
+		$this->assertEquals(Constants::ANSWER_TYPE_DROPDOWN, $triggerQuestion['type']);
+		$this->assertEquals('Question with branches', $triggerQuestion['text']);
+		$this->assertNull($triggerQuestion['parentQuestionId']);
+		$this->assertNull($triggerQuestion['branchId']);
 
 		// Add options for the trigger
-		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$conditionalQuestion['id']}/options", [
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$triggerQuestion['id']}/options", [
 			'json' => [
 				'optionTexts' => ['Option A', 'Option B']
 			]
@@ -1099,12 +1099,11 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals(201, $resp->getStatusCode());
 		$this->assertCount(2, $options);
 
-		// Update the conditional question with extraSettings
-		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$conditionalQuestion['id']}", [
+		// Add the branches
+		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$triggerQuestion['id']}", [
 			'json' => [
 				'keyValuePairs' => [
 					'extraSettings' => [
-						'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
 						'branches' => [
 							[
 								'id' => 'branch-a',
@@ -1126,7 +1125,7 @@ class ApiV3Test extends IntegrationBase {
 			'json' => [
 				'type' => 'short',
 				'text' => 'Subquestion for Option A',
-				'parentQuestionId' => $conditionalQuestion['id'],
+				'parentQuestionId' => $triggerQuestion['id'],
 				'branchId' => 'branch-a'
 			]
 		]);
@@ -1136,31 +1135,31 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals(201, $resp->getStatusCode());
 		$this->assertEquals('short', $subQuestion['type']);
 		$this->assertEquals('Subquestion for Option A', $subQuestion['text']);
-		$this->assertEquals($conditionalQuestion['id'], $subQuestion['parentQuestionId']);
+		$this->assertEquals($triggerQuestion['id'], $subQuestion['parentQuestionId']);
 		$this->assertEquals('branch-a', $subQuestion['branchId']);
 
-		// Fetch the form and verify the conditional question structure
+		// Fetch the form and verify the structure
 		$resp = $this->http->request('GET', "api/v3/forms/{$this->testForms[0]['id']}");
 		$form = $this->OcsResponse2Data($resp);
 		$this->assertEquals(200, $resp->getStatusCode());
 
-		// Find the conditional question in the form
-		$foundConditional = null;
+		// Find the question in the form
+		$foundQuestion = null;
 		foreach ($form['questions'] as $question) {
-			if ($question['id'] === $conditionalQuestion['id']) {
-				$foundConditional = $question;
+			if ($question['id'] === $triggerQuestion['id']) {
+				$foundQuestion = $question;
 				break;
 			}
 		}
 
-		$this->assertNotNull($foundConditional);
-		$this->assertEquals(Constants::ANSWER_TYPE_CONDITIONAL, $foundConditional['type']);
-		$this->assertArrayHasKey('extraSettings', $foundConditional);
-		$this->assertArrayHasKey('branches', $foundConditional['extraSettings']);
+		$this->assertNotNull($foundQuestion);
+		$this->assertEquals(Constants::ANSWER_TYPE_DROPDOWN, $foundQuestion['type']);
+		$this->assertArrayHasKey('extraSettings', $foundQuestion);
+		$this->assertArrayHasKey('branches', $foundQuestion['extraSettings']);
 
 		// Verify subquestion is attached to the correct branch
 		$branchA = null;
-		foreach ($foundConditional['extraSettings']['branches'] as $branch) {
+		foreach ($foundQuestion['extraSettings']['branches'] as $branch) {
 			if ($branch['id'] === 'branch-a') {
 				$branchA = $branch;
 				break;
@@ -1174,34 +1173,30 @@ class ApiV3Test extends IntegrationBase {
 	}
 
 	/**
-	 * Test that nested conditional questions are not allowed
+	 * Test that follow-up questions can not have follow-up questions themselves
 	 */
-	public function testNestedConditionalNotAllowed(): void {
-		// First create a conditional question
+	public function testNestedFollowUpQuestionsNotAllowed(): void {
 		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
 			'json' => [
-				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'text' => 'Parent Conditional'
+				'type' => Constants::ANSWER_TYPE_DROPDOWN,
+				'text' => 'Parent question'
 			]
 		]);
-		$parentConditional = $this->OcsResponse2Data($resp);
-		$this->testForms[0]['questions'][] = $parentConditional;
+		$parentQuestion = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $parentQuestion;
 		$this->assertEquals(201, $resp->getStatusCode());
 
-		// Add an option for the trigger
-		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$parentConditional['id']}/options", [
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$parentQuestion['id']}/options", [
 			'json' => [
 				'optionTexts' => ['Trigger Option']
 			]
 		]);
 		$options = $this->OcsResponse2Data($resp);
 
-		// Update with extraSettings
-		$resp = $this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$parentConditional['id']}", [
+		$this->http->request('PATCH', "api/v3/forms/{$this->testForms[0]['id']}/questions/{$parentQuestion['id']}", [
 			'json' => [
 				'keyValuePairs' => [
 					'extraSettings' => [
-						'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
 						'branches' => [
 							['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => $options[0]['id']]]]
 						]
@@ -1210,13 +1205,25 @@ class ApiV3Test extends IntegrationBase {
 			]
 		]);
 
-		// Try to create a nested conditional (should fail)
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => Constants::ANSWER_TYPE_DROPDOWN,
+				'text' => 'Follow-up question',
+				'parentQuestionId' => $parentQuestion['id'],
+				'branchId' => 'branch-1'
+			]
+		]);
+		$subQuestion = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $subQuestion;
+		$this->assertEquals(201, $resp->getStatusCode());
+
+		// A follow-up question of the follow-up question fails
 		$this->expectException(ClientException::class);
 		$this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
 			'json' => [
-				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'text' => 'Nested Conditional',
-				'parentQuestionId' => $parentConditional['id'],
+				'type' => 'short',
+				'text' => 'Nested follow-up question',
+				'parentQuestionId' => $subQuestion['id'],
 				'branchId' => 'branch-1'
 			]
 		]);
@@ -1226,15 +1233,15 @@ class ApiV3Test extends IntegrationBase {
 	 * Test that subquestion requires branchId
 	 */
 	public function testSubquestionRequiresBranchId(): void {
-		// First create a conditional question
+		// First create a question that can have branches
 		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
 			'json' => [
-				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'text' => 'Conditional for branch test'
+				'type' => Constants::ANSWER_TYPE_DROPDOWN,
+				'text' => 'Question for branch test'
 			]
 		]);
-		$conditionalQuestion = $this->OcsResponse2Data($resp);
-		$this->testForms[0]['questions'][] = $conditionalQuestion;
+		$triggerQuestion = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $triggerQuestion;
 
 		// Try to create a subquestion without branchId (should fail)
 		$this->expectException(ClientException::class);
@@ -1242,7 +1249,7 @@ class ApiV3Test extends IntegrationBase {
 			'json' => [
 				'type' => 'short',
 				'text' => 'Subquestion without branch',
-				'parentQuestionId' => $conditionalQuestion['id']
+				'parentQuestionId' => $triggerQuestion['id']
 			]
 		]);
 	}

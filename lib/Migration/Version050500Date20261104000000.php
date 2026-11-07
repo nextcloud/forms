@@ -16,7 +16,7 @@ use OCP\Migration\IOutput;
 use OCP\Migration\SimpleMigrationStep;
 
 /**
- * Add parent_question_id and branch_id columns for conditional questions
+ * Add parent_question_id and branch_id columns for follow-up questions in branches
  */
 class Version050500Date20261104000000 extends SimpleMigrationStep {
 
@@ -31,12 +31,12 @@ class Version050500Date20261104000000 extends SimpleMigrationStep {
 		$schema = $schemaClosure();
 		$table = $schema->getTable('forms_v2_questions');
 
-		// Add parent_question_id column - references parent conditional question
+		// Add parent_question_id column - references the question the branch belongs to
 		if (!$table->hasColumn('parent_question_id')) {
 			$table->addColumn('parent_question_id', Types::INTEGER, [
 				'notnull' => false,
 				'default' => null,
-				'comment' => 'ID of parent conditional question, null for top-level questions',
+				'comment' => 'ID of the parent question, null for top-level questions',
 			]);
 		}
 
@@ -46,7 +46,7 @@ class Version050500Date20261104000000 extends SimpleMigrationStep {
 				'notnull' => false,
 				'length' => 64,
 				'default' => null,
-				'comment' => 'Branch identifier within parent conditional question',
+				'comment' => 'Branch identifier within the parent question',
 			]);
 		}
 

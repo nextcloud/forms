@@ -55,7 +55,7 @@ class QuestionMapperTest extends IntegrationBase {
 		$this->questionMapper = \OCP\Server::get(QuestionMapper::class);
 
 		$formId = $this->testForms[0]['id'];
-		$this->questions['parent'] = $this->insertQuestion($formId, Constants::ANSWER_TYPE_CONDITIONAL, 1);
+		$this->questions['parent'] = $this->insertQuestion($formId, Constants::ANSWER_TYPE_DROPDOWN, 1);
 		$this->questions['deletedTop'] = $this->insertQuestion($formId, Constants::ANSWER_TYPE_SHORT, 0);
 		$parentId = $this->questions['parent']->getId();
 		$this->questions['a2'] = $this->insertQuestion($formId, Constants::ANSWER_TYPE_SHORT, 2, $parentId, 'branch-a');

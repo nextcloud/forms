@@ -181,6 +181,7 @@
 			v-model:open="isOptionDialogShown"
 			@multipleAnswers="handleMultipleOptions" />
 		<template #insert>
+			<slot name="branches" />
 			<slot name="insert" />
 		</template>
 	</Question>

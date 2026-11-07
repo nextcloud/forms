@@ -115,6 +115,9 @@ class ApiControllerTest extends TestCase {
 		$this->configService = $this->createMock(ConfigService::class);
 		$this->formsService = $this->createMock(FormsService::class);
 		$this->submissionService = $this->createMock(SubmissionService::class);
+		// Branches are evaluated by the service, here all follow-up questions are shown
+		$this->submissionService->method('getVisibleQuestions')
+			->willReturnCallback(static fn (array $questions): array => FormsService::flattenQuestions($questions));
 		$this->logger = $this->createMock(LoggerInterface::class);
 		$this->request = $this->createMock(IRequest::class);
 		$this->userManager = $this->createMock(IUserManager::class);
@@ -1018,17 +1021,17 @@ class ApiControllerTest extends TestCase {
 			'ordinary foreign token' => [false, 'foreign-upload-token', false],
 			'ordinary missing token' => [false, null, false],
 			'ordinary empty token' => [false, '', false],
-			'conditional valid token' => [true, 'valid-upload-token', true],
-			'conditional foreign token' => [true, 'foreign-upload-token', false],
-			'conditional missing token' => [true, null, false],
-			'conditional empty token' => [true, '', false],
+			'follow-up valid token' => [true, 'valid-upload-token', true],
+			'follow-up foreign token' => [true, 'foreign-upload-token', false],
+			'follow-up missing token' => [true, null, false],
+			'follow-up empty token' => [true, '', false],
 		];
 	}
 
 	/**
 	 * @dataProvider dataNewSubmission_fileUploadAuthorization
 	 */
-	public function testNewSubmission_fileUploadAuthorization(bool $conditional, ?string $uploadToken, bool $authorized): void {
+	public function testNewSubmission_fileUploadAuthorization(bool $followUp, ?string $uploadToken, bool $authorized): void {
 		$form = Form::fromParams(['id' => 7, 'hash' => 'hash', 'ownerId' => 'admin']);
 		$fileQuestion = [
 			'id' => 8,
@@ -1044,13 +1047,12 @@ class ApiControllerTest extends TestCase {
 			'conditions' => [['type' => 'option_selected', 'optionId' => 3]],
 			'subQuestions' => [$fileQuestion],
 		];
-		$question = $conditional ? [
+		$question = $followUp ? [
 			'id' => 9,
-			'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-			'text' => 'Conditional question',
+			'type' => Constants::ANSWER_TYPE_DROPDOWN,
+			'text' => 'Question with branches',
 			'options' => [['id' => 3, 'text' => 'Attach a file']],
 			'extraSettings' => [
-				'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'branches' => [$branch],
 			],
 		] : $fileQuestion;
@@ -1058,8 +1060,8 @@ class ApiControllerTest extends TestCase {
 		if ($uploadToken !== null) {
 			$fileAnswer['uploadToken'] = $uploadToken;
 		}
-		$answers = $conditional
-			? [9 => ['trigger' => ['3'], 'subQuestions' => [8 => [$fileAnswer]]]]
+		$answers = $followUp
+			? [9 => ['3'], 8 => [$fileAnswer]]
 			: [8 => [$fileAnswer]];
 
 		$this->formsService->expects($this->once())
@@ -1076,10 +1078,6 @@ class ApiControllerTest extends TestCase {
 		$this->submissionService->expects($this->once())
 			->method('validateSubmission')
 			->with([$question], $answers, 'admin', 7);
-		$this->submissionService->expects($conditional ? $this->once() : $this->never())
-			->method('getActiveBranches')
-			->with($question, ['3'])
-			->willReturn([$branch]);
 		$this->submissionMapper->expects($this->once())
 			->method('insert')
 			->willReturnCallback(function (Submission $submission): Submission {
@@ -1088,7 +1086,7 @@ class ApiControllerTest extends TestCase {
 				return $submission;
 			});
 
-		$expectedAnswers = $conditional ? [[9, 12, null, 'Attach a file']] : [];
+		$expectedAnswers = $followUp ? [[9, 12, null, 'Attach a file']] : [];
 		if ($authorized) {
 			$expectedAnswers[] = [8, 12, 99, 'real-file.txt'];
 		}
@@ -1170,7 +1168,7 @@ class ApiControllerTest extends TestCase {
 		$this->assertEquals(new DataResponse(null, Http::STATUS_CREATED), $this->apiController->newSubmission(7, $answers, ''));
 	}
 
-	public function testNewSubmission_conditionalQuestion() {
+	public function testNewSubmission_questionWithBranches() {
 		$form = new Form();
 		$form->setId(1);
 		$form->setHash('hash');
@@ -1179,10 +1177,9 @@ class ApiControllerTest extends TestCase {
 		$questions = [
 			[
 				'id' => 100,
-				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'text' => 'Conditional Q',
+				'type' => Constants::ANSWER_TYPE_DROPDOWN,
+				'text' => 'Trigger Q',
 				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
 					'branches' => [
 						[
 							'id' => 'branch-a',
@@ -1206,12 +1203,8 @@ class ApiControllerTest extends TestCase {
 		];
 
 		$answers = [
-			100 => [
-				'trigger' => ['10'],
-				'subQuestions' => [
-					'101' => ['Sub answer']
-				]
-			],
+			100 => ['10'],
+			101 => ['Sub answer'],
 		];
 
 		$this->formsService->expects($this->once())
@@ -1233,12 +1226,7 @@ class ApiControllerTest extends TestCase {
 				return true;
 			}));
 
-		$this->submissionService->expects($this->once())
-			->method('getActiveBranches')
-			->with($questions[0], $answers[100]['trigger'])
-			->willReturn([$questions[0]['extraSettings']['branches'][0]]);
-
-		// Trigger answer + subquestion answer = 2 inserts
+		// Answer of the question + answer of the follow-up question = 2 inserts
 		$this->answerMapper->expects($this->exactly(2))
 			->method('insert');
 
@@ -1276,10 +1264,9 @@ class ApiControllerTest extends TestCase {
 		];
 		$question = [
 			'id' => 100,
-			'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-			'text' => 'Conditional Q',
+			'type' => Constants::ANSWER_TYPE_DROPDOWN,
+			'text' => 'Trigger Q',
 			'extraSettings' => [
-				'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'branches' => [$branch],
 			],
 			'options' => [['id' => 10, 'text' => 'Option A']],
@@ -1292,7 +1279,6 @@ class ApiControllerTest extends TestCase {
 			$submission->setId(12);
 			return $submission;
 		});
-		$this->submissionService->method('getActiveBranches')->willReturn([$branch]);
 
 		$stored = [];
 		$this->answerMapper->method('insert')->willReturnCallback(function (Answer $answer) use (&$stored) {
@@ -1301,13 +1287,9 @@ class ApiControllerTest extends TestCase {
 		});
 
 		$this->apiController->newSubmission(1, [
-			100 => [
-				'trigger' => [10],
-				'subQuestions' => [
-					101 => ['2', '1'],
-					102 => [Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'typed'],
-				],
-			],
+			100 => [10],
+			101 => ['2', '1'],
+			102 => [Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'typed'],
 		], '');
 
 		$this->assertSame([
@@ -1776,14 +1758,13 @@ class ApiControllerTest extends TestCase {
 		return $form;
 	}
 
-	private function createConditionalQuestion(): Question {
+	private function createQuestionWithBranches(): Question {
 		$question = new Question();
 		$question->setId(100);
 		$question->setFormId(1);
 		$question->setOrder(1);
-		$question->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+		$question->setType(Constants::ANSWER_TYPE_MULTIPLEUNIQUE);
 		$question->setExtraSettings([
-			'triggerType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
 			'branches' => [
 				['id' => 'branch-a', 'conditions' => [['optionId' => 10]]],
 				['id' => 'branch-b', 'conditions' => [['optionId' => 11]]],
@@ -1805,7 +1786,7 @@ class ApiControllerTest extends TestCase {
 
 	public function testReorderQuestionsRejectsSubquestion(): void {
 		$this->mockEditableForm();
-		$this->questionMapper->method('findByForm')->with(1)->willReturn([$this->createConditionalQuestion()]);
+		$this->questionMapper->method('findByForm')->with(1)->willReturn([$this->createQuestionWithBranches()]);
 		$this->questionMapper->method('findById')->with(101)->willReturn($this->createSubQuestion(101, 'branch-a', 1));
 		$this->questionMapper->expects($this->never())->method('update');
 
@@ -1833,22 +1814,23 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->updateQuestion(1, 101, $keyValuePairs);
 	}
 
-	public static function dataUpdateQuestionConditionalTypeChange(): array {
+	public static function dataUpdateQuestionRejectsBranchChanges(): array {
 		return [
-			'subquestion into conditional' => [false, Constants::ANSWER_TYPE_CONDITIONAL],
-			'conditional into short' => [true, Constants::ANSWER_TYPE_SHORT],
+			'type of a question with branches' => [true, ['type' => Constants::ANSWER_TYPE_DROPDOWN], 'Not allowed to change the type of a question with follow-up questions'],
+			'branches of a subquestion' => [false, ['extraSettings' => ['branches' => [['id' => 'nested', 'conditions' => []]]]], 'Nested follow-up questions are not supported'],
 		];
 	}
 
-	#[\PHPUnit\Framework\Attributes\DataProvider('dataUpdateQuestionConditionalTypeChange')]
-	public function testUpdateQuestionConditionalTypeChange(bool $isConditional, string $newType): void {
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataUpdateQuestionRejectsBranchChanges')]
+	public function testUpdateQuestionRejectsBranchChanges(bool $withBranches, array $keyValuePairs, string $message): void {
 		$this->mockEditableForm();
-		$question = $isConditional ? $this->createConditionalQuestion() : $this->createSubQuestion(101, 'branch-a', 1);
+		$question = $withBranches ? $this->createQuestionWithBranches() : $this->createSubQuestion(101, 'branch-a', 1);
 		$this->questionMapper->method('findById')->willReturn($question);
 		$this->questionMapper->expects($this->never())->method('update');
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->apiController->updateQuestion(1, $question->getId(), ['type' => $newType]);
+		$this->expectExceptionMessage($message);
+		$this->apiController->updateQuestion(1, $question->getId(), $keyValuePairs);
 	}
 
 	public function testDeleteQuestionClearsConfirmationEmailQuestionIdWhenDeletingSelectedQuestion(): void {
@@ -3201,58 +3183,18 @@ class ApiControllerTest extends TestCase {
 		$this->assertEquals(new DataResponse($submissionId), $response);
 	}
 
-	// Tests for new conditional question functionality
+	// Follow-up questions in branches
 
-	public function testNewQuestion_conditionalQuestion() {
-		$formId = 1;
+	public function testNewQuestion_conditionalTypeIsGone() {
 		$form = new Form();
-		$form->setId($formId);
+		$form->setId(1);
+		$this->formsService->method('getFormIfAllowed')->willReturn($form);
+		$this->questionMapper->expects($this->never())->method('insert');
 
-		$this->formsService->expects($this->once())
-			->method('getFormIfAllowed')
-			->with($formId, Constants::PERMISSION_EDIT)
-			->willReturn($form);
-
-		$this->formsService->expects($this->once())
-			->method('obtainFormLock')
-			->with($form);
-
-		$this->questionMapper->expects($this->once())
-			->method('findByForm')
-			->with($formId)
-			->willReturn([]);
-
-		$this->questionMapper->expects($this->once())
-			->method('insert')
-			->willReturnCallback(function ($question) {
-				$question->setId(100);
-				return $question;
-			});
-
-		$this->formsService->expects($this->once())
-			->method('getQuestion')
-			->with(100)
-			->willReturn([
-				'id' => 100,
-				'formId' => $formId,
-				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'text' => 'Conditional Q',
-				'order' => 1,
-				'isRequired' => false,
-				'name' => '',
-				'options' => [],
-				'accept' => [],
-				'description' => '',
-				'extraSettings' => [],
-				'parentQuestionId' => null,
-				'branchId' => null,
-			]);
-
-		$response = $this->apiController->newQuestion($formId, Constants::ANSWER_TYPE_CONDITIONAL, null, 'Conditional Q');
-		$this->assertInstanceOf(DataResponse::class, $response);
-		$this->assertEquals(Http::STATUS_CREATED, $response->getStatus());
-		$data = $response->getData();
-		$this->assertEquals(Constants::ANSWER_TYPE_CONDITIONAL, $data['type']);
+		// Branches are part of normal questions, there is no type of its own for them
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Invalid type');
+		$this->apiController->newQuestion(1, 'conditional', null, 'Q');
 	}
 
 	public function testNewQuestion_subQuestion() {
@@ -3266,8 +3208,8 @@ class ApiControllerTest extends TestCase {
 		$parentQuestion = new Question();
 		$parentQuestion->setId($parentQuestionId);
 		$parentQuestion->setFormId($formId);
-		$parentQuestion->setType(Constants::ANSWER_TYPE_CONDITIONAL);
-		$parentQuestion->setExtraSettings(['triggerType' => 'short', 'branches' => [['id' => $branchId, 'conditions' => []]]]);
+		$parentQuestion->setType(Constants::ANSWER_TYPE_DROPDOWN);
+		$parentQuestion->setExtraSettings(['branches' => [['id' => $branchId, 'conditions' => []]]]);
 
 		$this->formsService->expects($this->once())
 			->method('getFormIfAllowed')
@@ -3322,13 +3264,16 @@ class ApiControllerTest extends TestCase {
 		$this->assertEquals($branchId, $data['branchId']);
 	}
 
-	public function testNewQuestion_nestedConditionalNotAllowed() {
+	public function testNewQuestion_nestedFollowUpQuestionNotAllowed() {
 		$formId = 1;
-		$parentQuestionId = 100;
+		$parentQuestionId = 101;
 		$branchId = 'branch-1';
 
 		$form = new Form();
 		$form->setId($formId);
+
+		// The parent is a follow-up question itself
+		$this->questionMapper->method('findById')->with($parentQuestionId)->willReturn($this->createSubQuestion($parentQuestionId, $branchId, 1));
 
 		$this->formsService->expects($this->once())
 			->method('getFormIfAllowed')
@@ -3340,8 +3285,8 @@ class ApiControllerTest extends TestCase {
 			->with($form);
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->expectExceptionMessage('Nested conditional questions are not supported');
-		$this->apiController->newQuestion($formId, Constants::ANSWER_TYPE_CONDITIONAL, null, 'Nested Conditional', null, $parentQuestionId, $branchId);
+		$this->expectExceptionMessage('Nested follow-up questions are not supported');
+		$this->apiController->newQuestion($formId, 'short', null, 'Nested', null, $parentQuestionId, $branchId);
 	}
 
 	public function testNewQuestion_parentNotFound() {
@@ -3371,7 +3316,7 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
 	}
 
-	public function testNewQuestion_parentNotConditional() {
+	public function testNewQuestion_parentTypeWithoutBranches() {
 		$formId = 1;
 		$parentQuestionId = 100;
 		$branchId = 'branch-1';
@@ -3382,7 +3327,7 @@ class ApiControllerTest extends TestCase {
 		$parentQuestion = new Question();
 		$parentQuestion->setId($parentQuestionId);
 		$parentQuestion->setFormId($formId);
-		$parentQuestion->setType('short'); // Not conditional
+		$parentQuestion->setType(Constants::ANSWER_TYPE_GRID); // Can not have branches
 
 		$this->formsService->expects($this->once())
 			->method('getFormIfAllowed')
@@ -3399,7 +3344,7 @@ class ApiControllerTest extends TestCase {
 			->willReturn($parentQuestion);
 
 		$this->expectException(OCSBadRequestException::class);
-		$this->expectExceptionMessage('Parent question must be a conditional question');
+		$this->expectExceptionMessage('Parent question can not have follow-up questions');
 		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, $branchId);
 	}
 
@@ -3414,7 +3359,7 @@ class ApiControllerTest extends TestCase {
 		$parentQuestion = new Question();
 		$parentQuestion->setId($parentQuestionId);
 		$parentQuestion->setFormId(999); // Different form
-		$parentQuestion->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+		$parentQuestion->setType(Constants::ANSWER_TYPE_DROPDOWN);
 
 		$this->formsService->expects($this->once())
 			->method('getFormIfAllowed')
@@ -3463,7 +3408,7 @@ class ApiControllerTest extends TestCase {
 		$parentQuestion = new Question();
 		$parentQuestion->setId($parentQuestionId);
 		$parentQuestion->setFormId($formId);
-		$parentQuestion->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+		$parentQuestion->setType(Constants::ANSWER_TYPE_DROPDOWN);
 
 		$this->formsService->expects($this->once())
 			->method('getFormIfAllowed')
@@ -3484,7 +3429,7 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->newQuestion($formId, 'short', null, 'Sub Q', null, $parentQuestionId, null);
 	}
 
-	public function testDeleteQuestion_conditionalWithSubquestions(): void {
+	public function testDeleteQuestion_withSubquestions(): void {
 		$formId = 1;
 		$questionId = 100;
 
@@ -3494,7 +3439,7 @@ class ApiControllerTest extends TestCase {
 		$question = new Question();
 		$question->setId($questionId);
 		$question->setFormId($formId);
-		$question->setType(Constants::ANSWER_TYPE_CONDITIONAL);
+		$question->setType(Constants::ANSWER_TYPE_DROPDOWN);
 		$question->setOrder(1);
 
 		$subQuestion1 = new Question();
@@ -3556,7 +3501,7 @@ class ApiControllerTest extends TestCase {
 	public function testUpdateQuestionRemovedBranchDeletesSubquestions(): void {
 		$this->mockEditableForm();
 		$this->formsService->method('areExtraSettingsValid')->willReturn(true);
-		$this->questionMapper->method('findById')->with(100)->willReturn($this->createConditionalQuestion());
+		$this->questionMapper->method('findById')->with(100)->willReturn($this->createQuestionWithBranches());
 		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([
 			$this->createSubQuestion(101, 'branch-a', 1),
 			$this->createSubQuestion(102, 'branch-b', 1),
@@ -3571,7 +3516,6 @@ class ApiControllerTest extends TestCase {
 			});
 
 		$this->apiController->updateQuestion(1, 100, ['extraSettings' => [
-			'triggerType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
 			'branches' => [
 				['id' => 'branch-a', 'conditions' => [['optionId' => 10]], 'subQuestions' => [['id' => 101]]],
 			],
@@ -3592,7 +3536,7 @@ class ApiControllerTest extends TestCase {
 		$this->formsService->method('areExtraSettingsValid')->willReturn(true);
 		$fileSubQuestion = $this->createSubQuestion(102, 'branch-b', 1);
 		$fileSubQuestion->setType(Constants::ANSWER_TYPE_FILE);
-		$this->questionMapper->method('findById')->with(100)->willReturn($this->createConditionalQuestion());
+		$this->questionMapper->method('findById')->with(100)->willReturn($this->createQuestionWithBranches());
 		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([$fileSubQuestion]);
 
 		// Like for a deleted file question, the uploaded files are deleted
@@ -3601,17 +3545,16 @@ class ApiControllerTest extends TestCase {
 			->with(\OCA\Forms\BackgroundJob\DeleteQuestionFoldersJob::class, ['formId' => 1, 'questionId' => 102, 'ownerId' => 'currentUser']);
 
 		$this->apiController->updateQuestion(1, 100, ['extraSettings' => [
-			'triggerType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
 			'branches' => [['id' => 'branch-a', 'conditions' => [['optionId' => 10]]]],
 		]]);
 	}
 
-	public function testDeleteConditionalQuestionDeletesFilesOfSubquestions(): void {
+	public function testDeleteQuestionDeletesFilesOfSubquestions(): void {
 		$form = $this->mockEditableForm();
 		$form->setConfirmationEmailQuestionId(102);
 		$fileSubQuestion = $this->createSubQuestion(101, 'branch-a', 1);
 		$fileSubQuestion->setType(Constants::ANSWER_TYPE_FILE);
-		$this->questionMapper->method('findById')->with(100)->willReturn($this->createConditionalQuestion());
+		$this->questionMapper->method('findById')->with(100)->willReturn($this->createQuestionWithBranches());
 		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([
 			$fileSubQuestion,
 			$this->createSubQuestion(102, 'branch-b', 1),
@@ -3641,9 +3584,9 @@ class ApiControllerTest extends TestCase {
 		$this->assertSame(1, $sibling->getOrder());
 	}
 
-	public function testCloneConditionalQuestionCopiesSubquestionsAndOptions(): void {
+	public function testCloneQuestionCopiesSubquestionsAndOptions(): void {
 		$this->mockEditableForm();
-		$source = $this->createConditionalQuestion();
+		$source = $this->createQuestionWithBranches();
 		$subQuestion = $this->createSubQuestion(101, 'branch-a', 1);
 
 		$this->questionMapper->method('findById')->with(100)->willReturn($source);
@@ -3690,7 +3633,7 @@ class ApiControllerTest extends TestCase {
 		$first = $this->createSubQuestion(101, 'branch-a', 1);
 		$second = $this->createSubQuestion(102, 'branch-a', 2);
 		$this->questionMapper->method('findByBranch')->with(100, 'branch-a')->willReturn([$first, $second]);
-		$this->questionMapper->method('findById')->willReturnMap([[100, $this->createConditionalQuestion()], [101, $first], [102, $second]]);
+		$this->questionMapper->method('findById')->willReturnMap([[100, $this->createQuestionWithBranches()], [101, $first], [102, $second]]);
 		$this->questionMapper->expects($this->exactly(2))->method('update');
 		$this->formMapper->expects($this->once())->method('update')->with($form);
 
@@ -3719,7 +3662,7 @@ class ApiControllerTest extends TestCase {
 	 */
 	public function testReorderSubQuestionsRejects(array $newOrder, string $exception, ?string $foreignKey): void {
 		$this->mockEditableForm();
-		$parent = $this->createConditionalQuestion();
+		$parent = $this->createQuestionWithBranches();
 		$first = $this->createSubQuestion(101, 'branch-a', 1);
 		$second = $this->createSubQuestion(102, 'branch-a', 2);
 		match ($foreignKey) {

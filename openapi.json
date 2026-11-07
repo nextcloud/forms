@@ -605,9 +605,6 @@
                     "questionType": {
                         "type": "string"
                     },
-                    "triggerType": {
-                        "type": "string"
-                    },
                     "branches": {
                         "type": "array",
                         "items": {
@@ -640,8 +637,7 @@
                     "file",
                     "datetime",
                     "grid",
-                    "color",
-                    "conditional"
+                    "color"
                 ]
             },
             "Share": {
@@ -1741,13 +1737,13 @@
                                         "format": "int64",
                                         "nullable": true,
                                         "default": null,
-                                        "description": "(optional) id of the parent conditional question (for subquestions)"
+                                        "description": "(optional) id of the question this follow-up question belongs to"
                                     },
                                     "branchId": {
                                         "type": "string",
                                         "nullable": true,
                                         "default": null,
-                                        "description": "(optional) branch id within the parent conditional question"
+                                        "description": "(optional) id of the branch of the parent question"
                                     },
                                     "position": {
                                         "type": "integer",
@@ -2423,7 +2419,7 @@
                         }
                     },
                     "400": {
-                        "description": "Invalid extraSettings, or a type change to or from a conditional question, will not update",
+                        "description": "Invalid extraSettings, nested follow-up questions, or a type change of a question with follow-up questions, will not update",
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -2730,7 +2726,7 @@
         "/ocs/v2.php/apps/forms/api/v3/forms/{formId}/questions/{questionId}/subquestions": {
             "patch": {
                 "operationId": "api-reorder-sub-questions",
-                "summary": "Updates the Order of all Questions in a Branch of a conditional",
+                "summary": "Updates the order of the follow-up questions in a branch of a question",
                 "description": "This endpoint allows CORS requests",
                 "tags": [
                     "api"
@@ -2782,7 +2778,7 @@
                     {
                         "name": "questionId",
                         "in": "path",
-                        "description": "Id of the parent trigger question.",
+                        "description": "Id of the question the branch belongs to.",
                         "required": true,
                         "schema": {
                             "type": "integer",

@@ -318,6 +318,7 @@ import { useViewForm } from '../composables/useViewForm.ts'
 import answerTypes from '../models/AnswerTypes.ts'
 import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import { PERMISSION_TYPES } from '../models/Permissions.ts'
+import { getBranches } from '../utils/Branches.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
@@ -432,27 +433,20 @@ export default defineComponent({
 		const questions = ref<FormsQuestion[]>([])
 
 		/**
-		 * List the trigger of a conditional question as a question of its trigger type,
-		 * followed by the subquestions of all its branches
+		 * List the questions followed by the subquestions of all their branches
 		 *
 		 * @param formQuestions The questions of the form
 		 */
 		const flattenQuestions = (formQuestions: FormsQuestion[]): FormsQuestion[] =>
-			formQuestions.flatMap((question) => {
-				const triggerType = question.extraSettings?.triggerType
-				if (question.type !== 'conditional' || !triggerType) {
-					return [question]
-				}
-				return [
-					{ ...question, type: triggerType },
-					...(question.extraSettings?.branches ?? []).flatMap(
-						(branch) => branch.subQuestions ?? [],
-					),
-				]
-			})
+			formQuestions.flatMap((question) => [
+				question,
+				...getBranches(question).flatMap(
+					(branch) => branch.subQuestions ?? [],
+				),
+			])
 
 		/**
-		 * Questions to summarize, subquestions and triggers like other questions
+		 * Questions to summarize, subquestions like other questions
 		 */
 		const summaryQuestions = computed<FormsQuestion[]>(() =>
 			flattenQuestions(questions.value),
@@ -673,7 +667,7 @@ export default defineComponent({
 				}
 				const data = OcsResponse2Data<ResultsResponse>(response)
 
-				// Answers of subquestions and triggers are dates as well
+				// Answers of subquestions are dates as well
 				submissions.value = formatDateAnswers(
 					data.submissions,
 					flattenQuestions(data.questions),

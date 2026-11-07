@@ -46,7 +46,6 @@ export interface FormsConditionalBranch {
 }
 
 export interface FormsQuestionExtraSettings {
-	triggerType?: string | null
 	branches?: FormsConditionalBranch[]
 	allowOtherAnswer?: boolean
 	shuffleOptions?: boolean

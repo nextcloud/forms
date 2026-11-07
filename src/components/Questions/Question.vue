@@ -4,22 +4,16 @@
 -->
 
 <template>
-	<!-- The trigger of a conditional question is part of the conditional question's list item -->
-	<component
-		:is="isTriggerQuestion ? 'div' : 'li'"
+	<li
 		class="question"
 		:class="{
 			'question--editable': !readOnly,
 		}"
-		:aria-label="
-			isTriggerQuestion
-				? undefined
-				: t('forms', 'Question number {index}', { index: number })
-		">
+		:aria-label="t('forms', 'Question number {index}', { index: number })">
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div
-			v-if="!readOnly && !isTriggerQuestion"
+			v-if="!readOnly"
 			class="question__drag-handle"
 			:class="{
 				'question__drag-handle--shiftup': shiftDragHandle,
@@ -50,10 +44,10 @@
 		</div>
 
 		<!-- Header -->
-		<div v-if="!isTriggerQuestion || !readOnly" class="question__header">
+		<div class="question__header">
 			<div class="question__header__title">
 				<input
-					v-if="!isTriggerQuestion && !readOnly"
+					v-if="!readOnly"
 					:placeholder="titlePlaceholder"
 					:aria-label="
 						t('forms', 'Title of question number {index}', {
@@ -69,13 +63,12 @@
 					required
 					@input="onTitleChange" />
 				<h3
-					v-else-if="readOnly"
+					v-else
 					:id="titleId"
 					class="question__header__title__text"
 					dir="auto">
 					{{ computedText }}
 				</h3>
-				<div v-else class="question__header__title__text"></div>
 				<div
 					v-if="!readOnly && !questionValid"
 					:title="warningInvalid"
@@ -83,19 +76,13 @@
 					tabindex="0">
 					<NcIconSvgWrapper :svg="IconAlertCircleOutline" />
 				</div>
-				<!-- A trigger only has the options of its type, the conditional question owns the rest -->
 				<NcActions
-					v-if="!readOnly && (!isTriggerQuestion || $slots.actions)"
+					v-if="!readOnly"
 					:id="actionsId"
-					:aria-label="
-						isTriggerQuestion
-							? t('forms', 'Trigger settings')
-							: undefined
-					"
 					forceMenu
 					placement="bottom-end"
 					class="question__header__title__menu">
-					<template v-if="isRequired && !isTriggerQuestion" #icon>
+					<template v-if="isRequired" #icon>
 						<IconOverlay>
 							<template #overlay>
 								<NcIconSvgWrapper :svg="IconAsterisk" inline />
@@ -104,7 +91,6 @@
 						</IconOverlay>
 					</template>
 					<NcActionCheckbox
-						v-if="!isTriggerQuestion"
 						:modelValue="isRequired"
 						@update:modelValue="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
@@ -112,7 +98,6 @@
 					</NcActionCheckbox>
 					<slot name="actions" />
 					<NcActionInput
-						v-if="!isTriggerQuestion"
 						:label="t('forms', 'Technical name of the question')"
 						:labelOutside="false"
 						:showTrailingButton="false"
@@ -123,16 +108,13 @@
 						</template>
 						{{ t('forms', 'Technical name') }}
 					</NcActionInput>
-					<NcActionButton
-						v-if="!isTriggerQuestion"
-						closeAfterClick
-						@click="onClone">
+					<NcActionButton closeAfterClick @click="onClone">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconContentCopy" />
 						</template>
 						{{ t('forms', 'Copy question') }}
 					</NcActionButton>
-					<NcActionButton v-if="!isTriggerQuestion" @click="onDelete">
+					<NcActionButton @click="onDelete">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconDelete" />
 						</template>
@@ -141,7 +123,7 @@
 				</NcActions>
 			</div>
 			<div
-				v-if="!isTriggerQuestion && (hasDescription || !readOnly)"
+				v-if="hasDescription || !readOnly"
 				class="question__header__description">
 				<textarea
 					v-if="!readOnly"
@@ -177,21 +159,12 @@
 				{{ errorMessage }}
 			</NcNoteCard>
 		</div>
-		<!-- An answered trigger has no header of its own, but its messages are shown -->
-		<template v-else>
-			<NcNoteCard v-if="hasInfo" :id="infoId" type="info">
-				{{ infoMessage }}
-			</NcNoteCard>
-			<NcNoteCard v-if="hasError" :id="errorId" type="error">
-				{{ errorMessage }}
-			</NcNoteCard>
-		</template>
 
 		<!-- Question content -->
 		<slot />
 		<!-- Insert question menu -->
 		<slot name="insert" />
-	</component>
+	</li>
 </template>
 
 <script lang="ts">
@@ -315,11 +288,6 @@ export default defineComponent({
 			type: String,
 			default: null,
 		},
-
-		isTriggerQuestion: {
-			type: Boolean,
-			default: false,
-		},
 	},
 
 	emits: [
@@ -368,11 +336,8 @@ export default defineComponent({
 		const number = computed(() =>
 			questionNumber({ index: props.index, subIndex: props.subIndex }),
 		)
-		// The trigger of a conditional question shares its index, so its own elements need other ids
-		const idPrefix = computed(
-			() =>
-				questionIdPrefix({ index: props.index, subIndex: props.subIndex })
-				+ (props.isTriggerQuestion ? '_trigger' : ''),
+		const idPrefix = computed(() =>
+			questionIdPrefix({ index: props.index, subIndex: props.subIndex }),
 		)
 		const actionsId = computed(() => idPrefix.value + '_actions')
 		const titleId = computed(() => idPrefix.value + '_title')
