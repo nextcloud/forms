@@ -699,8 +699,10 @@ class SubmissionService {
 				}
 			}
 
-			// Handle custom validation of short answers
-			if ($question['type'] === Constants::ANSWER_TYPE_SHORT && !$this->validateShortQuestion($question, $answers[$questionId][0])) {
+			// Handle custom validation of short answers, empty answers are not stored so skip validation for them
+			if ($question['type'] === Constants::ANSWER_TYPE_SHORT
+				&& $answers[$questionId][0] !== ''
+				&& !$this->validateShortQuestion($question, $answers[$questionId][0])) {
 				throw new \InvalidArgumentException(sprintf('Invalid input for question "%s".', $question['text']));
 			}
 

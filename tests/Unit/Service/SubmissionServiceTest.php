@@ -969,6 +969,30 @@ file2.txt"
 				// Expected Result
 				'Invalid input for question "q1".',
 			],
+			'empty-short-email-not-required' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'email']]
+				],
+				// Answers
+				[
+					'1' => ['']
+				],
+				// Expected Result
+				null,
+			],
+			'empty-short-email-required' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => true, 'extraSettings' => ['validationType' => 'email']]
+				],
+				// Answers
+				[
+					'1' => ['']
+				],
+				// Expected Result
+				'Question "q1" is required.',
+			],
 			'invalid-short-regex-not-matching' => [
 				// Questions
 				[
