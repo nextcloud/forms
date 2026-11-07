@@ -42,11 +42,10 @@ namespace OCA\Forms;
  *   validationRegex?: string,
  *   validationType?: string,
  *   questionType?: string,
- *   triggerType?: string,
  *   branches?: list<array<string, mixed>>,
  * }
  *
- * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"|"grid"|"color"|"conditional"
+ * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"|"grid"|"color"
  * @psalm-type FormsQuestionGridCellType = "checkbox"|"number"|"radio"
  *
  * @psalm-type FormsQuestion = array{

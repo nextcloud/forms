@@ -117,7 +117,7 @@ class FormsService {
 	}
 
 	/**
-	 * List the subquestions of conditional questions after their conditional question instead of within its branches
+	 * List the subquestions of a question after it instead of within its branches
 	 *
 	 * @param list<array<string, mixed>> $questions questions as returned by getQuestions()
 	 * @return array<int, array<string, mixed>>
@@ -141,11 +141,11 @@ class FormsService {
 	}
 
 	/**
-	 * Point the branch conditions of a conditional question to other options, e.g. those of a copy
+	 * Point the branch conditions of a question to other options, e.g. those of a copy
 	 *
 	 * Subquestions are rows of their own, any snapshot of them in the branches is dropped.
 	 *
-	 * @param array<string, mixed> $extraSettings the extra settings of the conditional question
+	 * @param array<string, mixed> $extraSettings the extra settings of the question
 	 * @param array<int, int> $optionIdMap the new option ids, keyed by the old ones
 	 * @return array<string, mixed>
 	 */
@@ -180,7 +180,7 @@ class FormsService {
 	 * Build the API representation of a question
 	 *
 	 * @param array<int, list<Option>> $optionsByQuestion the options keyed by question id
-	 * @param Question[] $subQuestionEntities the subquestions, if the question is a conditional question
+	 * @param Question[] $subQuestionEntities the subquestions of the question's branches
 	 * @return FormsQuestion
 	 */
 	private function formatQuestion(Question $questionEntity, array $optionsByQuestion, array $subQuestionEntities = []): array {
@@ -204,8 +204,8 @@ class FormsService {
 			$question['isRequired'] = true;
 		}
 
-		// Attach the subquestions of conditional questions to their branches
-		if ($question['type'] === Constants::ANSWER_TYPE_CONDITIONAL && is_array($question['extraSettings']['branches'] ?? null)) {
+		// Attach the subquestions to their branches
+		if (is_array($question['extraSettings']['branches'] ?? null)) {
 			$subQuestionsByBranch = [];
 			foreach ($subQuestionEntities as $subQuestionEntity) {
 				// Subquestions always belong to the form of their parent
@@ -235,9 +235,9 @@ class FormsService {
 			return null;
 		}
 
-		$subQuestionEntities = $questionEntity->getType() === Constants::ANSWER_TYPE_CONDITIONAL
-			? $this->questionMapper->findByParentQuestion($questionId)
-			: [];
+		$subQuestionEntities = empty($questionEntity->getExtraSettings()['branches'])
+			? []
+			: $this->questionMapper->findByParentQuestion($questionId);
 		$optionsByQuestion = $this->getOptionsByQuestion(array_merge([$questionEntity], $subQuestionEntities));
 
 		return $this->formatQuestion($questionEntity, $optionsByQuestion, $subQuestionEntities);
@@ -936,13 +936,41 @@ class FormsService {
 	}
 
 	/**
-	 * Check the conditions of a conditional question branch against its trigger type
+	 * Check the branches of a question against its type
 	 *
-	 * @param string $triggerType the type of the trigger question
+	 * @param mixed $branches the branches from the extra settings
+	 * @param string $questionType the type of the question
+	 */
+	private function areBranchesValid(mixed $branches, string $questionType): bool {
+		if (!is_array($branches) || !array_key_exists($questionType, Constants::QUESTION_TYPES_WITH_BRANCHES)) {
+			return false;
+		}
+
+		$branchIds = [];
+		foreach ($branches as $branch) {
+			// Each branch must have a unique id that fits into the branch id of its subquestions
+			if (!is_array($branch) || !isset($branch['id']) || !is_string($branch['id']) || $branch['id'] === ''
+				|| strlen($branch['id']) > 64 || isset($branchIds[$branch['id']])) {
+				return false;
+			}
+			$branchIds[$branch['id']] = true;
+
+			if (!isset($branch['conditions']) || !is_array($branch['conditions'])
+				|| !$this->areBranchConditionsValid($questionType, $branch['conditions'])) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Check the conditions of a branch against the type of its question
+	 *
+	 * @param string $questionType the type of the question
 	 * @param array $conditions the conditions of the branch
 	 */
-	private function areBranchConditionsValid(string $triggerType, array $conditions): bool {
-		$allowedTypes = Constants::CONDITIONAL_TRIGGER_TYPES[$triggerType] ?? [];
+	private function areBranchConditionsValid(string $questionType, array $conditions): bool {
+		$allowedTypes = Constants::QUESTION_TYPES_WITH_BRANCHES[$questionType];
 		foreach ($conditions as $condition) {
 			if (!is_array($condition)) {
 				return false;
@@ -1022,14 +1050,16 @@ class FormsService {
 			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
 			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
 			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
-			Constants::ANSWER_TYPE_CONDITIONAL => Constants::EXTRA_SETTINGS_CONDITIONAL,
 		];
 
-		// Get triggertype if is conditional
-		$triggerType = $extraSettings['triggerType'] ?? null;
-		if (is_string($triggerType) && isset($extraSettingsMap[$triggerType])) {
-			$extraSettingsMap[Constants::ANSWER_TYPE_CONDITIONAL] += $extraSettingsMap[$triggerType];
+		// Branches with follow-up questions are possible for some types, in addition to their own settings
+		if (array_key_exists('branches', $extraSettings)) {
+			if (!$this->areBranchesValid($extraSettings['branches'], $questionType)) {
+				return false;
+			}
+			unset($extraSettings['branches']);
 		}
+
 		// Ensure only allowed keys are set
 		$allowed = $extraSettingsMap[$questionType] ?? [];
 		// Number of keys in extraSettings but not in allowed (but not the other way round)
@@ -1153,53 +1183,6 @@ class FormsService {
 				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
 				return false;
 			}
-		} elseif ($questionType === Constants::ANSWER_TYPE_CONDITIONAL) {
-			// Validate conditional question settings
-			if (!isset($extraSettings['triggerType']) || !is_string($extraSettings['triggerType'])) {
-				return false;
-			}
-
-			// Validate trigger type is a valid question type (and not nested conditional)
-			if (!array_key_exists($extraSettings['triggerType'], Constants::CONDITIONAL_TRIGGER_TYPES)) {
-				return false;
-			}
-
-			// Branches are required for conditional questions
-			if (!isset($extraSettings['branches']) || !is_array($extraSettings['branches'])) {
-				return false;
-			}
-
-			// Validate branches structure
-			$branchIds = [];
-			foreach ($extraSettings['branches'] as $branch) {
-				// Each branch must have a unique id that fits into the branch id of its subquestions
-				if (!isset($branch['id']) || !is_string($branch['id']) || $branch['id'] === ''
-					|| strlen($branch['id']) > 64 || isset($branchIds[$branch['id']])) {
-					return false;
-				}
-				$branchIds[$branch['id']] = true;
-
-				// Branches must have conditions array
-				if (!isset($branch['conditions']) || !is_array($branch['conditions'])) {
-					return false;
-				}
-
-				if (!$this->areBranchConditionsValid($extraSettings['triggerType'], $branch['conditions'])) {
-					return false;
-				}
-			}
-
-			$diff = array_diff(array_keys($extraSettings), array_keys(Constants::EXTRA_SETTINGS_CONDITIONAL));
-			// Handle options of triggerQuestion
-			if (count($diff) > 0 && isset($triggerType) && $triggerType !== '') {
-				$diffDict = [];
-				foreach ($diff as $k) {
-					$diffDict[$k] = $extraSettings[$k];
-				}
-				$valid = self::areExtraSettingsValid($diffDict, $triggerType);
-				return $valid;
-			}
-
 		}
 		return true;
 	}

@@ -1904,155 +1904,90 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
 				'expected' => false
 			],
-			// Conditional question tests
-			'valid-conditional-dropdown-trigger' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]],
-						['id' => 'branch-2', 'conditions' => [['type' => 'option_selected', 'optionId' => 2]]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			// Branches with follow-up questions
+			'valid-branches-dropdown' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]], ['id' => 'branch-2', 'conditions' => [['optionId' => 2]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'expected' => true
 			],
-			'valid-conditional-multiple-unique-trigger' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 5]]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'valid-branches-multiple-unique' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
 				'expected' => true
 			],
-			'invalid-conditional-missing-triggerType' => [
-				'extraSettings' => [
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['optionId' => 1]]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'valid-branches-with-own-settings' => [
+				'extraSettings' => ['shuffleOptions' => true, 'branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => true
+			],
+			'valid-branches-empty' => [
+				'extraSettings' => ['branches' => []],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => true
+			],
+			'valid-branch-without-conditions' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => []]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => true
+			],
+			'invalid-branches-on-other-type' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'expected' => false
 			],
-			'invalid-conditional-missing-branches' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'invalid-branches-own-settings-invalid' => [
+				'extraSettings' => ['invalidKey' => 'value', 'branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'expected' => false
 			],
-			'invalid-conditional-invalid-triggerType' => [
-				'extraSettings' => [
-					'triggerType' => 'invalid_type',
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['optionId' => 1]]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'invalid-branches-trigger-type-key' => [
+				'extraSettings' => ['triggerType' => 'dropdown', 'branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'expected' => false
 			],
-			'invalid-conditional-nested-not-allowed' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_CONDITIONAL,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['optionId' => 1]]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'invalid-branches-not-array' => [
+				'extraSettings' => ['branches' => 'not-an-array'],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'expected' => false
 			],
-			'invalid-conditional-branch-missing-id' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-					'branches' => [
-						['conditions' => [['optionId' => 1]]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'invalid-branch-not-array' => [
+				'extraSettings' => ['branches' => ['branch-1']],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'expected' => false
 			],
-			'invalid-conditional-branch-missing-conditions' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-					'branches' => [
-						['id' => 'branch-1']
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'invalid-branch-missing-id' => [
+				'extraSettings' => ['branches' => [['conditions' => [['optionId' => 1]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'expected' => false
 			],
-			'invalid-conditional-branches-not-array' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-					'branches' => 'not-an-array'
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'invalid-branch-missing-conditions' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1']]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'expected' => false
 			],
-			'invalid-conditional-triggerType-not-string' => [
-				'extraSettings' => [
-					'triggerType' => 123,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['optionId' => 1]]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'invalid-branch-condition-type-of-other-question-type' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'value_range', 'min' => 1, 'max' => 3]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'expected' => false
 			],
-			'invalid-conditional-extra-settings-key' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['optionId' => 1]]]
-					],
-					'invalidKey' => 'value'
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'invalid-branch-option-id-not-a-number' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['optionId' => ['nested']]]]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'expected' => false
 			],
-			'invalid-conditional-condition-type-of-other-trigger' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['type' => 'value_range', 'min' => 1, 'max' => 3]]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'invalid-branch-empty-id' => [
+				'extraSettings' => ['branches' => [['id' => '', 'conditions' => []]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'expected' => false
 			],
-			'invalid-conditional-option-id-not-a-number' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-					'branches' => [
-						['id' => 'branch-1', 'conditions' => [['optionId' => ['nested']]]]
-					]
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'invalid-branch-id-too-long' => [
+				'extraSettings' => ['branches' => [['id' => str_repeat('b', 65), 'conditions' => []]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'expected' => false
 			],
-			'invalid-conditional-branch-empty-id' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-					'branches' => [['id' => '', 'conditions' => []]],
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'expected' => false
-			],
-			'invalid-conditional-branch-id-too-long' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-					'branches' => [['id' => str_repeat('b', 65), 'conditions' => []]],
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'expected' => false
-			],
-			'invalid-conditional-duplicate-branch-ids' => [
-				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-					'branches' => [['id' => 'branch-1', 'conditions' => []], ['id' => 'branch-1', 'conditions' => []]],
-				],
-				'questionType' => Constants::ANSWER_TYPE_CONDITIONAL,
+			'invalid-branch-duplicate-ids' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => []], ['id' => 'branch-1', 'conditions' => []]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'expected' => false
 			],
 		];
@@ -2158,18 +2093,17 @@ class FormsServiceTest extends TestCase {
 		$this->assertEmpty($result);
 	}
 
-	public function testGetQuestionsWithConditionalQuestion(): void {
-		$conditionalQuestionData = [
+	public function testGetQuestionsWithBranches(): void {
+		$triggerQuestionData = [
 			'id' => 100,
 			'formId' => 1,
-			'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-			'text' => 'Conditional Q',
+			'type' => Constants::ANSWER_TYPE_DROPDOWN,
+			'text' => 'Trigger Q',
 			'order' => 1,
 			'isRequired' => true,
 			'name' => '',
 			'description' => '',
 			'extraSettings' => [
-				'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'branches' => [
 					['id' => 'branch-a', 'conditions' => [['type' => 'option_selected', 'optionId' => 10]]],
 					['id' => 'branch-b', 'conditions' => [['type' => 'option_selected', 'optionId' => 11]]]
@@ -2193,17 +2127,17 @@ class FormsServiceTest extends TestCase {
 			'branchId' => 'branch-a',
 		];
 
-		$conditionalQuestion = $this->createQuestionEntity($conditionalQuestionData);
+		$triggerQuestion = $this->createQuestionEntity($triggerQuestionData);
 		$subQuestion = $this->createQuestionEntity($subQuestionData);
 
 		// Top-level questions and subquestions come from one query
-		$this->questionMapper->method('findByForm')->with(1, false, true)->willReturn([$conditionalQuestion, $subQuestion]);
+		$this->questionMapper->method('findByForm')->with(1, false, true)->willReturn([$triggerQuestion, $subQuestion]);
 		$this->optionMapper->method('findByQuestions')->willReturn([]);
 
 		$result = $this->formsService->getQuestions(1);
 
 		$this->assertCount(1, $result);
-		$this->assertEquals(Constants::ANSWER_TYPE_CONDITIONAL, $result[0]['type']);
+		$this->assertEquals(Constants::ANSWER_TYPE_DROPDOWN, $result[0]['type']);
 		$this->assertArrayHasKey('extraSettings', $result[0]);
 		$this->assertArrayHasKey('branches', $result[0]['extraSettings']);
 
@@ -2233,18 +2167,17 @@ class FormsServiceTest extends TestCase {
 		$this->assertEmpty($branchB['subQuestions']);
 	}
 
-	public function testGetQuestionsWithConditionalSubQuestionFile(): void {
-		$conditionalQuestionData = [
+	public function testGetQuestionsWithFileSubQuestion(): void {
+		$triggerQuestionData = [
 			'id' => 100,
 			'formId' => 1,
-			'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-			'text' => 'Conditional Q',
+			'type' => Constants::ANSWER_TYPE_DROPDOWN,
+			'text' => 'Trigger Q',
 			'order' => 1,
 			'isRequired' => true,
 			'name' => '',
 			'description' => '',
 			'extraSettings' => [
-				'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'branches' => [
 					['id' => 'branch-a', 'conditions' => [['type' => 'option_selected', 'optionId' => 10]]]
 				]
@@ -2270,11 +2203,11 @@ class FormsServiceTest extends TestCase {
 			'branchId' => 'branch-a',
 		];
 
-		$conditionalQuestion = $this->createQuestionEntity($conditionalQuestionData);
+		$triggerQuestion = $this->createQuestionEntity($triggerQuestionData);
 		$fileSubQuestion = $this->createQuestionEntity($fileSubQuestionData);
 
 		// Top-level questions and subquestions come from one query
-		$this->questionMapper->method('findByForm')->with(1, false, true)->willReturn([$conditionalQuestion, $fileSubQuestion]);
+		$this->questionMapper->method('findByForm')->with(1, false, true)->willReturn([$triggerQuestion, $fileSubQuestion]);
 		$this->optionMapper->method('findByQuestions')->willReturn([]);
 
 		$result = $this->formsService->getQuestions(1);
@@ -2300,21 +2233,20 @@ class FormsServiceTest extends TestCase {
 	}
 
 	public function testGetQuestionSkipsSubquestionsOfOtherForms(): void {
-		$conditionalQuestion = $this->createQuestionEntity([
+		$triggerQuestion = $this->createQuestionEntity([
 			'id' => 100,
 			'formId' => 1,
-			'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-			'text' => 'Conditional Q',
+			'type' => Constants::ANSWER_TYPE_DROPDOWN,
+			'text' => 'Trigger Q',
 			'order' => 1,
 			'extraSettings' => [
-				'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
 				'branches' => [['id' => 'branch-a', 'conditions' => [['optionId' => 10]]]],
 			],
 		]);
 		$ownSubQuestion = $this->createQuestionEntity(['id' => 101, 'formId' => 1, 'type' => 'short', 'text' => 'Own', 'order' => 1, 'parentQuestionId' => 100, 'branchId' => 'branch-a']);
 		$otherSubQuestion = $this->createQuestionEntity(['id' => 201, 'formId' => 2, 'type' => 'short', 'text' => 'Other form', 'order' => 2, 'parentQuestionId' => 100, 'branchId' => 'branch-a']);
 
-		$this->questionMapper->method('findById')->with(100)->willReturn($conditionalQuestion);
+		$this->questionMapper->method('findById')->with(100)->willReturn($triggerQuestion);
 		$this->questionMapper->method('findByParentQuestion')->with(100)->willReturn([$ownSubQuestion, $otherSubQuestion]);
 		$this->optionMapper->method('findByQuestions')->willReturn([]);
 

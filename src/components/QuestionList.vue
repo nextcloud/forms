@@ -47,6 +47,22 @@
 				@delete="$emit('delete', question)"
 				@moveDown="$emit('moveDown', index)"
 				@moveUp="$emit('moveUp', index)">
+				<template
+					v-if="!isSubQuestionList && canHaveBranches(question.type)"
+					#branches>
+					<QuestionBranches
+						:id="question.id"
+						:formId="formId ?? question.formId"
+						:type="question.type"
+						:text="question.text"
+						:index="baseIndex + index + 1"
+						:options="question.options"
+						:extraSettings="question.extraSettings ?? {}"
+						:maxStringLengths="maxStringLengths"
+						@update:extraSettings="
+							$emit('updateProperty', index, 'extraSettings', $event)
+						" />
+				</template>
 				<template v-if="showInsert && index < modelValue.length - 1" #insert>
 					<div
 						class="question-insert"
@@ -94,9 +110,14 @@ import type { FormsQuestion } from '../types/Entities.d.ts'
 
 import { t } from '@nextcloud/l10n'
 import { useIsMobile } from '@nextcloud/vue'
-import { defineComponent, nextTick, ref } from 'vue'
+import { defineAsyncComponent, defineComponent, nextTick, ref } from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import AddQuestionMenu from './AddQuestionMenu.vue'
+import { canHaveBranches } from '../utils/Branches.ts'
+
+// QuestionBranches lists the subquestions with this component, the typed loader breaks the cycle
+const loadQuestionBranches: () => Promise<{ default: Component }> = () =>
+	import('./Conditional/QuestionBranches.vue')
 
 interface QuestionRefInstance extends ComponentPublicInstance {
 	focus?: () => void
@@ -108,6 +129,7 @@ export default defineComponent({
 	components: {
 		AddQuestionMenu,
 		Draggable,
+		QuestionBranches: defineAsyncComponent(loadQuestionBranches),
 	},
 
 	props: {
@@ -254,6 +276,7 @@ export default defineComponent({
 			onDragStart,
 			onDragEnd,
 			forwardAddQuestion,
+			canHaveBranches,
 			isMobile: useIsMobile(),
 			t,
 		}

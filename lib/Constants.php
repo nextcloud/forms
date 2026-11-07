@@ -101,7 +101,6 @@ class Constants {
 
 	// Available AnswerTypes
 	public const ANSWER_TYPE_COLOR = 'color';
-	public const ANSWER_TYPE_CONDITIONAL = 'conditional';
 	public const ANSWER_TYPE_DATE = 'date';
 	public const ANSWER_TYPE_DATETIME = 'datetime';
 	public const ANSWER_TYPE_DROPDOWN = 'dropdown';
@@ -122,7 +121,6 @@ class Constants {
 	// All AnswerTypes
 	public const ANSWER_TYPES = [
 		self::ANSWER_TYPE_COLOR,
-		self::ANSWER_TYPE_CONDITIONAL,
 		self::ANSWER_TYPE_DATE,
 		self::ANSWER_TYPE_DATETIME,
 		self::ANSWER_TYPE_DROPDOWN,
@@ -242,30 +240,17 @@ class Constants {
 	];
 
 	/**
-	 * Extra settings for conditional questions
-	 * - triggerType: The question type used for the trigger (e.g., 'multiple_unique', 'dropdown', 'short')
-	 * - branches: Array of branch definitions, each containing:
-	 *   - id: Unique branch identifier
-	 *   - conditions: Array of condition objects defining when this branch is active
-	 *     For predefined types: [{ optionId: number }]
-	 *     For text types: [{ type: 'string_equals'|'string_contains'|'regex', value: string }]
-	 *     For numeric/scale: [{ type: 'value_equals'|'value_range', value: number, min?: number, max?: number }]
-	 */
-	public const EXTRA_SETTINGS_CONDITIONAL = [
-		'triggerType' => ['string'],
-		'branches' => ['array'],
-	];
-
-	/**
-	 * Condition types for conditional questions
+	 * Condition types of branches
 	 */
 	public const CONDITION_TYPE_OPTION_SELECTED = 'option_selected';
 
 	/**
-	 * Trigger types allowed for conditional questions
-	 * Maps each trigger type to its supported condition types
+	 * Question types that can have branches with follow-up questions in `extraSettings.branches`,
+	 * mapped to the condition types their branches support
+	 *
+	 * Each branch has a unique `id` and `conditions`, e.g. `[{optionId: 1}]` for choice questions.
 	 */
-	public const CONDITIONAL_TRIGGER_TYPES = [
+	public const QUESTION_TYPES_WITH_BRANCHES = [
 		self::ANSWER_TYPE_MULTIPLEUNIQUE => [self::CONDITION_TYPE_OPTION_SELECTED],
 		self::ANSWER_TYPE_DROPDOWN => [self::CONDITION_TYPE_OPTION_SELECTED],
 	];

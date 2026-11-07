@@ -1,0 +1,108 @@
+/**
+ * SPDX-FileCopyrightText: 2026 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-License-Identifier: AGPL-3.0-or-later
+ */
+
+import type { FormsConditionalBranch, FormsQuestion } from '../types/Entities.d.ts'
+
+type BranchMatcher = (
+	conditions: Record<string, unknown>[],
+	values: string[],
+) => boolean
+
+/**
+ * Question types that can have branches, with how a branch condition matches the answer
+ * !! Keep in sync with Constants::QUESTION_TYPES_WITH_BRANCHES and SubmissionService::evaluateBranchConditions() !!
+ */
+const BRANCH_MATCHERS: Record<string, BranchMatcher> = {
+	multiple_unique: matchOptionSelected,
+	dropdown: matchOptionSelected,
+}
+
+/**
+ * A single select matches if the selected option is one of the conditions
+ *
+ * @param conditions the conditions of the branch
+ * @param values the answer of the question
+ */
+function matchOptionSelected(
+	conditions: Record<string, unknown>[],
+	values: string[],
+): boolean {
+	return conditions.some((condition) =>
+		values.includes(String(condition.optionId)),
+	)
+}
+
+/**
+ * @param type the question type
+ */
+export function canHaveBranches(type: string): boolean {
+	return type in BRANCH_MATCHERS
+}
+
+/**
+ * @param question the question
+ */
+export function getBranches(question: FormsQuestion): FormsConditionalBranch[] {
+	return question.extraSettings?.branches ?? []
+}
+
+/**
+ * Extra settings as stored, the subquestions are rows of their own
+ *
+ * @param extraSettings the extra settings of a question
+ */
+export function persistedSettings<T extends Record<string, unknown>>(
+	extraSettings: T,
+): T {
+	if (!Array.isArray(extraSettings.branches)) {
+		return extraSettings
+	}
+	return {
+		...extraSettings,
+		branches: extraSettings.branches.map(
+			// eslint-disable-next-line @typescript-eslint/no-unused-vars
+			({ subQuestions, ...branch }) => branch,
+		),
+	}
+}
+
+/**
+ * Branches the answer activates, an unanswered question activates none
+ *
+ * @param question the question with the branches
+ * @param values the answer of the question
+ */
+export function getActiveBranches(
+	question: FormsQuestion,
+	values: unknown,
+): FormsConditionalBranch[] {
+	const matcher = BRANCH_MATCHERS[question.type]
+	const answer = Array.isArray(values) ? values.map(String) : []
+	if (!matcher || answer.length === 0 || answer[0] === '') {
+		return []
+	}
+	return getBranches(question).filter(
+		(branch) =>
+			(branch.conditions?.length ?? 0) > 0
+			&& matcher(branch.conditions, answer),
+	)
+}
+
+/**
+ * Subquestions shown for the answer
+ *
+ * @param question the question with the branches
+ * @param values the answer of the question
+ * @param isShown whether a subquestion is complete enough to be shown, like other questions
+ */
+export function getVisibleSubQuestions(
+	question: FormsQuestion,
+	values: unknown,
+	isShown: (question: FormsQuestion) => boolean,
+): FormsQuestion[] {
+	return getActiveBranches(question, values)
+		.flatMap((branch) => branch.subQuestions ?? [])
+		.filter(isShown)
+}

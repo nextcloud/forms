@@ -78,7 +78,7 @@ class FormsMigrator implements IMigrator {
 					// Do NOT unset ID of question here, as it is necessary for answers.
 					unset($formData['questions'][$qKey]['formId']);
 					foreach ($question['options'] as $oKey => $option) {
-						// Do NOT unset ID of option here, as it is necessary for the conditions of conditional questions.
+						// Do NOT unset ID of option here, as it is necessary for the conditions of branches.
 						unset($formData['questions'][$qKey]['options'][$oKey]['questionId']);
 					}
 				}
@@ -166,9 +166,9 @@ class FormsMigrator implements IMigrator {
 
 				$questionIdMap = [];
 				$optionIdMap = [];
-				$conditionalQuestions = [];
+				$questionsWithBranches = [];
 				foreach ($formData['questions'] as $questionData) {
-					// Subquestions follow their conditional question
+					// Subquestions follow their question
 					$parentQuestionId = $questionData['parentQuestionId'] ?? null;
 					if ($parentQuestionId !== null && !isset($questionIdMap[$parentQuestionId])) {
 						continue;
@@ -199,19 +199,19 @@ class FormsMigrator implements IMigrator {
 
 						$this->optionMapper->insert($option);
 
-						// Store OptionId to map the conditions of conditional questions.
+						// Store OptionId to map the conditions of branches.
 						if (isset($optionData['id'])) {
 							$optionIdMap[$optionData['id']] = $option->getId();
 						}
 					}
 
-					if ($questionData['type'] === Constants::ANSWER_TYPE_CONDITIONAL) {
-						$conditionalQuestions[] = $question;
+					if (!empty($questionData['extraSettings']['branches'])) {
+						$questionsWithBranches[] = $question;
 					}
 				}
 
 				// The branch conditions refer to the imported options
-				foreach ($conditionalQuestions as $question) {
+				foreach ($questionsWithBranches as $question) {
 					$question->setExtraSettings(FormsService::mapConditionOptionIds($question->getExtraSettings(), $optionIdMap));
 					$this->questionMapper->update($question);
 				}

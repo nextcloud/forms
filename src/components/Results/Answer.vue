@@ -5,7 +5,7 @@
 
 <template>
 	<div class="answer">
-		<!-- Subquestions are below the heading of their conditional question -->
+		<!-- Subquestions are below the heading of their parent question -->
 		<component
 			:is="isSubQuestion ? 'h5' : 'h4'"
 			class="answer__question-text"

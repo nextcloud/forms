@@ -323,7 +323,7 @@ JSON
 		$this->formsService->method('getQuestions')->with(42)->willReturn([[
 			'id' => 14,
 			'formId' => 42,
-			'type' => 'conditional',
+			'type' => 'multiple_unique',
 			'extraSettings' => ['branches' => [[
 				'id' => 'branch-1',
 				'conditions' => [['optionId' => 35]],
@@ -347,10 +347,10 @@ JSON
 		$this->formsMigrator->export($user, $exportDestination, $this->createMock(OutputInterface::class));
 	}
 
-	public function testImportConditionalQuestion(): void {
+	public function testImportQuestionWithBranches(): void {
 		$inputJson = '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"state":0,"isAnonymous":false,"submitMultiple":false,"allowEditSubmissions":false,"showExpiration":false,"lastUpdated":123456789,'
 			. '"questions":['
-			. '{"id":14,"order":1,"type":"conditional","isRequired":false,"text":"Pets?","description":"","extraSettings":{"triggerType":"multiple_unique","branches":[{"id":"branch-1","conditions":[{"optionId":35}]}]},"options":[{"id":35,"text":"Yes"}]},'
+			. '{"id":14,"order":1,"type":"multiple_unique","isRequired":false,"text":"Pets?","description":"","extraSettings":{"branches":[{"id":"branch-1","conditions":[{"optionId":35}]}]},"options":[{"id":35,"text":"Yes"}]},'
 			. '{"id":15,"order":1,"type":"short","isRequired":false,"text":"Name?","description":"","extraSettings":{},"options":[],"parentQuestionId":14,"branchId":"branch-1"}'
 			. '],'
 			. '"submissions":[{"userId":"anyUser@localhost","timestamp":1651354059,"answers":[{"questionId":14,"text":"Yes"},{"questionId":15,"text":"Rex"}]}]}]';

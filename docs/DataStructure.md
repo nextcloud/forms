@@ -240,7 +240,6 @@ Currently supported Question-Types are:
 | `linearscale`     | A linear or Likert scale question where you choose an option that best fits your opinion                                                                                          |
 | `color`           | A color answer, hex string representation (e. g. `#123456`)                                                                                                                       |
 | `ranking`         | Using pre-defined options, the user ranks them from most to least preferred. Needs at least one option available. Answers are stored in ranked order (one answer row per option). |
-| `conditional`     | A conditional branching question with a trigger question and multiple branches containing subquestions                                                                            |
 
 ## Extra Settings
 
@@ -271,8 +270,7 @@ Optional extra settings for some [Question Types](#question-types)
 | `columns`               | `grid`                                         | Array            | -                                           | Array of column identifiers / labels for grid questions                     |
 | `rows`                  | `grid`                                         | Array            | -                                           | Array of row identifiers / labels for grid questions                        |
 | `questionType`          | `grid`                                         | String           | `checkbox`, `number`, `radio`               | Type of cell for grid questions (checkbox, numeric input, or radio)         |
-| `triggerType`           | `conditional`                                  | string           | [See trigger types](#conditional-trigger-types) | The type of trigger question (dropdown, multiple_unique, etc.)              |
-| `branches`              | `conditional`                                  | Array            | Array of [Branch objects](#branch-object)   | The branches with conditions and subquestions                               |
+| `branches`              | `dropdown`, `multiple_unique`                  | Array            | Array of [Branch objects](#branch-object)   | Branches with follow-up questions, see [Follow-up Questions](#follow-up-questions) |
 
 ### Option Types
 
@@ -286,37 +284,35 @@ Supported option types and their intended usage.
 
 `row` and `column` option types are primarily used together with `grid` question types to build a two-dimensional selection matrix. `choice` is the default for normal option lists.
 
-## Conditional Questions
+## Follow-up Questions
 
-Conditional questions enable branching logic in forms. A trigger question determines which branch of subquestions appears based on the respondent's answer.
+Some question types can have branches of follow-up questions in `extraSettings.branches`. A branch is shown when the answer of its question matches one of the branch's conditions, and its follow-up questions are shown right below that question. Follow-up questions can not have branches themselves.
 
 ### Question Properties for Subquestions
 
-Subquestions (questions belonging to a conditional question's branch) have additional properties:
+Follow-up questions (subquestions) are questions of their own with additional properties:
 
-| Property         | Type    | Description                                                            |
-| ---------------- | ------- | ---------------------------------------------------------------------- |
-| parentQuestionId | Integer | The ID of the parent conditional question (null for regular questions) |
-| branchId         | String  | The ID of the branch this subquestion belongs to                       |
+| Property         | Type    | Description                                                           |
+| ---------------- | ------- | --------------------------------------------------------------------- |
+| parentQuestionId | Integer | The ID of the question the branch belongs to (null for other questions) |
+| branchId         | String  | The ID of the branch this subquestion belongs to                      |
 
-### Conditional Trigger Types
+### Question Types With Branches
 
-Supported trigger types for conditional questions:
-
-| Trigger Type      | Condition Types                                                             | Description                                       |
-| ----------------- | --------------------------------------------------------------------------- | ------------------------------------------------- |
-| `multiple_unique` | `option_selected`                                                           | Radio buttons - the selected option               |
-| `dropdown`        | `option_selected`                                                           | Dropdown - the selected option                    |
+| Question Type     | Condition Types   | Description                         |
+| ----------------- | ----------------- | ----------------------------------- |
+| `multiple_unique` | `option_selected` | Radio buttons - the selected option |
+| `dropdown`        | `option_selected` | Dropdown - the selected option      |
 
 A branch is shown when any of its conditions matches. Several branches can be shown at once.
 
 ### Branch Object
 
-A branch defines conditions and subquestions that appear when those conditions are met.
+A branch defines conditions and the subquestions that appear when those conditions are met. The subquestions are only part of a branch when reading a question, they are created, changed and deleted like other questions.
 
 | Property     | Type                                     | Description                                    |
 | ------------ | ---------------------------------------- | ---------------------------------------------- |
-| id           | String                                   | Unique identifier for the branch               |
+| id           | String                                   | Unique identifier for the branch, at most 64 characters |
 | conditions   | Array of [Conditions](#condition-object) | Conditions that must be met to show the branch |
 | subQuestions | Array of [Questions](#question)          | Questions shown when conditions are met        |
 
@@ -340,7 +336,7 @@ A branch defines conditions and subquestions that appear when those conditions a
 
 ### Condition Object
 
-Conditions determine when a branch is activated. The structure depends on the trigger type.
+Conditions determine when a branch is activated. The structure depends on the type of the question.
 
 #### option_selected (for dropdown, multiple_unique)
 
@@ -348,16 +344,16 @@ Conditions determine when a branch is activated. The structure depends on the tr
 { "type": "option_selected", "optionId": 42 }
 ```
 
-### Conditional Question Example
+### Example
 
-A complete conditional question structure:
+A dropdown question with a branch of follow-up questions:
 
 ```json
 {
 	"id": 100,
 	"formId": 3,
 	"order": 1,
-	"type": "conditional",
+	"type": "dropdown",
 	"isRequired": true,
 	"text": "Do you have any dietary restrictions?",
 	"options": [
@@ -365,7 +361,6 @@ A complete conditional question structure:
 		{ "id": 43, "questionId": 100, "order": 2, "text": "No" }
 	],
 	"extraSettings": {
-		"triggerType": "dropdown",
 		"branches": [
 			{
 				"id": "branch-yes",
@@ -387,22 +382,15 @@ A complete conditional question structure:
 }
 ```
 
-### Conditional Answer Structure
+### Answers
 
-When submitting or storing conditional question answers, the structure differs from regular questions:
+Follow-up questions are answered like any other question, keyed by their own id:
 
 ```json
 {
-	"100": {
-		"trigger": ["42"],
-		"subQuestions": {
-			"101": ["Vegetarian, no nuts"]
-		}
-	}
+	"100": ["42"],
+	"101": ["Vegetarian, no nuts"]
 }
 ```
 
-| Property     | Type                        | Description                                         |
-| ------------ | --------------------------- | --------------------------------------------------- |
-| trigger      | Array of strings            | Answer values for the trigger question              |
-| subQuestions | Object (questionId → Array) | Map of subquestion IDs to their answer value arrays |
+Only the follow-up questions of the branches the answers open can be answered, and only those are required.

@@ -237,8 +237,8 @@ class ApiController extends OCSController {
 
 				$copiedOptions = $this->copyOptions($oldQuestion->getId(), $newQuestion->getId());
 
-				if ($newQuestion->getType() === Constants::ANSWER_TYPE_CONDITIONAL) {
-					$this->copyConditionalBranches($oldQuestion, $newQuestion, $copiedOptions);
+				if (!empty($newQuestion->getExtraSettings()['branches'])) {
+					$this->copyBranches($oldQuestion, $newQuestion, $copiedOptions);
 				}
 			}
 
@@ -525,8 +525,8 @@ class ApiController extends OCSController {
 	 * @param FormsQuestionGridCellType $subtype the new question subtype
 	 * @param string $text the new question title
 	 * @param ?int $fromId (optional) id of the question that should be cloned
-	 * @param ?int $parentQuestionId (optional) id of the parent conditional question (for subquestions)
-	 * @param ?string $branchId (optional) branch id within the parent conditional question
+	 * @param ?int $parentQuestionId (optional) id of the question this follow-up question belongs to
+	 * @param ?string $branchId (optional) id of the branch of the parent question
 	 * @param ?int $position (optional) the position of the new question
 	 * @return DataResponse<Http::STATUS_CREATED, FormsQuestion, array{}>
 	 * @throws OCSBadRequestException Invalid type
@@ -571,12 +571,6 @@ class ApiController extends OCSController {
 				throw new OCSBadRequestException('Datetime question type no longer supported');
 			}
 
-			// Block creation of nested conditional questions (conditional within conditional)
-			if ($type === Constants::ANSWER_TYPE_CONDITIONAL && $parentQuestionId !== null) {
-				$this->logger->debug('Nested conditional questions are not supported');
-				throw new OCSBadRequestException('Nested conditional questions are not supported');
-			}
-
 			// Validate parent question if creating a subquestion
 			if ($parentQuestionId !== null) {
 				try {
@@ -592,10 +586,14 @@ class ApiController extends OCSController {
 					throw new OCSBadRequestException('Parent question does not belong to this form');
 				}
 
-				// Parent must be a conditional question
-				if ($parentQuestion->getType() !== Constants::ANSWER_TYPE_CONDITIONAL) {
-					$this->logger->debug('Parent question must be a conditional question');
-					throw new OCSBadRequestException('Parent question must be a conditional question');
+				// Follow-up questions are one level deep and only possible for some question types
+				if ($parentQuestion->getParentQuestionId() !== null) {
+					$this->logger->debug('Nested follow-up questions are not supported');
+					throw new OCSBadRequestException('Nested follow-up questions are not supported');
+				}
+				if (!array_key_exists($parentQuestion->getType(), Constants::QUESTION_TYPES_WITH_BRANCHES)) {
+					$this->logger->debug('Parent question can not have follow-up questions');
+					throw new OCSBadRequestException('Parent question can not have follow-up questions');
 				}
 
 				// branchId is required when parentQuestionId is set
@@ -694,8 +692,8 @@ class ApiController extends OCSController {
 
 			$copiedOptions = $this->copyOptions($fromId, $newQuestion->getId());
 
-			if ($newQuestion->getType() === Constants::ANSWER_TYPE_CONDITIONAL) {
-				$this->copyConditionalBranches($sourceQuestion, $newQuestion, $copiedOptions);
+			if (!empty($newQuestion->getExtraSettings()['branches'])) {
+				$this->copyBranches($sourceQuestion, $newQuestion, $copiedOptions);
 				$response = $this->formsService->getQuestion($newQuestion->getId());
 				if ($response === null) {
 					throw new OCSException('Failed to copy question');
@@ -725,7 +723,7 @@ class ApiController extends OCSController {
 	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
 	 * @return DataResponse<Http::STATUS_OK, int, array{}>
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
-	 * @throws OCSBadRequestException Invalid extraSettings, or a type change to or from a conditional question, will not update
+	 * @throws OCSBadRequestException Invalid extraSettings, nested follow-up questions, or a type change of a question with follow-up questions, will not update
 	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
 	 * @throws OCSForbiddenException Not allowed to update `parentQuestionId`, `branchId`, `options` or `accept`
 	 * @throws OCSForbiddenException Not allowed to update `id` or `formId`
@@ -789,13 +787,18 @@ class ApiController extends OCSController {
 			}
 		}
 
-		// Conditional questions can not be changed into another type and vice versa,
-		// the subquestions would be lost or end up nested
+		// The conditions of the branches depend on the type, the follow-up questions would be lost
 		if (array_key_exists('type', $keyValuePairs)
 			&& $keyValuePairs['type'] !== $question->getType()
-			&& ($keyValuePairs['type'] === Constants::ANSWER_TYPE_CONDITIONAL || $question->getType() === Constants::ANSWER_TYPE_CONDITIONAL)) {
-			$this->logger->debug('Not allowed to change the type of or into a conditional question');
-			throw new OCSBadRequestException('Not allowed to change the type of or into a conditional question');
+			&& !empty($question->getExtraSettings()['branches'])) {
+			$this->logger->debug('Not allowed to change the type of a question with follow-up questions');
+			throw new OCSBadRequestException('Not allowed to change the type of a question with follow-up questions');
+		}
+
+		// Follow-up questions are one level deep
+		if ($question->getParentQuestionId() !== null && !empty($keyValuePairs['extraSettings']['branches'])) {
+			$this->logger->debug('Nested follow-up questions are not supported');
+			throw new OCSBadRequestException('Nested follow-up questions are not supported');
 		}
 
 		// Don't allow to reorder here
@@ -813,8 +816,8 @@ class ApiController extends OCSController {
 			$form->setConfirmationEmailQuestionId(null);
 		}
 
-		if ($question->getType() === Constants::ANSWER_TYPE_CONDITIONAL && isset($keyValuePairs['extraSettings']['branches'])) {
-			$keyValuePairs['extraSettings'] = $this->updateConditionalBranches($form, $question, $keyValuePairs['extraSettings']);
+		if (is_array($keyValuePairs['extraSettings'] ?? null) && $question->getParentQuestionId() === null) {
+			$keyValuePairs['extraSettings'] = $this->updateBranches($form, $question, $keyValuePairs['extraSettings']);
 		}
 
 		// Create QuestionEntity with given Params & Id.
@@ -873,11 +876,9 @@ class ApiController extends OCSController {
 		// Store Order of deleted Question
 		$deletedOrder = $question->getOrder();
 
-		// If this is a conditional question, also soft-delete its subquestions
-		if ($question->getType() === Constants::ANSWER_TYPE_CONDITIONAL) {
-			foreach ($this->questionMapper->findByParentQuestion($questionId) as $subQuestion) {
-				$this->deleteSubQuestion($form, $subQuestion);
-			}
+		// Its follow-up questions are deleted as well
+		foreach ($this->questionMapper->findByParentQuestion($questionId) as $subQuestion) {
+			$this->deleteSubQuestion($form, $subQuestion);
 		}
 
 		// Mark question as deleted
@@ -1024,11 +1025,11 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * Updates the Order of all Questions in a Branch of a conditional
+	 * Updates the order of the follow-up questions in a branch of a question
 	 *
 	 * @param int $formId Id of the form to reorder
 	 * @param string $branchId Id of the branch.
-	 * @param int $questionId Id of the parent trigger question.
+	 * @param int $questionId Id of the question the branch belongs to.
 	 * @param list<int> $newOrder Array of Question-Ids in new order.
 	 * @return DataResponse<Http::STATUS_OK, array<string, FormsOrder>, array{}>
 	 * @throws OCSBadRequestException The given array contains duplicates
@@ -1742,7 +1743,8 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('Already submitted');
 		}
 
-		// Process Answers
+		// Process Answers, follow-up questions are answered only when their branch is active
+		$questions = $this->submissionService->getVisibleQuestions($questions, $answers);
 		foreach ($answers as $questionId => $answerArray) {
 			// Search corresponding Question, skip processing if not found
 			$questionIndex = array_search($questionId, array_column($questions, 'id'));
@@ -1825,7 +1827,8 @@ class ApiController extends OCSController {
 		// Delete current answers
 		$this->answerMapper->deleteBySubmission($submissionId);
 
-		// Process Answers
+		// Process Answers, follow-up questions are answered only when their branch is active
+		$questions = $this->submissionService->getVisibleQuestions($questions, $answers);
 		foreach ($answers as $questionId => $answerArray) {
 			// Search corresponding Question, skip processing if not found
 			$questionIndex = array_search($questionId, array_column($questions, 'id'));
@@ -2113,11 +2116,11 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * Copy the subquestions of a conditional question and point the branch conditions of the copy to its own options
+	 * Copy the subquestions of a question and point the branch conditions of the copy to its own options
 	 *
 	 * @param array<int, Option> $copiedOptions the options of the copy, keyed by the id of the option they were copied from
 	 */
-	private function copyConditionalBranches(Question $source, Question $copy, array $copiedOptions): void {
+	private function copyBranches(Question $source, Question $copy, array $copiedOptions): void {
 		$optionIdMap = array_map(static fn (Option $option) => $option->getId(), $copiedOptions);
 		$copy->setExtraSettings(FormsService::mapConditionOptionIds($copy->getExtraSettings(), $optionIdMap));
 		$this->questionMapper->update($copy);
@@ -2139,12 +2142,12 @@ class ApiController extends OCSController {
 	/**
 	 * Drop subquestion snapshots from the branches and delete the subquestions of removed branches
 	 *
-	 * @param array<string, mixed> $extraSettings the new extra settings of the conditional question
+	 * @param array<string, mixed> $extraSettings the new extra settings of the question
 	 * @return array<string, mixed> the extra settings to store
 	 */
-	private function updateConditionalBranches(Form $form, Question $question, array $extraSettings): array {
+	private function updateBranches(Form $form, Question $question, array $extraSettings): array {
 		$branchIds = [];
-		foreach ($extraSettings['branches'] as $branchIndex => $branch) {
+		foreach ($extraSettings['branches'] ?? [] as $branchIndex => $branch) {
 			unset($extraSettings['branches'][$branchIndex]['subQuestions']);
 			$branchIds[] = $branch['id'] ?? null;
 		}
@@ -2159,7 +2162,7 @@ class ApiController extends OCSController {
 	}
 
 	/**
-	 * Soft-delete a subquestion whose conditional question or branch is deleted, like a deleted question
+	 * Soft-delete a subquestion whose question or branch is deleted, like a deleted question
 	 */
 	private function deleteSubQuestion(Form $form, Question $subQuestion): void {
 		$subQuestion->setOrder(0);
@@ -2200,12 +2203,6 @@ class ApiController extends OCSController {
 			$answerEntity->setText($answerText);
 			$this->answerMapper->insert($answerEntity);
 
-			return;
-		}
-
-		// Special handling for conditional questions
-		if ($question['type'] === Constants::ANSWER_TYPE_CONDITIONAL) {
-			$this->storeConditionalAnswer($form, $submissionId, $question, $answerArray);
 			return;
 		}
 
@@ -2274,35 +2271,6 @@ class ApiController extends OCSController {
 		$this->uploadedFileMapper->delete($uploadedFile);
 
 		return $name;
-	}
-
-	/**
-	 * Store answers for a conditional question
-	 *
-	 * Conditional answers have the structure:
-	 * - trigger: array of trigger answer values (option IDs for predefined types, or text)
-	 * - subQuestions: array of subquestion answers keyed by subquestion ID
-	 *
-	 * @param Form $form
-	 * @param int $submissionId
-	 * @param array $question The conditional question
-	 * @param array $answerData The conditional answer data
-	 */
-	private function storeConditionalAnswer(Form $form, int $submissionId, array $question, array $answerData): void {
-		[$triggerAnswers, $subQuestionAnswers] = SubmissionService::splitConditionalAnswer($answerData);
-
-		// The trigger is stored like a regular question of the trigger type
-		$this->storeAnswersForQuestion($form, $submissionId, SubmissionService::getTriggerQuestion($question), $triggerAnswers);
-
-		// Store subquestion answers only for the branches the trigger activated
-		foreach ($this->submissionService->getActiveBranches($question, $triggerAnswers) as $branch) {
-			foreach ($branch['subQuestions'] ?? [] as $subQuestion) {
-				$subAnswers = $subQuestionAnswers[$subQuestion['id']] ?? [];
-				if (!empty($subAnswers)) {
-					$this->storeAnswersForQuestion($form, $submissionId, $subQuestion, (array)$subAnswers);
-				}
-			}
-		}
 	}
 
 	/**

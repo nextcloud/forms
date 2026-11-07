@@ -610,11 +610,10 @@ file2.txt"
 				"1","user1","User 1","1973-11-29T22:33:09+01:00","",""
 				'
 			],
-			'conditional-subquestions-follow-their-question' => [
+			'subquestions-follow-their-question' => [
 				// Questions, sorted by order like the mapper returns them: subquestions are ordered within their branch
 				[
-					['id' => 1, 'type' => 'conditional', 'text' => 'Cond', 'order' => 1, 'extraSettings' => [
-						'triggerType' => 'short',
+					['id' => 1, 'type' => 'dropdown', 'text' => 'Cond', 'order' => 1, 'extraSettings' => [
 						'branches' => [['id' => 'b1', 'conditions' => []], ['id' => 'b2', 'conditions' => []]],
 					]],
 					['id' => 3, 'type' => 'short', 'text' => 'Sub B', 'order' => 1, 'parentQuestionId' => 1, 'branchId' => 'b2'],
@@ -1462,230 +1461,188 @@ file2.txt"
 				// Expected Result – required question must be answered
 				'Question "Rank these" is required.',
 			],
-			// Conditional question tests
-			'valid-conditional-with-trigger-and-subquestions' => [
-				// Questions - conditional with dropdown trigger and subquestions in branches
+			// Questions with branches of follow-up questions
+			'valid-branch-subquestion-answered' => [
+				// Questions - The answer of the question opens branch-1, so only subquestion 101 needs to be answered
 				[
 					[
 						'id' => 100,
-						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-						'text' => 'Conditional Q',
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
 						'isRequired' => true,
 						'extraSettings' => [
-							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
 							'branches' => [
 								[
 									'id' => 'branch-1',
 									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
-									'subQuestions' => [
-										[
-											'id' => 101,
-											'type' => 'short',
-											'text' => 'Sub Q1',
-											'isRequired' => true,
-										]
-									]
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
 								],
 								[
 									'id' => 'branch-2',
 									'conditions' => [['type' => 'option_selected', 'optionId' => 11]],
-									'subQuestions' => [
-										[
-											'id' => 102,
-											'type' => 'short',
-											'text' => 'Sub Q2',
-											'isRequired' => true,
-										]
-									]
-								]
-							]
-						],
-						'options' => [
-							['id' => 10],
-							['id' => 11]
-						]
-					]
-				],
-				// Answers - trigger selects branch-1, so only subquestion 101 needs to be answered
-				[
-					'100' => [
-						'trigger' => ['10'],
-						'subQuestions' => [
-							'101' => ['Sub answer 1']
-						]
-					]
-				],
-				// Expected Result - valid
-				null,
-			],
-			'valid-conditional-optional-not-answered' => [
-				// Questions - optional conditional question
-				[
-					[
-						'id' => 100,
-						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-						'text' => 'Conditional Q',
-						'isRequired' => false,
-						'extraSettings' => [
-							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-							'branches' => [
-								[
-									'id' => 'branch-1',
-									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
-									'subQuestions' => []
-								]
-							]
-						],
-						'options' => [
-							['id' => 10]
-						]
-					]
-				],
-				// Answers - not answered at all
-				[],
-				// Expected Result - valid since optional
-				null,
-			],
-			'invalid-conditional-required-trigger-not-answered' => [
-				// Questions - required conditional question
-				[
-					[
-						'id' => 100,
-						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-						'text' => 'Conditional Q',
-						'isRequired' => true,
-						'extraSettings' => [
-							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-							'branches' => [
-								[
-									'id' => 'branch-1',
-									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
-									'subQuestions' => []
-								]
-							]
-						],
-						'options' => [
-							['id' => 10]
-						]
-					]
-				],
-				// Answers - not answered
-				[],
-				// Expected Result
-				'Question "Conditional Q" is required.',
-			],
-			'invalid-conditional-required-subquestion-not-answered' => [
-				// Questions - conditional with required subquestion in the branch
-				[
-					[
-						'id' => 100,
-						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-						'text' => 'Conditional Q',
-						'isRequired' => true,
-						'extraSettings' => [
-							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-							'branches' => [
-								[
-									'id' => 'branch-1',
-									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
-									'subQuestions' => [
-										[
-											'id' => 101,
-											'type' => 'short',
-											'text' => 'Sub Q1',
-											'isRequired' => true,
-										]
-									]
-								]
-							]
-						],
-						'options' => [
-							['id' => 10]
-						]
-					]
-				],
-				// Answers - trigger answered but subquestion not
-				[
-					'100' => [
-						'trigger' => ['10'],
-						'subQuestions' => []
-					]
-				],
-				// Expected Result
-				'Question "Sub Q1" is required.',
-			],
-			'valid-conditional-no-branch-matched' => [
-				// Questions - conditional where trigger value doesn't match any branch
-				[
-					[
-						'id' => 100,
-						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-						'text' => 'Conditional Q',
-						'isRequired' => true,
-						'extraSettings' => [
-							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-							'branches' => [
-								[
-									'id' => 'branch-1',
-									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
-									'subQuestions' => []
-								]
-							]
-						],
-						'options' => [
-							['id' => 10],
-							['id' => 11]
-						]
-					]
-				],
-				// Answers - trigger value 11 doesn't match any branch (only branch-1 matches 10)
-				[
-					'100' => [
-						'trigger' => ['11'],
-						'subQuestions' => []
-					]
-				],
-				// Expected Result - valid (no branch matched, but that's okay)
-				null,
-			],
-			'invalid-conditional-dropdown-number-trigger-activates-branch' => [
-				// Questions - dropdowns send option ids as numbers, the branch must still be active
-				[
-					[
-						'id' => 100,
-						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-						'text' => 'Conditional Q',
-						'isRequired' => true,
-						'extraSettings' => [
-							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-							'branches' => [
-								[
-									'id' => 'branch-1',
-									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
-									'subQuestions' => [
-										['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true],
-									],
+									'subQuestions' => [['id' => 102, 'type' => 'short', 'text' => 'Sub Q2', 'isRequired' => true]],
 								],
 							],
 						],
 						'options' => [['id' => 10], ['id' => 11]],
 					],
 				],
-				// Answers - numeric trigger, required subquestion not answered
-				['100' => ['trigger' => [10], 'subQuestions' => []]],
+				// Answers
+				['100' => ['10'], '101' => ['Sub answer 1']],
 				// Expected Result
-				'Question "Sub Q1" is required.',
+				null,
 			],
-			'invalid-conditional-unknown-trigger-option' => [
-				// Questions - the trigger is validated like a dropdown question
+			'valid-branch-optional-not-answered' => [
+				// Questions - Neither the question nor its follow-up questions are required without an answer
 				[
 					[
 						'id' => 100,
-						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-						'text' => 'Conditional Q',
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
 						'isRequired' => false,
 						'extraSettings' => [
-							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
+							'branches' => [
+								['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 10]], 'subQuestions' => []],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				[],
+				// Expected Result
+				null,
+			],
+			'invalid-branch-required-question-not-answered' => [
+				// Questions - A required question with branches is required as usual
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'branches' => [
+								['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 10]], 'subQuestions' => []],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				[],
+				// Expected Result
+				'Question "Trigger Q" is required.',
+			],
+			'invalid-branch-required-subquestion-not-answered' => [
+				// Questions - Required follow-up questions of an active branch must be answered
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
+								],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				['100' => ['10']],
+				// Expected Result
+				'Question "Sub Q1" is required.',
+			],
+			'valid-branch-no-branch-matched' => [
+				// Questions - Follow-up questions of inactive branches are not required
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
+								],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				['100' => ['11']],
+				// Expected Result
+				null,
+			],
+			'invalid-branch-number-answer-activates-branch' => [
+				// Questions - Dropdowns send option ids as numbers, the branch must still be active
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
+								],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				['100' => [10]],
+				// Expected Result
+				'Question "Sub Q1" is required.',
+			],
+			'invalid-branch-answer-with-keys-activates-branch' => [
+				// Questions - Keys of the answer values do not keep the branch closed
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
+								],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				['100' => ['1' => '10']],
+				// Expected Result
+				'Question "Sub Q1" is required.',
+			],
+			'invalid-branch-unknown-option' => [
+				// Questions - The question is validated like any other question
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
+						'isRequired' => false,
+						'extraSettings' => [
 							'branches' => [
 								['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 10]], 'subQuestions' => []],
 							],
@@ -1693,87 +1650,65 @@ file2.txt"
 						'options' => [['id' => 10]],
 					],
 				],
-				// Answers - not an option of the trigger
-				['100' => ['trigger' => ['totally-not-an-option'], 'subQuestions' => []]],
+				// Answers
+				['100' => ['totally-not-an-option']],
 				// Expected Result
-				'Answer "totally-not-an-option" for question "Conditional Q" is not a valid option.',
+				'Answer "totally-not-an-option" for question "Trigger Q" is not a valid option.',
 			],
-			'invalid-conditional-required-empty-trigger' => [
-				// Questions - required conditional question
+			'invalid-branch-answer-for-inactive-branch' => [
+				// Questions - Follow-up questions of inactive branches can not be answered
 				[
 					[
 						'id' => 100,
-						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-						'text' => 'Conditional Q',
-						'isRequired' => true,
-						'extraSettings' => [
-							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-							'branches' => [
-								['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 10]], 'subQuestions' => []],
-							],
-						],
-						'options' => [['id' => 10]],
-					],
-				],
-				// Answers - sent, but the trigger is empty
-				['100' => ['trigger' => [], 'subQuestions' => []]],
-				// Expected Result
-				'Question "Conditional Q" is required.',
-			],
-			'invalid-conditional-answer-for-inactive-branch' => [
-				// Questions - two branches with one subquestion each
-				[
-					[
-						'id' => 100,
-						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-						'text' => 'Conditional Q',
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
 						'isRequired' => false,
 						'extraSettings' => [
-							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
 							'branches' => [
 								[
 									'id' => 'branch-1',
 									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
-									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => false]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
 								],
 								[
 									'id' => 'branch-2',
 									'conditions' => [['type' => 'option_selected', 'optionId' => 11]],
-									'subQuestions' => [['id' => 102, 'type' => 'short', 'text' => 'Sub Q2', 'isRequired' => false]],
+									'subQuestions' => [['id' => 102, 'type' => 'short', 'text' => 'Sub Q2', 'isRequired' => true]],
 								],
 							],
 						],
 						'options' => [['id' => 10], ['id' => 11]],
 					],
 				],
-				// Answers - the subquestion of the inactive branch is answered
-				['100' => ['trigger' => ['10'], 'subQuestions' => ['102' => ['left over']]]],
+				// Answers
+				['100' => ['10'], '101' => ['shown'], '102' => ['left over']],
 				// Expected Result
 				'Answer for non-existent question with ID 102.',
 			],
-			'invalid-conditional-trigger-not-a-list' => [
-				// Questions - the trigger option opens a branch with a required subquestion
+			'invalid-branch-subquestion-without-question-answer' => [
+				// Questions - Follow-up questions can not be answered without the answer opening their branch
 				[
 					[
 						'id' => 100,
-						'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-						'text' => 'Conditional Q',
+						'type' => Constants::ANSWER_TYPE_DROPDOWN,
+						'text' => 'Trigger Q',
 						'isRequired' => false,
 						'extraSettings' => [
-							'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
-							'branches' => [[
-								'id' => 'branch-1',
-								'conditions' => [['optionId' => 10]],
-								'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
-							]],
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [['type' => 'option_selected', 'optionId' => 10]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Sub Q1', 'isRequired' => true]],
+								],
+							],
 						],
-						'options' => [['id' => 10]],
+						'options' => [['id' => 10], ['id' => 11]],
 					],
 				],
-				// Answers - a trigger with keys would select the option without opening its branch
-				['100' => ['trigger' => ['1' => '10'], 'subQuestions' => []]],
+				// Answers
+				['101' => ['left over']],
 				// Expected Result
-				'Invalid answer for conditional question.',
+				'Answer for non-existent question with ID 101.',
 			],
 		];
 	}
@@ -1846,7 +1781,7 @@ file2.txt"
 
 	public static function dataFileUploadAuthorization(): array {
 		$cases = [];
-		foreach ([false, true] as $conditional) {
+		foreach ([false, true] as $followUp) {
 			foreach ([false, true] as $required) {
 				foreach ([
 					'valid' => 'valid-upload-token',
@@ -1854,9 +1789,9 @@ file2.txt"
 					'missing' => null,
 					'empty' => '',
 				] as $name => $token) {
-					$case = ($conditional ? 'conditional' : 'ordinary') . '-'
+					$case = ($followUp ? 'follow-up' : 'ordinary') . '-'
 						. ($required ? 'required' : 'optional') . '-' . $name;
-					$cases[$case] = [$conditional, $required, $token];
+					$cases[$case] = [$followUp, $required, $token];
 				}
 			}
 		}
@@ -1866,7 +1801,7 @@ file2.txt"
 	/**
 	 * @dataProvider dataFileUploadAuthorization
 	 */
-	public function testValidateSubmission_fileUploadAuthorization(bool $conditional, bool $required, ?string $uploadToken): void {
+	public function testValidateSubmission_fileUploadAuthorization(bool $followUp, bool $required, ?string $uploadToken): void {
 		$fileQuestion = [
 			'id' => 8,
 			'type' => Constants::ANSWER_TYPE_FILE,
@@ -1884,15 +1819,15 @@ file2.txt"
 		$questions = [$fileQuestion];
 		$answers = [8 => [$fileAnswer]];
 
-		if ($conditional) {
+		if ($followUp) {
+			// The file question is a follow-up question of an active branch
 			$questions = [[
 				'id' => 9,
-				'type' => Constants::ANSWER_TYPE_CONDITIONAL,
-				'text' => 'Conditional question',
+				'type' => Constants::ANSWER_TYPE_DROPDOWN,
+				'text' => 'Question with branches',
 				'isRequired' => true,
 				'options' => [['id' => 11, 'text' => 'Yes']],
 				'extraSettings' => [
-					'triggerType' => Constants::ANSWER_TYPE_DROPDOWN,
 					'branches' => [[
 						'id' => 'file-branch',
 						'conditions' => [[
@@ -1903,7 +1838,7 @@ file2.txt"
 					]],
 				],
 			]];
-			$answers = [9 => ['trigger' => ['11'], 'subQuestions' => $answers]];
+			$answers = [9 => ['11']] + $answers;
 		}
 
 		$this->uploadedFileMapper->expects($this->never())

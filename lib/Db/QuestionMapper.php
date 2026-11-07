@@ -38,7 +38,7 @@ class QuestionMapper extends QBMapper {
 			);
 
 		if (!$loadSubquestions) {
-			// Only load top-level questions (not subquestions of conditional questions)
+			// Only load top-level questions (not follow-up questions in branches)
 			$qb->andWhere(
 				$qb->expr()->isNull('parent_question_id')
 			);
@@ -58,9 +58,9 @@ class QuestionMapper extends QBMapper {
 	}
 
 	/**
-	 * Find subquestions belonging to a parent conditional question
+	 * Find the subquestions of a question
 	 *
-	 * @param int $parentQuestionId The ID of the parent conditional question
+	 * @param int $parentQuestionId The ID of the parent question
 	 * @param bool $loadDeleted Whether to include soft-deleted questions
 	 * @return Question[]
 	 */
@@ -79,16 +79,16 @@ class QuestionMapper extends QBMapper {
 			);
 		}
 
-		// Sort by order within the conditional question
+		// Sort by order within the parent question
 		$qb->orderBy('order');
 
 		return $this->findEntities($qb);
 	}
 
 	/**
-	 * Find subquestions belonging to a specific branch of a conditional question
+	 * Find the subquestions of a specific branch of a question
 	 *
-	 * @param int $parentQuestionId The ID of the parent conditional question
+	 * @param int $parentQuestionId The ID of the parent question
 	 * @param string $branchId The branch identifier
 	 * @return Question[]
 	 */

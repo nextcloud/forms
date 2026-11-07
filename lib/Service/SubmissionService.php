@@ -587,31 +587,22 @@ class SubmissionService {
 
 	/**
 	 * Validate all answers against the questions
-	 * @param array $questions Array of the questions of the form
+	 *
+	 * Follow-up questions are validated, and can be answered, only when their branch is active.
+	 *
+	 * @param array $questions Array of the questions of the form, as returned by FormsService::getQuestions()
 	 * @param array $answers Array of the submitted answers
 	 * @param string $formOwnerId Owner of the form
 	 * @param int $formId Id of the form being submitted
 	 * @throws \InvalidArgumentException if validation failed
 	 */
 	public function validateSubmission(array $questions, array $answers, string $formOwnerId, int $formId): void {
+		$questions = $this->getVisibleQuestions($questions, $answers);
+
 		// Check by questions
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
 			$questionAnswered = array_key_exists($questionId, $answers);
-
-			// Special handling for conditional questions
-			if ($question['type'] === Constants::ANSWER_TYPE_CONDITIONAL) {
-				// Check if required conditional has any answer
-				if ($question['isRequired'] && !$questionAnswered) {
-					throw new \InvalidArgumentException(sprintf('Question "%s" is required.', $question['text']));
-				}
-
-				// If answered, validate the conditional structure
-				if ($questionAnswered) {
-					$this->validateConditionalQuestion($question, $answers[$questionId], $formOwnerId, $formId);
-				}
-				continue;
-			}
 
 			// Check if all required questions have an answer
 			if ($question['isRequired']
@@ -976,7 +967,7 @@ class SubmissionService {
 	}
 
 	/**
-	 * Put the subquestions of each conditional question right after it, in branch order,
+	 * Put the subquestions of each question right after it, in branch order,
 	 * and leave out subquestions of branches that no longer exist
 	 *
 	 * @param Question[] $questions top-level questions and subquestions, sorted by order
@@ -996,115 +987,42 @@ class SubmissionService {
 				continue;
 			}
 			$ordered[] = $question;
-			if ($question->getType() === Constants::ANSWER_TYPE_CONDITIONAL) {
-				foreach ($question->getExtraSettings()['branches'] ?? [] as $branch) {
-					array_push($ordered, ...($subQuestions[$question->getId()][(string)($branch['id'] ?? '')] ?? []));
-				}
+			foreach ($question->getExtraSettings()['branches'] ?? [] as $branch) {
+				array_push($ordered, ...($subQuestions[$question->getId()][(string)($branch['id'] ?? '')] ?? []));
 			}
 		}
 		return $ordered;
 	}
 
 	/**
-	 * Validate conditional question answers
+	 * List the questions shown for the given answers: the top-level questions,
+	 * each followed by the subquestions of its active branches
 	 *
-	 * Conditional questions have a special answer structure:
-	 * - trigger: array of trigger answer values
-	 * - subQuestions: array of subquestion answers keyed by subquestion ID
-	 *
-	 * @param array $question The conditional question
-	 * @param array $answerData The answer data for the conditional question
-	 * @param string $formOwnerId Owner of the form
-	 * @param int $formId Id of the form being submitted
-	 * @throws \InvalidArgumentException if validation failed
+	 * @param list<array> $questions The questions of the form, as returned by FormsService::getQuestions()
+	 * @param array $answers The submitted answers, keyed by question id
+	 * @return list<array> The shown questions
 	 */
-	private function validateConditionalQuestion(array $question, array $answerData, string $formOwnerId, int $formId): void {
-		if (empty($question['extraSettings']['triggerType'])) {
-			throw new \InvalidArgumentException(sprintf('Conditional question "%s" is missing trigger type configuration.', $question['text']));
-		}
-
-		[$triggerAnswer, $subQuestionAnswers] = self::splitConditionalAnswer($answerData);
-
-		// The trigger gets the same checks as a regular question of the trigger type
-		$triggerQuestion = self::getTriggerQuestion($question);
-		$this->validateSubmission([$triggerQuestion], $triggerAnswer === [] ? [] : [$triggerQuestion['id'] => $triggerAnswer], $formOwnerId, $formId);
-
-		// Only the subquestions of the active branches may be answered, with the full per-question rules
-		$subQuestions = [];
-		foreach ($this->getActiveBranches($question, $triggerAnswer) as $branch) {
-			array_push($subQuestions, ...($branch['subQuestions'] ?? []));
-		}
-		$this->validateSubmission($subQuestions, $subQuestionAnswers, $formOwnerId, $formId);
-	}
-
-	/**
-	 * Split the answer of a conditional question into the trigger answer and the subquestion answers
-	 *
-	 * @param array $answerData `{trigger: [...], subQuestions: {id: [...]}}`, or just the trigger answer
-	 * @return array{0: array, 1: array} the trigger answer and the subquestion answers keyed by subquestion id
-	 */
-	public static function splitConditionalAnswer(array $answerData): array {
-		if (!array_key_exists('trigger', $answerData) && !array_key_exists('subQuestions', $answerData)) {
-			$triggerAnswer = $answerData;
-			$subQuestionAnswers = [];
-		} else {
-			$triggerAnswer = $answerData['trigger'] ?? [];
-			$subQuestionAnswers = $answerData['subQuestions'] ?? [];
-		}
-
-		// Like the answer of a question, the trigger answer is a list of values, the branches are matched against it
-		if (!is_array($triggerAnswer) || !array_is_list($triggerAnswer) || !is_array($subQuestionAnswers)) {
-			throw new \InvalidArgumentException('Invalid answer for conditional question.');
-		}
-		foreach ($subQuestionAnswers as $subQuestionAnswer) {
-			if (!is_array($subQuestionAnswer)) {
-				throw new \InvalidArgumentException('Invalid answer for conditional question.');
+	public function getVisibleQuestions(array $questions, array $answers): array {
+		$visible = [];
+		foreach ($questions as $question) {
+			$visible[] = $question;
+			// Empty extra settings can be an object
+			$branches = is_array($question['extraSettings'] ?? null) ? ($question['extraSettings']['branches'] ?? []) : [];
+			// Keys of the answer values do not matter, like for storing them
+			$answer = $answers[$question['id']] ?? [];
+			foreach ($this->findActiveBranches($question['type'], is_array($answer) ? array_values($answer) : [], $branches) as $branch) {
+				/** @var list<array> $subQuestions */
+				$subQuestions = $branch['subQuestions'] ?? [];
+				array_push($visible, ...$subQuestions);
 			}
 		}
-
-		return [$triggerAnswer, $subQuestionAnswers];
+		return $visible;
 	}
 
 	/**
-	 * Get the trigger of a conditional question as a regular question of the trigger type
+	 * Find the active branches based on the answer of their question
 	 *
-	 * The trigger shares id, options and the remaining extra settings with the conditional question.
-	 *
-	 * @param array $question The conditional question
-	 * @return array The trigger question
-	 */
-	public static function getTriggerQuestion(array $question): array {
-		$extraSettings = $question['extraSettings'] ?? [];
-		$triggerType = $extraSettings['triggerType'] ?? '';
-		unset($extraSettings['triggerType'], $extraSettings['branches']);
-
-		return [
-			...$question,
-			'type' => $triggerType,
-			'extraSettings' => $extraSettings,
-		];
-	}
-
-	/**
-	 * Resolve the branch a conditional question's trigger answer activates
-	 *
-	 * @param array $question The conditional question
-	 * @param array $triggerAnswer The trigger answer values
-	 * @return array The active branches or empty array if none matches
-	 */
-	public function getActiveBranches(array $question, array $triggerAnswer): array {
-		$extraSettings = $question['extraSettings'] ?? [];
-		return $this->findActiveBranches(
-			$extraSettings['triggerType'] ?? '',
-			$triggerAnswer,
-			$extraSettings['branches'] ?? [],
-		);
-	}
-
-	/**
-	 * Find the active branches based on trigger answer
-	 *
-	 * @param string $triggerType The type of the trigger question
+	 * @param string $triggerType The type of the question
 	 * @param array $triggerAnswer The trigger answer values
 	 * @param array $branches The available branches
 	 * @return array The active branches or empty array if none matches
@@ -1122,8 +1040,8 @@ class SubmissionService {
 	/**
 	 * Evaluate if branch conditions match the trigger answer
 	 *
-	 * @param string $triggerType The type of the trigger question
-	 * @param array $triggerAnswer The trigger answer values
+	 * @param string $triggerType The type of the question
+	 * @param array $triggerAnswer The answer values of the question
 	 * @param array $conditions The conditions to evaluate
 	 * @return bool True if conditions match
 	 */
