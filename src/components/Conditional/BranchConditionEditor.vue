@@ -5,10 +5,12 @@
 
 <template>
 	<div class="branch-condition-editor">
-		<!-- Option-based conditions (radio, dropdown) -->
+		<!-- Option-based conditions (radio, dropdown, checkbox) -->
 		<template v-if="isOptionBasedTrigger">
 			<div class="condition-options">
+				<!-- Single select for radio/dropdown -->
 				<NcSelect
+					v-if="isSingleSelect"
 					:inputLabel="conditionLabel"
 					:modelValue="selectedOptions"
 					:options="optionsList"
@@ -16,6 +18,17 @@
 					:multiple="false"
 					label="text"
 					@update:modelValue="onSingleOptionSelect" />
+
+				<!-- Multi select for checkboxes -->
+				<NcSelect
+					v-else
+					:inputLabel="conditionLabel"
+					:modelValue="selectedOptions"
+					:options="optionsList"
+					:placeholder="t('forms', 'Select options combination')"
+					:multiple="true"
+					label="text"
+					@update:modelValue="onMultipleOptionsSelect" />
 			</div>
 		</template>
 	</div>
@@ -62,9 +75,18 @@ export default {
 
 	computed: {
 		/**
-		 * Check if trigger is option-based (radio, dropdown)
+		 * Check if trigger is option-based (radio, dropdown, checkbox)
 		 */
 		isOptionBasedTrigger() {
+			return ['multiple_unique', 'dropdown', 'multiple'].includes(
+				this.triggerType,
+			)
+		},
+
+		/**
+		 * Check if trigger is single-select (radio, dropdown)
+		 */
+		isSingleSelect() {
 			return ['multiple_unique', 'dropdown'].includes(this.triggerType)
 		},
 
@@ -72,7 +94,10 @@ export default {
 		 * Label for option-based conditions
 		 */
 		conditionLabel() {
-			return t('forms', 'Show when selected:')
+			if (this.isSingleSelect) {
+				return t('forms', 'Show when selected:')
+			}
+			return t('forms', 'Show when all selected:')
 		},
 
 		/**
@@ -90,15 +115,22 @@ export default {
 		 */
 		selectedOptions() {
 			if (!this.branch.conditions || this.branch.conditions.length === 0) {
-				return null
+				return this.isSingleSelect ? null : []
 			}
 
-			const selectedIds = this.branch.conditions.map((c) => c.optionId)
+			let selectedIds
+			if (this.isSingleSelect) {
+				// Single select uses optionId in each condition
+				selectedIds = this.branch.conditions.map((c) => c.optionId)
+			} else {
+				// Multi select uses optionIds array in first condition
+				selectedIds = this.branch.conditions[0]?.optionIds || []
+			}
 			const selected = this.optionsList.filter((opt) =>
 				selectedIds.includes(opt.id),
 			)
 
-			return selected[0] || null
+			return this.isSingleSelect ? selected[0] || null : selected
 		},
 	},
 
@@ -110,6 +142,17 @@ export default {
 		 */
 		onSingleOptionSelect(option) {
 			const conditions = option ? [{ optionId: option.id }] : []
+			this.emitUpdate({ conditions })
+		},
+
+		/**
+		 * Handle multiple option selection (checkbox)
+		 *
+		 * @param {Array} options The selected options array
+		 */
+		onMultipleOptionsSelect(options) {
+			const optionIds = options.map((opt) => opt.id)
+			const conditions = optionIds.length > 0 ? [{ optionIds }] : []
 			this.emitUpdate({ conditions })
 		},
 

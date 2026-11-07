@@ -17,6 +17,7 @@ type BranchMatcher = (
 const BRANCH_MATCHERS: Record<string, BranchMatcher> = {
 	multiple_unique: matchOptionSelected,
 	dropdown: matchOptionSelected,
+	multiple: matchOptionsCombination,
 }
 
 /**
@@ -31,6 +32,24 @@ function matchOptionSelected(
 ): boolean {
 	return conditions.some((condition) =>
 		values.includes(String(condition.optionId)),
+	)
+}
+
+/**
+ * Checkboxes match if all options of any condition's combination are selected
+ *
+ * @param conditions the conditions of the branch
+ * @param values the answer of the question
+ */
+function matchOptionsCombination(
+	conditions: Record<string, unknown>[],
+	values: string[],
+): boolean {
+	return conditions.some(
+		(condition) =>
+			Array.isArray(condition.optionIds)
+			&& condition.optionIds.length > 0
+			&& condition.optionIds.every((id) => values.includes(String(id))),
 	)
 }
 

@@ -1634,6 +1634,83 @@ file2.txt"
 				// Expected Result
 				'Question "Sub Q1" is required.',
 			],
+			'valid-branch-checkbox-combination' => [
+				// Questions - selecting options 10 and 11 opens the branch of that combination
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_MULTIPLE,
+						'text' => 'Checkbox Q',
+						'isRequired' => true,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-combo1',
+									'conditions' => [['type' => 'options_combination', 'optionIds' => [10, 11]]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Combo 1 question', 'isRequired' => true]],
+								],
+								['id' => 'branch-combo2', 'conditions' => [['type' => 'options_combination', 'optionIds' => [12]]], 'subQuestions' => []],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11], ['id' => 12]],
+					],
+				],
+				// Answers
+				['100' => ['10', '11'], '101' => ['Combo answer']],
+				// Expected Result
+				null,
+			],
+			'invalid-branch-checkbox-any-condition' => [
+				// Questions - a branch is active if any of its option combinations is selected
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_MULTIPLE,
+						'text' => 'Checkbox Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-1',
+									'conditions' => [
+										['type' => 'options_combination', 'optionIds' => [10, 11]],
+										['type' => 'options_combination', 'optionIds' => [12]],
+									],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Combo question', 'isRequired' => true]],
+								],
+							],
+						],
+						'options' => [['id' => 10], ['id' => 11], ['id' => 12]],
+					],
+				],
+				// Answers - only the second combination is selected
+				['100' => ['12']],
+				// Expected Result
+				'Question "Combo question" is required.',
+			],
+			'invalid-branch-checkbox-incomplete-combination' => [
+				// Questions - a combination opens its branch only when all of its options are selected
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_MULTIPLE,
+						'text' => 'Checkbox Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'branches' => [[
+								'id' => 'branch-1',
+								'conditions' => [['type' => 'options_combination', 'optionIds' => [10, 11]]],
+								'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Combo question', 'isRequired' => false]],
+							]],
+						],
+						'options' => [['id' => 10], ['id' => 11]],
+					],
+				],
+				// Answers
+				['100' => ['10'], '101' => ['hidden']],
+				// Expected Result
+				'Answer for non-existent question with ID 101.',
+			],
 			'invalid-branch-unknown-option' => [
 				// Questions - The question is validated like any other question
 				[
