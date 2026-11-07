@@ -245,6 +245,7 @@ class Constants {
 	public const CONDITION_TYPE_OPTION_SELECTED = 'option_selected';
 	public const CONDITION_TYPE_OPTIONS_COMBINATION = 'options_combination';
 	public const CONDITION_TYPE_DATE_RANGE = 'date_range';
+	public const CONDITION_TYPE_FILE_UPLOADED = 'file_uploaded';
 
 	/**
 	 * Question types that can have branches with follow-up questions in `extraSettings.branches`,
@@ -259,6 +260,7 @@ class Constants {
 		self::ANSWER_TYPE_DATE => [self::CONDITION_TYPE_DATE_RANGE],
 		self::ANSWER_TYPE_DATETIME => [self::CONDITION_TYPE_DATE_RANGE],
 		self::ANSWER_TYPE_TIME => [self::CONDITION_TYPE_DATE_RANGE],
+		self::ANSWER_TYPE_FILE => [self::CONDITION_TYPE_FILE_UPLOADED],
 	];
 
 	/**
