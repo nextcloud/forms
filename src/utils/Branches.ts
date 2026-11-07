@@ -5,6 +5,8 @@
 
 import type { FormsConditionalBranch, FormsQuestion } from '../types/Entities.d.ts'
 
+import { splitRegex } from './RegularExpression.ts'
+
 type BranchMatcher = (
 	conditions: Record<string, unknown>[],
 	values: string[],
@@ -24,6 +26,8 @@ const BRANCH_MATCHERS: Record<string, BranchMatcher> = {
 	file: matchFileUploaded,
 	linearscale: matchValue,
 	color: matchColor,
+	short: matchText,
+	long: matchText,
 }
 
 /**
@@ -145,6 +149,54 @@ function matchColor(
 	return conditions.some(
 		(condition) => color === String(condition.value ?? '').toLowerCase(),
 	)
+}
+
+/**
+ * Texts match if they equal or contain the value of any condition, or match its regular expression
+ *
+ * @param conditions the conditions of the branch
+ * @param values the answer of the question
+ */
+function matchText(
+	conditions: Record<string, unknown>[],
+	values: string[],
+): boolean {
+	const text = values[0]
+	return conditions.some((condition) => {
+		const value = String(condition.value ?? '')
+		switch (condition.type) {
+			case 'regex':
+				return matchRegex(value, text)
+			case 'string_contains':
+				return text.includes(value)
+			case 'string_equals':
+				return text === value
+			default:
+				return false
+		}
+	})
+}
+
+/**
+ * Match a regular expression in the `/pattern/modifiers` format of the server
+ *
+ * @param expression the regular expression with delimiters, e.g. `/^yes$/i`
+ * @param subject the text to match
+ */
+function matchRegex(expression: string, subject: string): boolean {
+	// Long texts are not matched, like on the server
+	if (!expression || subject.length > 10000) {
+		return false
+	}
+	const { pattern, modifiers } = splitRegex(expression)
+	if (!pattern) {
+		return false
+	}
+	try {
+		return new RegExp(pattern, modifiers).test(subject)
+	} catch {
+		return false
+	}
 }
 
 /**

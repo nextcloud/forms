@@ -1950,6 +1950,31 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_COLOR,
 				'expected' => true
 			],
+			'valid-branches-short-text' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'string_equals', 'value' => 'yes']]]]],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-branches-short-text-with-validation' => [
+				'extraSettings' => ['validationType' => 'email', 'branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'string_contains', 'value' => '@example.com']]]]],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-branches-regex' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'regex', 'value' => '/^ye(s|p)$/i']]]]],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-branch-regex-without-delimiters' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'regex', 'value' => '^yes$']]]]],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-branch-string-equals-on-long-text' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'string_equals', 'value' => 'yes']]]]],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => false
+			],
 			'valid-branches-with-own-settings' => [
 				'extraSettings' => ['shuffleOptions' => true, 'branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
 				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
