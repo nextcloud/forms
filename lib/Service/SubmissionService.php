@@ -1077,6 +1077,33 @@ class SubmissionService {
 					}
 				}
 				return false;
+			case Constants::ANSWER_TYPE_SHORT:
+			case Constants::ANSWER_TYPE_LONG:
+				// Text-based: evaluate regex/string conditions
+				$text = is_scalar($triggerAnswer[0] ?? null) ? (string)$triggerAnswer[0] : '';
+				foreach ($conditions as $condition) {
+					$type = $condition['type'] ?? Constants::CONDITION_TYPE_STRING_CONTAINS;
+					$value = $condition['value'] ?? '';
+
+					switch ($type) {
+						case Constants::CONDITION_TYPE_STRING_EQUALS:
+							if ($text === $value) {
+								return true;
+							}
+							break;
+						case Constants::CONDITION_TYPE_STRING_CONTAINS:
+							if (str_contains($text, $value)) {
+								return true;
+							}
+							break;
+						case Constants::CONDITION_TYPE_REGEX:
+							if ($this->safeRegexMatch($value, $text)) {
+								return true;
+							}
+							break;
+					}
+				}
+				return false;
 			case Constants::ANSWER_TYPE_LINEARSCALE:
 				$numValue = (float)($triggerAnswer[0] ?? 0);
 				foreach ($conditions as $condition) {
@@ -1156,6 +1183,35 @@ class SubmissionService {
 				return false;
 			default:
 				return false;
+		}
+	}
+
+	/**
+	 * Safely execute a regex match with validation to prevent ReDoS attacks
+	 *
+	 * @param string $pattern The regex pattern to match
+	 * @param string $subject The string to match against
+	 * @return bool True if the pattern matches, false otherwise
+	 */
+	private function safeRegexMatch(string $pattern, string $subject): bool {
+		if (empty($pattern) || strlen($subject) > 10000) {
+			return false;
+		}
+
+		// Validate regex syntax
+		if (@preg_match($pattern, '') === false) {
+			return false;
+		}
+
+		// Set backtrack limit to prevent catastrophic backtracking
+		$previousLimit = ini_get('pcre.backtrack_limit');
+		ini_set('pcre.backtrack_limit', '10000');
+
+		try {
+			$result = @preg_match($pattern, $subject);
+			return $result === 1;
+		} finally {
+			ini_set('pcre.backtrack_limit', $previousLimit);
 		}
 	}
 }
