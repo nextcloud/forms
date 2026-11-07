@@ -1077,6 +1077,45 @@ class SubmissionService {
 					}
 				}
 				return false;
+			case Constants::ANSWER_TYPE_LINEARSCALE:
+				$numValue = (float)($triggerAnswer[0] ?? 0);
+				foreach ($conditions as $condition) {
+					$type = $condition['type'] ?? Constants::CONDITION_TYPE_VALUE_EQUALS;
+					if ($type === Constants::CONDITION_TYPE_VALUE_EQUALS) {
+						if ($numValue == (float)($condition['value'] ?? 0)) {
+							return true;
+						}
+					} elseif ($type === Constants::CONDITION_TYPE_VALUE_NOT_EQUALS) {
+						if ($numValue != (float)($condition['value'] ?? 0)) {
+							return true;
+						}
+					} elseif ($type === Constants::CONDITION_TYPE_VALUE_RANGE) {
+						$min = $condition['min'] ?? -PHP_FLOAT_MAX;
+						$max = $condition['max'] ?? PHP_FLOAT_MAX;
+						if ($numValue >= $min && $numValue <= $max) {
+							return true;
+						}
+					} elseif ($type === Constants::CONDITION_TYPE_VALUE_MIN) {
+						$min = $condition['min'] ?? -PHP_FLOAT_MAX;
+						if ($numValue >= $min) {
+							return true;
+						}
+					} elseif ($type === Constants::CONDITION_TYPE_VALUE_MAX) {
+						$max = $condition['max'] ?? PHP_FLOAT_MAX;
+						if ($numValue <= $max) {
+							return true;
+						}
+					}
+				}
+				return false;
+			case Constants::ANSWER_TYPE_COLOR:
+				$colorValue = is_scalar($triggerAnswer[0] ?? null) ? (string)$triggerAnswer[0] : '';
+				foreach ($conditions as $condition) {
+					if (strcasecmp($colorValue, $condition['value'] ?? '') === 0) {
+						return true;
+					}
+				}
+				return false;
 			case Constants::ANSWER_TYPE_FILE:
 				$hasFile = !empty($triggerAnswer);
 				foreach ($conditions as $condition) {
