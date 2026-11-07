@@ -21,6 +21,7 @@ const BRANCH_MATCHERS: Record<string, BranchMatcher> = {
 	date: matchDateRange,
 	datetime: matchDateRange,
 	time: matchDateRange,
+	file: matchFileUploaded,
 }
 
 /**
@@ -77,6 +78,22 @@ function matchDateRange(
 }
 
 /**
+ * Files match if a condition is about the upload state of the answer, also "no file uploaded"
+ *
+ * @param conditions the conditions of the branch
+ * @param values the answer of the question
+ */
+function matchFileUploaded(
+	conditions: Record<string, unknown>[],
+	values: string[],
+): boolean {
+	const hasFile = values.length > 0 && values[0] !== ''
+	return conditions.some(
+		(condition) => (condition.fileUploaded ?? true) === hasFile,
+	)
+}
+
+/**
  * @param type the question type
  */
 export function canHaveBranches(type: string): boolean {
@@ -111,7 +128,7 @@ export function persistedSettings<T extends Record<string, unknown>>(
 }
 
 /**
- * Branches the answer activates, an unanswered question activates none
+ * Branches the answer activates, an unanswered question activates none except "no file uploaded"
  *
  * @param question the question with the branches
  * @param values the answer of the question
@@ -122,7 +139,10 @@ export function getActiveBranches(
 ): FormsConditionalBranch[] {
 	const matcher = BRANCH_MATCHERS[question.type]
 	const answer = Array.isArray(values) ? values.map(String) : []
-	if (!matcher || answer.length === 0 || answer[0] === '') {
+	if (
+		!matcher
+		|| (question.type !== 'file' && (answer.length === 0 || answer[0] === ''))
+	) {
 		return []
 	}
 	return getBranches(question).filter(

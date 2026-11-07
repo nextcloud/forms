@@ -1935,6 +1935,11 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_TIME,
 				'expected' => true
 			],
+			'valid-branches-file-uploaded' => [
+				'extraSettings' => ['branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'file_uploaded', 'fileUploaded' => false]]]]],
+				'questionType' => Constants::ANSWER_TYPE_FILE,
+				'expected' => true
+			],
 			'valid-branches-with-own-settings' => [
 				'extraSettings' => ['shuffleOptions' => true, 'branches' => [['id' => 'branch-1', 'conditions' => [['type' => 'option_selected', 'optionId' => 1]]]]],
 				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,

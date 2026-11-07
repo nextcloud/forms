@@ -50,12 +50,24 @@
 					class="condition-date-input" />
 			</div>
 		</template>
+
+		<!-- File-based conditions -->
+		<template v-else-if="triggerType === 'file'">
+			<div class="condition-row">
+				<NcCheckboxRadioSwitch
+					:modelValue="fileUploadedCondition"
+					@update:modelValue="onFileConditionChange">
+					{{ t('forms', 'File is uploaded') }}
+				</NcCheckboxRadioSwitch>
+			</div>
+		</template>
 	</div>
 </template>
 
 <script>
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
+import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 
@@ -63,6 +75,7 @@ export default {
 	name: 'BranchConditionEditor',
 
 	components: {
+		NcCheckboxRadioSwitch,
 		NcDateTimePicker,
 		NcSelect,
 	},
@@ -237,6 +250,13 @@ export default {
 		},
 
 		/**
+		 * File uploaded condition
+		 */
+		fileUploadedCondition() {
+			return this.branch.conditions?.[0]?.fileUploaded ?? true
+		},
+
+		/**
 		 * Date picker type based on trigger type
 		 */
 		datePickerType() {
@@ -285,6 +305,16 @@ export default {
 		onMultipleOptionsSelect(options) {
 			const optionIds = options.map((opt) => opt.id)
 			const conditions = optionIds.length > 0 ? [{ optionIds }] : []
+			this.emitUpdate({ conditions })
+		},
+
+		/**
+		 * Handle file condition change
+		 *
+		 * @param {boolean} checked Whether file is uploaded condition is checked
+		 */
+		onFileConditionChange(checked) {
+			const conditions = [{ fileUploaded: checked }]
 			this.emitUpdate({ conditions })
 		},
 

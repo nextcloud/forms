@@ -307,6 +307,7 @@ Follow-up questions (subquestions) are questions of their own with additional pr
 | `date`            | `date_range`      | Date - range including its bounds (`YYYY-MM-DD`) |
 | `datetime`        | `date_range`      | Deprecated date and time (`YYYY-MM-DD HH:mm`) |
 | `time`            | `date_range`      | Time - range including its bounds (`HH:mm`) |
+| `file`            | `file_uploaded`   | File - whether a file was uploaded  |
 
 A branch is shown when any of its conditions matches. Several branches can be shown at once.
 
@@ -367,6 +368,14 @@ All options in `optionIds` must be selected for the condition to match.
 ```
 
 `min` and `max` use the answer format of the question type and are optional.
+
+#### file_uploaded (for file)
+
+```json
+{ "type": "file_uploaded", "fileUploaded": true }
+```
+
+`"fileUploaded": false` matches when no file was uploaded.
 
 ### Example
 
