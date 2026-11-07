@@ -1755,6 +1755,35 @@ file2.txt"
 				// Expected Result
 				null,
 			],
+			'invalid-branch-no-file-uploaded' => [
+				// Questions - an unanswered file question opens its "no file uploaded" branch
+				[
+					[
+						'id' => 100,
+						'type' => Constants::ANSWER_TYPE_FILE,
+						'text' => 'File Q',
+						'isRequired' => false,
+						'extraSettings' => [
+							'branches' => [
+								[
+									'id' => 'branch-no-file',
+									'conditions' => [['type' => 'file_uploaded', 'fileUploaded' => false]],
+									'subQuestions' => [['id' => 101, 'type' => 'short', 'text' => 'Why no file?', 'isRequired' => true]],
+								],
+								[
+									'id' => 'branch-file',
+									'conditions' => [['type' => 'file_uploaded', 'fileUploaded' => true]],
+									'subQuestions' => [['id' => 102, 'type' => 'short', 'text' => 'About the file', 'isRequired' => true]],
+								],
+							],
+						],
+					],
+				],
+				// Answers - nothing uploaded
+				[],
+				// Expected Result
+				'Question "Why no file?" is required.',
+			],
 			'invalid-branch-unknown-option' => [
 				// Questions - The question is validated like any other question
 				[
