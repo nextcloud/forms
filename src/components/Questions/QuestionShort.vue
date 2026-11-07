@@ -9,6 +9,7 @@
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
 		:errorMessage="errorMessage"
+		:isTriggerQuestion="isTriggerQuestion"
 		v-on="commonListeners">
 		<div class="question__content">
 			<input
@@ -91,6 +92,7 @@ import Question from './Question.vue'
 import {
 	QUESTION_EMITS,
 	QUESTION_PROPS,
+	questionIdPrefix,
 	useQuestion,
 } from '../../composables/useQuestion.ts'
 import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
@@ -154,7 +156,7 @@ export default defineComponent({
 		 * Id of the validation type menu
 		 */
 		const validationTypeMenuId = computed(
-			() => 'q' + props.index + '__validation_menu',
+			() => questionIdPrefix(props) + '__validation_menu',
 		)
 
 		/**

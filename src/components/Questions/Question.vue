@@ -4,16 +4,22 @@
 -->
 
 <template>
-	<li
+	<!-- The trigger of a conditional question is part of the conditional question's list item -->
+	<component
+		:is="isTriggerQuestion ? 'div' : 'li'"
 		class="question"
 		:class="{
 			'question--editable': !readOnly,
 		}"
-		:aria-label="t('forms', 'Question number {index}', { index })">
+		:aria-label="
+			isTriggerQuestion
+				? undefined
+				: t('forms', 'Question number {index}', { index: number })
+		">
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div
-			v-if="!readOnly"
+			v-if="!readOnly && !isTriggerQuestion"
 			class="question__drag-handle"
 			:class="{
 				'question__drag-handle--shiftup': shiftDragHandle,
@@ -44,14 +50,14 @@
 		</div>
 
 		<!-- Header -->
-		<div class="question__header">
+		<div v-if="!isTriggerQuestion || !readOnly" class="question__header">
 			<div class="question__header__title">
 				<input
-					v-if="!readOnly"
+					v-if="!isTriggerQuestion && !readOnly"
 					:placeholder="titlePlaceholder"
 					:aria-label="
 						t('forms', 'Title of question number {index}', {
-							index,
+							index: number,
 						})
 					"
 					:value="text"
@@ -63,12 +69,13 @@
 					required
 					@input="onTitleChange" />
 				<h3
-					v-else
+					v-else-if="readOnly"
 					:id="titleId"
 					class="question__header__title__text"
 					dir="auto">
 					{{ computedText }}
 				</h3>
+				<div v-else class="question__header__title__text"></div>
 				<div
 					v-if="!readOnly && !questionValid"
 					:title="warningInvalid"
@@ -76,8 +83,9 @@
 					tabindex="0">
 					<NcIconSvgWrapper :svg="IconAlertCircleOutline" />
 				</div>
+				<!-- A trigger only has the options of its type, the conditional question owns the rest -->
 				<NcActions
-					v-if="!readOnly"
+					v-if="!readOnly && (!isTriggerQuestion || $slots.actions)"
 					:id="actionsId"
 					forceMenu
 					placement="bottom-end"
@@ -91,6 +99,7 @@
 						</IconOverlay>
 					</template>
 					<NcActionCheckbox
+						v-if="!isTriggerQuestion"
 						:modelValue="isRequired"
 						@update:modelValue="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
@@ -98,6 +107,7 @@
 					</NcActionCheckbox>
 					<slot name="actions" />
 					<NcActionInput
+						v-if="!isTriggerQuestion"
 						:label="t('forms', 'Technical name of the question')"
 						:labelOutside="false"
 						:showTrailingButton="false"
@@ -108,13 +118,16 @@
 						</template>
 						{{ t('forms', 'Technical name') }}
 					</NcActionInput>
-					<NcActionButton closeAfterClick @click="onClone">
+					<NcActionButton
+						v-if="!isTriggerQuestion"
+						closeAfterClick
+						@click="onClone">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconContentCopy" />
 						</template>
 						{{ t('forms', 'Copy question') }}
 					</NcActionButton>
-					<NcActionButton @click="onDelete">
+					<NcActionButton v-if="!isTriggerQuestion" @click="onDelete">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconDelete" />
 						</template>
@@ -123,7 +136,7 @@
 				</NcActions>
 			</div>
 			<div
-				v-if="hasDescription || !readOnly"
+				v-if="!isTriggerQuestion && (hasDescription || !readOnly)"
 				class="question__header__description">
 				<textarea
 					v-if="!readOnly"
@@ -132,7 +145,7 @@
 					:value="description"
 					:aria-label="
 						t('forms', 'Description of question number {index}', {
-							index,
+							index: number,
 						})
 					"
 					:placeholder="
@@ -164,7 +177,7 @@
 		<slot />
 		<!-- Insert question menu -->
 		<slot name="insert" />
-	</li>
+	</component>
 </template>
 
 <script lang="ts">
@@ -190,6 +203,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconOverlay from '../Icons/IconOverlay.vue'
+import { questionIdPrefix, questionNumber } from '../../composables/useQuestion.ts'
 
 export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
@@ -210,6 +224,11 @@ export default defineComponent({
 		index: {
 			type: Number,
 			required: true,
+		},
+
+		subIndex: {
+			type: Number,
+			default: null,
 		},
 
 		text: {
@@ -282,6 +301,11 @@ export default defineComponent({
 			type: String,
 			default: null,
 		},
+
+		isTriggerQuestion: {
+			type: Boolean,
+			default: false,
+		},
 	},
 
 	emits: [
@@ -327,14 +351,23 @@ export default defineComponent({
 		 * @return true if question valid
 		 */
 		const questionValid = computed(() => !!props.text && props.contentValid)
-		const actionsId = computed(() => 'q' + props.index + '_actions')
-		const titleId = computed(() => 'q' + props.index + '_title')
-		const descriptionId = computed(() => 'q' + props.index + '_desc')
+		const number = computed(() =>
+			questionNumber({ index: props.index, subIndex: props.subIndex }),
+		)
+		// The trigger of a conditional question shares its index, so its own elements need other ids
+		const idPrefix = computed(
+			() =>
+				questionIdPrefix({ index: props.index, subIndex: props.subIndex })
+				+ (props.isTriggerQuestion ? '_trigger' : ''),
+		)
+		const actionsId = computed(() => idPrefix.value + '_actions')
+		const titleId = computed(() => idPrefix.value + '_title')
+		const descriptionId = computed(() => idPrefix.value + '_desc')
 		const hasDescription = computed(() => props.description !== '')
 		const hasError = computed(() => !!props.errorMessage)
 		const hasInfo = computed(() => !!props.infoMessage)
-		const errorId = computed(() => `q${props.index}_error`)
-		const infoId = computed(() => `q${props.index}_info`)
+		const errorId = computed(() => `${idPrefix.value}_error`)
+		const infoId = computed(() => `${idPrefix.value}_info`)
 
 		const resizeDescription = (): void => {
 			// next tick ensures that the textarea is attached to DOM
@@ -425,6 +458,7 @@ export default defineComponent({
 			computedText,
 			computedDescription,
 			questionValid,
+			number,
 			actionsId,
 			titleId,
 			descriptionId,

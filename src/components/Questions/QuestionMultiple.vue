@@ -13,6 +13,7 @@
 		:shiftDragHandle="shiftDragHandle"
 		:errorMessage="errorMessage"
 		:infoMessage="infoMessage"
+		:isTriggerQuestion="isTriggerQuestion"
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox

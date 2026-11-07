@@ -30,6 +30,34 @@ export const QUESTION_EMITS = [
 	'moveUp',
 ]
 
+/**
+ * Prefix for the element ids of a question, unique for subquestions as well
+ *
+ * @param props question props
+ * @param props.index position of the question in the form
+ * @param props.subIndex position of a subquestion within its branch
+ */
+export function questionIdPrefix(props: {
+	index?: number
+	subIndex?: number | null
+}): string {
+	return props.subIndex ? `q${props.index}_${props.subIndex}` : `q${props.index}`
+}
+
+/**
+ * Number of a question as announced to users, e.g. "2" or "2.1" for a subquestion
+ *
+ * @param props question props
+ * @param props.index position of the question in the form
+ * @param props.subIndex position of a subquestion within its branch
+ */
+export function questionNumber(props: {
+	index?: number
+	subIndex?: number | null
+}): string {
+	return props.subIndex ? `${props.index}.${props.subIndex}` : `${props.index}`
+}
+
 export const QUESTION_PROPS = {
 	id: {
 		type: Number,
@@ -47,6 +75,10 @@ export const QUESTION_PROPS = {
 		type: String,
 		required: true,
 	},
+	isTriggerQuestion: {
+		type: Boolean,
+		default: false,
+	},
 	isRequired: {
 		type: Boolean,
 		required: true,
@@ -54,6 +86,11 @@ export const QUESTION_PROPS = {
 	index: {
 		type: Number,
 		required: true,
+	},
+	// Position of a subquestion within its branch, `index` is then the one of the conditional question
+	subIndex: {
+		type: Number,
+		default: null,
 	},
 	name: {
 		type: String,
@@ -124,8 +161,10 @@ interface QuestionPropsLike {
 	id: number
 	formId: number | null
 	index: number
+	subIndex?: number | null
 	text: string
 	description: string
+	isTriggerQuestion: boolean
 	isRequired: boolean
 	readOnly: boolean
 	name: string
@@ -139,8 +178,10 @@ interface QuestionPropsLike {
 
 interface QuestionForwardedProps {
 	index: number
+	subIndex: number | null
 	text: string
 	description: string
+	isTriggerQuestion: boolean
 	isRequired: boolean
 	readOnly: boolean
 	maxStringLengths: Record<string, number>
@@ -160,8 +201,10 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 
 	const questionProps = computed<QuestionForwardedProps>(() => ({
 		index: props.index,
+		subIndex: props.subIndex ?? null,
 		text: props.text,
 		description: props.description,
+		isTriggerQuestion: props.isTriggerQuestion,
 		isRequired: props.isRequired,
 		readOnly: props.readOnly,
 		maxStringLengths: props.maxStringLengths,
@@ -171,11 +214,11 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 	}))
 
 	const titleId = computed(() => {
-		return 'q' + props.index + '_title'
+		return questionIdPrefix(props) + '_title'
 	})
 
 	const descriptionId = computed(() => {
-		return 'q' + props.index + '_desc'
+		return questionIdPrefix(props) + '_desc'
 	})
 
 	const hasError = computed(() => {
@@ -187,11 +230,11 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 	})
 
 	const errorId = computed(() => {
-		return `q${props.index}_error`
+		return `${questionIdPrefix(props)}${props.isTriggerQuestion ? '_trigger' : ''}_error`
 	})
 
 	const infoId = computed(() => {
-		return `q${props.index}_info`
+		return `${questionIdPrefix(props)}${props.isTriggerQuestion ? '_trigger' : ''}_info`
 	})
 
 	const onTitleChange = debounce(function (text: string) {
@@ -214,7 +257,23 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 	) {
 		const newExtraSettings = { ...props.extraSettings, ...newSettings }
 		options.emit('update:extraSettings', newExtraSettings)
-		saveQuestionProperty('extraSettings', newExtraSettings)
+		const persistedExtraSettings =
+			props.type === 'conditional'
+				? {
+						...newExtraSettings,
+						branches: Array.isArray(newExtraSettings.branches)
+							? newExtraSettings.branches.map((branch) => {
+									const settings = { ...branch }
+									delete settings.subQuestions
+									return settings
+								})
+							: [],
+					}
+				: newExtraSettings
+		// Embedded triggers share their parent's ID; the parent owns persistence.
+		if (!props.isTriggerQuestion) {
+			saveQuestionProperty('extraSettings', persistedExtraSettings)
+		}
 	}, INPUT_DEBOUNCE_MS)
 
 	const onNameChange = debounce(function (name: string) {

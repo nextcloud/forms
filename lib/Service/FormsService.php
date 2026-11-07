@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2020 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2020-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -11,7 +11,6 @@ use OCA\Forms\Activity\ActivityManager;
 use OCA\Forms\Constants;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
-use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
@@ -86,73 +85,94 @@ class FormsService {
 	}
 
 	/**
-	 * Load options corresponding to question
-	 *
-	 * @param integer $questionId
-	 * @return list<FormsOption>
-	 */
-	private function getOptions(int $questionId): array {
-		$optionList = [];
-		try {
-			$optionEntities = $this->optionMapper->findByQuestion($questionId);
-			foreach ($optionEntities as $optionEntity) {
-				$optionList[] = $optionEntity->read();
-			}
-		} catch (DoesNotExistException) {
-			//handle silently
-		} finally {
-			return $optionList;
-		}
-	}
-
-	/**
 	 * Load questions corresponding to form
 	 *
 	 * @param integer $formId
 	 * @return list<FormsQuestion>
 	 */
 	public function getQuestions(int $formId): array {
-		$questionList = [];
 		try {
-			$questionEntities = $this->questionMapper->findByForm($formId);
-
-			$questionIds = array_map(static fn (Question $question) => $question->getId(), $questionEntities);
-			$optionsByQuestion = [];
-			foreach ($this->optionMapper->findByQuestions($questionIds) as $optionEntity) {
-				$optionsByQuestion[$optionEntity->getQuestionId()][] = $optionEntity;
-			}
-
-			foreach ($questionEntities as $questionEntity) {
-				$question = $questionEntity->read();
-				$question['options'] = array_map(
-					static fn (Option $option) => $option->read(),
-					$optionsByQuestion[$question['id']] ?? []
-				);
-				$question['accept'] = [];
-				if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
-					if ($question['extraSettings']['allowedFileTypes'] ?? null) {
-						$question['accept'] = array_map(fn (string $fileType) => str_contains($fileType, '/') ? $fileType : $fileType . '/*', $question['extraSettings']['allowedFileTypes']);
-					}
-
-					if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
-						foreach ($question['extraSettings']['allowedFileExtensions'] as $extension) {
-							$question['accept'][] = '.' . $extension;
-						}
-					}
-				}
-
-				// Set `isRequired` if minimum options limit is set
-				if ($question['type'] === Constants::ANSWER_TYPE_MULTIPLE && ($question['extraSettings']['optionsLimitMin'] ?? 0) > 0) {
-					$question['isRequired'] = true;
-				}
-
-				$questionList[] = $question;
-			}
+			// Top-level questions and subquestions are loaded at once and sorted by order
+			$questionEntities = $this->questionMapper->findByForm($formId, false, true);
 		} catch (DoesNotExistException) {
-			//handle silently
-		} finally {
-			return $questionList;
+			return [];
 		}
+
+		$optionsByQuestion = $this->getOptionsByQuestion($questionEntities);
+		$subQuestionsByParent = [];
+		foreach ($questionEntities as $questionEntity) {
+			if ($questionEntity->getParentQuestionId() !== null) {
+				$subQuestionsByParent[$questionEntity->getParentQuestionId()][] = $questionEntity;
+			}
+		}
+
+		$questionList = [];
+		foreach ($questionEntities as $questionEntity) {
+			if ($questionEntity->getParentQuestionId() === null) {
+				$questionList[] = $this->formatQuestion($questionEntity, $optionsByQuestion, $subQuestionsByParent[$questionEntity->getId()] ?? []);
+			}
+		}
+		return $questionList;
+	}
+
+	/**
+	 * Load the options of the given questions at once
+	 *
+	 * @param Question[] $questionEntities
+	 * @return array<int, list<FormsOption>> the options keyed by question id
+	 */
+	private function getOptionsByQuestion(array $questionEntities): array {
+		$questionIds = array_map(static fn (Question $question) => $question->getId(), $questionEntities);
+		$optionsByQuestion = [];
+		foreach ($this->optionMapper->findByQuestions($questionIds) as $optionEntity) {
+			$optionsByQuestion[$optionEntity->getQuestionId()][] = $optionEntity->read();
+		}
+		return $optionsByQuestion;
+	}
+
+	/**
+	 * Build the API representation of a question
+	 *
+	 * @param array<int, list<FormsOption>> $optionsByQuestion the options keyed by question id
+	 * @param Question[] $subQuestionEntities the subquestions, if the question is a conditional question
+	 * @return FormsQuestion
+	 */
+	private function formatQuestion(Question $questionEntity, array $optionsByQuestion, array $subQuestionEntities = []): array {
+		$question = $questionEntity->read();
+		$question['options'] = $optionsByQuestion[$question['id']] ?? [];
+		$question['accept'] = [];
+		if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
+			if ($question['extraSettings']['allowedFileTypes'] ?? null) {
+				$question['accept'] = array_map(fn (string $fileType) => str_contains($fileType, '/') ? $fileType : $fileType . '/*', $question['extraSettings']['allowedFileTypes']);
+			}
+
+			if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
+				foreach ($question['extraSettings']['allowedFileExtensions'] as $extension) {
+					$question['accept'][] = '.' . $extension;
+				}
+			}
+		}
+
+		// Set `isRequired` if minimum options limit is set
+		if ($question['type'] === Constants::ANSWER_TYPE_MULTIPLE && ($question['extraSettings']['optionsLimitMin'] ?? 0) > 0) {
+			$question['isRequired'] = true;
+		}
+
+		// Attach the subquestions of conditional questions to their branches
+		if ($question['type'] === Constants::ANSWER_TYPE_CONDITIONAL && is_array($question['extraSettings']['branches'] ?? null)) {
+			$subQuestionsByBranch = [];
+			foreach ($subQuestionEntities as $subQuestionEntity) {
+				// Subquestions always belong to the form of their parent
+				if ($subQuestionEntity->getFormId() === $questionEntity->getFormId()) {
+					$subQuestionsByBranch[$subQuestionEntity->getBranchId()][] = $this->formatQuestion($subQuestionEntity, $optionsByQuestion);
+				}
+			}
+			foreach ($question['extraSettings']['branches'] as $index => $branch) {
+				$question['extraSettings']['branches'][$index]['subQuestions'] = $subQuestionsByBranch[$branch['id'] ?? ''] ?? [];
+			}
+		}
+
+		return $question;
 	}
 
 	/**
@@ -164,24 +184,16 @@ class FormsService {
 	public function getQuestion(int $questionId): ?array {
 		try {
 			$questionEntity = $this->questionMapper->findById($questionId);
-			$question = $questionEntity->read();
-			$question['options'] = $this->getOptions($question['id']);
-			$question['accept'] = [];
-			if ($question['type'] === Constants::ANSWER_TYPE_FILE) {
-				if ($question['extraSettings']['allowedFileTypes'] ?? null) {
-					$question['accept'] = array_map(fn (string $fileType) => str_contains($fileType, '/') ? $fileType : $fileType . '/*', $question['extraSettings']['allowedFileTypes']);
-				}
-
-				if ($question['extraSettings']['allowedFileExtensions'] ?? null) {
-					foreach ($question['extraSettings']['allowedFileExtensions'] as $extension) {
-						$question['accept'][] = '.' . $extension;
-					}
-				}
-			}
-			return $question;
 		} catch (DoesNotExistException) {
 			return null;
 		}
+
+		$subQuestionEntities = $questionEntity->getType() === Constants::ANSWER_TYPE_CONDITIONAL
+			? $this->questionMapper->findByParentQuestion($questionId)
+			: [];
+		$optionsByQuestion = $this->getOptionsByQuestion(array_merge([$questionEntity], $subQuestionEntities));
+
+		return $this->formatQuestion($questionEntity, $optionsByQuestion, $subQuestionEntities);
 	}
 
 	/**
@@ -853,6 +865,64 @@ class FormsService {
 	}
 
 	/**
+	 * Check that a regular expression is enclosed in slashes, only uses modifiers supported by PHP *and* JS and compiles
+	 */
+	private function isValidRegex(string $regex): bool {
+		// general pattern of a valid regex
+		$VALID_REGEX = '/^\/(.+)\/([smi]{0,3})$/';
+		// pattern to look for unescaped slashes
+		$REGEX_UNESCAPED_SLASHES = '/(?<=(^|[^\\]))(\\\\)*\//';
+
+		$matches = [];
+		// only pattern with delimiters and supported modifiers (by PHP *and* JS)
+		if (@preg_match($VALID_REGEX, $regex, $matches) !== 1) {
+			return false;
+		}
+
+		// We use slashes as delimters, so unescaped slashes within the pattern are **not** allowed
+		if (@preg_match($REGEX_UNESCAPED_SLASHES, $matches[1]) === 1) {
+			return false;
+		}
+
+		// Try to compile the given pattern, `preg_match` will return false if the pattern is invalid
+		return @preg_match($regex, 'some string') !== false;
+	}
+
+	/**
+	 * Check the conditions of a conditional question branch against its trigger type
+	 *
+	 * @param string $triggerType the type of the trigger question
+	 * @param array $conditions the conditions of the branch
+	 */
+	private function areBranchConditionsValid(string $triggerType, array $conditions): bool {
+		$allowedTypes = Constants::CONDITIONAL_TRIGGER_TYPES[$triggerType] ?? [];
+		foreach ($conditions as $condition) {
+			if (!is_array($condition)) {
+				return false;
+			}
+			if (isset($condition['type']) && !in_array($condition['type'], $allowedTypes, true)) {
+				return false;
+			}
+			if (isset($condition['optionId']) && !is_int($condition['optionId'])) {
+				return false;
+			}
+			if (isset($condition['optionIds'])
+				&& (!is_array($condition['optionIds']) || array_filter($condition['optionIds'], static fn ($id) => !is_int($id)) !== [])) {
+				return false;
+			}
+			foreach (['value', 'min', 'max'] as $key) {
+				if (isset($condition[$key]) && !is_scalar($condition[$key])) {
+					return false;
+				}
+			}
+			if (($condition['type'] ?? null) === Constants::CONDITION_TYPE_REGEX && !$this->isValidRegex((string)($condition['value'] ?? ''))) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
 	 * Return shares of a form shared with given user
 	 *
 	 * @param int $formId The form to query shares for
@@ -900,19 +970,28 @@ class FormsService {
 			return true;
 		}
 
-		// Ensure only allowed keys are set
-		$allowed = match ($questionType) {
+		// Map allowed options to answer type
+		$extraSettingsMap = [
 			Constants::ANSWER_TYPE_DROPDOWN => Constants::EXTRA_SETTINGS_DROPDOWN,
-			Constants::ANSWER_TYPE_MULTIPLE, Constants::ANSWER_TYPE_MULTIPLEUNIQUE => Constants::EXTRA_SETTINGS_MULTIPLE,
+			Constants::ANSWER_TYPE_MULTIPLE => Constants::EXTRA_SETTINGS_MULTIPLE,
+			Constants::ANSWER_TYPE_MULTIPLEUNIQUE => Constants::EXTRA_SETTINGS_MULTIPLE,
 			Constants::ANSWER_TYPE_SHORT => Constants::EXTRA_SETTINGS_SHORT,
 			Constants::ANSWER_TYPE_FILE => Constants::EXTRA_SETTINGS_FILE,
 			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
 			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
-			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
 			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
 			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
-			default => [],
-		};
+			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
+			Constants::ANSWER_TYPE_CONDITIONAL => Constants::EXTRA_SETTINGS_CONDITIONAL,
+		];
+
+		// Get triggertype if is conditional
+		$triggerType = $extraSettings['triggerType'] ?? null;
+		if (is_string($triggerType) && isset($extraSettingsMap[$triggerType])) {
+			$extraSettingsMap[Constants::ANSWER_TYPE_CONDITIONAL] += $extraSettingsMap[$triggerType];
+		}
+		// Ensure only allowed keys are set
+		$allowed = $extraSettingsMap[$questionType] ?? [];
 		// Number of keys in extraSettings but not in allowed (but not the other way round)
 		$diff = array_diff(array_keys($extraSettings), array_keys($allowed));
 		if (count($diff) > 0) {
@@ -1022,24 +1101,7 @@ class FormsService {
 					return true;
 				}
 
-				// general pattern of a valid regex
-				$VALID_REGEX = '/^\/(.+)\/([smi]{0,3})$/';
-				// pattern to look for unescaped slashes
-				$REGEX_UNESCAPED_SLASHES = '/(?<=(^|[^\\\\]))(\\\\\\\\)*\\//';
-
-				$matches = [];
-				// only pattern with delimiters and supported modifiers (by PHP *and* JS)
-				if (@preg_match($VALID_REGEX, $extraSettings['validationRegex'], $matches) !== 1) {
-					return false;
-				}
-
-				// We use slashes as delimters, so unescaped slashes within the pattern are **not** allowed
-				if (@preg_match($REGEX_UNESCAPED_SLASHES, $matches[1]) === 1) {
-					return false;
-				}
-
-				// Try to compile the given pattern, `preg_match` will return false if the pattern is invalid
-				if (@preg_match($extraSettings['validationRegex'], 'some string') === false) {
+				if (!$this->isValidRegex($extraSettings['validationRegex'])) {
 					return false;
 				}
 			}
@@ -1051,6 +1113,50 @@ class FormsService {
 				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
 				return false;
 			}
+		} elseif ($questionType === Constants::ANSWER_TYPE_CONDITIONAL) {
+			// Validate conditional question settings
+			if (!isset($extraSettings['triggerType']) || !is_string($extraSettings['triggerType'])) {
+				return false;
+			}
+
+			// Validate trigger type is a valid question type (and not nested conditional)
+			if (!array_key_exists($extraSettings['triggerType'], Constants::CONDITIONAL_TRIGGER_TYPES)) {
+				return false;
+			}
+
+			// Branches are required for conditional questions
+			if (!isset($extraSettings['branches']) || !is_array($extraSettings['branches'])) {
+				return false;
+			}
+
+			// Validate branches structure
+			foreach ($extraSettings['branches'] as $branch) {
+				// Each branch must have an id
+				if (!isset($branch['id']) || !is_string($branch['id'])) {
+					return false;
+				}
+
+				// Branches must have conditions array
+				if (!isset($branch['conditions']) || !is_array($branch['conditions'])) {
+					return false;
+				}
+
+				if (!$this->areBranchConditionsValid($extraSettings['triggerType'], $branch['conditions'])) {
+					return false;
+				}
+			}
+
+			$diff = array_diff(array_keys($extraSettings), array_keys(Constants::EXTRA_SETTINGS_CONDITIONAL));
+			// Handle options of triggerQuestion
+			if (count($diff) > 0 && isset($triggerType) && $triggerType !== '') {
+				$diffDict = [];
+				foreach ($diff as $k) {
+					$diffDict[$k] = $extraSettings[$k];
+				}
+				$valid = self::areExtraSettingsValid($diffDict, $triggerType);
+				return $valid;
+			}
+
 		}
 		return true;
 	}

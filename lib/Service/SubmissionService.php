@@ -1,7 +1,7 @@
 <?php
 
 /**
- * SPDX-FileCopyrightText: 2021 Nextcloud GmbH and Nextcloud contributors
+ * SPDX-FileCopyrightText: 2021-2026 Nextcloud GmbH and Nextcloud contributors
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
@@ -241,7 +241,7 @@ class SubmissionService {
 		// Oldest first
 		$submissionEntities = array_reverse($submissionEntities);
 
-		$questions = $this->questionMapper->findByForm($form->getId());
+		$questions = $this->orderQuestionsForExport($this->questionMapper->findByForm($form->getId(), false, true));
 		$defaultTimeZone = $this->config->getSystemValueString('default_timezone', 'UTC');
 
 		if (!$this->currentUser) {
@@ -591,13 +591,27 @@ class SubmissionService {
 	 * @param array $answers Array of the submitted answers
 	 * @param string $formOwnerId Owner of the form
 	 * @param int $formId Id of the form being submitted
-	 * @throw \InvalidArgumentException if validation failed
+	 * @throws \InvalidArgumentException if validation failed
 	 */
 	public function validateSubmission(array $questions, array $answers, string $formOwnerId, int $formId): void {
 		// Check by questions
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
 			$questionAnswered = array_key_exists($questionId, $answers);
+
+			// Special handling for conditional questions
+			if ($question['type'] === Constants::ANSWER_TYPE_CONDITIONAL) {
+				// Check if required conditional has any answer
+				if ($question['isRequired'] && !$questionAnswered) {
+					throw new \InvalidArgumentException(sprintf('Question "%s" is required.', $question['text']));
+				}
+
+				// If answered, validate the conditional structure
+				if ($questionAnswered) {
+					$this->validateConditionalQuestion($question, $answers[$questionId], $formOwnerId, $formId);
+				}
+				continue;
+			}
 
 			// Check if all required questions have an answer
 			if ($question['isRequired']
@@ -958,5 +972,326 @@ class SubmissionService {
 		// Explicitly type as string so values that start with '=' are not interpreted as formulas.
 		$activeWorksheet->getCell([$column, $row])
 			->setValueExplicit($value, DataType::TYPE_STRING);
+	}
+
+	/**
+	 * Put the subquestions of each conditional question right after it, in branch order,
+	 * and leave out subquestions of branches that no longer exist
+	 *
+	 * @param Question[] $questions top-level questions and subquestions, sorted by order
+	 * @return list<Question>
+	 */
+	private function orderQuestionsForExport(array $questions): array {
+		$subQuestions = [];
+		foreach ($questions as $question) {
+			if ($question->getParentQuestionId() !== null) {
+				$subQuestions[$question->getParentQuestionId()][(string)$question->getBranchId()][] = $question;
+			}
+		}
+
+		$ordered = [];
+		foreach ($questions as $question) {
+			if ($question->getParentQuestionId() !== null) {
+				continue;
+			}
+			$ordered[] = $question;
+			if ($question->getType() === Constants::ANSWER_TYPE_CONDITIONAL) {
+				foreach ($question->getExtraSettings()['branches'] ?? [] as $branch) {
+					array_push($ordered, ...($subQuestions[$question->getId()][(string)($branch['id'] ?? '')] ?? []));
+				}
+			}
+		}
+		return $ordered;
+	}
+
+	/**
+	 * Validate conditional question answers
+	 *
+	 * Conditional questions have a special answer structure:
+	 * - trigger: array of trigger answer values
+	 * - subQuestions: array of subquestion answers keyed by subquestion ID
+	 *
+	 * @param array $question The conditional question
+	 * @param array $answerData The answer data for the conditional question
+	 * @param string $formOwnerId Owner of the form
+	 * @param int $formId Id of the form being submitted
+	 * @throws \InvalidArgumentException if validation failed
+	 */
+	private function validateConditionalQuestion(array $question, array $answerData, string $formOwnerId, int $formId): void {
+		if (empty($question['extraSettings']['triggerType'])) {
+			throw new \InvalidArgumentException(sprintf('Conditional question "%s" is missing trigger type configuration.', $question['text']));
+		}
+
+		[$triggerAnswer, $subQuestionAnswers] = self::splitConditionalAnswer($answerData);
+
+		// The trigger gets the same checks as a regular question of the trigger type
+		$triggerQuestion = self::getTriggerQuestion($question);
+		$this->validateSubmission([$triggerQuestion], $triggerAnswer === [] ? [] : [$triggerQuestion['id'] => $triggerAnswer], $formOwnerId, $formId);
+
+		// Only the subquestions of the active branches may be answered, with the full per-question rules
+		$subQuestions = [];
+		foreach ($this->getActiveBranches($question, $triggerAnswer) as $branch) {
+			array_push($subQuestions, ...($branch['subQuestions'] ?? []));
+		}
+		$this->validateSubmission($subQuestions, $subQuestionAnswers, $formOwnerId, $formId);
+	}
+
+	/**
+	 * Split the answer of a conditional question into the trigger answer and the subquestion answers
+	 *
+	 * @param array $answerData `{trigger: [...], subQuestions: {id: [...]}}`, or just the trigger answer
+	 * @return array{0: array, 1: array} the trigger answer and the subquestion answers keyed by subquestion id
+	 */
+	public static function splitConditionalAnswer(array $answerData): array {
+		if (!array_key_exists('trigger', $answerData) && !array_key_exists('subQuestions', $answerData)) {
+			return [$answerData, []];
+		}
+
+		$triggerAnswer = $answerData['trigger'] ?? [];
+		$subQuestionAnswers = $answerData['subQuestions'] ?? [];
+		if (!is_array($triggerAnswer) || !is_array($subQuestionAnswers)) {
+			throw new \InvalidArgumentException('Invalid answer for conditional question.');
+		}
+		foreach ($subQuestionAnswers as $subQuestionAnswer) {
+			if (!is_array($subQuestionAnswer)) {
+				throw new \InvalidArgumentException('Invalid answer for conditional question.');
+			}
+		}
+
+		return [$triggerAnswer, $subQuestionAnswers];
+	}
+
+	/**
+	 * Get the trigger of a conditional question as a regular question of the trigger type
+	 *
+	 * The trigger shares id, options and the remaining extra settings with the conditional question.
+	 *
+	 * @param array $question The conditional question
+	 * @return array The trigger question
+	 */
+	public static function getTriggerQuestion(array $question): array {
+		$extraSettings = $question['extraSettings'] ?? [];
+		$triggerType = $extraSettings['triggerType'] ?? '';
+		unset($extraSettings['triggerType'], $extraSettings['branches']);
+
+		return [
+			...$question,
+			'type' => $triggerType,
+			'extraSettings' => $extraSettings,
+		];
+	}
+
+	/**
+	 * Resolve the branch a conditional question's trigger answer activates
+	 *
+	 * @param array $question The conditional question
+	 * @param array $triggerAnswer The trigger answer values
+	 * @return array The active branches or empty array if none matches
+	 */
+	public function getActiveBranches(array $question, array $triggerAnswer): array {
+		$extraSettings = $question['extraSettings'] ?? [];
+		return $this->findActiveBranches(
+			$extraSettings['triggerType'] ?? '',
+			$triggerAnswer,
+			$extraSettings['branches'] ?? [],
+			$question['options'] ?? [],
+		);
+	}
+
+	/**
+	 * Find the active branches based on trigger answer
+	 *
+	 * @param string $triggerType The type of the trigger question
+	 * @param array $triggerAnswer The trigger answer values
+	 * @param array $branches The available branches
+	 * @param array $options The options for the trigger question
+	 * @return array The active branches or empty array if none matches
+	 */
+	private function findActiveBranches(string $triggerType, array $triggerAnswer, array $branches, array $options): array {
+		return array_filter($branches, function ($branch) use ($triggerType, $triggerAnswer) {
+			$conditions = $branch['conditions'] ?? [];
+			if (empty($conditions)) {
+				return false;
+			}
+			return $this->evaluateBranchConditions($triggerType, $triggerAnswer, $conditions);
+		});
+	}
+
+	/**
+	 * Evaluate if branch conditions match the trigger answer
+	 *
+	 * @param string $triggerType The type of the trigger question
+	 * @param array $triggerAnswer The trigger answer values
+	 * @param array $conditions The conditions to evaluate
+	 * @return bool True if conditions match
+	 */
+	private function evaluateBranchConditions(string $triggerType, array $triggerAnswer, array $conditions): bool {
+		// Option ids arrive as numbers or strings depending on the trigger component
+		$selectedOptionIds = array_map('strval', array_filter($triggerAnswer, 'is_scalar'));
+
+		// An unanswered trigger activates no branch, except "no file uploaded" for file triggers
+		if ($triggerType !== Constants::ANSWER_TYPE_FILE && ($triggerAnswer === [] || ($triggerAnswer[0] ?? '') === '')) {
+			return false;
+		}
+
+		switch ($triggerType) {
+			case Constants::ANSWER_TYPE_MULTIPLEUNIQUE:
+			case Constants::ANSWER_TYPE_DROPDOWN:
+				// Single select: check if selected option matches any condition
+				foreach ($conditions as $condition) {
+					$optionId = $condition['optionId'] ?? null;
+					if (is_scalar($optionId) && in_array((string)$optionId, $selectedOptionIds, true)) {
+						return true;
+					}
+				}
+				return false;
+			case Constants::ANSWER_TYPE_MULTIPLE:
+				// Multi-select: the branch is active if all option ids of any of its conditions are selected
+				foreach ($conditions as $condition) {
+					$optionIds = $condition['optionIds'] ?? [];
+					if (empty($optionIds) || !is_array($optionIds)) {
+						continue;
+					}
+					if (array_diff(array_map('strval', $optionIds), $selectedOptionIds) === []) {
+						return true;
+					}
+				}
+				return false;
+			case Constants::ANSWER_TYPE_SHORT:
+			case Constants::ANSWER_TYPE_LONG:
+				// Text-based: evaluate regex/string conditions
+				$text = is_scalar($triggerAnswer[0] ?? null) ? (string)$triggerAnswer[0] : '';
+				foreach ($conditions as $condition) {
+					$type = $condition['type'] ?? Constants::CONDITION_TYPE_STRING_CONTAINS;
+					$value = $condition['value'] ?? '';
+
+					switch ($type) {
+						case Constants::CONDITION_TYPE_STRING_EQUALS:
+							if ($text === $value) {
+								return true;
+							}
+							break;
+						case Constants::CONDITION_TYPE_STRING_CONTAINS:
+							if (str_contains($text, $value)) {
+								return true;
+							}
+							break;
+						case Constants::CONDITION_TYPE_REGEX:
+							if ($this->safeRegexMatch($value, $text)) {
+								return true;
+							}
+							break;
+					}
+				}
+				return false;
+			case Constants::ANSWER_TYPE_LINEARSCALE:
+				$numValue = (float)($triggerAnswer[0] ?? 0);
+				foreach ($conditions as $condition) {
+					$type = $condition['type'] ?? Constants::CONDITION_TYPE_VALUE_EQUALS;
+					if ($type === Constants::CONDITION_TYPE_VALUE_EQUALS) {
+						if ($numValue == (float)($condition['value'] ?? 0)) {
+							return true;
+						}
+					} elseif ($type === Constants::CONDITION_TYPE_VALUE_NOT_EQUALS) {
+						if ($numValue != (float)($condition['value'] ?? 0)) {
+							return true;
+						}
+					} elseif ($type === Constants::CONDITION_TYPE_VALUE_RANGE) {
+						$min = $condition['min'] ?? -PHP_FLOAT_MAX;
+						$max = $condition['max'] ?? PHP_FLOAT_MAX;
+						if ($numValue >= $min && $numValue <= $max) {
+							return true;
+						}
+					} elseif ($type === Constants::CONDITION_TYPE_VALUE_MIN) {
+						$min = $condition['min'] ?? -PHP_FLOAT_MAX;
+						if ($numValue >= $min) {
+							return true;
+						}
+					} elseif ($type === Constants::CONDITION_TYPE_VALUE_MAX) {
+						$max = $condition['max'] ?? PHP_FLOAT_MAX;
+						if ($numValue <= $max) {
+							return true;
+						}
+					}
+				}
+				return false;
+			case Constants::ANSWER_TYPE_COLOR:
+				$colorValue = is_scalar($triggerAnswer[0] ?? null) ? (string)$triggerAnswer[0] : '';
+				foreach ($conditions as $condition) {
+					if (strcasecmp($colorValue, $condition['value'] ?? '') === 0) {
+						return true;
+					}
+				}
+				return false;
+			case Constants::ANSWER_TYPE_FILE:
+				$hasFile = !empty($triggerAnswer);
+				foreach ($conditions as $condition) {
+					if (($condition['fileUploaded'] ?? true) === $hasFile) {
+						return true;
+					}
+				}
+				return false;
+			case Constants::ANSWER_TYPE_DATE:
+			case Constants::ANSWER_TYPE_DATETIME:
+			case Constants::ANSWER_TYPE_TIME:
+				// Date range conditions
+				$dateValue = $triggerAnswer[0] ?? '';
+				if (empty($dateValue)) {
+					return false;
+				}
+				$format = Constants::ANSWER_PHPDATETIME_FORMAT[$triggerType] ?? 'Y-m-d';
+				$date = \DateTime::createFromFormat('!' . $format, $dateValue);
+				if (!$date) {
+					return false;
+				}
+
+				foreach ($conditions as $condition) {
+					$min = isset($condition['min']) ? \DateTime::createFromFormat('!' . $format, $condition['min']) : null;
+					$max = isset($condition['max']) ? \DateTime::createFromFormat('!' . $format, $condition['max']) : null;
+
+					$inRange = true;
+					if ($min && $date < $min) {
+						$inRange = false;
+					}
+					if ($max && $date > $max) {
+						$inRange = false;
+					}
+					if ($inRange) {
+						return true;
+					}
+				}
+				return false;
+			default:
+				return false;
+		}
+	}
+
+	/**
+	 * Safely execute a regex match with validation to prevent ReDoS attacks
+	 *
+	 * @param string $pattern The regex pattern to match
+	 * @param string $subject The string to match against
+	 * @return bool True if the pattern matches, false otherwise
+	 */
+	private function safeRegexMatch(string $pattern, string $subject): bool {
+		if (empty($pattern) || strlen($subject) > 10000) {
+			return false;
+		}
+
+		// Validate regex syntax
+		if (@preg_match($pattern, '') === false) {
+			return false;
+		}
+
+		// Set backtrack limit to prevent catastrophic backtracking
+		$previousLimit = ini_get('pcre.backtrack_limit');
+		ini_set('pcre.backtrack_limit', '10000');
+
+		try {
+			$result = @preg_match($pattern, $subject);
+			return $result === 1;
+		} finally {
+			ini_set('pcre.backtrack_limit', $previousLimit);
+		}
 	}
 }

@@ -229,7 +229,7 @@
 		<!-- Summary view for visualization -->
 		<section v-else-if="isSummaryView">
 			<ResultsSummary
-				v-for="question in questions"
+				v-for="question in summaryQuestions"
 				:key="question.id"
 				:question="question"
 				:submissions="submissions" />
@@ -430,6 +430,25 @@ export default defineComponent({
 		const viewForm = useViewForm({ form: () => props.form, emit })
 
 		const questions = ref<FormsQuestion[]>([])
+
+		/**
+		 * Questions to summarize: the trigger of a conditional question as a question of
+		 * its trigger type, followed by the subquestions of all its branches
+		 */
+		const summaryQuestions = computed<FormsQuestion[]>(() =>
+			questions.value.flatMap((question) => {
+				const triggerType = question.extraSettings?.triggerType
+				if (question.type !== 'conditional' || !triggerType) {
+					return [question]
+				}
+				return [
+					{ ...question, type: triggerType },
+					...(question.extraSettings?.branches ?? []).flatMap(
+						(branch) => branch.subQuestions ?? [],
+					),
+				]
+			}),
+		)
 		const submissions = ref<FormsSubmission[]>([])
 		const filteredSubmissionsCount = ref(0)
 		const isDownloadActionOpened = ref(false)
@@ -1074,6 +1093,7 @@ export default defineComponent({
 			t,
 			responseViews,
 			questions,
+			summaryQuestions,
 			submissions,
 			filteredSubmissionsCount,
 			isDownloadActionOpened,
