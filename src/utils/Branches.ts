@@ -18,6 +18,9 @@ const BRANCH_MATCHERS: Record<string, BranchMatcher> = {
 	multiple_unique: matchOptionSelected,
 	dropdown: matchOptionSelected,
 	multiple: matchOptionsCombination,
+	date: matchDateRange,
+	datetime: matchDateRange,
+	time: matchDateRange,
 }
 
 /**
@@ -50,6 +53,26 @@ function matchOptionsCombination(
 			Array.isArray(condition.optionIds)
 			&& condition.optionIds.length > 0
 			&& condition.optionIds.every((id) => values.includes(String(id))),
+	)
+}
+
+/**
+ * Dates and times match if they are within the range of any condition, including its bounds
+ *
+ * Answers and bounds use the same format (`YYYY-MM-DD`, `HH:mm`), so they compare as strings.
+ *
+ * @param conditions the conditions of the branch
+ * @param values the answer of the question
+ */
+function matchDateRange(
+	conditions: Record<string, unknown>[],
+	values: string[],
+): boolean {
+	const value = values[0]
+	return conditions.some(
+		(condition) =>
+			!(condition.min && value < String(condition.min))
+			&& !(condition.max && value > String(condition.max)),
 	)
 }
 
