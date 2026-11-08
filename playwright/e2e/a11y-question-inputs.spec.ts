@@ -305,4 +305,39 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 			question.getByRole('radio', { name: 'Service, Good' }),
 		).toBeAttached()
 	})
+
+	test('Ranking question groups two named lists instead of a list of non-items', async ({
+		appNavigation,
+		form,
+		topBar,
+		page,
+	}) => {
+		await appNavigation.clickNewForm()
+		await form.fillTitle('Test form')
+
+		await form.addQuestion(QuestionType.Ranking)
+		const questions = await form.getQuestions()
+		await questions[0].fillTitle('Rank snacks')
+		await questions[0].addAnswer('Pretzels')
+		await questions[0].addAnswer('Popcorn')
+
+		await topBar.toggleView(FormsView.View)
+
+		const question = page.getByRole('listitem', { name: /Question number 1/ })
+		const group = question.getByRole('group', { name: /Rank snacks/ })
+		const unrankedList = group.getByRole('list', {
+			name: 'Unranked options',
+		})
+		const rankedList = group.getByRole('list', { name: 'Your ranking' })
+
+		await expect(unrankedList).toBeVisible()
+		await expect(unrankedList).toHaveAttribute('role', 'list')
+		// The empty ranked list has no role to avoid an empty list role
+		await expect(rankedList).toBeAttached()
+		await expect(rankedList).not.toHaveAttribute('role', 'list')
+
+		await group.getByRole('button', { name: 'Pretzels' }).click()
+		await expect(rankedList).toHaveAttribute('role', 'list')
+		await expect(rankedList).toBeVisible()
+	})
 })
