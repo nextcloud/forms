@@ -674,7 +674,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
 	 * @throws OCSBadRequestException Invalid extraSettings, will not update.
 	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
-	 * @throws OCSForbiddenException Not allowed to update `id` or `formId`
+	 * @throws OCSForbiddenException Not allowed to update `id`, `formId` or `type`
 	 * @throws OCSForbiddenException Please use reorderQuestions() to change order
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException User has no permissions to get this form
@@ -721,10 +721,10 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Empty keyValuePairs, will not update.');
 		}
 
-		//Don't allow to change id or formId
-		if (array_key_exists('id', $keyValuePairs) || array_key_exists('formId', $keyValuePairs)) {
-			$this->logger->debug('Not allowed to update \'id\' or \'formId\'');
-			throw new OCSForbiddenException('Not allowed to update \'id\' or \'formId\'');
+		// Don't allow to change id, formId, or type
+		if (array_key_exists('id', $keyValuePairs) || array_key_exists('formId', $keyValuePairs) || array_key_exists('type', $keyValuePairs)) {
+			$this->logger->debug('Not allowed to update \'id\', \'formId\' or \'type\'');
+			throw new OCSForbiddenException('Not allowed to update \'id\', \'formId\' or \'type\'');
 		}
 
 		// Don't allow to reorder here
