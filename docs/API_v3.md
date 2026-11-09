@@ -451,7 +451,7 @@ Update a single or multiple properties of a question-object.
   | Parameter | Type | Description |
   |-----------|---------|-------------|
   | _keyValuePairs_ | Array | Array of key-value pairs to update |
-- Restrictions: It is **not allowed** to update one of the following key-value pairs: _id, formId, order_.
+- Restrictions: It is **not allowed** to update one of the following key-value pairs: _id, formId, order, type_.
 - Response: **Status-Code OK**, as well as the id of the updated question.
 
 ```
