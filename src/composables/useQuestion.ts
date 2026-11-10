@@ -13,7 +13,7 @@ import { emit as emitEvent } from '@nextcloud/event-bus'
 import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
-import { computed, nextTick, ref, toRaw } from 'vue'
+import { computed, nextTick, onDeactivated, ref, toRaw, watch } from 'vue'
 import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
@@ -110,6 +110,13 @@ export const QUESTION_PROPS = {
 		type: Boolean,
 		default: false,
 	},
+	/**
+	 * Error shown instead of the error of the last validation, `null` for none
+	 */
+	answerError: {
+		type: String,
+		default: null,
+	},
 }
 
 const questionRequests = new Map<number, Promise<unknown>>()
@@ -163,6 +170,7 @@ interface QuestionPropsLike {
 	canMoveDown: boolean
 	extraSettings: Record<string, unknown>
 	options: FormsOption[]
+	answerError?: string | null
 	[key: string]: unknown
 }
 
@@ -186,7 +194,24 @@ interface QuestionForwardedProps {
  * @param options Emits bridge for forwarding events to parent components.
  */
 export function useQuestion(props: QuestionPropsLike, options: UseQuestionOptions) {
-	const errorMessage = ref<string | null>(null)
+	const validationError = ref<string | null>(null)
+	const errorMessage = computed<string | null>({
+		get: () => props.answerError ?? validationError.value,
+		set: (message) => {
+			validationError.value = message
+		},
+	})
+	watch(
+		() => props.answerError,
+		(current, previous) => {
+			if (previous && !current) {
+				validationError.value = null
+			}
+		},
+	)
+	onDeactivated(() => {
+		errorMessage.value = null
+	})
 
 	let pendingExtraSettings: Record<string, unknown> = {}
 	const saveExtraSettings = debounce(function () {

@@ -60,6 +60,9 @@
 			<div class="hidden-visually" aria-live="polite">
 				{{ successAnnouncement }}
 			</div>
+			<div class="hidden-visually" aria-live="polite">
+				{{ jumpAnnouncement }}
+			</div>
 
 			<NcEmptyContent
 				v-if="loading"
@@ -149,20 +152,26 @@
 				@keydown.enter="onKeydownEnter"
 				@submit.prevent="onSubmit">
 				<ul>
-					<component
-						:is="answerTypes[question.type].component"
-						v-for="(question, index) in validQuestions"
-						ref="questionRefs"
-						:key="question.id"
-						v-bind="question"
-						readOnly
-						:answerType="answerTypes[question.type]"
-						:index="index + 1"
-						:maxStringLengths="maxStringLengths"
-						:values="answers[question.id]"
-						@update:values="
-							(values: AnswerValue) => onUpdate(question, values)
-						" />
+					<KeepAlive v-for="question in validQuestions" :key="question.id">
+						<component
+							:is="answerTypes[question.type].component"
+							v-if="visibleQuestionIds.has(question.id)"
+							ref="questionRefs"
+							v-bind="question"
+							:isRequired="
+								question.isRequired
+								|| answersToChooseAgain.has(question.id)
+							"
+							:answerError="getAnswerError(question)"
+							readOnly
+							:answerType="answerTypes[question.type]"
+							:index="shownQuestions.indexOf(question) + 1"
+							:maxStringLengths="maxStringLengths"
+							:values="answers[question.id]"
+							@update:values="
+								(values: AnswerValue) => onUpdate(question, values)
+							" />
+					</KeepAlive>
 				</ul>
 				<div class="form-buttons">
 					<NcButton
@@ -279,12 +288,14 @@ import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit as emitEvent } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
-import { t } from '@nextcloud/l10n'
+import { getLanguage, n, t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
+import debounce from 'debounce'
 import {
 	computed,
 	inject,
+	nextTick,
 	onBeforeMount,
 	onMounted,
 	onUnmounted,
@@ -317,6 +328,7 @@ import {
 	QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 } from '../models/Constants.ts'
 import { PERMISSION_TYPES } from '../models/Permissions.ts'
+import { formatList, getJumps, getVisibleQuestions } from '../utils/Jumps.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
@@ -325,6 +337,27 @@ const formsAppName = 'forms'
 
 type AnswerValue = string[] | GridQuestionValues
 type AnswersMap = Record<number, AnswerValue>
+
+/**
+ * Whether an answer has values
+ *
+ * @param value the values of the answer
+ */
+function hasValues(value: AnswerValue | undefined): boolean {
+	return (
+		value !== undefined
+		&& (Array.isArray(value) ? value.length > 0 : Object.keys(value).length > 0)
+	)
+}
+
+/**
+ * Whether a question has jumps per answer
+ *
+ * @param question the question
+ */
+function hasJumpsPerAnswer(question: FormsQuestion): boolean {
+	return getJumps(question.extraSettings).length > 0
+}
 
 interface StoredAnswerState {
 	value: AnswerValue
@@ -451,10 +484,11 @@ export default defineComponent({
 		const showClearFormDueToChangeDialog = ref(false)
 		const removedAnswerQuestionIds = ref<number[]>([])
 		const hasAnswersToDeletedQuestions = ref(false)
+		const answersToChooseAgain = ref<Set<number>>(new Set())
 		const confirmButtonCallback = ref<(val: boolean) => void>(() => {})
 
 		const validQuestions = computed<SubmitQuestion[]>(() => {
-			return props.form.questions.filter((question: FormsQuestion) => {
+			return (props.form.questions ?? []).filter((question: FormsQuestion) => {
 				// All questions must have a valid title
 				if (question.text?.trim() === '') {
 					return false
@@ -473,9 +507,123 @@ export default defineComponent({
 			return new Set(validQuestions.value.map((question) => question.id))
 		})
 
+		const visibleQuestionIds = computed<Set<number>>(() => {
+			return new Set(
+				getVisibleQuestions(
+					(props.form.questions ?? []).map((question: FormsQuestion) =>
+						validQuestionsIds.value.has(question.id)
+							? question
+							: {
+									...question,
+									extraSettings: {
+										...question.extraSettings,
+										goTo: [],
+									},
+								},
+					),
+					answers.value,
+				).map((question) => question.id),
+			)
+		})
+
+		const shownQuestions = computed<SubmitQuestion[]>(() => {
+			return validQuestions.value.filter((question) =>
+				visibleQuestionIds.value.has(question.id),
+			)
+		})
+
+		const submittedAnswers = computed<AnswersMap>(() => {
+			return Object.fromEntries(
+				Object.entries(answers.value).filter(([questionId]) =>
+					visibleQuestionIds.value.has(Number(questionId)),
+				),
+			)
+		})
+
+		const jumpAnnouncement = ref('')
+		let shownBeforeAnnouncement: SubmitQuestion[] | null = null
+
+		/**
+		 * The status of the questions added to or skipped from the path, empty without changes
+		 *
+		 * @param oldQuestions the questions shown before
+		 * @param newQuestions the questions shown now
+		 */
+		function getPathChangeStatus(
+			oldQuestions: SubmitQuestion[],
+			newQuestions: SubmitQuestion[],
+		): string {
+			const oldIds = new Set(oldQuestions.map((question) => question.id))
+			const newIds = new Set(newQuestions.map((question) => question.id))
+			const added = newQuestions.filter((question) => !oldIds.has(question.id))
+			const removed = oldQuestions.filter(
+				(question) => !newIds.has(question.id),
+			)
+			return formatList(
+				[
+					added.length > 0
+						? n(
+								'forms',
+								'%n question added',
+								'%n questions added',
+								added.length,
+							)
+						: '',
+					removed.length > 0
+						? n(
+								'forms',
+								'%n question skipped',
+								'%n questions skipped',
+								removed.length,
+							)
+						: '',
+				].filter(Boolean),
+				getLanguage(),
+			)
+		}
+
+		const announcePathStatus = debounce((): void => {
+			jumpAnnouncement.value = getPathChangeStatus(
+				shownBeforeAnnouncement ?? [],
+				shownQuestions.value,
+			)
+			shownBeforeAnnouncement = null
+		}, 100)
+
+		/**
+		 * Announce the questions answers added to or skipped from the path, once for answers in quick succession
+		 *
+		 * @param oldQuestions the questions shown before the answer
+		 */
+		function announcePathChange(oldQuestions: SubmitQuestion[]): void {
+			if (
+				shownBeforeAnnouncement === null
+				&& getPathChangeStatus(oldQuestions, shownQuestions.value) === ''
+			) {
+				return
+			}
+			shownBeforeAnnouncement ??= oldQuestions
+			jumpAnnouncement.value = ''
+			announcePathStatus()
+		}
+
+		/**
+		 * Stop announcing changes of the path and empty its live region
+		 */
+		function clearPathAnnouncement(): void {
+			announcePathStatus.clear()
+			shownBeforeAnnouncement = null
+			jumpAnnouncement.value = ''
+		}
+
 		const isRequiredUsed = computed<boolean>(() => {
-			return props.form.questions.some((question: FormsQuestion) =>
-				Boolean(question.isRequired),
+			return (
+				shownQuestions.value.some((question) =>
+					answersToChooseAgain.value.has(question.id),
+				)
+				|| props.form.questions.some((question: FormsQuestion) =>
+					Boolean(question.isRequired),
+				)
 			)
 		})
 
@@ -924,6 +1072,7 @@ export default defineComponent({
 				)
 
 				const loaded: AnswersMap = {}
+				const otherAnswerIdsWithJumps = new Set<number>()
 				const loadedAnswers =
 					OcsResponse2Data<LoadedSubmissionResponse>(response).answers
 				for (const answer of loadedAnswers) {
@@ -994,6 +1143,9 @@ export default defineComponent({
 							questionAnswers.push(
 								QUESTION_EXTRASETTINGS_OTHER_PREFIX + text,
 							)
+							if (hasJumpsPerAnswer(question)) {
+								otherAnswerIdsWithJumps.add(questionId)
+							}
 						} else {
 							noteRemovedAnswer(questionId)
 							logger.debug(
@@ -1022,6 +1174,32 @@ export default defineComponent({
 					}
 				}
 				answers.value = loaded
+				if (
+					Object.entries(loaded).some(
+						([questionId, value]) =>
+							!visibleQuestionIds.value.has(Number(questionId))
+							&& hasValues(value),
+					)
+				) {
+					showClearFormDueToChangeDialog.value = true
+					otherAnswerIdsWithJumps.forEach((questionId) => {
+						delete loaded[questionId]
+					})
+					answers.value = { ...loaded }
+				}
+				answersToChooseAgain.value = new Set(
+					validQuestions.value
+						.filter(
+							(question) =>
+								hasJumpsPerAnswer(question)
+								&& loadedAnswers.some(
+									(answer) =>
+										Number(answer.questionId) === question.id,
+								)
+								&& !hasValues(loaded[question.id]),
+						)
+						.map((question) => question.id),
+				)
 				saveAllAnswersToLocalStorage()
 			} catch (error) {
 				logger.error('Error while loading response', { error })
@@ -1032,16 +1210,52 @@ export default defineComponent({
 		}
 
 		/**
+		 * The error of a question whose earlier answer the form no longer offers, while it has no new answer
+		 *
+		 * @param question the question
+		 */
+		function getAnswerError(question: SubmitQuestion): string | null {
+			return answersToChooseAgain.value.has(question.id)
+				&& !hasValues(answers.value[question.id])
+				? t(
+						'forms',
+						'Your earlier answer is no longer available. Choose again.',
+					)
+				: null
+		}
+
+		/**
+		 * Focus the first shown question whose earlier answer the form no longer offers
+		 */
+		async function focusAnswerToChooseAgain(): Promise<void> {
+			const index = shownQuestions.value.findIndex((question) =>
+				answersToChooseAgain.value.has(question.id),
+			)
+			if (index === -1) {
+				return
+			}
+			await nextTick()
+			formElement.value
+				?.querySelectorAll(':scope > ul > li')
+				[index]?.querySelector<HTMLElement>(
+					'input, select, textarea, button',
+				)
+				?.focus()
+		}
+
+		/**
 		 * Update answers of a give value
 		 *
 		 * @param question The question to answer
 		 * @param values The new values
 		 */
 		function onUpdate(question: SubmitQuestion, values: AnswerValue): void {
+			const shownBefore = shownQuestions.value
 			answers.value = {
 				...answers.value,
 				[question.id]: values,
 			}
+			announcePathChange(shownBefore)
 			addFormFieldToLocalStorage(question)
 		}
 
@@ -1203,8 +1417,8 @@ export default defineComponent({
 
 				// in case no answer is set or all are empty show the confirmation dialog
 				if (
-					Object.keys(answers.value).length === 0
-					|| Object.values(answers.value).every((localAnswers) =>
+					Object.keys(submittedAnswers.value).length === 0
+					|| Object.values(submittedAnswers.value).every((localAnswers) =>
 						Array.isArray(localAnswers)
 							? localAnswers.length === 0
 							: Object.keys(localAnswers).length === 0,
@@ -1239,7 +1453,7 @@ export default defineComponent({
 							},
 						),
 						{
-							answers: answers.value,
+							answers: submittedAnswers.value,
 						},
 					)
 				} else {
@@ -1248,13 +1462,14 @@ export default defineComponent({
 							id: props.form.id,
 						}),
 						{
-							answers: answers.value,
+							answers: submittedAnswers.value,
 							shareHash: props.shareHash,
 						},
 					)
 				}
 				submitForm.value = true
 				success.value = true
+				answersToChooseAgain.value = new Set()
 				deleteFormFieldFromLocalStorage()
 				emitEvent('forms:last-updated:set', props.form.id)
 			} catch (error) {
@@ -1309,18 +1524,27 @@ export default defineComponent({
 		 */
 		function resetData(): void {
 			answers.value = {}
+			clearPathAnnouncement()
 			loading.value = false
 			showConfirmLeaveDialog.value = false
 			showClearFormDialog.value = false
 			showClearFormDueToChangeDialog.value = false
 			removedAnswerQuestionIds.value = []
 			hasAnswersToDeletedQuestions.value = false
+			answersToChooseAgain.value = new Set()
 			success.value = false
 			submitForm.value = false
 		}
 
+		watch(showClearFormDueToChangeDialog, (open: boolean): void => {
+			if (!open) {
+				void focusAnswerToChooseAgain()
+			}
+		})
+
 		watch(success, (newVal: boolean): void => {
 			if (newVal) {
+				clearPathAnnouncement()
 				// Delay populating the live region to avoid the announcement being
 				// swallowed by the simultaneous large DOM change (form replaced by
 				// success view). Screen readers need a moment to process the new DOM
@@ -1397,6 +1621,7 @@ export default defineComponent({
 
 		onUnmounted((): void => {
 			window.removeEventListener('beforeunload', beforeWindowUnload)
+			clearPathAnnouncement()
 		})
 
 		onBeforeMount(async (): Promise<void> => {
@@ -1431,6 +1656,10 @@ export default defineComponent({
 			answers,
 			questionsWithRemovedAnswers,
 			hasAnswersToDeletedQuestions,
+			answersToChooseAgain,
+			getAnswerError,
+			jumpAnnouncement,
+			shownQuestions,
 			confirmClearFormButtons,
 			confirmEmptyModalButtons,
 			confirmLeaveFormButtons,
@@ -1460,6 +1689,7 @@ export default defineComponent({
 			successAnnouncement,
 			updateQuestionValues,
 			validQuestions,
+			visibleQuestionIds,
 			title,
 			IconCheckSvg: IconCheck,
 			IconScheduleSvg: IconSchedule,
