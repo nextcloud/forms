@@ -5,6 +5,16 @@
 
 # Changelog
 
+## v5.4.2 - 2026-11-10
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.1...v5.4.2)
+
+### Fixed
+
+- [stable5.4] fix: prevent updating the question type via API by @backportbot[bot] in [\#3866](https://github.com/nextcloud/forms/pull/3866)
+- [stable5.4] fix(a11y): use role group for ranking lists container by @backportbot[bot] in [\#3863](https://github.com/nextcloud/forms/pull/3863)
+- [stable5.4] fix(a11y): give all form fields a proper accessible name by @backportbot[bot] in [\#3830](https://github.com/nextcloud/forms/pull/3830)
+
 ## v5.4.1 - 2026-10-22
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.0...v5.4.1)
