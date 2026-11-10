@@ -258,6 +258,46 @@
 		"visible": [1]
 	},
 	{
+		"name": "a scale value jumps",
+		"questions": [
+			{ "id": 1, "type": "linearscale", "extraSettings": { "goTo": [{ "value": 4, "target": 3 }, { "value": 5, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["5"] },
+		"visible": [1, 3]
+	},
+	{
+		"name": "a scale value with a leading zero matches its value",
+		"questions": [
+			{ "id": 1, "type": "linearscale", "extraSettings": { "goTo": [{ "value": 4, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["04"] },
+		"visible": [1, 3]
+	},
+	{
+		"name": "a scale value without a jump goes to the following question",
+		"questions": [
+			{ "id": 1, "type": "linearscale", "extraSettings": { "goTo": [{ "value": 4, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["2"] },
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "a negative scale value does not match",
+		"questions": [
+			{ "id": 1, "type": "linearscale", "extraSettings": { "goTo": [{ "value": -1, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["-1"] },
+		"visible": [1, 2, 3]
+	},
+	{
 		"name": "the jumps of skipped questions do not count",
 		"questions": [
 			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 3 }] } },

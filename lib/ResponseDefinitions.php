@@ -27,7 +27,7 @@ namespace OCA\Forms;
  *   dateMax?: string|int,
  *   dateMin?: string|int,
  *   dateRange?: bool,
- *   goTo?: list<array{optionId?: int, other?: bool, target: int|string}>,
+ *   goTo?: list<array{optionId?: int, other?: bool, value?: int<0, 10>, target: int|string}>,
  *   maxAllowedFilesCount?: int,
  *   maxFileSize?: int,
  *   next?: int|string,

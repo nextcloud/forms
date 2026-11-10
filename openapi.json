@@ -545,6 +545,12 @@
                                 "other": {
                                     "type": "boolean"
                                 },
+                                "value": {
+                                    "type": "integer",
+                                    "format": "int64",
+                                    "minimum": 0,
+                                    "maximum": 10
+                                },
                                 "target": {
                                     "oneOf": [
                                         {
@@ -2378,7 +2384,7 @@
             "patch": {
                 "operationId": "api-update-question",
                 "summary": "Writes the given key-value pairs into Database Key `order` should only be changed by reorderQuestions() and is not allowed here",
-                "description": "Jumps to the question itself or to an earlier question are removed before saving, and the header `X-Forms-Adjusted` then holds `removed-jumps` with the id of the question. Jumps to questions of other forms or to options that are not options of the question are rejected as invalid `extraSettings`.\nThis endpoint allows CORS requests",
+                "description": "Jumps to the question itself or to an earlier question, and jumps of a linear scale for values outside its bounds, are removed before saving, and the header `X-Forms-Adjusted` then holds `removed-jumps` with the id of the question. Jumps to questions of other forms or to options that are not options of the question are rejected as invalid `extraSettings`.\nThis endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],

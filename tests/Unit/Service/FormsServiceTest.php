@@ -1732,6 +1732,46 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
 				'expected' => true,
 			],
+			'jump: goTo per scale value' => [
+				'extraSettings' => ['goTo' => [['value' => 1, 'target' => 5], ['value' => 5, 'target' => 'submit']]],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true,
+			],
+			'jump: next not offered on linear scales' => [
+				'extraSettings' => ['next' => 6],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false,
+			],
+			'jump: goTo with an option on a scale' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false,
+			],
+			'jump: goTo with a value on a radio question' => [
+				'extraSettings' => ['goTo' => [['value' => 1, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: goTo for the values at the ends of all scales' => [
+				'extraSettings' => ['goTo' => [['value' => 0, 'target' => 5], ['value' => 10, 'target' => 'submit']]],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true,
+			],
+			'jump: goTo for a value below all scales' => [
+				'extraSettings' => ['goTo' => [['value' => -1, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false,
+			],
+			'jump: goTo for a value above all scales' => [
+				'extraSettings' => ['goTo' => [['value' => 11, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false,
+			],
+			'jump: two jumps for one scale value' => [
+				'extraSettings' => ['goTo' => [['value' => 1, 'target' => 5], ['value' => 1, 'target' => 6]]],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false,
+			],
 			'jump: goTo not offered on checkboxes' => [
 				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]]],
 				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
@@ -2181,6 +2221,13 @@ class FormsServiceTest extends TestCase {
 		], FormsService::mapJumps($extraSettings, [2 => 20, 3 => 30], [11 => 110, 12 => 120]));
 	}
 
+	public function testMapJumpsKeepsScaleValues(): void {
+		$this->assertSame(
+			['optionsHighest' => 7, 'goTo' => [['value' => 7, 'target' => 20], ['value' => 1, 'target' => 'submit']]],
+			FormsService::mapJumps(['optionsHighest' => 7, 'goTo' => [['value' => 7, 'target' => 2], ['value' => 1, 'target' => 'submit'], ['value' => 3, 'target' => 9]]], [2 => 20], []),
+		);
+	}
+
 	public function testMapJumpsKeepsTargetsWithoutQuestionMap(): void {
 		$this->assertSame(
 			['next' => 3, 'goTo' => [['optionId' => 110, 'target' => 2]]],
@@ -2237,6 +2284,18 @@ class FormsServiceTest extends TestCase {
 		$this->assertSame([], $questions[0]->getExtraSettings());
 		$this->assertSame(['goTo' => [['optionId' => 70, 'target' => 30], ['other' => true, 'target' => 20]]], $questions[1]->getExtraSettings());
 		$this->assertSame(['shuffleOptions' => true], $questions[2]->getExtraSettings());
+	}
+
+	public function testMapJumpsOfCopiesRemovesJumpsOutsideTheScale(): void {
+		$question = new Question();
+		$question->setId(10);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_LINEARSCALE);
+		$question->setExtraSettings(['optionsLowest' => 1, 'optionsHighest' => 3, 'goTo' => [['value' => 0, 'target' => 'submit'], ['value' => 3, 'target' => 'submit'], ['value' => 4, 'target' => 'submit']]]);
+
+		FormsService::mapJumpsOfCopies([$question], [], []);
+
+		$this->assertSame(['optionsLowest' => 1, 'optionsHighest' => 3, 'goTo' => [['value' => 3, 'target' => 'submit']]], $question->getExtraSettings());
 	}
 
 	public function testMapJumpsOfCopiesWithoutJumpsLeavesTheCopiesAlone(): void {

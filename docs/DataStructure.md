@@ -270,21 +270,21 @@ Optional extra settings for some [Question Types](#question-types)
 | `columns`               | `grid`                                         | Array            | -                                           | Array of column identifiers / labels for grid questions                     |
 | `rows`                  | `grid`                                         | Array            | -                                           | Array of row identifiers / labels for grid questions                        |
 | `questionType`          | `grid`                                         | String           | `checkbox`, `number`, `radio`               | Type of cell for grid questions (checkbox, numeric input, or radio)         |
-| `goTo`                  | `dropdown, multiple_unique`                    | Array            | see [Jumps](#jumps)                         | Where to go next for an answer                                              |
+| `goTo`                  | `dropdown, linearscale, multiple_unique`       | Array            | see [Jumps](#jumps)                         | Where to go next for an answer                                              |
 | `next`                  | `color, date, file, grid, long, multiple, ranking, short, time` | Integer / string | question id, `'submit'` | Where to go after the question, see [Jumps](#jumps) |
 
 ### Jumps
 
 An answer can lead to a later question or to the end of the form, as in Microsoft and Google Forms. The form stays a flat list of questions.
 
-- `goTo` is a list of jumps per answer: `{"optionId": 12, "target": 34}` for an option, `{"other": true, "target": "submit"}` for the answer "Other". There is at most one jump per answer.
+- `goTo` is a list of jumps per answer: `{"optionId": 12, "target": 34}` for an option, `{"other": true, "target": "submit"}` for the answer "Other", `{"value": 4, "target": 34}` for a value of a linear scale. There is at most one jump per answer. A `value` is an integer from 0 to 10, the range of all scales. When a question is updated, or its form copied or imported, the server removes the jumps for values outside the scale of the question; on update the response header `X-Forms-Adjusted` then holds `removed-jumps` with the id of the question.
 - `next` is one target after the whole question; on a checkbox question it applies whichever options are checked.
-- A question has either jumps per answer or one jump after the question, depending on its type: `goTo` only on `dropdown` and `multiple_unique`, `next` only on the other types listed above. Sending `next` on a question type with `goTo`, or `goTo` on a question type with `next`, is rejected with 400 "Invalid extraSettings". An answer without a `goTo` entry leads to the following question.
+- A question has either jumps per answer or one jump after the question, depending on its type: `goTo` only on `dropdown`, `linearscale` and `multiple_unique`, `next` only on the other types listed above. Sending `next` on a question type with `goTo`, or `goTo` on a question type with `next`, is rejected with 400 "Invalid extraSettings". An answer without a `goTo` entry leads to the following question.
 - A target is the id of a later question of the same form or `"submit"` for the end of the form, and `optionId` is the id of an option of the question. Ids of questions of other forms and option ids that are not options of the question are rejected as invalid `extraSettings`; ids of deleted questions of the form are accepted. Without a jump the respondent goes to the following question.
 - Jumps never go back: the server removes jumps to the question itself or to an earlier question when a question is updated, reordered or copied, and when a form is copied or imported; copying or importing a form also drops `goTo` or `next` on question types without it. Updating, reordering and copying a question still succeed with their usual status, and the payload keeps its shape: a reorder adds the new `extraSettings` of the questions concerned, and a copied question is returned with its reduced `extraSettings`. The response header `X-Forms-Adjusted` lists the questions that lost jumps, e.g. `removed-jumps=(3 7)`, see [Adjustments by the server](API_v3.md#adjustments-by-the-server).
 - Deleting an option removes the jumps of the question for that option; the response header `X-Forms-Adjusted` then holds `removed-jumps` with the id of the question.
 - Saving a question rejects jumps with an invalid structure with 400, as any invalid `extraSettings`. Copying or importing a form keeps the jumps whose target and option it can map, and drops the others and jumps per answer with an invalid structure. The path walks ignore malformed entries.
-- Question types in neither list, such as `datetime`, accept neither `goTo` nor `next` (400).
+- Only the deprecated `datetime` accepts neither `goTo` nor `next` (400).
 - A jump of the answer "Other" only matches while `allowOtherAnswer` is on.
 - `next` also applies when the question is left unanswered.
 

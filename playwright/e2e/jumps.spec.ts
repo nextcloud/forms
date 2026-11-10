@@ -227,4 +227,71 @@ test.describe('Jumps', () => {
 		await submitView.checkRadio('Do you have a pet?', 'Yes')
 		await expect(submitView.getQuestion('Comments')).toBeVisible()
 	})
+
+	test('A value of a linear scale jumps past a question, set in the editor', async ({
+		page,
+		submitView,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		await api(page.request, 'PATCH', `/forms/${form.id}`, {
+			keyValuePairs: { title: 'Scale form' },
+		})
+		const scale = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'linearscale',
+				text: 'How do you like it?',
+			},
+		)
+		await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'short',
+			text: 'What can we improve?',
+		})
+		const comments = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'short',
+				text: 'Comments',
+			},
+		)
+		await page.goto(`apps/forms/${form.hash}/edit`)
+
+		const question = page.getByRole('listitem', { name: 'Question number 1' })
+		await question.getByRole('button', { name: 'Actions', exact: true }).click()
+		await page
+			.getByRole('checkbox', { name: 'Go to based on answer' })
+			.click({ force: true })
+		await page.keyboard.press('Escape')
+
+		await question
+			.getByRole('combobox', {
+				name: 'After "5 - Strongly agree" go to',
+			})
+			.click()
+		await page
+			.getByRole('option')
+			.filter({ hasText: 'Question 3: Comments' })
+			.click()
+
+		await expect(async () => {
+			const stored = await api(
+				page.request,
+				'GET',
+				`/forms/${form.id}/questions/${scale.id}`,
+			)
+			expect(stored.extraSettings.goTo).toEqual([
+				{ value: 5, target: comments.id },
+			])
+		}).toPass()
+
+		await page.goto(`apps/forms/${form.hash}/submit`)
+		await submitView.checkRadio('How do you like it?', '5')
+		await expect(submitView.getQuestion('What can we improve?')).toBeHidden()
+		await submitView.checkRadio('How do you like it?', '4')
+		await expect(submitView.getQuestion('What can we improve?')).toBeVisible()
+	})
 })
