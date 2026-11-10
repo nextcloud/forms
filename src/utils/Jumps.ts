@@ -21,6 +21,7 @@ export const QUESTION_TYPES_WITH_NEXT = [
 	'file',
 	'grid',
 	'long',
+	'multiple',
 	'ranking',
 	'short',
 ]

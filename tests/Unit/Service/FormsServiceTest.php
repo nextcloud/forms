@@ -1722,6 +1722,11 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'expected' => false,
 			],
+			'jump: next on checkboxes' => [
+				'extraSettings' => ['next' => 5],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => true,
+			],
 			'jump: goTo not offered on checkboxes' => [
 				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]]],
 				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
