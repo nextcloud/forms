@@ -1481,6 +1481,45 @@ class ApiControllerTest extends TestCase {
 		$this->assertNull($form->getConfirmationEmailQuestionId());
 	}
 
+	public function testDeleteQuestionRejectsDeletedQuestion(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setOrder(0);
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->questionMapper->method('findById')->with(7)->willReturn($question);
+		$this->questionMapper->expects($this->never())->method('update');
+		$this->formMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSNotFoundException::class);
+		$this->apiController->deleteQuestion(1, 7);
+	}
+
+	public function testCloneQuestionRejectsDeletedQuestion(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setOrder(0);
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->questionMapper->method('findById')->with(7)->willReturn($question);
+		$this->questionMapper->expects($this->never())->method('insert');
+
+		$this->expectException(OCSNotFoundException::class);
+		$this->apiController->newQuestion(1, null, null, '', 7);
+	}
+
 	public function testCloneFormWithConfirmationEmailQuestionId(): void {
 		$this->configService->method('canCreateForms')->willReturn(true);
 

@@ -617,6 +617,9 @@ class ApiController extends OCSController {
 				if ($sourceQuestion->getFormId() !== $formId) {
 					throw new OCSBadRequestException('Question doesn\'t belong to given form');
 				}
+				if ($sourceQuestion->getOrder() === 0) {
+					throw new OCSNotFoundException('Could not find question');
+				}
 				$sourceOptions = $this->optionMapper->findByQuestion($fromId);
 			} catch (IMapperException) {
 				$this->logger->debug('Could not find question');
@@ -793,6 +796,10 @@ class ApiController extends OCSController {
 
 		if ($question->getFormId() !== $formId) {
 			throw new OCSBadRequestException('Question doesn\'t belong to given Form');
+		}
+
+		if ($question->getOrder() === 0) {
+			throw new OCSNotFoundException('Could not find question');
 		}
 
 		// Store Order of deleted Question
