@@ -20,7 +20,14 @@
 		<NcEmptyContent
 			v-if="isLoadingForm"
 			class="emtpycontent"
-			:name="t('forms', 'Loading {title} …', { title: form.title })">
+			:name="
+				t(
+					'forms',
+					'Loading {title} …',
+					{ title: form.title },
+					{ escape: false, sanitize: false },
+				)
+			">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
@@ -31,9 +38,12 @@
 			class="emtpycontent"
 			:name="t('forms', 'Form is archived')"
 			:description="
-				t('forms', 'Form \'{title}\' is archived and cannot be modified.', {
-					title: form.title,
-				})
+				t(
+					'forms',
+					'Form \'{title}\' is archived and cannot be modified.',
+					{ title: form.title },
+					{ escape: false, sanitize: false },
+				)
 			">
 			<template #icon>
 				<NcIconSvgWrapper :svg="IconLock" :size="64" />
@@ -56,6 +66,7 @@
 								? t('forms', 'never')
 								: lockedUntilFormatted,
 					},
+					{ escape: false, sanitize: false },
 				)
 			">
 			<template #icon>
