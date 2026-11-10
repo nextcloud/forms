@@ -98,6 +98,7 @@ class AnalyticsDatasource implements IDatasource {
 	public function readData($option): array {
 		$questionMap = [];
 		$answerCounts = [];
+		$results = [];
 
 		$formId = $option['formId'];
 
@@ -109,7 +110,10 @@ class AnalyticsDatasource implements IDatasource {
 		$submissions = $this->submissionService->getSubmissions($formId);
 		foreach ($submissions as $submission) {
 			foreach ($submission['answers'] as $answer) {
-				$questionText = $questionMap[$answer['questionId']];
+				$questionText = $questionMap[$answer['questionId']] ?? null;
+				if ($questionText === null) {
+					continue;
+				}
 				$key = $questionText . '|' . $answer['text'];
 				if (isset($answerCounts[$key])) {
 					$answerCounts[$key]++;
