@@ -4,7 +4,8 @@
  */
 
 import type { Ref } from 'vue'
-import type { FormsOption } from '../types/Entities.d.ts'
+import type { FormsOption, FormsQuestion } from '../types/Entities.d.ts'
+import type { Jumps } from './useJumps.ts'
 
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
@@ -12,9 +13,11 @@ import { emit as emitEvent } from '@nextcloud/event-bus'
 import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, ref, toRaw } from 'vue'
 import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import logger from '../utils/Logger.ts'
+import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
+import { useJumps } from './useJumps.ts'
 
 export const QUESTION_EMITS = [
 	'update:text',
@@ -147,6 +150,7 @@ interface QuestionForwardedProps {
 	name: string
 	canMoveUp: boolean
 	canMoveDown: boolean
+	jumps: Jumps
 }
 
 /**
@@ -158,6 +162,29 @@ interface QuestionForwardedProps {
 export function useQuestion(props: QuestionPropsLike, options: UseQuestionOptions) {
 	const errorMessage = ref<string | null>(null)
 
+	let pendingExtraSettings: Record<string, unknown> = {}
+	const saveExtraSettings = debounce(function () {
+		const newExtraSettings = { ...props.extraSettings, ...pendingExtraSettings }
+		pendingExtraSettings = {}
+		options.emit('update:extraSettings', newExtraSettings)
+		saveQuestionProperty('extraSettings', newExtraSettings)
+	}, INPUT_DEBOUNCE_MS)
+
+	/**
+	 * Save changed extra settings; changes within the debounce time are saved together
+	 *
+	 * @param newSettings the changed extra settings
+	 */
+	const onExtraSettingsChange = (newSettings: Record<string, unknown>): void => {
+		pendingExtraSettings = { ...pendingExtraSettings, ...newSettings }
+		saveExtraSettings()
+	}
+
+	const jumps = useJumps(props, (newSettings: Record<string, unknown>): void => {
+		onExtraSettingsChange(newSettings)
+		saveExtraSettings.flush()
+	})
+
 	const questionProps = computed<QuestionForwardedProps>(() => ({
 		index: props.index,
 		text: props.text,
@@ -168,6 +195,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		name: props.name,
 		canMoveUp: props.canMoveUp,
 		canMoveDown: props.canMoveDown,
+		jumps,
 	}))
 
 	const titleId = computed(() => {
@@ -208,24 +236,6 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		options.emit('update:isRequired', isRequiredValue)
 		saveQuestionProperty('isRequired', isRequiredValue)
 	}, INPUT_DEBOUNCE_MS)
-
-	let pendingExtraSettings: Record<string, unknown> = {}
-	const saveExtraSettings = debounce(function () {
-		const newExtraSettings = { ...props.extraSettings, ...pendingExtraSettings }
-		pendingExtraSettings = {}
-		options.emit('update:extraSettings', newExtraSettings)
-		saveQuestionProperty('extraSettings', newExtraSettings)
-	}, INPUT_DEBOUNCE_MS)
-
-	/**
-	 * Save changed extra settings; changes within the debounce time are saved together
-	 *
-	 * @param newSettings the changed extra settings
-	 */
-	const onExtraSettingsChange = (newSettings: Record<string, unknown>): void => {
-		pendingExtraSettings = { ...pendingExtraSettings, ...newSettings }
-		saveExtraSettings()
-	}
 
 	const onNameChange = debounce(function (name: string) {
 		options.emit('update:name', name)
@@ -288,6 +298,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 
 	/**
 	 * Persist a single question field to the backend.
+	 * Extra settings the server adjusted replace the local ones, unless these changed in the meantime.
 	 *
 	 * @param key Question property name.
 	 * @param value Question property value.
@@ -303,21 +314,31 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 			| null
 			| unknown,
 	): Promise<void> {
+		const url = generateOcsUrl(
+			'apps/forms/api/v3/forms/{id}/questions/{questionId}',
+			{
+				id: props.formId,
+				questionId: props.id,
+			},
+		)
 		try {
-			await axios.patch(
-				generateOcsUrl(
-					'apps/forms/api/v3/forms/{id}/questions/{questionId}',
-					{
-						id: props.formId,
-						questionId: props.id,
-					},
-				),
-				{
-					keyValuePairs: {
-						[key]: value,
-					},
+			const response = await axios.patch(url, {
+				keyValuePairs: {
+					[key]: value,
 				},
-			)
+			})
+			if (
+				String(response.headers['x-forms-adjusted'] ?? '').includes(
+					'removed-jumps',
+				)
+			) {
+				const question = OcsResponse2Data<FormsQuestion>(
+					await axios.get(url),
+				)
+				if (toRaw(props.extraSettings) === value) {
+					options.emit('update:extraSettings', question.extraSettings)
+				}
+			}
 			emitEvent('forms:last-updated:set', props.formId)
 		} catch (error) {
 			logger.error('Error while saving question', { error })
@@ -340,6 +361,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 
 	return {
 		errorMessage,
+		jumps,
 		questionProps,
 		titleId,
 		descriptionId,

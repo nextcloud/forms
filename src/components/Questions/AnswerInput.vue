@@ -4,7 +4,10 @@
 -->
 
 <template>
-	<li class="question__item" @focusout="handleTabbing">
+	<li
+		class="question__item"
+		:class="{ 'question__item--with-target': !!$slots.default }"
+		@focusout="handleTabbing">
 		<NcIconSvgWrapper
 			v-if="!isDropdown"
 			:svg="pseudoIcon"
@@ -25,6 +28,7 @@
 			@keydown.enter.prevent="onEnter"
 			@compositionstart="onCompositionStart"
 			@compositionend="onCompositionEnd" />
+		<slot />
 
 		<!-- Actions for reordering and deleting the option  -->
 		<div v-if="!answer.local" class="option__actions">
@@ -638,6 +642,36 @@ export default defineComponent({
 				var(--default-clickable-area) + var(--default-grid-baseline)
 			) !important;
 		}
+	}
+
+	&--with-target {
+		container-type: inline-size;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--default-grid-baseline);
+
+		.question__input {
+			flex: 1 1 0;
+			width: auto;
+			min-width: 0;
+
+			&--shifted {
+				margin-inline-end: calc(
+					-1 * var(--default-clickable-area)
+				) !important;
+			}
+		}
+
+		.option__actions {
+			position: static;
+			height: auto;
+		}
+	}
+}
+
+@container (max-width: 480px) {
+	.question__item--with-target .question__input {
+		flex-basis: 100%;
 	}
 }
 </style>

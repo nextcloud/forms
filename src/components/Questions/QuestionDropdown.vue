@@ -85,7 +85,19 @@
 						@focusNext="focusNextInput"
 						@moveUp="onOptionMoveUp(index, OptionType.Choice)"
 						@moveDown="onOptionMoveDown(index, OptionType.Choice)"
-						@tabbedOut="checkValidOption" />
+						@tabbedOut="checkValidOption">
+						<template v-if="jumps.showTargets && !answer.local" #default>
+							<JumpTargetSelect
+								:modelValue="
+									jumps.getTarget({ optionId: answer.id })
+								"
+								:options="jumps.targetOptions"
+								:inputLabel="jumps.getTargetLabel(answer.text)"
+								@update:modelValue="
+									jumps.setTarget({ optionId: answer.id }, $event)
+								" />
+						</template>
+					</AnswerInput>
 				</TransitionGroup>
 			</Draggable>
 		</template>
@@ -114,6 +126,7 @@ import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import NcSelect from '@nextcloud/vue/components/NcSelect'
 import OptionInputDialog from '../OptionInputDialog.vue'
 import AnswerInput from './AnswerInput.vue'
+import JumpTargetSelect from './JumpTargetSelect.vue'
 import Question from './Question.vue'
 import {
 	QUESTION_EMITS,
@@ -139,6 +152,7 @@ export default defineComponent({
 		NcSelect,
 		OptionInputDialog,
 		Question,
+		JumpTargetSelect,
 	},
 
 	props: QUESTION_PROPS,

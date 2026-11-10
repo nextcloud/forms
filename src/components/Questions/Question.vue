@@ -79,6 +79,7 @@
 				<NcActions
 					v-if="!readOnly"
 					:id="actionsId"
+					v-model:open="isActionsOpen"
 					forceMenu
 					placement="bottom-end"
 					class="question__header__title__menu">
@@ -95,6 +96,16 @@
 						@update:modelValue="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
 						{{ t('forms', 'Required') }}
+					</NcActionCheckbox>
+					<NcActionCheckbox
+						v-if="jumps && (jumps.canGoTo || jumps.canNext)"
+						:modelValue="jumps.enabled"
+						@update:modelValue="onJumpsEnabledChange">
+						{{
+							jumps.canGoTo
+								? t('forms', 'Go to based on answer')
+								: t('forms', 'Go to after this question')
+						}}
 					</NcActionCheckbox>
 					<slot name="actions" />
 					<NcActionInput
@@ -158,10 +169,25 @@
 			<NcNoteCard v-if="hasError" :id="errorId" type="error">
 				{{ errorMessage }}
 			</NcNoteCard>
+			<template v-if="!readOnly && jumps">
+				<NcNoteCard
+					v-for="warning in jumps.warnings"
+					:key="warning"
+					type="warning">
+					{{ warning }}
+				</NcNoteCard>
+			</template>
 		</div>
 
 		<!-- Question content -->
 		<slot />
+		<div v-if="jumps?.showNext" class="question__jump">
+			<JumpTargetSelect
+				:modelValue="jumps.next"
+				:options="jumps.targetOptions"
+				:inputLabel="jumps.nextLabel"
+				@update:modelValue="jumps.setNext" />
+		</div>
 		<!-- Insert question menu -->
 		<slot name="insert" />
 	</li>
@@ -169,6 +195,7 @@
 
 <script lang="ts">
 import type { PropType } from 'vue'
+import type { Jumps } from '../../composables/useJumps.ts'
 import type { MaxStringLengths } from '../../types/Entities.ts'
 
 import IconAsterisk from '@material-symbols/svg-400/outlined/asterisk.svg?raw'
@@ -190,6 +217,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconOverlay from '../Icons/IconOverlay.vue'
+import JumpTargetSelect from './JumpTargetSelect.vue'
 
 export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
@@ -204,6 +232,7 @@ export default defineComponent({
 		NcActionInput,
 		NcButton,
 		NcNoteCard,
+		JumpTargetSelect,
 	},
 
 	props: {
@@ -280,6 +309,14 @@ export default defineComponent({
 
 		infoMessage: {
 			type: String,
+			default: null,
+		},
+
+		/**
+		 * The jumps of the question, see `useJumps()`
+		 */
+		jumps: {
+			type: Object as PropType<Jumps | null>,
 			default: null,
 		},
 	},
@@ -377,6 +414,22 @@ export default defineComponent({
 			emit('update:isRequired', isRequired)
 		}
 
+		const isActionsOpen = ref(false)
+
+		/**
+		 * Switch the jumps of the question on or off; switching off closes the menu first
+		 *
+		 * @param enabled whether jumps are switched on
+		 */
+		const onJumpsEnabledChange = (
+			enabled: boolean,
+		): Promise<void> | undefined => {
+			if (!enabled) {
+				isActionsOpen.value = false
+			}
+			return props.jumps?.setEnabled(enabled)
+		}
+
 		/**
 		 * Reorder question but keep focus on the button, or on the other move button once the question is the last one
 		 */
@@ -441,6 +494,8 @@ export default defineComponent({
 			onDescriptionChange,
 			onNameChange,
 			onRequiredChange,
+			isActionsOpen,
+			onJumpsEnabledChange,
 			onMoveDown,
 			onMoveUp,
 			onDelete,
@@ -519,6 +574,14 @@ export default defineComponent({
 		flex: 1 1 100%;
 		max-width: 100%;
 		padding: 0;
+	}
+
+	&__jump {
+		display: flex;
+		container-type: inline-size;
+		margin-block-start: calc(2 * var(--default-grid-baseline));
+		max-width: 440px;
+		padding-inline-end: calc(var(--default-clickable-area) + 12px);
 	}
 
 	&__header {
