@@ -260,6 +260,7 @@ class Constants {
 		'optionsLabelHighest' => ['string', 'NULL'],
 		'questionType' => ['string'],
 		'ratingIcon' => ['string', 'NULL'],
+		'goTo' => ['array'],
 	];
 
 	public const RATING_ICONS = [

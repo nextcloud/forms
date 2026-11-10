@@ -1737,6 +1737,46 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
 				'expected' => true,
 			],
+			'jump: goTo per scale value' => [
+				'extraSettings' => ['goTo' => [['value' => 1, 'target' => 5], ['value' => 5, 'target' => 'submit']]],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true,
+			],
+			'jump: next not offered on linear scales' => [
+				'extraSettings' => ['next' => 6],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false,
+			],
+			'jump: goTo with an option on a scale' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false,
+			],
+			'jump: goTo with a value on a radio question' => [
+				'extraSettings' => ['goTo' => [['value' => 1, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: goTo for the values at the ends of all scales' => [
+				'extraSettings' => ['goTo' => [['value' => 0, 'target' => 5], ['value' => 10, 'target' => 'submit']]],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true,
+			],
+			'jump: goTo for a value below all scales' => [
+				'extraSettings' => ['goTo' => [['value' => -1, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false,
+			],
+			'jump: goTo for a value above all scales' => [
+				'extraSettings' => ['goTo' => [['value' => 11, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false,
+			],
+			'jump: two jumps for one scale value' => [
+				'extraSettings' => ['goTo' => [['value' => 1, 'target' => 5], ['value' => 1, 'target' => 6]]],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false,
+			],
 			'jump: goTo not offered on checkboxes' => [
 				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]]],
 				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,

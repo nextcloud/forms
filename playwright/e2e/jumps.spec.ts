@@ -825,4 +825,166 @@ test.describe('Jumps', () => {
 			/^Question 1: Respondents see the questions after this one/,
 		)
 	})
+
+	test('A value of a linear scale jumps past a question, set in the editor', async ({
+		page,
+		submitView,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		await api(page.request, 'PATCH', `/forms/${form.id}`, {
+			keyValuePairs: { title: 'Scale form' },
+		})
+		const scale = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'linearscale',
+				text: 'How do you like it?',
+			},
+		)
+		await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'short',
+			text: 'What can we improve?',
+		})
+		const comments = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'short',
+				text: 'Comments',
+			},
+		)
+		await page.goto(`apps/forms/${form.hash}/edit`)
+
+		const question = page.getByRole('listitem', { name: 'Question number 1' })
+		await question.getByRole('button', { name: 'Actions', exact: true }).click()
+		await page
+			.getByRole('checkbox', { name: 'Go to based on answer' })
+			.click({ force: true })
+		await page.keyboard.press('Escape')
+
+		await question
+			.getByRole('combobox', {
+				name: 'Option 5 - Strongly agree go to',
+			})
+			.click()
+		await page
+			.getByRole('option')
+			.filter({ hasText: 'Question 3: Comments' })
+			.click()
+
+		await expect(async () => {
+			const stored = await api(
+				page.request,
+				'GET',
+				`/forms/${form.id}/questions/${scale.id}`,
+			)
+			expect(stored.extraSettings.goTo).toEqual([
+				{ value: 5, target: comments.id },
+			])
+		}).toPass()
+
+		await page.goto(`apps/forms/${form.hash}/submit`)
+		await expect(submitView.getQuestion('What can we improve?')).toBeHidden()
+		await submitView.checkRadio('How do you like it?', '5')
+		await expect(submitView.getQuestion('What can we improve?')).toBeHidden()
+		await submitView.checkRadio('How do you like it?', '4')
+		await expect(submitView.getQuestion('What can we improve?')).toBeVisible()
+	})
+
+	test('The values of a rating and a promoter score get jumps with their own labels', async ({
+		page,
+		submitView,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		await api(page.request, 'PATCH', `/forms/${form.id}`, {
+			keyValuePairs: { title: 'Rating form' },
+		})
+		const rating = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'linearscale',
+				subtype: 'rating',
+				text: 'Rate the service',
+			},
+		)
+		await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'linearscale',
+			subtype: 'promoter',
+			text: 'Would you recommend us?',
+		})
+		const comments = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'short',
+				text: 'Comments',
+			},
+		)
+		await page.goto(`apps/forms/${form.hash}/edit`)
+
+		for (const name of ['Question number 1', 'Question number 2']) {
+			const question = page.getByRole('listitem', { name })
+			await question
+				.getByRole('button', { name: 'Actions', exact: true })
+				.click()
+			await page
+				.getByRole('checkbox', { name: 'Go to based on answer' })
+				.click({ force: true })
+			await page.keyboard.press('Escape')
+		}
+
+		const ratingQuestion = page.getByRole('listitem', {
+			name: 'Question number 1',
+		})
+		await expect(ratingQuestion.getByRole('combobox')).toHaveCount(5)
+		await expect(
+			ratingQuestion.getByRole('combobox', { name: 'Option 1 go to' }),
+		).toBeVisible()
+		await ratingQuestion
+			.getByRole('combobox', { name: 'Option 5 go to' })
+			.click()
+		await page
+			.getByRole('option')
+			.filter({ hasText: 'Question 3: Comments' })
+			.click()
+
+		const promoterQuestion = page.getByRole('listitem', {
+			name: 'Question number 2',
+		})
+		await expect(promoterQuestion.getByRole('combobox')).toHaveCount(11)
+		await expect(
+			promoterQuestion.getByRole('combobox', {
+				name: 'Option 0 - Not at all likely go to',
+			}),
+		).toBeVisible()
+		await expect(
+			promoterQuestion.getByRole('combobox', {
+				name: 'Option 10 - Extremely likely go to',
+			}),
+		).toBeVisible()
+
+		await expect(async () => {
+			const stored = await api(
+				page.request,
+				'GET',
+				`/forms/${form.id}/questions/${rating.id}`,
+			)
+			expect(stored.extraSettings).toEqual({
+				questionType: 'rating',
+				goTo: [{ value: 5, target: comments.id }],
+			})
+		}).toPass()
+
+		await page.goto(`apps/forms/${form.hash}/submit`)
+		await submitView.checkRadio('Rate the service', '5')
+		await expect(submitView.getQuestion('Would you recommend us?')).toBeHidden()
+		await submitView.checkRadio('Rate the service', '4')
+		await expect(submitView.getQuestion('Would you recommend us?')).toBeVisible()
+	})
 })

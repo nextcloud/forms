@@ -14,7 +14,11 @@ import { QUESTION_EXTRASETTINGS_OTHER_PREFIX } from '../models/Constants.ts'
 
 export const JUMP_TARGET_SUBMIT = 'submit'
 
-export const QUESTION_TYPES_WITH_GOTO = ['dropdown', 'multiple_unique']
+export const QUESTION_TYPES_WITH_GOTO = [
+	'dropdown',
+	'linearscale',
+	'multiple_unique',
+]
 
 export const QUESTION_TYPES_WITH_NEXT = [
 	'color',
@@ -28,8 +32,8 @@ export const QUESTION_TYPES_WITH_NEXT = [
 	'time',
 ]
 
-/** The answer a jump belongs to: an option or the answer "Other" */
-export type JumpAnswer = { optionId: number } | { other: true }
+/** The answer a jump belongs to: an option, the answer "Other", or a value of a linear scale */
+export type JumpAnswer = { optionId: number } | { other: true } | { value: number }
 
 /**
  * Whether the jump belongs to the answer
@@ -38,9 +42,13 @@ export type JumpAnswer = { optionId: number } | { other: true }
  * @param answer the answer
  */
 export function isJumpOf(jump: FormsJump, answer: JumpAnswer): boolean {
-	return 'optionId' in answer
-		? jump.optionId === answer.optionId
-		: jump.other === true
+	if ('optionId' in answer) {
+		return jump.optionId === answer.optionId
+	}
+	if ('value' in answer) {
+		return jump.value === answer.value
+	}
+	return jump.other === true
 }
 
 /**
@@ -73,6 +81,9 @@ export function getJumpTarget(
 					&& !!extraSettings.allowOtherAnswer
 					&& typeof value === 'string'
 					&& value.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX))
+				|| (jump.value !== undefined
+					&& /^\d+$/.test(String(value))
+					&& Number(value) === jump.value)
 			) {
 				return typeof jump.target === 'number'
 					|| typeof jump.target === 'string'
@@ -219,13 +230,23 @@ export interface JumpIssues {
 }
 
 /**
- * The answers a respondent can give to a question with one answer, for which `goTo` can hold a jump: the options, and the answer "Other" of a radio question; none for a question without a title or options
+ * The answers a respondent can give to a question with one answer, for which `goTo` can hold a jump: the values of a linear scale, or the options of a choice question and the answer "Other" of a radio question; none for a question without a title or a choice question without options
  *
  * @param question the question
  */
 function getPossibleAnswers(question: FormsQuestion): JumpAnswer[] | null {
 	if (!question.text?.trim()) {
 		return []
+	}
+	if (question.type === 'linearscale') {
+		const lowest = Number(question.extraSettings?.optionsLowest ?? 1)
+		const highest = Number(question.extraSettings?.optionsHighest ?? 5)
+		return Array.from(
+			{ length: Math.max(highest - lowest + 1, 0) },
+			(_, offset) => ({
+				value: lowest + offset,
+			}),
+		)
 	}
 	if (!QUESTION_TYPES_WITH_GOTO.includes(question.type)) {
 		return null

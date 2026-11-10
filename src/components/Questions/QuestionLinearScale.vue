@@ -187,6 +187,20 @@
 				{{ optionsLabelHighest }}
 			</div>
 		</div>
+		<ul v-if="jumps.showTargets" class="question-linear-scale__targets">
+			<li
+				v-for="option in scaleOptions"
+				:key="option"
+				class="question-linear-scale__target">
+				<JumpTargetSelect
+					:modelValue="jumps.getTarget({ value: option })"
+					:options="jumps.targetOptions"
+					:inputLabel="getTargetInputLabel(option)"
+					@update:modelValue="
+						jumps.setTarget({ value: option }, $event)
+					" />
+			</li>
+		</ul>
 		<template #insert>
 			<slot name="insert" />
 		</template>
@@ -203,6 +217,7 @@ import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
+import JumpTargetSelect from './JumpTargetSelect.vue'
 import Question from './Question.vue'
 import {
 	QUESTION_EMITS,
@@ -232,6 +247,7 @@ export default defineComponent({
 		NcActionInput,
 		NcCheckboxRadioSwitch,
 		NcTextArea,
+		JumpTargetSelect,
 		Question,
 	},
 
@@ -328,6 +344,43 @@ export default defineComponent({
 		})
 
 		const questionValues = computed(() => values.value)
+
+		/**
+		 * A scale value with the label of its end of the scale, e.g. "1 - Strongly disagree", and a value of a rating alone
+		 *
+		 * @param option the value
+		 */
+		const getValueText = (option: number): string => {
+			const label = isRating.value
+				? ''
+				: option === optionsLowest.value
+					? optionsLabelLowest.value
+					: option === optionsHighest.value
+						? optionsLabelHighest.value
+						: ''
+			return label
+				? t(
+						'forms',
+						'{value} - {label}',
+						{ value: option, label },
+						{ escape: false, sanitize: false },
+					)
+				: String(option)
+		}
+
+		/**
+		 * Visible label of the select where a scale value goes, e.g. "Option 5 - Strongly agree go to"
+		 *
+		 * @param option the value
+		 */
+		const getTargetInputLabel = (option: number): string =>
+			// TRANSLATORS {value} is a value of a linear scale, possibly with its label, e.g. "5 - Strongly agree"
+			t(
+				'forms',
+				'Option {value} go to',
+				{ value: getValueText(option) },
+				{ escape: false, sanitize: false },
+			)
 
 		/**
 		 * ID for the label for the lowest option
@@ -466,6 +519,7 @@ export default defineComponent({
 			lowest,
 			highest,
 			scaleOptions,
+			getTargetInputLabel,
 			isUnique,
 			questionValues,
 			labelId,
@@ -554,6 +608,20 @@ export default defineComponent({
 			transform: scale(1.1);
 		}
 	}
+}
+
+.question-linear-scale__targets {
+	display: flex;
+	flex-direction: column;
+	gap: var(--default-grid-baseline);
+	margin-block-start: calc(2 * var(--default-grid-baseline));
+	max-width: 440px;
+	padding-inline-end: calc(var(--default-clickable-area) + 12px);
+}
+
+.question-linear-scale__target {
+	display: flex;
+	container-type: inline-size;
 }
 
 .question__content {
