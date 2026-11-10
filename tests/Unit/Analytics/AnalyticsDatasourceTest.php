@@ -123,4 +123,25 @@ class AnalyticsDatasourceTest extends TestCase {
 
 		$this->assertEquals($expectedData, $data);
 	}
+
+	public function testReadDataWithoutAnswers(): void {
+		$this->formsService->method('getQuestions')->willReturn([['id' => 1, 'text' => 'Question 1']]);
+		$this->submissionService->method('getSubmissions')->willReturn([]);
+		$this->l10n->method('t')->willReturnArgument(0);
+
+		$this->assertSame([], $this->analyticsDatasource->readData(['formId' => 123])['data']);
+	}
+
+	public function testReadDataSkipsAnswersOfDeletedQuestions(): void {
+		$this->formsService->method('getQuestions')->willReturn([['id' => 1, 'text' => 'Question 1']]);
+		$this->submissionService->method('getSubmissions')->willReturn([
+			['answers' => [
+				['questionId' => 1, 'text' => 'Answer 1'],
+				['questionId' => 2, 'text' => 'Answer of a deleted question'],
+			]],
+		]);
+		$this->l10n->method('t')->willReturnArgument(0);
+
+		$this->assertSame([['Question 1', 'Answer 1', 1]], $this->analyticsDatasource->readData(['formId' => 123])['data']);
+	}
 }
