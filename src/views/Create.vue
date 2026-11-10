@@ -127,6 +127,7 @@
 				<!-- Questions list -->
 				<Draggable
 					:modelValue="form.questions"
+					:disabled="isChangingQuestions"
 					:animation="300"
 					target=".sort-target"
 					direction="vertical"
@@ -145,8 +146,11 @@
 							:key="question.id"
 							:ref="registerQuestionRef(question)"
 							v-bind="form.questions[index]"
-							:canMoveDown="index < form.questions.length - 1"
-							:canMoveUp="index > 0"
+							:canMoveDown="
+								!isChangingQuestions
+								&& index < form.questions.length - 1
+							"
+							:canMoveUp="!isChangingQuestions && index > 0"
 							:answerType="answerTypes[question.type]"
 							:index="index + 1"
 							:maxStringLengths="maxStringLengths"
@@ -230,15 +234,23 @@ import type { FormsForm, FormsOption, FormsQuestion } from '../types/Entities.d.
 
 import IconLock from '@material-symbols/svg-400/outlined/lock.svg?raw'
 import axios from '@nextcloud/axios'
-import { showError } from '@nextcloud/dialogs'
+import { showConfirmation, showError, showWarning } from '@nextcloud/dialogs'
 import { emit as emitEvent } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
-import { t } from '@nextcloud/l10n'
+import { getLanguage, t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import { useIsMobile } from '@nextcloud/vue'
 import debounce from 'debounce'
-import { computed, defineComponent, nextTick, onMounted, ref, watch } from 'vue'
+import {
+	computed,
+	defineComponent,
+	nextTick,
+	onMounted,
+	provide,
+	ref,
+	watch,
+} from 'vue'
 import { VueDraggable as Draggable } from 'vue-draggable-plus'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
@@ -251,9 +263,18 @@ import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
 import TopBar from '../components/TopBar.vue'
+import { FORM_JUMP_ISSUES_KEY, FORM_QUESTIONS_KEY } from '../composables/useJumps.ts'
+import { queueQuestionRequest } from '../composables/useQuestion.ts'
 import { useViewForm } from '../composables/useViewForm.ts'
 import answerTypes from '../models/AnswerTypes.ts'
 import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
+import {
+	formatList,
+	getJumpIssues,
+	getNewlyBrokenQuestions,
+	withoutBackwardJumps,
+	withoutRemovedJumps,
+} from '../utils/Jumps.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
@@ -304,6 +325,12 @@ export default defineComponent({
 	emits: ['update:form', 'open-sharing'],
 
 	setup(props, { emit }) {
+		const formQuestions = computed(() => props.form.questions)
+		provide(FORM_QUESTIONS_KEY, formQuestions)
+		provide(
+			FORM_JUMP_ISSUES_KEY,
+			computed(() => getJumpIssues(formQuestions.value ?? [])),
+		)
 		const title = ref<HTMLTextAreaElement | null>(null)
 		const description = ref<HTMLTextAreaElement | null>(null)
 		const viewForm = useViewForm({
@@ -314,6 +341,32 @@ export default defineComponent({
 
 		// Various states
 		const isLoadingQuestions = ref<boolean>(false)
+		const changingFormIds = ref<number[]>([])
+		const deletingQuestionIds = new Set<number>()
+		const isChangingQuestions = computed<boolean>(() =>
+			changingFormIds.value.includes(props.form.id),
+		)
+
+		/**
+		 * Mark a question of a form as being added, copied or deleted
+		 *
+		 * @param formId the id of the form
+		 */
+		const startChangingQuestions = (formId: number): void => {
+			changingFormIds.value = [...changingFormIds.value, formId]
+		}
+
+		/**
+		 * Mark one adding, copying or deleting of a question of a form as done
+		 *
+		 * @param formId the id of the form
+		 */
+		const endChangingQuestions = (formId: number): void => {
+			const index = changingFormIds.value.indexOf(formId)
+			changingFormIds.value = changingFormIds.value.filter(
+				(id, position) => position !== index,
+			)
+		}
 		const isDragging = ref<boolean>(false)
 		const maxStringLengths = loadState(
 			formsAppName,
@@ -489,18 +542,106 @@ export default defineComponent({
 			})
 		}
 
+		/**
+		 * The numbers of the questions, as a list
+		 *
+		 * @param questions the questions of the form in their order
+		 * @param ids the ids of the questions
+		 */
+		const numbersOf = (questions: FormsQuestion[], ids: number[]): string =>
+			formatList(
+				questions.flatMap((question, position) =>
+					ids.includes(question.id) ? [String(position + 1)] : [],
+				),
+				getLanguage(),
+			)
+
+		/**
+		 * Show a warning when a change breaks jumps, makes questions unreachable or lets jumps skip more questions
+		 *
+		 * @param oldQuestions the questions before the change
+		 * @param newQuestions the questions after the change
+		 * @param reportSkippable whether to name the questions that jumps can skip now
+		 */
+		const warnAboutJumpChanges = (
+			oldQuestions: FormsQuestion[],
+			newQuestions: FormsQuestion[],
+			reportSkippable = true,
+		): void => {
+			const before = getJumpIssues(oldQuestions)
+			const after = getJumpIssues(newQuestions)
+
+			const broken = getNewlyBrokenQuestions(before, after)
+			const unreachable = [...after.unreachable].filter(
+				(id) => !before.unreachable.has(id),
+			)
+			const skipped = reportSkippable
+				? [...after.skippable].filter((id) => !before.skippable.has(id))
+				: []
+
+			const messages = [
+				broken.length === 1
+					&& t(
+						'forms',
+						'Question {questions} jumped to the deleted question, so respondents now go to the next question instead.',
+						{ questions: numbersOf(newQuestions, broken) },
+					),
+				broken.length > 1
+					&& t(
+						'forms',
+						'Questions {questions} jumped to the deleted question, so respondents now go to the next question instead.',
+						{ questions: numbersOf(newQuestions, broken) },
+					),
+				unreachable.length === 1
+					&& t(
+						'forms',
+						'Question {questions} can no longer be reached by respondents.',
+						{ questions: numbersOf(newQuestions, unreachable) },
+					),
+				unreachable.length > 1
+					&& t(
+						'forms',
+						'Questions {questions} can no longer be reached by respondents.',
+						{ questions: numbersOf(newQuestions, unreachable) },
+					),
+				skipped.length === 1
+					&& t(
+						'forms',
+						'Question {questions} can now be skipped through a jump.',
+						{ questions: numbersOf(newQuestions, skipped) },
+					),
+				skipped.length > 1
+					&& t(
+						'forms',
+						'Questions {questions} can now be skipped through jumps.',
+						{ questions: numbersOf(newQuestions, skipped) },
+					),
+			].filter(Boolean)
+
+			if (messages.length > 0) {
+				showWarning(
+					[...messages, t('forms', 'Please review the jumps.')].join(' '),
+				)
+			}
+		}
+
 		const updateQuestionProperty = <K extends keyof FormsQuestion>(
 			index: number,
 			property: K,
 			value: FormsQuestion[K],
-		): void => {
+		): FormsQuestion[] => {
 			const questions = [...props.form.questions]
 			questions[index] = { ...questions[index], [property]: value }
 			emit('update:form', { ...props.form, questions })
+			return questions
 		}
 
 		const updateQuestionText = (index: number, value: string): void => {
-			updateQuestionProperty(index, 'text', value)
+			warnAboutJumpChanges(
+				props.form.questions,
+				updateQuestionProperty(index, 'text', value),
+				false,
+			)
 		}
 
 		const updateQuestionDescription = (index: number, value: string): void => {
@@ -519,14 +660,57 @@ export default defineComponent({
 			index: number,
 			value: Record<string, unknown> | null,
 		): void => {
-			updateQuestionProperty(index, 'extraSettings', value)
+			warnAboutJumpChanges(
+				props.form.questions,
+				updateQuestionProperty(index, 'extraSettings', value),
+				false,
+			)
 		}
 
 		const updateQuestionOptions = (
 			index: number,
 			value: FormsOption[],
 		): void => {
-			updateQuestionProperty(index, 'options', value)
+			warnAboutJumpChanges(
+				props.form.questions,
+				updateQuestionProperty(index, 'options', value),
+				false,
+			)
+		}
+
+		/**
+		 * Ask whether to remove the jumps that a new order of the questions would turn into jumps to an earlier question, or to move the questions back
+		 *
+		 * @param questions the questions in the new order
+		 * @param ids the ids of the questions with such jumps
+		 * @return whether to remove the jumps
+		 */
+		const confirmRemovingBackwardJumps = async (
+			questions: FormsQuestion[],
+			ids: number[],
+		): Promise<boolean> => {
+			try {
+				return await showConfirmation({
+					name: t('forms', 'Jumps cannot go back'),
+					text:
+						ids.length === 1
+							? t(
+									'forms',
+									'After this move, question {questions} would jump to an earlier question. Move the question back, or remove the jumps that would go back?',
+									{ questions: numbersOf(questions, ids) },
+								)
+							: t(
+									'forms',
+									'After this move, questions {questions} would jump to earlier questions. Move the question back, or remove the jumps that would go back?',
+									{ questions: numbersOf(questions, ids) },
+								),
+					labelConfirm: t('forms', 'Remove jumps'),
+					labelReject: t('forms', 'Move back'),
+					severity: 'warning',
+				})
+			} catch {
+				return false
+			}
 		}
 
 		/**
@@ -537,18 +721,102 @@ export default defineComponent({
 		const onQuestionOrderChange = async (
 			questions: FormsQuestion[],
 		): Promise<void> => {
+			const formId = props.form.id
+			const oldQuestions = props.form.questions
+			const focused = document.activeElement
+			const backward = getNewlyBrokenQuestions(
+				getJumpIssues(oldQuestions),
+				getJumpIssues(questions),
+			)
+			let order = questions
+			if (backward.length > 0) {
+				const removeJumps = await confirmRemovingBackwardJumps(
+					questions,
+					backward,
+				)
+				if (!removeJumps) {
+					const current = new Map(
+						props.form.questions.map((question) => [
+							question.id,
+							question,
+						]),
+					)
+					const restored = oldQuestions.flatMap(
+						(question) => current.get(question.id) ?? [],
+					)
+					props.form.questions.forEach((question, position) => {
+						if (!oldQuestions.some(({ id }) => id === question.id)) {
+							restored.splice(position, 0, question)
+						}
+					})
+					emit('update:form', { ...props.form, questions: restored })
+				}
+				await nextTick()
+				if (focused instanceof HTMLElement && focused.isConnected) {
+					focused.focus()
+				}
+				if (!removeJumps) {
+					return
+				}
+				order = props.form.questions
+			}
+
 			isLoadingQuestions.value = true
-			const newOrder = questions.map((question: FormsQuestion) => question.id)
+			const newOrder = order.map((question: FormsQuestion) => question.id)
 
 			try {
-				await axios.patch(
-					generateOcsUrl('apps/forms/api/v3/forms/{id}/questions', {
-						id: props.form.id,
-					}),
-					{
-						newOrder,
-					},
+				await queueQuestionRequest(newOrder, () =>
+					axios.patch(
+						generateOcsUrl('apps/forms/api/v3/forms/{id}/questions', {
+							id: props.form.id,
+						}),
+						{
+							newOrder,
+						},
+					),
 				)
+				if (props.form.id !== formId) {
+					return
+				}
+				const adjustedOrder = withoutBackwardJumps(order)
+				warnAboutJumpChanges(oldQuestions, adjustedOrder)
+				const changes = new Map(
+					order.flatMap((question, position) =>
+						adjustedOrder[position] === question
+							? []
+							: [
+									[
+										question.id,
+										[
+											question.extraSettings ?? {},
+											adjustedOrder[position].extraSettings
+												?? {},
+										],
+									] as const,
+								],
+					),
+				)
+				const questions = props.form.questions.map((question) => {
+					const change = changes.get(question.id)
+					if (!change) {
+						return question
+					}
+					const extraSettings = withoutRemovedJumps(
+						question.extraSettings ?? {},
+						...change,
+					)
+					return extraSettings === question.extraSettings
+						? question
+						: { ...question, extraSettings }
+				})
+				if (
+					questions.some(
+						(question, index) =>
+							question !== props.form.questions[index],
+					)
+				) {
+					emit('update:form', { ...props.form, questions })
+				}
 				emitEvent('forms:last-updated:set', props.form.id)
 			} catch (error) {
 				logger.error('Error while saving form', { error })
@@ -614,6 +882,7 @@ export default defineComponent({
 				})
 			}
 
+			warnAboutJumpChanges(props.form.questions, questions, false)
 			emitEvent('forms:last-updated:set', props.form.id)
 		}
 
@@ -659,7 +928,9 @@ export default defineComponent({
 		): Promise<void> => {
 			activeQuestionType.value = null
 			const text = ''
+			const formId = props.form.id
 			isLoadingQuestions.value = true
+			startChangingQuestions(formId)
 
 			try {
 				const body: {
@@ -673,12 +944,22 @@ export default defineComponent({
 					body.position = position + 2
 				}
 
-				const response = await axios.post(
-					generateOcsUrl('apps/forms/api/v3/forms/{id}/questions', {
-						id: props.form.id,
-					}),
-					body,
+				const response = await queueQuestionRequest(
+					props.form.questions.map(({ id }) => id),
+					() =>
+						axios.post(
+							generateOcsUrl(
+								'apps/forms/api/v3/forms/{id}/questions',
+								{
+									id: props.form.id,
+								},
+							),
+							body,
+						),
 				)
+				if (props.form.id !== formId) {
+					return
+				}
 				const question = OcsResponse2Data<FormsQuestion>(response)
 
 				// Delegate insertion & focus handling to helper
@@ -690,6 +971,7 @@ export default defineComponent({
 				)
 			} finally {
 				isLoadingQuestions.value = false
+				endChangingQuestions(formId)
 			}
 		}
 
@@ -699,21 +981,35 @@ export default defineComponent({
 		 * @param questionId the question id to delete
 		 */
 		const deleteQuestion = async (questionId: number): Promise<void> => {
+			if (deletingQuestionIds.has(questionId)) {
+				return
+			}
+			deletingQuestionIds.add(questionId)
+			const formId = props.form.id
 			isLoadingQuestions.value = true
+			startChangingQuestions(formId)
 
 			try {
-				await axios.delete(
-					generateOcsUrl(
-						'apps/forms/api/v3/forms/{id}/questions/{questionId}',
-						{
-							id: props.form.id,
-							questionId,
-						},
-					),
+				await queueQuestionRequest(
+					props.form.questions.map(({ id }) => id),
+					() =>
+						axios.delete(
+							generateOcsUrl(
+								'apps/forms/api/v3/forms/{id}/questions/{questionId}',
+								{
+									id: props.form.id,
+									questionId,
+								},
+							),
+						),
 				)
+				if (props.form.id !== formId) {
+					return
+				}
 				const questions = props.form.questions.filter(
 					(search: FormsQuestion) => search.id !== questionId,
 				)
+				warnAboutJumpChanges(props.form.questions, questions)
 				emit('update:form', { ...props.form, questions })
 				emitEvent('forms:last-updated:set', props.form.id)
 			} catch (error) {
@@ -725,6 +1021,8 @@ export default defineComponent({
 				)
 			} finally {
 				isLoadingQuestions.value = false
+				endChangingQuestions(formId)
+				deletingQuestionIds.delete(questionId)
 			}
 		}
 
@@ -739,7 +1037,9 @@ export default defineComponent({
 			question: Pick<FormsQuestion, 'id'>,
 			position: number | null,
 		): Promise<void> => {
+			const formId = props.form.id
 			isLoadingQuestions.value = true
+			startChangingQuestions(formId)
 
 			try {
 				const url = generateOcsUrl(
@@ -756,7 +1056,13 @@ export default defineComponent({
 					body.position = position + 2
 				}
 
-				const response = await axios.post(url, body)
+				const response = await queueQuestionRequest(
+					props.form.questions.map(({ id }) => id),
+					() => axios.post(url, body),
+				)
+				if (props.form.id !== formId) {
+					return
+				}
 				const clonedQuestion = OcsResponse2Data<FormsQuestion>(response)
 
 				// Delegate insertion & focus handling to helper
@@ -768,6 +1074,7 @@ export default defineComponent({
 				showError('There was an error while duplicating the question')
 			} finally {
 				isLoadingQuestions.value = false
+				endChangingQuestions(formId)
 			}
 		}
 
@@ -816,6 +1123,7 @@ export default defineComponent({
 			title,
 			description,
 			isLoadingQuestions,
+			isChangingQuestions,
 			isDragging,
 			maxStringLengths,
 			questionMenuOpened,
