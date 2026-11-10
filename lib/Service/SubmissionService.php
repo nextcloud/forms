@@ -586,7 +586,27 @@ class SubmissionService {
 	}
 
 	/**
+	 * Whether the submit view shows the question to respondents: it needs a title, choice, dropdown and ranking questions need options, and grid questions need rows and columns
+	 *
+	 * @param array $question the question with its options
+	 */
+	private static function isShownToRespondents(array $question): bool {
+		if (preg_match('/^[\s\p{Z}\x{FEFF}]*$/u', (string)($question['text'] ?? '')) === 1) {
+			return false;
+		}
+
+		$optionTypes = array_map(static fn (mixed $option): mixed => is_array($option) ? ($option['optionType'] ?? null) : null, $question['options'] ?? []);
+		return match ($question['type'] ?? null) {
+			Constants::ANSWER_TYPE_MULTIPLE, Constants::ANSWER_TYPE_MULTIPLEUNIQUE, Constants::ANSWER_TYPE_DROPDOWN, Constants::ANSWER_TYPE_RANKING => $optionTypes !== [],
+			Constants::ANSWER_TYPE_GRID => in_array(Option::OPTION_TYPE_ROW, $optionTypes, true) && in_array(Option::OPTION_TYPE_COLUMN, $optionTypes, true),
+			default => true,
+		};
+	}
+
+	/**
 	 * Validate all answers against the questions
+	 * Required questions the submit view does not show to respondents need no answer
+	 *
 	 * @param array $questions Array of the questions of the form
 	 * @param array $answers Array of the submitted answers
 	 * @param string $formOwnerId Owner of the form
@@ -601,6 +621,7 @@ class SubmissionService {
 
 			// Check if all required questions have an answer
 			if ($question['isRequired']
+				&& self::isShownToRespondents($question)
 				&& (!$questionAnswered
 				|| !array_filter($answers[$questionId], static function (string|array $value): bool {
 					if (is_array($value)) {
