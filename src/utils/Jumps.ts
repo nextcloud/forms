@@ -17,12 +17,14 @@ export const QUESTION_TYPES_WITH_GOTO = ['dropdown', 'multiple_unique']
 
 export const QUESTION_TYPES_WITH_NEXT = [
 	'color',
+	'date',
 	'file',
 	'grid',
 	'long',
 	'multiple',
 	'ranking',
 	'short',
+	'time',
 ]
 
 /** The answer a jump belongs to: an option or the answer "Other" */

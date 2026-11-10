@@ -1687,9 +1687,19 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'expected' => false,
 			],
-			'jump: next not offered on date questions' => [
+			'jump: next on date questions' => [
 				'extraSettings' => ['next' => 5],
 				'questionType' => Constants::ANSWER_TYPE_DATE,
+				'expected' => true,
+			],
+			'jump: next on time questions' => [
+				'extraSettings' => ['next' => 'submit'],
+				'questionType' => Constants::ANSWER_TYPE_TIME,
+				'expected' => true,
+			],
+			'jump: next not offered on datetime questions' => [
+				'extraSettings' => ['next' => 5],
+				'questionType' => Constants::ANSWER_TYPE_DATETIME,
 				'expected' => false,
 			],
 			'jump: goTo per option and Other' => [
