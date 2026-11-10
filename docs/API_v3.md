@@ -18,6 +18,7 @@ This file contains the API-Documentation. For more information on the returned D
 - The OCS-Endpoint _always returns_ an object called `ocs`. This contains an object `meta` holding some meta-data, as well as an object `data` holding the actual data. In this document, the response-blocks only show the `data`, if not explicitely stated different.
 
 - OpenAPI spec: a machine-readable OpenAPI description is available at `/openapi.json` in the repository root. Prefer it as source-of-truth for exact request/response shapes.
+- When the server changes data beyond what a request asked for, it reports this in the response header `X-Forms-Adjusted`, see [Adjustments by the server](#adjustments-by-the-server).
 
 ```
 "ocs": {
@@ -29,6 +30,20 @@ This file contains the API-Documentation. For more information on the returned D
   "data": <Actual data>
 }
 ```
+
+### Adjustments by the server
+
+Some requests succeed with their usual status, and their payload keeps its shape, but the server changes data beyond what the request asked for. The response header `X-Forms-Adjusted` then reports this as a [structured field dictionary (RFC 8941)](https://www.rfc-editor.org/rfc/rfc8941#name-dictionaries); the header is absent when nothing was adjusted. `Access-Control-Expose-Headers` makes it readable for cross-origin clients. Clients should ignore keys they do not know, as more keys may follow.
+
+| Key | Value | Set by | Meaning |
+|-----|-------|--------|---------|
+| `removed-jumps` | Inner list of question ids, e.g. `(3 7)` | Updating, reordering and copying questions; deleting options | Jumps to the question itself or to an earlier question, or jumps of the deleted option or of options that are not options of the question, were removed from the `extraSettings` of these questions, see [Jumps](DataStructure.md#jumps) |
+
+```
+X-Forms-Adjusted: removed-jumps=(3 7)
+```
+
+When more than 100 questions lost jumps, which only a reorder can cause, `removed-jumps` holds no list but the boolean `true`, written as the key alone: `X-Forms-Adjusted: removed-jumps`. The response of the reorder holds the new `extraSettings` of these questions.
 
 ## API changes
 
@@ -49,6 +64,7 @@ This file contains the API-Documentation. For more information on the returned D
 
 ### Other API changes
 
+- Questions can jump to a later question or to the end of the form with the extra settings `goTo` (per answer, on dropdown and radio questions) or `next` (after the question, on the other types with jumps), never both (see [Jumps](DataStructure.md#jumps)). Jumps to questions of other forms are rejected, jumps for options that are not options of the question are removed, and deleting an option removes its jumps. Submissions and submission updates ignore answers to the questions the jumps skip and do not require them, the path ends at an unanswered question with a jump per answer past the following question, and an answer "Other" needs a text. Updating, reordering and copying questions removes jumps to the question itself or to an earlier question; the response header `X-Forms-Adjusted` then lists the questions concerned under `removed-jumps` (see [Adjustments by the server](#adjustments-by-the-server)). Copying or importing a form drops such jumps as well, without the header, as these create a new form.
 - In API version 3.0 the following endpoints were introduced/changed:
     - `GET /api/v3/forms/{formId}/questions` to get all questions of a form
     - `GET /api/v3/forms/{formId}/questions/{questionId}` to get a single question
@@ -260,7 +276,7 @@ Creates a clone of a form (without submissions).
   | Parameter | Type | Description |
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form to clone |
-- Response: Returns the full object of the new form. See [Request full data of a Form](#request-full-data-of-a-form)
+- Response: Returns the full object of the new form. See [Request full data of a Form](#request-full-data-of-a-form). The jumps of the copied questions point at the copied questions and options; jumps whose target or option was not copied, jumps that would go to the question itself or to an earlier question, and `goTo` or `next` on a question type without it, are dropped, without the header `X-Forms-Adjusted` (see [Jumps](DataStructure.md#jumps)).
 
 ```
 See section 'Request full data of a form'.
@@ -453,7 +469,7 @@ Update a single or multiple properties of a question-object.
   |-----------|---------|-------------|
   | _keyValuePairs_ | Array | Array of key-value pairs to update |
 - Restrictions: It is **not allowed** to update one of the following key-value pairs: _id, formId, order, type_.
-- Response: **Status-Code OK**, as well as the id of the updated question.
+- Response: **Status-Code OK**, as well as the id of the updated question. Jumps in `extraSettings` that go to the question itself or to an earlier question are removed before saving (see [Jumps](DataStructure.md#jumps)), and the response header `X-Forms-Adjusted` then holds `removed-jumps=(<question id>)` (see [Adjustments by the server](#adjustments-by-the-server)). Jumps with an invalid structure, `goTo` or `next` on a question type without it, and ids of questions of other forms are rejected with **Status-Code Bad Request** "Invalid extraSettings, will not update." Jumps for options that are not options of the question are removed before saving, with the same header.
 
 ```
 "data": 1
@@ -474,7 +490,7 @@ Reorders all Questions of a single form
   |-----------|---------|-------------|
   | _newOrder_ | Array | Array of **all** Question-IDs, ordered in the desired order |
 - Restrictions: The Array **must** contain all Question-IDs corresponding to the specified form and **must not** contain any duplicates.
-- Response: Array of questionIDs and their corresponding order.
+- Response: Array of questionIDs and their corresponding order. Jumps that would go to the question itself or to an earlier question are removed (see [Jumps](DataStructure.md#jumps)): the questions concerned also carry their new `extraSettings`, and the response header `X-Forms-Adjusted` then lists their ids, e.g. `X-Forms-Adjusted: removed-jumps=(3 7)`, or holds `removed-jumps` alone for more than 100 questions (see [Adjustments by the server](#adjustments-by-the-server)).
 
 ```
 "data": {
@@ -520,7 +536,7 @@ Creates a clone of a question with all its options.
   | Parameter | Type | Optional | Description |
   |-----------|---------|----------|-------------|
   | _position_ | Integer | yes | _(optional)_ 1-based position to insert the cloned question. When omitted the clone is appended at the end. |
-- Response: Returns cloned question object with the new ID set.
+- Response: Returns cloned question object with the new ID set. Jumps that would go to the clone itself or to an earlier question, for example when it is appended at the end, are removed from its `extraSettings` (see [Jumps](DataStructure.md#jumps)), and the response header `X-Forms-Adjusted` then holds `removed-jumps=(<clone id>)` (see [Adjustments by the server](#adjustments-by-the-server)).
 
 ```
 See section 'Create a new question'.
@@ -591,7 +607,7 @@ Update a single or all properties of an option-object
   | _formId_ | Integer | ID of the form containing the question and option |
   | _questionId_ | Integer | ID of the question, the new option will belong to |
   | _optionId_ | Integer | ID of the option to delete |
-- Response: **Status-Code OK**, as well as the id of the deleted option.
+- Response: **Status-Code OK**, as well as the id of the deleted option. The jumps of the question for this option are removed (see [Jumps](DataStructure.md#jumps)), and the response header `X-Forms-Adjusted` then holds `removed-jumps=(<question id>)` (see [Adjustments by the server](#adjustments-by-the-server)).
 
 ```
 "data": 7
@@ -952,6 +968,8 @@ Store Submission to Database
     - An **array** of values as value --> Even for short Text Answers, wrapped into Array.
     - For Question-Types with pre-defined answers (`multiple`, `multiple_unique`, `dropdown`), the array contains the corresponding option-IDs, each as a number or as a string of exactly its digits, e.g. `12` or `"12"`, but not `"012"` or `" 12"`.
     - For File-Uploads, the array contains objects with `uploadedFileId` and `uploadToken` (both from the [Upload a file] endpoint for the same `questionId`).
+    - Answers to questions that the [jumps](DataStructure.md#jumps) of the answers skip are ignored, and a skipped required question needs no answer. The path ends at a question that has no answer and a jump per answer past the following question, so the questions after an optional one left empty need no answer either.
+    - An answer "Other" is `system-other-answer:` followed by its text, and the text must not be empty.
 
 ```
   {
@@ -985,6 +1003,7 @@ Update an existing submission (only allowed when `allowEditSubmissions` is set o
     - The form must have `allowEditSubmissions` enabled.
     - Only the user who created the submission may update it.
     - Answers are validated the same way as on submit.
+    - The answers replace all stored answers of the submission; answers to questions the [jumps](DataStructure.md#jumps) skip are not stored.
 - Response: **Status-Code OK**, as well as the id of the updated submission.
 
 ```

@@ -888,6 +888,30 @@ class FormsService {
 		});
 	}
 
+	/**
+	 * The extra settings a question type allows, with the allowed types of their values
+	 *
+	 * @param string $questionType the question type
+	 * @return array<string, list<string>> the allowed value types by extra setting
+	 */
+	public static function getAllowedExtraSettings(string $questionType): array {
+		return match ($questionType) {
+			Constants::ANSWER_TYPE_DROPDOWN => Constants::EXTRA_SETTINGS_DROPDOWN,
+			Constants::ANSWER_TYPE_MULTIPLE => Constants::EXTRA_SETTINGS_MULTIPLE,
+			Constants::ANSWER_TYPE_MULTIPLEUNIQUE => Constants::EXTRA_SETTINGS_MULTIPLEUNIQUE,
+			Constants::ANSWER_TYPE_SHORT => Constants::EXTRA_SETTINGS_SHORT,
+			Constants::ANSWER_TYPE_LONG => Constants::EXTRA_SETTINGS_LONG,
+			Constants::ANSWER_TYPE_FILE => Constants::EXTRA_SETTINGS_FILE,
+			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
+			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
+			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
+			Constants::ANSWER_TYPE_COLOR => Constants::EXTRA_SETTINGS_COLOR,
+			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
+			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
+			default => [],
+		};
+	}
+
 	/*
 	 * Validates the extraSettings
 	 *
@@ -901,18 +925,7 @@ class FormsService {
 		}
 
 		// Ensure only allowed keys are set
-		$allowed = match ($questionType) {
-			Constants::ANSWER_TYPE_DROPDOWN => Constants::EXTRA_SETTINGS_DROPDOWN,
-			Constants::ANSWER_TYPE_MULTIPLE, Constants::ANSWER_TYPE_MULTIPLEUNIQUE => Constants::EXTRA_SETTINGS_MULTIPLE,
-			Constants::ANSWER_TYPE_SHORT => Constants::EXTRA_SETTINGS_SHORT,
-			Constants::ANSWER_TYPE_FILE => Constants::EXTRA_SETTINGS_FILE,
-			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
-			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
-			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
-			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
-			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
-			default => [],
-		};
+		$allowed = self::getAllowedExtraSettings($questionType);
 		// Number of keys in extraSettings but not in allowed (but not the other way round)
 		$diff = array_diff(array_keys($extraSettings), array_keys($allowed));
 		if (count($diff) > 0) {
@@ -925,6 +938,13 @@ class FormsService {
 				// Not allowed type
 				return false;
 			}
+		}
+
+		if (array_key_exists('next', $extraSettings) && !self::isJumpTarget($extraSettings['next'])) {
+			return false;
+		}
+		if (array_key_exists('goTo', $extraSettings) && !self::isGoToValid($extraSettings['goTo'], $questionType)) {
+			return false;
 		}
 
 		// Validate extraSettings for specific question types
@@ -1053,6 +1073,226 @@ class FormsService {
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Whether the value is a jump target: the id of a question or the end of the form
+	 *
+	 * @param mixed $target the value
+	 */
+	private static function isJumpTarget(mixed $target): bool {
+		return (is_int($target) && $target > 0) || $target === Constants::JUMP_TARGET_SUBMIT;
+	}
+
+	/**
+	 * Whether the value is a list of jumps per answer, at most one per answer
+	 *
+	 * @param mixed $goTo the value of `goTo`
+	 * @param string $questionType the question type
+	 */
+	private static function isGoToValid(mixed $goTo, string $questionType): bool {
+		if (!is_array($goTo) || !array_is_list($goTo)) {
+			return false;
+		}
+
+		$answers = [];
+		foreach ($goTo as $jump) {
+			$answer = self::getJumpAnswer($jump, $questionType);
+			if ($answer === null || isset($answers[$answer])) {
+				return false;
+			}
+			$answers[$answer] = true;
+		}
+
+		return true;
+	}
+
+	/**
+	 * The answer of a jump per answer with one answer key and a target: `option:<id>` for an option, `other` for the answer "Other" of a radio question
+	 *
+	 * @param mixed $jump the jump
+	 * @param string $questionType the question type
+	 * @return ?string the answer, `null` for a jump with an invalid structure or for an answer the question type has no jumps for
+	 */
+	private static function getJumpAnswer(mixed $jump, string $questionType): ?string {
+		if (!is_array($jump) || count($jump) !== 2 || !self::isJumpTarget($jump['target'] ?? null)) {
+			return null;
+		}
+		if (is_int($jump['optionId'] ?? null) && $jump['optionId'] > 0) {
+			return 'option:' . $jump['optionId'];
+		}
+		if (($jump['other'] ?? null) === true && $questionType === Constants::ANSWER_TYPE_MULTIPLEUNIQUE) {
+			return 'other';
+		}
+		return null;
+	}
+
+	/**
+	 * Whether the jump targets are questions of the form, deleted ones included
+	 *
+	 * @param array $extraSettings the extra settings of the question, with a valid structure
+	 * @param list<Question> $formQuestions the questions of the form, deleted ones included
+	 */
+	public function areJumpsOfForm(array $extraSettings, array $formQuestions): bool {
+		$goTo = is_array($extraSettings['goTo'] ?? null) ? $extraSettings['goTo'] : [];
+		$questionIds = array_map(static fn (Question $question): int => $question->getId(), $formQuestions);
+		foreach ([$extraSettings['next'] ?? null, ...array_column($goTo, 'target')] as $target) {
+			if (is_int($target) && !in_array($target, $questionIds, true)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Remove the jumps for options that are not options of the question
+	 *
+	 * @param Question $question the question, with extra settings of a valid structure
+	 * @return bool whether jumps were removed, with the new extra settings set
+	 */
+	public function removeJumpsOfMissingOptions(Question $question): bool {
+		$extraSettings = $question->getExtraSettings();
+		$goTo = is_array($extraSettings['goTo'] ?? null) ? $extraSettings['goTo'] : [];
+		if (array_column($goTo, 'optionId') === []) {
+			return false;
+		}
+
+		$optionIds = array_map(static fn (Option $option): int => $option->getId(), $this->optionMapper->findByQuestion($question->getId()));
+		$kept = array_values(array_filter($goTo, static fn (array $jump): bool => !isset($jump['optionId']) || in_array($jump['optionId'], $optionIds, true)));
+		if (count($kept) === count($goTo)) {
+			return false;
+		}
+
+		$extraSettings['goTo'] = $kept;
+		$question->setExtraSettings($extraSettings);
+		return true;
+	}
+
+	/**
+	 * The extra settings of a copied question, with its jumps pointing at the copied questions and options.
+	 * Jumps whose target or option has no copy are removed.
+	 *
+	 * @param array $extraSettings the extra settings of the original question
+	 * @param ?array<int, int> $questionIdMap the ids of the copied questions by original id, `null` keeps the targets
+	 * @param array<int, int> $optionIdMap the ids of the copied options by original id
+	 * @return array the extra settings of the copy
+	 */
+	public static function mapJumps(array $extraSettings, ?array $questionIdMap, array $optionIdMap): array {
+		$mapTarget = static function (mixed $target) use ($questionIdMap): string|int|null {
+			if (!is_int($target)) {
+				return $target === Constants::JUMP_TARGET_SUBMIT ? $target : null;
+			}
+			return $questionIdMap === null ? $target : ($questionIdMap[$target] ?? null);
+		};
+
+		if (array_key_exists('next', $extraSettings)) {
+			$next = $mapTarget($extraSettings['next']);
+			if ($next === null) {
+				unset($extraSettings['next']);
+			} else {
+				$extraSettings['next'] = $next;
+			}
+		}
+
+		if (array_key_exists('goTo', $extraSettings)) {
+			$goTo = [];
+			foreach (is_array($extraSettings['goTo']) ? $extraSettings['goTo'] : [] as $jump) {
+				if (!is_array($jump)) {
+					continue;
+				}
+				$jump['target'] = $mapTarget($jump['target'] ?? null);
+				if (array_key_exists('optionId', $jump)) {
+					$jump['optionId'] = is_int($jump['optionId']) ? ($optionIdMap[$jump['optionId']] ?? null) : null;
+					if ($jump['optionId'] === null) {
+						continue;
+					}
+				}
+				if ($jump['target'] !== null) {
+					$goTo[] = $jump;
+				}
+			}
+			$extraSettings['goTo'] = $goTo;
+		}
+
+		return $extraSettings;
+	}
+
+	/**
+	 * Point the jumps of copied questions at the copied questions and options, and remove the jumps that go to the question itself or to an earlier question, jumps per answer with an invalid structure or for an answer with a jump already, and `goTo` or `next` on question types without it
+	 *
+	 * @param list<Question> $questions the copied questions
+	 * @param array<int, int> $questionIdMap the ids of the copied questions by original id
+	 * @param array<int, array<int, int>> $optionIdMaps the ids of the copied options by original id, per id of the copied question
+	 * @return list<Question> the copied questions with jumps, with their new extra settings set
+	 */
+	public static function mapJumpsOfCopies(array $questions, array $questionIdMap, array $optionIdMaps): array {
+		$copiesWithJumps = [];
+		foreach ($questions as $question) {
+			$extraSettings = $question->getExtraSettings();
+			if (array_key_exists('goTo', $extraSettings) || array_key_exists('next', $extraSettings)) {
+				$allowed = self::getAllowedExtraSettings($question->getType());
+				if (!isset($allowed['goTo'])) {
+					unset($extraSettings['goTo']);
+				}
+				if (!isset($allowed['next'])) {
+					unset($extraSettings['next']);
+				}
+				$extraSettings = self::mapJumps($extraSettings, $questionIdMap, $optionIdMaps[$question->getId()] ?? []);
+				if (array_key_exists('goTo', $extraSettings)) {
+					$goTo = [];
+					foreach ($extraSettings['goTo'] as $jump) {
+						$answer = self::getJumpAnswer($jump, $question->getType());
+						if ($answer !== null && !isset($goTo[$answer])) {
+							$goTo[$answer] = $jump;
+						}
+					}
+					$extraSettings['goTo'] = array_values($goTo);
+				}
+				$question->setExtraSettings($extraSettings);
+				$copiesWithJumps[] = $question;
+			}
+		}
+
+		if ($copiesWithJumps !== []) {
+			usort($questions, static fn (Question $a, Question $b): int => $a->getOrder() <=> $b->getOrder());
+			self::removeBackwardJumps($questions);
+		}
+
+		return $copiesWithJumps;
+	}
+
+	/**
+	 * Remove the jumps that go to the question itself or to an earlier question, keeping the jumps to the end of the form, to later questions and to questions that are not in the list
+	 *
+	 * @param list<Question> $questions the questions of the form in their order
+	 * @return list<Question> the questions whose jumps were removed, with their new extra settings set
+	 */
+	public static function removeBackwardJumps(array $questions): array {
+		$positions = array_flip(array_map(static fn (Question $question): int => $question->getId(), $questions));
+		$changed = [];
+
+		foreach ($questions as $position => $question) {
+			$isBackward = static fn (mixed $target): bool => is_int($target) && isset($positions[$target]) && $positions[$target] <= $position;
+			$extraSettings = $question->getExtraSettings();
+			$newSettings = $extraSettings;
+
+			if ($isBackward($extraSettings['next'] ?? null)) {
+				unset($newSettings['next']);
+			}
+			if (is_array($extraSettings['goTo'] ?? null)) {
+				$goTo = array_values(array_filter($extraSettings['goTo'], static fn (mixed $jump): bool => !$isBackward(is_array($jump) ? ($jump['target'] ?? null) : null)));
+				if (count($goTo) !== count($extraSettings['goTo'])) {
+					$newSettings['goTo'] = $goTo;
+				}
+			}
+
+			if ($newSettings !== $extraSettings) {
+				$question->setExtraSettings($newSettings);
+				$changed[] = $question;
+			}
+		}
+
+		return $changed;
 	}
 
 	/**
