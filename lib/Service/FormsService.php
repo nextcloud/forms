@@ -22,6 +22,7 @@ use OCA\Forms\Db\SubmissionMapper;
 use OCA\Forms\Events\FormSubmittedEvent;
 use OCA\Forms\Exception\NoSuchFormException;
 use OCA\Forms\Helper\FilePathHelper;
+use OCA\Forms\Helper\JumpHelper;
 use OCA\Forms\ResponseDefinitions;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
@@ -888,6 +889,30 @@ class FormsService {
 		});
 	}
 
+	/**
+	 * The extra settings a question type allows, with the allowed types of their values
+	 *
+	 * @param string $questionType the question type
+	 * @return array<string, list<string>> the allowed value types by extra setting
+	 */
+	public static function getAllowedExtraSettings(string $questionType): array {
+		return match ($questionType) {
+			Constants::ANSWER_TYPE_DROPDOWN => Constants::EXTRA_SETTINGS_DROPDOWN,
+			Constants::ANSWER_TYPE_MULTIPLE => Constants::EXTRA_SETTINGS_MULTIPLE,
+			Constants::ANSWER_TYPE_MULTIPLEUNIQUE => Constants::EXTRA_SETTINGS_MULTIPLEUNIQUE,
+			Constants::ANSWER_TYPE_SHORT => Constants::EXTRA_SETTINGS_SHORT,
+			Constants::ANSWER_TYPE_LONG => Constants::EXTRA_SETTINGS_LONG,
+			Constants::ANSWER_TYPE_FILE => Constants::EXTRA_SETTINGS_FILE,
+			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
+			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
+			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
+			Constants::ANSWER_TYPE_COLOR => Constants::EXTRA_SETTINGS_COLOR,
+			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
+			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
+			default => [],
+		};
+	}
+
 	/*
 	 * Validates the extraSettings
 	 *
@@ -901,18 +926,7 @@ class FormsService {
 		}
 
 		// Ensure only allowed keys are set
-		$allowed = match ($questionType) {
-			Constants::ANSWER_TYPE_DROPDOWN => Constants::EXTRA_SETTINGS_DROPDOWN,
-			Constants::ANSWER_TYPE_MULTIPLE, Constants::ANSWER_TYPE_MULTIPLEUNIQUE => Constants::EXTRA_SETTINGS_MULTIPLE,
-			Constants::ANSWER_TYPE_SHORT => Constants::EXTRA_SETTINGS_SHORT,
-			Constants::ANSWER_TYPE_FILE => Constants::EXTRA_SETTINGS_FILE,
-			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
-			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
-			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
-			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
-			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
-			default => [],
-		};
+		$allowed = self::getAllowedExtraSettings($questionType);
 		// Number of keys in extraSettings but not in allowed (but not the other way round)
 		$diff = array_diff(array_keys($extraSettings), array_keys($allowed));
 		if (count($diff) > 0) {
@@ -925,6 +939,13 @@ class FormsService {
 				// Not allowed type
 				return false;
 			}
+		}
+
+		if (array_key_exists('next', $extraSettings) && !JumpHelper::isJumpTarget($extraSettings['next'])) {
+			return false;
+		}
+		if (array_key_exists('goTo', $extraSettings) && !JumpHelper::isGoToValid($extraSettings['goTo'], $questionType)) {
+			return false;
 		}
 
 		// Validate extraSettings for specific question types
@@ -1082,6 +1103,47 @@ class FormsService {
 				return false;
 			}
 		}
+		return true;
+	}
+
+	/**
+	 * Whether the jump targets are questions of the form, deleted ones included
+	 *
+	 * @param array $extraSettings the extra settings of the question, with a valid structure
+	 * @param list<Question> $formQuestions the questions of the form, deleted ones included
+	 */
+	public function areJumpsOfForm(array $extraSettings, array $formQuestions): bool {
+		$goTo = is_array($extraSettings['goTo'] ?? null) ? $extraSettings['goTo'] : [];
+		$questionIds = array_map(static fn (Question $question): int => $question->getId(), $formQuestions);
+		foreach ([$extraSettings['next'] ?? null, ...array_column($goTo, 'target')] as $target) {
+			if (is_int($target) && !in_array($target, $questionIds, true)) {
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Remove the jumps for options that are not options of the question
+	 *
+	 * @param Question $question the question, with extra settings of a valid structure
+	 * @return bool whether jumps were removed, with the new extra settings set
+	 */
+	public function removeJumpsOfMissingOptions(Question $question): bool {
+		$extraSettings = $question->getExtraSettings();
+		$goTo = is_array($extraSettings['goTo'] ?? null) ? $extraSettings['goTo'] : [];
+		if (array_column($goTo, 'optionId') === []) {
+			return false;
+		}
+
+		$optionIds = array_map(static fn (Option $option): int => $option->getId(), $this->optionMapper->findByQuestion($question->getId()));
+		$kept = array_values(array_filter($goTo, static fn (array $jump): bool => !isset($jump['optionId']) || in_array($jump['optionId'], $optionIds, true)));
+		if (count($kept) === count($goTo)) {
+			return false;
+		}
+
+		$extraSettings['goTo'] = $kept;
+		$question->setExtraSettings($extraSettings);
 		return true;
 	}
 
