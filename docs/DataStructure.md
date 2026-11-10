@@ -273,14 +273,14 @@ Optional extra settings for some [Question Types](#question-types)
 | `questionType`          | `linearscale`                                  | String           | `rating`, `promoter`                        | Sub type, fixed at creation; `rating` is a 1 to N scale drawn as icons, `promoter` is a 0 to 10 scale whose results show the promoter score; absent for a plain scale |
 | `ratingIcon`            | `linearscale` with `questionType` `rating`     | string           | `'star', 'heart', 'thumb'`                  | Set the icon of the rating, default: `'star'`                               |
 | `goTo`                  | `dropdown, multiple_unique`                    | Array            | see [Jumps](#jumps)                         | Where to go next for an answer                                              |
-| `next`                  | `color, file, grid, long, ranking, short`      | Integer / string | question id, `'submit'`                     | Where to go after the question, see [Jumps](#jumps)                         |
+| `next`                  | `color, file, grid, long, multiple, ranking, short` | Integer / string | question id, `'submit'`                | Where to go after the question, see [Jumps](#jumps)                         |
 
 ### Jumps
 
 An answer can lead to a later question or to the end of the form, as in Microsoft Forms. The form stays a flat list of questions.
 
 - `goTo` is a list of jumps per answer: `{"optionId": 12, "target": 34}` for an option, `{"other": true, "target": "submit"}` for the answer "Other". There is at most one jump per answer.
-- `next` is one target after the whole question.
+- `next` is one target after the whole question; on a checkbox question it applies whichever options are checked.
 - A question has either jumps per answer or one jump after the question, depending on its type: `goTo` only on `dropdown` and `multiple_unique`, `next` only on the other types listed above. Sending `next` on a question type with `goTo`, or `goTo` on a question type with `next`, is rejected with 400 "Invalid extraSettings". An answer without a `goTo` entry leads to the following question.
 - A target is the id of a later question of the same form or `"submit"` for the end of the form, and `optionId` is the id of an option of the question. Ids of questions of other forms are rejected as invalid `extraSettings`, while ids of deleted questions of the form are accepted. Updating a question removes its jumps for option ids that are not options of the question; the response header `X-Forms-Adjusted` then holds `removed-jumps` with the id of the question.
 - Jumps never go back: the server removes jumps to the question itself or to an earlier question when a question is updated, reordered or copied, and when a form is copied or imported; copying or importing a form also drops `goTo` or `next` on question types without it. Updating, reordering and copying a question still succeed with their usual status, and the payload keeps its shape: a reorder adds the new `extraSettings` of the questions concerned, and a copied question is returned with its reduced `extraSettings`. The response header `X-Forms-Adjusted` lists the questions that lost jumps, e.g. `removed-jumps=(3 7)`, see [Adjustments by the server](API_v3.md#adjustments-by-the-server).
