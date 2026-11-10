@@ -156,7 +156,7 @@
 						@tabbedOut="checkValidOption" />
 				</TransitionGroup>
 			</Draggable>
-			<li
+			<div
 				v-if="allowOtherAnswer"
 				key="option-add-other"
 				class="question__item">
@@ -173,7 +173,7 @@
 					minlength="1"
 					type="text"
 					:readonly="!readOnly" />
-			</li>
+			</div>
 		</template>
 
 		<!-- Add multiple options modal -->
