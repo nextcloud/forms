@@ -187,6 +187,7 @@ OC.L10N.register(
     "Other:" : "Autre :",
     "Other" : "Autre",
     "You must rank all options" : "Vous devez classer toutes les options",
+    "Unranked options" : "Options non classées",
     "All options ranked" : "Toutes les options classées",
     "Your ranking" : "Votre classement",
     "Remove from ranking" : "Retirer du classement",

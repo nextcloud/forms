@@ -187,6 +187,7 @@ OC.L10N.register(
     "Other:" : "Andet:",
     "Other" : "Andet",
     "You must rank all options" : "Du skal rangordne alle muligheder",
+    "Unranked options" : "Ikke rangordnede muligheder",
     "All options ranked" : "Alle muligheder er rangordnet",
     "Your ranking" : "Din rangordning",
     "Remove from ranking" : "Fjern fra rangordningen",

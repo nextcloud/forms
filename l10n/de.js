@@ -187,6 +187,7 @@ OC.L10N.register(
     "Other:" : "Andere:",
     "Other" : "Andere",
     "You must rank all options" : "Es müssen alle Optionen bewertet werden",
+    "Unranked options" : "Nicht bewertete Optionen",
     "All options ranked" : "Alle Optionen wurden bewertet",
     "Your ranking" : "Deine Bewertung",
     "Remove from ranking" : "Aus den Bewertungen entfernen",
