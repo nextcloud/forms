@@ -229,6 +229,16 @@
 		"visible": [1, 3, 4]
 	},
 	{
+		"name": "a checkbox question has one target whichever options are checked",
+		"questions": [
+			{ "id": 1, "type": "multiple", "extraSettings": { "next": 3 } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["11", "12"] },
+		"visible": [1, 3]
+	},
+	{
 		"name": "the jumps of skipped questions do not count",
 		"questions": [
 			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 3 }] } },
