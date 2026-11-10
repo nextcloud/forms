@@ -239,6 +239,7 @@ class Constants {
 		'optionsHighest' => ['integer', 'NULL'],
 		'optionsLabelLowest' => ['string', 'NULL'],
 		'optionsLabelHighest' => ['string', 'NULL'],
+		'goTo' => ['array'],
 	];
 
 	public const EXTRA_SETTINGS_GRID = [

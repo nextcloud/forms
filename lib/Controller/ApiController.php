@@ -703,7 +703,7 @@ class ApiController extends OCSController {
 	 * Writes the given key-value pairs into Database
 	 * Key `order` should only be changed by reorderQuestions() and is not allowed here
 	 *
-	 * Jumps to the question itself or to an earlier question are removed before saving, and the header `X-Forms-Adjusted` then holds `removed-jumps` with the id of the question.
+	 * Jumps to the question itself or to an earlier question, and jumps of a linear scale for values outside its bounds, are removed before saving, and the header `X-Forms-Adjusted` then holds `removed-jumps` with the id of the question.
 	 * Jumps for options that are not options of the question are removed as well, with the same header. Jumps to questions of other forms are rejected as invalid `extraSettings`.
 	 *
 	 * @param int $formId the form id
@@ -791,6 +791,9 @@ class ApiController extends OCSController {
 			$updatedQuestion->setExtraSettings($keyValuePairs['extraSettings']);
 			$removedJumps = $this->formsService->removeJumpsOfMissingOptions($updatedQuestion);
 			$formQuestions = array_values(array_map(static fn (Question $formQuestion): Question => $formQuestion->getId() === $questionId ? $updatedQuestion : $formQuestion, array_filter($allQuestions, static fn (Question $formQuestion): bool => $formQuestion->getOrder() !== 0)));
+			if (FormsService::removeJumpsOutsideScale($updatedQuestion)) {
+				$removedJumps = true;
+			}
 			if (in_array($updatedQuestion, FormsService::removeBackwardJumps($formQuestions), true)) {
 				$removedJumps = true;
 			}
