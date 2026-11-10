@@ -79,6 +79,7 @@
 				<NcActions
 					v-if="!readOnly"
 					:id="actionsId"
+					v-model:open="isActionsOpen"
 					forceMenu
 					placement="bottom-end"
 					class="question__header__title__menu">
@@ -95,6 +96,16 @@
 						@update:modelValue="onRequiredChange">
 						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
 						{{ t('forms', 'Required') }}
+					</NcActionCheckbox>
+					<NcActionCheckbox
+						v-if="jumps && (jumps.canGoTo || jumps.canNext)"
+						:modelValue="jumps.enabled"
+						@update:modelValue="onJumpsEnabledChange">
+						{{
+							jumps.canGoTo
+								? t('forms', 'Go to based on answer')
+								: t('forms', 'Go to after this question')
+						}}
 					</NcActionCheckbox>
 					<slot name="actions" />
 					<NcActionInput
@@ -114,7 +125,7 @@
 						</template>
 						{{ t('forms', 'Copy question') }}
 					</NcActionButton>
-					<NcActionButton @click="onDelete">
+					<NcActionButton closeAfterClick @click="onDelete">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconDelete" />
 						</template>
@@ -158,10 +169,31 @@
 			<NcNoteCard v-if="hasError" :id="errorId" type="error">
 				{{ errorMessage }}
 			</NcNoteCard>
+			<div v-if="!readOnly && jumps" class="question__header__warnings">
+				<NcNoteCard
+					v-for="warning in jumps.warnings"
+					:key="warning"
+					type="warning">
+					{{ warning }}
+				</NcNoteCard>
+				<NcNoteCard v-if="jumps.hint" type="warning">
+					{{ jumps.hint }}
+				</NcNoteCard>
+				<div class="hidden-visually" aria-live="polite">
+					{{ hintAnnouncement }}
+				</div>
+			</div>
 		</div>
 
 		<!-- Question content -->
 		<slot />
+		<div v-if="jumps?.showNext" class="question__jump">
+			<JumpTargetSelect
+				:modelValue="jumps.next"
+				:options="jumps.targetOptions"
+				:inputLabel="jumps.nextLabel"
+				@update:modelValue="jumps.setNext" />
+		</div>
 		<!-- Insert question menu -->
 		<slot name="insert" />
 	</li>
@@ -169,6 +201,7 @@
 
 <script lang="ts">
 import type { PropType } from 'vue'
+import type { Jumps } from '../../composables/useJumps.ts'
 import type { MaxStringLengths } from '../../types/Entities.ts'
 
 import IconAsterisk from '@material-symbols/svg-400/outlined/asterisk.svg?raw'
@@ -181,7 +214,15 @@ import IconArrowDown from '@material-symbols/svg-400/outlined/keyboard_arrow_dow
 import IconArrowUp from '@material-symbols/svg-400/outlined/keyboard_arrow_up.svg?raw'
 import IconDotsHorizontal from '@material-symbols/svg-400/outlined/more_horiz.svg?raw'
 import { t } from '@nextcloud/l10n'
-import { computed, defineComponent, inject, nextTick, onMounted, ref } from 'vue'
+import {
+	computed,
+	defineComponent,
+	inject,
+	nextTick,
+	onMounted,
+	ref,
+	watch,
+} from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
@@ -190,6 +231,7 @@ import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconOverlay from '../Icons/IconOverlay.vue'
+import JumpTargetSelect from './JumpTargetSelect.vue'
 
 export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
@@ -204,6 +246,7 @@ export default defineComponent({
 		NcActionInput,
 		NcButton,
 		NcNoteCard,
+		JumpTargetSelect,
 	},
 
 	props: {
@@ -280,6 +323,14 @@ export default defineComponent({
 
 		infoMessage: {
 			type: String,
+			default: null,
+		},
+
+		/**
+		 * The jumps of the question, see `useJumps()`
+		 */
+		jumps: {
+			type: Object as PropType<Jumps | null>,
 			default: null,
 		},
 	},
@@ -377,6 +428,37 @@ export default defineComponent({
 			emit('update:isRequired', isRequired)
 		}
 
+		const isActionsOpen = ref(false)
+
+		const hintAnnouncement = ref('')
+		watch(
+			() => props.jumps?.hint,
+			(hint) => {
+				hintAnnouncement.value = hint
+					? t(
+							'forms',
+							'Question {number}: {title}',
+							{ number: props.index, title: hint },
+							{ escape: false, sanitize: false },
+						)
+					: ''
+			},
+		)
+
+		/**
+		 * Switch the jumps of the question on or off; switching off closes the menu first
+		 *
+		 * @param enabled whether jumps are switched on
+		 */
+		const onJumpsEnabledChange = (
+			enabled: boolean,
+		): Promise<void> | undefined => {
+			if (!enabled) {
+				isActionsOpen.value = false
+			}
+			return props.jumps?.setEnabled(enabled)
+		}
+
 		/**
 		 * Reorder question but keep focus on the button, or on the other move button once the question is the last one
 		 */
@@ -441,6 +523,9 @@ export default defineComponent({
 			onDescriptionChange,
 			onNameChange,
 			onRequiredChange,
+			isActionsOpen,
+			hintAnnouncement,
+			onJumpsEnabledChange,
 			onMoveDown,
 			onMoveUp,
 			onDelete,
@@ -521,6 +606,14 @@ export default defineComponent({
 		padding: 0;
 	}
 
+	&__jump {
+		display: flex;
+		container-type: inline-size;
+		margin-block-start: calc(2 * var(--default-grid-baseline));
+		max-width: 440px;
+		padding-inline-end: calc(var(--default-clickable-area) + 12px);
+	}
+
 	&__header {
 		display: block;
 		padding-block-end: 8px;
@@ -591,6 +684,13 @@ export default defineComponent({
 				// Styling for rendered Output
 				@include markdown-output;
 			}
+		}
+
+		&__warnings :deep(.notecard) {
+			position: relative;
+			inset-inline-start: -12px;
+			width: calc(100% - var(--default-clickable-area));
+			box-sizing: border-box;
 		}
 	}
 }
