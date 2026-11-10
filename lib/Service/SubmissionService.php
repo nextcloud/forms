@@ -37,7 +37,9 @@ use OCP\IUserSession;
 use OCP\Mail\IEmailValidator;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Shared\Date as ExcelDate;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use PhpOffice\PhpSpreadsheet\Worksheet\Worksheet;
 use PhpOffice\PhpSpreadsheet\Writer\Csv;
 use Psr\Log\LoggerInterface;
@@ -47,6 +49,12 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type FormsAnswer from ResponseDefinitions
  */
 class SubmissionService {
+	/**
+	 * Built-in Excel number format index for 'h:mm'.
+	 * PhpSpreadsheet only exposes constants for indexes 14 (short date) and 22 (date time).
+	 */
+	private const NUMBER_FORMAT_TIME_INDEX = 20;
+
 	private readonly ?IUser $currentUser;
 
 	public function __construct(
@@ -351,7 +359,8 @@ class SubmissionService {
 			}
 
 			// Date
-			$row[] = date_format(date_timestamp_set(new DateTime(), $submission->getTimestamp())->setTimezone(new DateTimeZone($userTimezone)), 'c');
+			$submissionDate = date_timestamp_set(new DateTime(), $submission->getTimestamp())->setTimezone(new DateTimeZone($userTimezone));
+			$row[] = $this->typedCellValue(ExcelDate::dateTimeToExcel($submissionDate), NumberFormat::DATE_TIME_INDEX, $submissionDate->format('c'));
 
 			// Answers, make sure we keep the question order
 			$answers = array_reduce($answersBySubmission[$submission->getId()] ?? [],
@@ -415,7 +424,7 @@ class SubmissionService {
 				}, []);
 
 			foreach ($questions as $question) {
-				$row[] = $answers[$question->getId()] ?? null;
+				$row[] = $this->answerExportValue($question, $answers[$question->getId()] ?? null);
 			}
 
 			$data[] = $row;
@@ -426,7 +435,7 @@ class SubmissionService {
 
 	/**
 	 * @param array<int, array{id: string, title: string}> $header
-	 * @param list<non-empty-list<array{columns?: list<mixed|string>, label?: string, url?: string}|mixed|null|string>> $data
+	 * @param list<non-empty-list<array{columns?: list<mixed|string>, label?: string, typedValue?: float|int, numberFormat?: int|null, stringValue?: string, url?: string}|mixed|null|string>> $data
 	 */
 	private function exportData(array $header, array $data, string $fileFormat, ?File $file = null): string {
 		$content = null;
@@ -931,7 +940,71 @@ class SubmissionService {
 		return $normalizedIds;
 	}
 
+	/**
+	 * Wrap a value so spreadsheet exports store it with a real cell type instead
+	 * of text. $numberFormat is a built-in Excel format index applied to the cell,
+	 * $stringValue is the plain-text representation used for CSV.
+	 *
+	 * @return array{typedValue: float|int, numberFormat: int|null, stringValue: string}
+	 */
+	private function typedCellValue(float|int $typedValue, ?int $numberFormat, string $stringValue): array {
+		return ['typedValue' => $typedValue, 'numberFormat' => $numberFormat, 'stringValue' => $stringValue];
+	}
+
+	/**
+	 * Convert an answer to a typed cell value where the question type maps to a
+	 * spreadsheet type (number, date, time). Answers that cannot be converted -
+	 * e.g. date ranges joined into a single string - keep their text form.
+	 */
+	private function answerExportValue(Question $question, mixed $answer): mixed {
+		if (!is_string($answer) || $answer === '') {
+			return $answer;
+		}
+
+		$questionType = $question->getType();
+		if ($questionType === Constants::ANSWER_TYPE_SHORT) {
+			return ($question->getExtraSettings()['validationType'] ?? null) === 'number' && is_numeric($answer)
+				? $this->typedCellValue(+$answer, null, $answer)
+				: $answer;
+		}
+
+		if ($questionType !== Constants::ANSWER_TYPE_DATE && $questionType !== Constants::ANSWER_TYPE_TIME) {
+			return $answer;
+		}
+
+		$answerFormat = Constants::ANSWER_PHPDATETIME_FORMAT[$questionType];
+		$dateTime = DateTime::createFromFormat('!' . $answerFormat, $answer, new DateTimeZone('UTC'));
+		if ($dateTime === false || $dateTime->format($answerFormat) !== $answer) {
+			return $answer;
+		}
+
+		if ($questionType === Constants::ANSWER_TYPE_DATE) {
+			return $this->typedCellValue(ExcelDate::dateTimeToExcel($dateTime), NumberFormat::SHORT_DATE_INDEX, $answer);
+		}
+
+		// A time of day is stored as the fraction of a day
+		$secondsOfDay = (int)$dateTime->format('H') * 3600 + (int)$dateTime->format('i') * 60 + (int)$dateTime->format('s');
+		return $this->typedCellValue($secondsOfDay / 86400, self::NUMBER_FORMAT_TIME_INDEX, $answer);
+	}
+
 	private function setCellValue(Worksheet $activeWorksheet, int $column, int $row, mixed $value, string $fileFormat): void {
+		// Typed values get a matching cell type/format for spreadsheet formats,
+		// while CSV keeps their plain-text representation.
+		if (is_array($value) && isset($value['typedValue'])) {
+			if ($fileFormat === 'csv') {
+				$activeWorksheet->getCell([$column, $row])
+					->setValueExplicit($this->escapeCSV($value['stringValue']), DataType::TYPE_STRING);
+			} else {
+				$activeWorksheet->setCellValue([$column, $row], $value['typedValue']);
+				if ($value['numberFormat'] !== null) {
+					$activeWorksheet->getStyle([$column, $row])
+						->getNumberFormat()
+						->setBuiltInFormatCode($value['numberFormat']);
+				}
+			}
+			return;
+		}
+
 		if (!is_string($value)) {
 			$activeWorksheet->setCellValue([$column, $row], $value);
 			return;
