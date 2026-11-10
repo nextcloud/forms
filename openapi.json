@@ -530,6 +530,35 @@
                     "dateRange": {
                         "type": "boolean"
                     },
+                    "goTo": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "required": [
+                                "target"
+                            ],
+                            "properties": {
+                                "optionId": {
+                                    "type": "integer",
+                                    "format": "int64"
+                                },
+                                "other": {
+                                    "type": "boolean"
+                                },
+                                "target": {
+                                    "oneOf": [
+                                        {
+                                            "type": "integer",
+                                            "format": "int64"
+                                        },
+                                        {
+                                            "type": "string"
+                                        }
+                                    ]
+                                }
+                            }
+                        }
+                    },
                     "maxAllowedFilesCount": {
                         "type": "integer",
                         "format": "int64"
@@ -537,6 +566,17 @@
                     "maxFileSize": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "next": {
+                        "oneOf": [
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            {
+                                "type": "string"
+                            }
+                        ]
                     },
                     "optionsHighest": {
                         "type": "integer",
@@ -605,6 +645,29 @@
                     "number",
                     "radio"
                 ]
+            },
+            "QuestionOrder": {
+                "type": "object",
+                "required": [
+                    "order"
+                ],
+                "properties": {
+                    "order": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "extraSettings": {
+                        "anyOf": [
+                            {
+                                "$ref": "#/components/schemas/QuestionExtraSettings"
+                            },
+                            {
+                                "type": "object",
+                                "additionalProperties": true
+                            }
+                        ]
+                    }
+                }
             },
             "QuestionType": {
                 "type": "string",
@@ -1675,7 +1738,7 @@
             "post": {
                 "operationId": "api-new-question",
                 "summary": "Add a new question",
-                "description": "This endpoint allows CORS requests",
+                "description": "A clone loses its jumps to itself or to an earlier question, and the header `X-Forms-Adjusted` then holds `removed-jumps` with its id\nThis endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -1750,6 +1813,18 @@
                 "responses": {
                     "201": {
                         "description": "the created question",
+                        "headers": {
+                            "X-Forms-Adjusted": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Access-Control-Expose-Headers": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1895,7 +1970,7 @@
             "patch": {
                 "operationId": "api-reorder-questions",
                 "summary": "Updates the Order of all Questions of a Form",
-                "description": "This endpoint allows CORS requests",
+                "description": "Jumps that would go to the question itself or to an earlier question are removed: the new extra settings of these questions are returned, and the header `X-Forms-Adjusted` holds `removed-jumps` with their ids\nThis endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -1951,7 +2026,19 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "the question ids of the given form in the new order",
+                        "description": "the question ids of the given form in the new order, with the new extra settings of the questions whose jumps were removed",
+                        "headers": {
+                            "X-Forms-Adjusted": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Access-Control-Expose-Headers": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -1973,7 +2060,7 @@
                                                 "data": {
                                                     "type": "object",
                                                     "additionalProperties": {
-                                                        "$ref": "#/components/schemas/Order"
+                                                        "$ref": "#/components/schemas/QuestionOrder"
                                                     }
                                                 }
                                             }
@@ -2291,7 +2378,7 @@
             "patch": {
                 "operationId": "api-update-question",
                 "summary": "Writes the given key-value pairs into Database Key `order` should only be changed by reorderQuestions() and is not allowed here",
-                "description": "This endpoint allows CORS requests",
+                "description": "Jumps to the question itself or to an earlier question are removed before saving, and the header `X-Forms-Adjusted` then holds `removed-jumps` with the id of the question. Jumps to questions of other forms or to options that are not options of the question are rejected as invalid `extraSettings`.\nThis endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -2357,6 +2444,18 @@
                 "responses": {
                     "200": {
                         "description": "the id of the updated question",
+                        "headers": {
+                            "X-Forms-Adjusted": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Access-Control-Expose-Headers": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {
@@ -3360,7 +3459,7 @@
             "delete": {
                 "operationId": "api-delete-option",
                 "summary": "Delete an option",
-                "description": "Returns the id of the deleted option\nThis endpoint allows CORS requests",
+                "description": "The jumps of the question for this option are removed as well, and the header `X-Forms-Adjusted` then holds `removed-jumps` with the id of the question.\nReturns the id of the deleted option\nThis endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -3414,6 +3513,18 @@
                 "responses": {
                     "200": {
                         "description": "the id of the deleted option",
+                        "headers": {
+                            "X-Forms-Adjusted": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Access-Control-Expose-Headers": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {

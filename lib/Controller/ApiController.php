@@ -64,6 +64,7 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type FormsOrder from ResponseDefinitions
  * @psalm-import-type FormsPartialForm from ResponseDefinitions
  * @psalm-import-type FormsQuestion from ResponseDefinitions
+ * @psalm-import-type FormsQuestionOrder from ResponseDefinitions
  * @psalm-import-type FormsQuestionType from ResponseDefinitions
  * @psalm-import-type FormsQuestionGridCellType from ResponseDefinitions
  * @psalm-import-type FormsSubmission from ResponseDefinitions
@@ -222,6 +223,9 @@ class ApiController extends OCSController {
 			// Get Questions, set new formId, reinsert
 			$questions = $this->questionMapper->findByForm($oldForm->getId());
 			$oldConfirmationEmailQuestionId = $oldForm->getConfirmationEmailQuestionId();
+			$questionIdMap = [];
+			$optionIdMap = [];
+			$newQuestions = [];
 
 			foreach ($questions as $oldQuestion) {
 				$questionData = $oldQuestion->read();
@@ -230,6 +234,8 @@ class ApiController extends OCSController {
 				$questionData['formId'] = $form->getId();
 				$newQuestion = Question::fromParams($questionData);
 				$this->questionMapper->insert($newQuestion);
+				$questionIdMap[$oldQuestion->getId()] = $newQuestion->getId();
+				$newQuestions[] = $newQuestion;
 
 				if (isset($oldConfirmationEmailQuestionId) && $oldConfirmationEmailQuestionId === $oldQuestion->getId()) {
 					$form->setConfirmationEmailQuestionId($newQuestion->getId());
@@ -244,7 +250,12 @@ class ApiController extends OCSController {
 					$optionData['questionId'] = $newQuestion->getId();
 					$newOption = Option::fromParams($optionData);
 					$this->optionMapper->insert($newOption);
+					$optionIdMap[$oldOption->getId()] = $newOption->getId();
 				}
+			}
+
+			foreach (FormsService::mapJumpsOfCopies($newQuestions, $questionIdMap, $optionIdMap) as $newQuestion) {
+				$this->questionMapper->update($newQuestion);
 			}
 
 			$this->formMapper->update($form);
@@ -525,13 +536,15 @@ class ApiController extends OCSController {
 	/**
 	 * Add a new question
 	 *
+	 * A clone loses its jumps to itself or to an earlier question, and the header `X-Forms-Adjusted` then holds `removed-jumps` with its id
+	 *
 	 * @param int $formId the form id
 	 * @param FormsQuestionType $type the new question type
 	 * @param FormsQuestionGridCellType $subtype the new question subtype
 	 * @param string $text the new question title
 	 * @param ?int $fromId (optional) id of the question that should be cloned
 	 * @param ?int $position (optional) the position of the new question
-	 * @return DataResponse<Http::STATUS_CREATED, FormsQuestion, array{}>
+	 * @return DataResponse<Http::STATUS_CREATED, FormsQuestion, array{X-Forms-Adjusted?: string, Access-Control-Expose-Headers?: string}>
 	 * @throws OCSBadRequestException Invalid type
 	 * @throws OCSBadRequestException Datetime question type no longer supported
 	 * @throws OCSForbiddenException User has no permissions to get this form
@@ -554,6 +567,7 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('This form is archived and can not be modified');
 		}
 
+		$headers = [];
 		if ($fromId === null) {
 			$this->logger->debug('Adding new question: formId: {formId}, type: {type}, text: {text}', [
 				'formId' => $formId,
@@ -644,6 +658,7 @@ class ApiController extends OCSController {
 			$response = $newQuestion->read();
 			$response['options'] = [];
 			$response['accept'] = [];
+			$optionIdMap = [];
 
 			foreach ($sourceOptions as $sourceOption) {
 				$optionData = $sourceOption->read();
@@ -652,8 +667,22 @@ class ApiController extends OCSController {
 				$optionData['questionId'] = $newQuestion->getId();
 				$newOption = Option::fromParams($optionData);
 				$insertedOption = $this->optionMapper->insert($newOption);
+				$optionIdMap[$sourceOption->getId()] = $insertedOption->getId();
 
 				$response['options'][] = $insertedOption->read();
+			}
+
+			$extraSettings = $newQuestion->getExtraSettings();
+			if (array_key_exists('goTo', $extraSettings) || array_key_exists('next', $extraSettings)) {
+				$newQuestion->setExtraSettings(FormsService::mapJumps($extraSettings, null, $optionIdMap));
+				$formQuestions = array_map(static fn (Question $formQuestion): Question => $formQuestion->getId() === $newQuestion->getId() ? $newQuestion : $formQuestion, $this->questionMapper->findByForm($formId));
+				if (in_array($newQuestion, FormsService::removeBackwardJumps($formQuestions), true)) {
+					$headers = self::getRemovedJumpsHeaders([$newQuestion->getId()]);
+				}
+				if ($newQuestion->getExtraSettings() !== $extraSettings) {
+					$this->questionMapper->update($newQuestion);
+					$response['extraSettings'] = $newQuestion->getExtraSettings();
+				}
 			}
 		}
 
@@ -663,17 +692,20 @@ class ApiController extends OCSController {
 			$response['extraSettings'] = new \stdClass();
 		}
 
-		return new DataResponse($response, Http::STATUS_CREATED);
+		return new DataResponse($response, Http::STATUS_CREATED, $headers);
 	}
 
 	/**
 	 * Writes the given key-value pairs into Database
 	 * Key `order` should only be changed by reorderQuestions() and is not allowed here
 	 *
+	 * Jumps to the question itself or to an earlier question are removed before saving, and the header `X-Forms-Adjusted` then holds `removed-jumps` with the id of the question.
+	 * Jumps to questions of other forms or to options that are not options of the question are rejected as invalid `extraSettings`.
+	 *
 	 * @param int $formId the form id
 	 * @param int $questionId id of question to update
 	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
-	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 * @return DataResponse<Http::STATUS_OK, int, array{X-Forms-Adjusted?: string, Access-Control-Expose-Headers?: string}>
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
 	 * @throws OCSBadRequestException Invalid extraSettings, will not update.
 	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
@@ -740,6 +772,20 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
 		}
 
+		$removedJumps = false;
+		if (is_array($keyValuePairs['extraSettings'] ?? null)
+			&& (array_key_exists('goTo', $keyValuePairs['extraSettings']) || array_key_exists('next', $keyValuePairs['extraSettings']))) {
+			$allQuestions = $this->questionMapper->findByForm($formId, true);
+			if (!$this->formsService->areJumpsOfForm($keyValuePairs['extraSettings'], $questionId, $allQuestions)) {
+				throw new OCSBadRequestException('Invalid extraSettings, will not update.');
+			}
+			$updatedQuestion = clone $question;
+			$updatedQuestion->setExtraSettings($keyValuePairs['extraSettings']);
+			$formQuestions = array_values(array_map(static fn (Question $formQuestion): Question => $formQuestion->getId() === $questionId ? $updatedQuestion : $formQuestion, array_filter($allQuestions, static fn (Question $formQuestion): bool => $formQuestion->getOrder() !== 0)));
+			$removedJumps = in_array($updatedQuestion, FormsService::removeBackwardJumps($formQuestions), true);
+			$keyValuePairs['extraSettings'] = $updatedQuestion->getExtraSettings();
+		}
+
 		if ($form->getConfirmationEmailQuestionId() === $question->getId()
 			&& !$question->isEmailType($keyValuePairs['type'] ?? null, $keyValuePairs['extraSettings'] ?? null)) {
 			$form->setConfirmationEmailQuestionId(null);
@@ -753,7 +799,7 @@ class ApiController extends OCSController {
 		$this->questionMapper->update($question);
 		$this->formMapper->update($form);
 
-		return new DataResponse($question->getId());
+		return new DataResponse($question->getId(), Http::STATUS_OK, $removedJumps ? self::getRemovedJumpsHeaders([$questionId]) : []);
 	}
 
 	/**
@@ -839,9 +885,11 @@ class ApiController extends OCSController {
 	/**
 	 * Updates the Order of all Questions of a Form
 	 *
+	 * Jumps that would go to the question itself or to an earlier question are removed: the new extra settings of these questions are returned, and the header `X-Forms-Adjusted` holds `removed-jumps` with their ids
+	 *
 	 * @param int $formId Id of the form to reorder
 	 * @param list<int> $newOrder Array of Question-Ids in new order.
-	 * @return DataResponse<Http::STATUS_OK, array<string, FormsOrder>, array{}>
+	 * @return DataResponse<Http::STATUS_OK, array<string, FormsQuestionOrder>, array{X-Forms-Adjusted?: string, Access-Control-Expose-Headers?: string}>
 	 * @throws OCSBadRequestException The given array contains duplicates
 	 * @throws OCSBadRequestException The length of the given array does not match the number of stored questions
 	 * @throws OCSBadRequestException Question doesn't belong to given Form
@@ -851,7 +899,7 @@ class ApiController extends OCSController {
 	 * @throws OCSNotFoundException Could not find form
 	 * @throws OCSNotFoundException Could not find question
 	 *
-	 * 200: the question ids of the given form in the new order
+	 * 200: the question ids of the given form in the new order, with the new extra settings of the questions whose jumps were removed
 	 */
 	#[CORS()]
 	#[NoAdminRequired()]
@@ -922,6 +970,8 @@ class ApiController extends OCSController {
 			}
 		}
 
+		$changedQuestions = FormsService::removeBackwardJumps($questions);
+
 		// Write to Database
 		foreach ($questions as $question) {
 			$this->questionMapper->update($question);
@@ -929,11 +979,14 @@ class ApiController extends OCSController {
 			$response[(string)$question->getId()] = [
 				'order' => $question->getOrder()
 			];
+			if (in_array($question, $changedQuestions, true)) {
+				$response[(string)$question->getId()]['extraSettings'] = $question->getExtraSettings() ?: new \stdClass();
+			}
 		}
 
 		$this->formMapper->update($form);
 
-		return new DataResponse($response);
+		return new DataResponse($response, Http::STATUS_OK, self::getRemovedJumpsHeaders(array_map(static fn (Question $question): int => $question->getId(), $changedQuestions)));
 	}
 
 	// Options
@@ -1099,10 +1152,12 @@ class ApiController extends OCSController {
 	/**
 	 * Delete an option
 	 *
+	 * The jumps of the question for this option are removed as well, and the header `X-Forms-Adjusted` then holds `removed-jumps` with the id of the question.
+	 *
 	 * @param int $formId id of form
 	 * @param int $questionId id of question
 	 * @param int $optionId id of option to update
-	 * @return DataResponse<Http::STATUS_OK, int, array{}> Returns the id of the deleted option
+	 * @return DataResponse<Http::STATUS_OK, int, array{X-Forms-Adjusted?: string, Access-Control-Expose-Headers?: string}> Returns the id of the deleted option
 	 * @throws OCSBadRequestException The given option id doesn't match the question or form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException Current user has no permission to edit
@@ -1143,6 +1198,18 @@ class ApiController extends OCSController {
 
 		$this->optionMapper->delete($option);
 
+		$headers = [];
+		$extraSettings = $question->getExtraSettings();
+		if (is_array($extraSettings['goTo'] ?? null)) {
+			$goTo = array_values(array_filter($extraSettings['goTo'], static fn (mixed $jump): bool => !is_array($jump) || ($jump['optionId'] ?? null) !== $optionId));
+			if (count($goTo) !== count($extraSettings['goTo'])) {
+				$extraSettings['goTo'] = $goTo;
+				$question->setExtraSettings($extraSettings);
+				$this->questionMapper->update($question);
+				$headers = self::getRemovedJumpsHeaders([$questionId]);
+			}
+		}
+
 		// Reorder the remaining options
 		$options = array_values($this->optionMapper->findByQuestion($questionId));
 		foreach ($options as $order => $option) {
@@ -1153,7 +1220,7 @@ class ApiController extends OCSController {
 
 		$this->formMapper->update($form);
 
-		return new DataResponse($optionId);
+		return new DataResponse($optionId, Http::STATUS_OK, $headers);
 	}
 
 	/**
@@ -1482,6 +1549,7 @@ class ApiController extends OCSController {
 		} catch (\InvalidArgumentException $e) {
 			throw new OCSBadRequestException($e->getMessage());
 		}
+		$answers = SubmissionService::getAnswersOnPath($questions, $answers);
 
 		// Create Submission
 		$submission = new Submission();
@@ -1577,6 +1645,7 @@ class ApiController extends OCSController {
 		} catch (\InvalidArgumentException $e) {
 			throw new OCSBadRequestException($e->getMessage());
 		}
+		$answers = SubmissionService::getAnswersOnPath($questions, $answers);
 
 		try {
 			$submission = $this->submissionMapper->findById($submissionId);
@@ -1871,6 +1940,23 @@ class ApiController extends OCSController {
 	}
 
 	// private functions
+
+	/**
+	 * The response headers reporting what the server changed beyond the request, readable by cross-origin clients as well:
+	 * `X-Forms-Adjusted` is a structured field dictionary (RFC 8941), here with `removed-jumps` listing the questions whose jumps were removed
+	 *
+	 * @param list<int> $questionIds the ids of the questions whose jumps were removed
+	 * @return array{X-Forms-Adjusted?: string, Access-Control-Expose-Headers?: string} no headers when nothing was adjusted
+	 */
+	private static function getRemovedJumpsHeaders(array $questionIds): array {
+		if ($questionIds === []) {
+			return [];
+		}
+		return [
+			'X-Forms-Adjusted' => 'removed-jumps=(' . implode(' ', $questionIds) . ')',
+			'Access-Control-Expose-Headers' => 'X-Forms-Adjusted',
+		];
+	}
 
 	/**
 	 * Insert answers for a question

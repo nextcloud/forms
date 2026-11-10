@@ -1,0 +1,241 @@
+[
+	{
+		"name": "no jumps shows every question",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": {} },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["11"] },
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "an option jumps over the questions in between",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["11"] },
+		"visible": [1, 3]
+	},
+	{
+		"name": "an option id sent as number matches",
+		"questions": [
+			{ "id": 1, "type": "dropdown", "extraSettings": { "goTo": [{ "optionId": 11, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": [11] },
+		"visible": [1, 3]
+	},
+	{
+		"name": "an option id in another notation does not match",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["011"] },
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "an option without a jump goes to the following question",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["12"] },
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "an unanswered question goes to the following question",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": {},
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "next is ignored on question types with goTo",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 3 }], "next": 3 } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["12"] },
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "next of a text question jumps",
+		"questions": [
+			{ "id": 1, "type": "short", "extraSettings": { "next": 3 } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": {},
+		"visible": [1, 3]
+	},
+	{
+		"name": "next jumps on every question type with next",
+		"questions": [
+			{ "id": 1, "type": "color", "extraSettings": { "next": 3 } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "file", "extraSettings": { "next": 5 } },
+			{ "id": 4, "type": "short", "extraSettings": {} },
+			{ "id": 5, "type": "grid", "extraSettings": { "next": 7 } },
+			{ "id": 6, "type": "short", "extraSettings": {} },
+			{ "id": 7, "type": "long", "extraSettings": { "next": 9 } },
+			{ "id": 8, "type": "short", "extraSettings": {} },
+			{ "id": 9, "type": "ranking", "extraSettings": { "next": 11 } },
+			{ "id": 10, "type": "short", "extraSettings": {} },
+			{ "id": 11, "type": "short", "extraSettings": {} }
+		],
+		"answers": {},
+		"visible": [1, 3, 5, 7, 9, 11]
+	},
+	{
+		"name": "only the first value of an answer decides",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["12", "11"] },
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "submit ends the form",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": "submit" }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["11"] },
+		"visible": [1]
+	},
+	{
+		"name": "the answer Other jumps",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "allowOtherAnswer": true, "goTo": [{ "other": true, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["system-other-answer:Rex"] },
+		"visible": [1, 3]
+	},
+	{
+		"name": "the answer Other does not jump when Other is off",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "other": true, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["system-other-answer:Rex"] },
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "a target before the question counts as the following question",
+		"questions": [
+			{ "id": 1, "type": "short", "extraSettings": {} },
+			{ "id": 2, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 21, "target": 1 }] } },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "2": ["21"] },
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "a target that is the question itself counts as the following question",
+		"questions": [
+			{ "id": 1, "type": "short", "extraSettings": { "next": 1 } },
+			{ "id": 2, "type": "short", "extraSettings": {} }
+		],
+		"answers": {},
+		"visible": [1, 2]
+	},
+	{
+		"name": "a missing target counts as the following question",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 99 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["11"] },
+		"visible": [1, 2]
+	},
+	{
+		"name": "a malformed jump counts as no jump",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [null, "3", { "optionId": 11, "target": [3] }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["11"] },
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "the first matching jump decides, even with a malformed target",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": [3] }, { "optionId": 11, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["11"] },
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "next is ignored on question types without jumps",
+		"questions": [
+			{ "id": 1, "type": "datetime", "extraSettings": { "next": 3 } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["2026-11-10 10:00"] },
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "jumps chain",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "dropdown", "extraSettings": { "goTo": [{ "optionId": 31, "target": 5 }] } },
+			{ "id": 4, "type": "short", "extraSettings": {} },
+			{ "id": 5, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["11"], "3": ["31"] },
+		"visible": [1, 3, 5]
+	},
+	{
+		"name": "each option has its own follow-up question, first option",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 2 }, { "optionId": 12, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": { "next": 4 } },
+			{ "id": 3, "type": "short", "extraSettings": {} },
+			{ "id": 4, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["11"] },
+		"visible": [1, 2, 4]
+	},
+	{
+		"name": "each option has its own follow-up question, second option",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 2 }, { "optionId": 12, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": { "next": 4 } },
+			{ "id": 3, "type": "short", "extraSettings": {} },
+			{ "id": 4, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["12"] },
+		"visible": [1, 3, 4]
+	},
+	{
+		"name": "the jumps of skipped questions do not count",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 3 }] } },
+			{ "id": 2, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 21, "target": "submit" }] } },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["11"], "2": ["21"] },
+		"visible": [1, 3]
+	}
+]

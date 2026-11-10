@@ -1662,6 +1662,111 @@ class FormsServiceTest extends TestCase {
 
 	public static function dataAreExtraSettingsValid() {
 		return [
+			'jump: next to a question on a text question' => [
+				'extraSettings' => ['next' => 5],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true,
+			],
+			'jump: next to the end on a long text question' => [
+				'extraSettings' => ['next' => 'submit'],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => true,
+			],
+			'jump: next with an unknown word' => [
+				'extraSettings' => ['next' => 'end'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
+			'jump: next with a negative id' => [
+				'extraSettings' => ['next' => -1],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
+			'jump: next as numeric string' => [
+				'extraSettings' => ['next' => '5'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
+			'jump: next not offered on date questions' => [
+				'extraSettings' => ['next' => 5],
+				'questionType' => Constants::ANSWER_TYPE_DATE,
+				'expected' => false,
+			],
+			'jump: goTo per option and Other' => [
+				'extraSettings' => ['allowOtherAnswer' => true, 'goTo' => [['optionId' => 11, 'target' => 5], ['other' => true, 'target' => 'submit']]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => true,
+			],
+			'jump: goTo on a dropdown' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => true,
+			],
+			'jump: next not offered on radio questions' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]], 'next' => 6],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: next not offered on dropdowns' => [
+				'extraSettings' => ['next' => 6],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false,
+			],
+			'jump: goTo not offered on text questions' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
+			'jump: goTo not offered on checkboxes' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => false,
+			],
+			'jump: goTo as object' => [
+				'extraSettings' => ['goTo' => ['a' => ['optionId' => 11, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: goTo entry without target' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: goTo entry with an extra key' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5, 'foo' => 1]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: goTo entry with option id as string' => [
+				'extraSettings' => ['goTo' => [['optionId' => '11', 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: goTo entry with other false' => [
+				'extraSettings' => ['goTo' => [['other' => false, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: goTo with a scalar entry' => [
+				'extraSettings' => ['goTo' => [5]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: two jumps for one option' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5], ['optionId' => 11, 'target' => 6]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: two jumps for Other' => [
+				'extraSettings' => ['goTo' => [['other' => true, 'target' => 5], ['other' => true, 'target' => 6]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: next on an empty regex short question' => [
+				'extraSettings' => ['validationType' => 'regex', 'validationRegex' => '', 'next' => 'end'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
 			'empty-extra-settings' => [
 				'extraSettings' => [],
 				'questionType' => Constants::ANSWER_TYPE_LONG,
@@ -2007,6 +2112,146 @@ class FormsServiceTest extends TestCase {
 		$questionEntity = $this->createMock(Question::class);
 		$questionEntity->method('read')->willReturn($data);
 		return $questionEntity;
+	}
+
+	public static function dataAreJumpsOfForm(): array {
+		return [
+			'targets of the form, a deleted one included' => [['next' => 2], true],
+			'the end of the form' => [['goTo' => [['other' => true, 'target' => 'submit']]], true],
+			'a question of another form' => [['next' => 9], false],
+			'a goTo target of another form' => [['goTo' => [['optionId' => 11, 'target' => 9]]], false],
+			'an option of the question' => [['goTo' => [['optionId' => 11, 'target' => 3]]], true],
+			'an option that no longer exists' => [['goTo' => [['optionId' => 13, 'target' => 3]]], false],
+			'an option of another question' => [['goTo' => [['optionId' => 12, 'target' => 3]]], false],
+		];
+	}
+
+	#[DataProvider('dataAreJumpsOfForm')]
+	public function testAreJumpsOfForm(array $extraSettings, bool $expected): void {
+		$questions = [];
+		foreach ([[1, 1], [2, 0], [3, 2]] as [$id, $order]) {
+			$question = new Question();
+			$question->setId($id);
+			$question->setOrder($order);
+			$questions[] = $question;
+		}
+		$option = new Option();
+		$option->setId(11);
+		$this->optionMapper->method('findByQuestion')->with(1)->willReturn([$option]);
+
+		$this->assertSame($expected, $this->formsService->areJumpsOfForm($extraSettings, 1, $questions));
+	}
+
+	public function testMapJumps(): void {
+		$extraSettings = [
+			'allowOtherAnswer' => true,
+			'next' => 3,
+			'goTo' => [
+				['optionId' => 11, 'target' => 2],
+				['optionId' => 12, 'target' => 'submit'],
+				['optionId' => 13, 'target' => 2],
+				['optionId' => 11, 'target' => 99],
+				['other' => true, 'target' => 3],
+			],
+		];
+
+		$this->assertSame([
+			'allowOtherAnswer' => true,
+			'next' => 30,
+			'goTo' => [
+				['optionId' => 110, 'target' => 20],
+				['optionId' => 120, 'target' => 'submit'],
+				['other' => true, 'target' => 30],
+			],
+		], FormsService::mapJumps($extraSettings, [2 => 20, 3 => 30], [11 => 110, 12 => 120]));
+	}
+
+	public function testMapJumpsKeepsTargetsWithoutQuestionMap(): void {
+		$this->assertSame(
+			['next' => 3, 'goTo' => [['optionId' => 110, 'target' => 2]]],
+			FormsService::mapJumps(['next' => 3, 'goTo' => [['optionId' => 11, 'target' => 2]]], null, [11 => 110]),
+		);
+	}
+
+	public function testMapJumpsRemovesUnmappedNextAndMalformedJumps(): void {
+		$this->assertSame(
+			['goTo' => []],
+			FormsService::mapJumps(['next' => 9, 'goTo' => [5, ['optionId' => '11', 'target' => 2], ['target' => [1]]]], [2 => 20], [11 => 110]),
+		);
+	}
+
+	public function testRemoveBackwardJumps(): void {
+		$questions = array_map(static function (array $data): Question {
+			$question = new Question();
+			$question->setId($data[0]);
+			$question->setExtraSettings($data[1]);
+			return $question;
+		}, [
+			[1, ['next' => 3, 'goTo' => [['optionId' => 11, 'target' => 1], ['optionId' => 12, 'target' => 'submit']]]],
+			[2, ['shuffleOptions' => true, 'goTo' => [['optionId' => 21, 'target' => 1], ['optionId' => 22, 'target' => 99]]]],
+			[3, ['next' => 2]],
+			[4, ['goTo' => []]],
+		]);
+
+		$changed = FormsService::removeBackwardJumps($questions);
+
+		$this->assertSame([$questions[0], $questions[1], $questions[2]], $changed);
+		$this->assertSame(['next' => 3, 'goTo' => [['optionId' => 12, 'target' => 'submit']]], $questions[0]->getExtraSettings());
+		$this->assertSame(['shuffleOptions' => true, 'goTo' => [['optionId' => 22, 'target' => 99]]], $questions[1]->getExtraSettings());
+		$this->assertSame([], $questions[2]->getExtraSettings());
+		$this->assertSame(['goTo' => []], $questions[3]->getExtraSettings());
+	}
+
+	public function testMapJumpsOfCopies(): void {
+		$questions = array_map(static function (array $data): Question {
+			$question = new Question();
+			$question->setId($data[0]);
+			$question->setOrder($data[1]);
+			$question->setType($data[3]);
+			$question->setExtraSettings($data[2]);
+			return $question;
+		}, [
+			[30, 3, ['next' => 1], Constants::ANSWER_TYPE_SHORT],
+			[10, 1, ['goTo' => [['optionId' => 7, 'target' => 3], ['other' => true, 'target' => 2]], 'next' => 3], Constants::ANSWER_TYPE_MULTIPLEUNIQUE],
+			[20, 2, ['shuffleOptions' => true], Constants::ANSWER_TYPE_MULTIPLEUNIQUE],
+		]);
+
+		$changed = FormsService::mapJumpsOfCopies($questions, [1 => 10, 2 => 20, 3 => 30], [7 => 70]);
+
+		$this->assertSame([$questions[0], $questions[1]], $changed);
+		$this->assertSame([], $questions[0]->getExtraSettings());
+		$this->assertSame(['goTo' => [['optionId' => 70, 'target' => 30], ['other' => true, 'target' => 20]]], $questions[1]->getExtraSettings());
+		$this->assertSame(['shuffleOptions' => true], $questions[2]->getExtraSettings());
+	}
+
+	public function testMapJumpsOfCopiesWithoutJumpsLeavesTheCopiesAlone(): void {
+		$question = new Question();
+		$question->setOrder(1);
+		$question->setExtraSettings(['shuffleOptions' => true]);
+
+		$this->assertSame([], FormsService::mapJumpsOfCopies([$question], [], []));
+		$this->assertSame(['shuffleOptions' => true], $question->getExtraSettings());
+	}
+
+	public function testMapJumpsOfCopiesDropsJumpsPerAnswerWithAnInvalidStructure(): void {
+		$question = new Question();
+		$question->setId(10);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_MULTIPLEUNIQUE);
+		$question->setExtraSettings(['goTo' => [
+			['optionId' => 7, 'target' => 2, 'label' => 'x'],
+			['target' => 2],
+			['optionId' => 7, 'target' => 'submit'],
+			['optionId' => 7, 'target' => 2],
+			['other' => true, 'target' => 2],
+		]]);
+		$target = new Question();
+		$target->setId(20);
+		$target->setOrder(2);
+		$target->setType(Constants::ANSWER_TYPE_SHORT);
+
+		$this->assertSame([$question], FormsService::mapJumpsOfCopies([$question, $target], [2 => 20], [7 => 70]));
+		$this->assertSame(['goTo' => [['optionId' => 70, 'target' => 'submit'], ['other' => true, 'target' => 20]]], $question->getExtraSettings());
 	}
 
 }

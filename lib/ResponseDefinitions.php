@@ -27,8 +27,10 @@ namespace OCA\Forms;
  *   dateMax?: string|int,
  *   dateMin?: string|int,
  *   dateRange?: bool,
+ *   goTo?: list<array{optionId?: int, other?: bool, target: int|string}>,
  *   maxAllowedFilesCount?: int,
  *   maxFileSize?: int,
+ *   next?: int|string,
  *   optionsHighest?: 2|3|4|5|6|7|8|9|10,
  *   optionsLabelHighest?: string,
  *   optionsLabelLowest?: string,
@@ -42,6 +44,11 @@ namespace OCA\Forms;
  *   validationRegex?: string,
  *   validationType?: string,
  *   questionType?: string,
+ * }
+ *
+ * @psalm-type FormsQuestionOrder = array{
+ *   order: int,
+ *   extraSettings?: FormsQuestionExtraSettings|\stdClass,
  * }
  *
  * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"|"grid"

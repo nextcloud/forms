@@ -613,8 +613,28 @@ class SubmissionService {
 	}
 
 	/**
+	 * Whether the values of an answer hold anything: a non-empty text, an uploaded file with its token, or a grid row with a value
+	 *
+	 * @param array $values the values of the answer
+	 */
+	private static function hasValues(array $values): bool {
+		return array_filter($values, static function (mixed $value): bool {
+			if (is_array($value)) {
+				if (isset($value['uploadedFileId'])) {
+					return !empty($value['uploadedFileId']) && !empty($value['uploadToken']);
+				}
+
+				return !empty(array_filter($value, static fn ($subValue): bool => is_array($subValue) ? !empty(array_filter($subValue)) : $subValue !== ''));
+			}
+
+			return is_scalar($value) && (string)$value !== '';
+		}) !== [];
+	}
+
+	/**
 	 * Validate all answers against the questions
 	 * Required questions the submit view does not show to respondents need no answer
+	 * Only the questions on the path of the respondent are checked, answers to skipped questions are ignored
 	 *
 	 * @param array $questions Array of the questions of the form
 	 * @param array $answers Array of the submitted answers
@@ -623,28 +643,18 @@ class SubmissionService {
 	 * @throw \InvalidArgumentException if validation failed
 	 */
 	public function validateSubmission(array $questions, array $answers, string $formOwnerId, int $formId): void {
+		$visibleQuestions = self::getQuestionsOnPath($questions, $answers);
+
 		// Check by questions
-		foreach ($questions as $question) {
+		foreach ($visibleQuestions as $question) {
 			$questionId = $question['id'];
 			$questionAnswered = array_key_exists($questionId, $answers);
 
 			// Check if all required questions have an answer
-			if ($question['isRequired']
+			if (!empty($question['isRequired'])
 				&& self::isShownToRespondents($question)
 				&& (!$questionAnswered
-				|| !array_filter($answers[$questionId], static function (string|array $value): bool {
-					if (is_array($value)) {
-						// file type
-						if (isset($value['uploadedFileId'])) {
-							return !empty($value['uploadedFileId']) && !empty($value['uploadToken']);
-						}
-
-						// Grid questions
-						return !empty(array_filter($value, static fn ($subValue): bool => is_array($subValue) ? !empty(array_filter($subValue)) : $subValue !== ''));
-					}
-
-					return $value !== '';
-				})
+				|| !self::hasValues($answers[$questionId])
 				|| (!empty($question['extraSettings']['allowOtherAnswer']) && !array_filter($answers[$questionId], fn ($value) => $value !== Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX)))
 			) {
 				throw new \InvalidArgumentException(sprintf('Question "%s" is required.', $question['text']));
@@ -711,6 +721,8 @@ class SubmissionService {
 					// Check if all grid rows, columns and values match the configured grid subtype
 					elseif ($question['type'] === Constants::ANSWER_TYPE_GRID) {
 						$this->validateGridQuestion($question, $answers[$questionId]);
+					} elseif ($answer === Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX && self::isOtherAnswer($question, $answer)) {
+						throw new \InvalidArgumentException(sprintf('The answer "Other" for question "%s" needs a text.', $question['text']));
 					}
 					// Search corresponding option, return false if non-existent
 					elseif (!self::isOtherAnswer($question, $answer)) {
@@ -790,6 +802,84 @@ class SubmissionService {
 				throw new \InvalidArgumentException(sprintf('Answer for non-existent question with ID %s.', $id));
 			}
 		}
+	}
+
+	/**
+	 * The questions on the path of the respondent: from the first question, each question leads to the target of its
+	 * answer in `goTo`, else to its `next` target, else to the following question, until the end of the form.
+	 * A target that is not a later question of the form counts as the following question.
+	 *
+	 * @param array $questions the questions of the form in their order
+	 * @param array $answers the answers by question id
+	 * @return list<array> the questions on the path, in their order
+	 */
+	public static function getVisibleQuestions(array $questions, array $answers): array {
+		$questions = array_values($questions);
+		$positions = array_flip(array_column($questions, 'id'));
+		$visibleQuestions = [];
+
+		$position = 0;
+		while ($position < count($questions)) {
+			$question = $questions[$position];
+			$visibleQuestions[] = $question;
+
+			$target = self::getJumpTarget($question, $answers[$question['id']] ?? []);
+			if ($target === Constants::JUMP_TARGET_SUBMIT) {
+				break;
+			}
+			$targetPosition = is_int($target) && isset($positions[$target]) ? $positions[$target] : null;
+			$position = $targetPosition !== null && $targetPosition > $position ? $targetPosition : $position + 1;
+		}
+
+		return $visibleQuestions;
+	}
+
+	/**
+	 * The answers to the questions on the path of the respondent
+	 *
+	 * @param array $questions the questions of the form in their order
+	 * @param array $answers the answers by question id
+	 * @return array the answers by question id, without the answers to skipped questions
+	 */
+	public static function getAnswersOnPath(array $questions, array $answers): array {
+		return array_intersect_key($answers, array_flip(array_column(self::getQuestionsOnPath($questions, $answers), 'id')));
+	}
+
+	/**
+	 * The questions on the path of the respondent, see getVisibleQuestions(), where answers to questions the submit view does not show do not decide the path
+	 *
+	 * @param array $questions the questions of the form in their order
+	 * @param array $answers the answers by question id
+	 * @return list<array> the questions on the path, in their order
+	 */
+	private static function getQuestionsOnPath(array $questions, array $answers): array {
+		$hiddenQuestionIds = array_column(array_filter($questions, static fn (array $question): bool => !self::isShownToRespondents($question)), 'id');
+		return self::getVisibleQuestions($questions, array_diff_key($answers, array_flip($hiddenQuestionIds)));
+	}
+
+	/**
+	 * The jump target of a question for its answer: the target of the `goTo` entry matching the first value of the answer, else `next` on question types with `next`
+	 *
+	 * @param array $question the question
+	 * @param mixed $answer the values of the answer to the question
+	 * @return string|int|null the target, `null` for the following question
+	 */
+	private static function getJumpTarget(array $question, mixed $answer): string|int|null {
+		$extraSettings = $question['extraSettings'] ?? [];
+		$value = is_array($answer) && array_is_list($answer) ? ($answer[0] ?? null) : null;
+
+		if (is_int($value) || is_float($value) || is_string($value)) {
+			foreach (is_array($extraSettings['goTo'] ?? null) ? $extraSettings['goTo'] : [] as $jump) {
+				if ((isset($jump['optionId']) && (string)$jump['optionId'] === (string)$value)
+					|| (($jump['other'] ?? false) === true && self::isOtherAnswer($question, $value))) {
+					$target = $jump['target'] ?? null;
+					return is_int($target) || is_string($target) ? $target : null;
+				}
+			}
+		}
+
+		$next = isset(FormsService::getAllowedExtraSettings((string)($question['type'] ?? ''))['next']) ? ($extraSettings['next'] ?? null) : null;
+		return is_int($next) || is_string($next) ? $next : null;
 	}
 
 	/**
