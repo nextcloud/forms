@@ -187,6 +187,7 @@ OC.L10N.register(
     "Other:" : "Другое:",
     "Other" : "Другое",
     "You must rank all options" : "Необходимо ранжировать все варианты",
+    "Unranked options" : "Неранжированные варианты",
     "All options ranked" : "Все варианты ранжированы",
     "Your ranking" : "Ваше ранжирование",
     "Remove from ranking" : "Удалить из ранжирования",

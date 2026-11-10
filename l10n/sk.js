@@ -187,6 +187,7 @@ OC.L10N.register(
     "Other:" : "Iné:",
     "Other" : "Iné",
     "You must rank all options" : "Všetky možnosti musíte zoradiť",
+    "Unranked options" : "Nezoradené možnosti",
     "All options ranked" : "Všetky možnosti sú zoradené",
     "Your ranking" : "Vaše poradie",
     "Remove from ranking" : "Odstrániť z poradia",
