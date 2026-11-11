@@ -595,7 +595,27 @@ class SubmissionService {
 	}
 
 	/**
+	 * Whether the submit view shows the question to respondents: it needs a title, choice, dropdown and ranking questions need options, and grid questions need rows and columns
+	 *
+	 * @param array $question the question with its options
+	 */
+	private static function isShownToRespondents(array $question): bool {
+		if (preg_match('/^[\s\p{Z}\x{FEFF}]*$/u', (string)($question['text'] ?? '')) === 1) {
+			return false;
+		}
+
+		$optionTypes = array_map(static fn (mixed $option): mixed => is_array($option) ? ($option['optionType'] ?? null) : null, $question['options'] ?? []);
+		return match ($question['type'] ?? null) {
+			Constants::ANSWER_TYPE_MULTIPLE, Constants::ANSWER_TYPE_MULTIPLEUNIQUE, Constants::ANSWER_TYPE_DROPDOWN, Constants::ANSWER_TYPE_RANKING => $optionTypes !== [],
+			Constants::ANSWER_TYPE_GRID => in_array(Option::OPTION_TYPE_ROW, $optionTypes, true) && in_array(Option::OPTION_TYPE_COLUMN, $optionTypes, true),
+			default => true,
+		};
+	}
+
+	/**
 	 * Validate all answers against the questions
+	 * Required questions the submit view does not show to respondents need no answer
+	 *
 	 * @param array $questions Array of the questions of the form
 	 * @param array $answers Array of the submitted answers
 	 * @param string $formOwnerId Owner of the form
@@ -610,6 +630,7 @@ class SubmissionService {
 
 			// Check if all required questions have an answer
 			if ($question['isRequired']
+				&& self::isShownToRespondents($question)
 				&& (!$questionAnswered
 				|| !array_filter($answers[$questionId], static function (string|array $value): bool {
 					if (is_array($value)) {
@@ -683,7 +704,7 @@ class SubmissionService {
 					if ($question['type'] === Constants::ANSWER_TYPE_LINEARSCALE) {
 						$optionsLowest = $question['extraSettings']['optionsLowest'] ?? 1;
 						$optionsHighest = $question['extraSettings']['optionsHighest'] ?? 5;
-						if (!ctype_digit((string)$answer) || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
+						if (!is_scalar($answer) || is_bool($answer) || !ctype_digit((string)$answer) || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
 							throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be an integer between %d and %d.', $question['text'], $optionsLowest, $optionsHighest));
 						}
 					}

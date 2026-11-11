@@ -925,6 +925,46 @@ file2.txt"
 	// Data for validation of Submissions
 	public static function dataValidateSubmission() {
 		return [
+			'required-without-title-is-not-shown' => [
+				[
+					['id' => 1, 'type' => 'short', 'text' => '  ', 'isRequired' => true]
+				],
+				[],
+				null,
+			],
+			'required-with-unicode-space-title-is-not-shown' => [
+				[
+					['id' => 1, 'type' => 'short', 'text' => "\u{00A0}\u{3000}\u{FEFF}", 'isRequired' => true]
+				],
+				[],
+				null,
+			],
+			'required-choice-without-options-is-not-shown' => [
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => true, 'options' => []]
+				],
+				[],
+				null,
+			],
+			'required-grid-without-columns-is-not-shown' => [
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'q1', 'isRequired' => true, 'options' => [
+						['id' => 3, 'optionType' => 'row']
+					]]
+				],
+				[],
+				null,
+			],
+			'required-grid-with-rows-and-columns' => [
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'q1', 'isRequired' => true, 'options' => [
+						['id' => 3, 'optionType' => 'row'],
+						['id' => 4, 'optionType' => 'column']
+					]]
+				],
+				[],
+				'Question "q1" is required.',
+			],
 			'required-not-answered' => [
 				// Questions
 				[
@@ -1295,6 +1335,24 @@ file2.txt"
 					'1' => ['6']
 				],
 				// Expected Result
+				'The answer for question "q1" must be an integer between 0 and 5.',
+			],
+			'boolean-linearscale-answer' => [
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]]
+				],
+				[
+					'1' => [true]
+				],
+				'The answer for question "q1" must be an integer between 0 and 5.',
+			],
+			'list-linearscale-answer' => [
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]]
+				],
+				[
+					'1' => [['3']]
+				],
 				'The answer for question "q1" must be an integer between 0 and 5.',
 			],
 			'invalid-color-question' => [
