@@ -791,7 +791,7 @@ class ApiControllerTest extends TestCase {
 
 		$answers = [
 			1 => ['3'],
-			2 => ['2', '5', Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'other answer'],
+			2 => ['2', '5', Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX . 'other answer ' . Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX],
 			3 => ['short anwer'],
 			4 => [['uploadedFileId' => 100, 'uploadToken' => 'valid-upload-token']],
 			5 => ['ignore unknown question'],
@@ -830,7 +830,7 @@ class ApiControllerTest extends TestCase {
 						}
 						break;
 					case 2:
-						if (!in_array($answer->getText(), ['other answer', 'test id 2'])) {
+						if (!in_array($answer->getText(), ['other answer ' . Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, 'test id 2'], true)) {
 							return false;
 						}
 						break;

@@ -1846,7 +1846,7 @@ class ApiController extends OCSController {
 				if ($optionIndex !== false) {
 					$answerText = $question['options'][$optionIndex]['text'];
 				} elseif (!empty($question['extraSettings']['allowOtherAnswer']) && str_starts_with($answer, Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX)) {
-					$answerText = str_replace(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX, '', $answer);
+					$answerText = substr($answer, strlen(Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX));
 				}
 			} elseif ($question['type'] === Constants::ANSWER_TYPE_FILE) {
 				$uploadedFile = $this->uploadedFileMapper->getForSubmission(
