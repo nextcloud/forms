@@ -203,6 +203,10 @@ class FormsMigrator implements IMigrator {
 					$this->submissionMapper->insert($submission);
 
 					foreach ($submissionData['answers'] as $answerData) {
+						if (!array_key_exists($answerData['questionId'], $questionIdMap)) {
+							continue;
+						}
+
 						$answer = new Answer();
 						$answer->setSubmissionId($submission->getId());
 						$answer->setQuestionId($questionIdMap[$answerData['questionId']]);
