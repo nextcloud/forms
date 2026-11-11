@@ -123,4 +123,47 @@ class AnalyticsDatasourceTest extends TestCase {
 
 		$this->assertEquals($expectedData, $data);
 	}
+
+	public function testReadDataWithoutAnswers(): void {
+		$this->formsService->method('getQuestions')->willReturn([['id' => 1, 'text' => 'Question 1']]);
+		$this->submissionService->method('getSubmissions')->willReturn([]);
+		$this->l10n->method('t')->willReturnArgument(0);
+
+		$this->assertSame([], $this->analyticsDatasource->readData(['formId' => 123])['data']);
+	}
+
+	public function testReadDataSkipsAnswersOfDeletedQuestions(): void {
+		$this->formsService->method('getQuestions')->willReturn([['id' => 1, 'text' => 'Question 1']]);
+		$this->submissionService->method('getSubmissions')->willReturn([
+			['answers' => [
+				['questionId' => 1, 'text' => 'Answer 1'],
+				['questionId' => 2, 'text' => 'Answer of a deleted question'],
+			]],
+		]);
+		$this->l10n->method('t')->willReturnArgument(0);
+
+		$this->assertSame([['Question 1', 'Answer 1', 1]], $this->analyticsDatasource->readData(['formId' => 123])['data']);
+	}
+
+	public function testReadDataKeepsSeparatorsAndQuestionsWithTheSameTitle(): void {
+		$this->formsService->method('getQuestions')->willReturn([
+			['id' => 1, 'text' => 'Pick A|B'],
+			['id' => 2, 'text' => 'Comment'],
+			['id' => 3, 'text' => 'Comment'],
+		]);
+		$this->submissionService->method('getSubmissions')->willReturn([
+			['answers' => [
+				['questionId' => 1, 'text' => 'a|b'],
+				['questionId' => 2, 'text' => '5'],
+				['questionId' => 3, 'text' => '5'],
+			]],
+		]);
+		$this->l10n->method('t')->willReturnArgument(0);
+
+		$this->assertSame([
+			['Comment', '5', 1],
+			['Comment', '5', 1],
+			['Pick A|B', 'a|b', 1],
+		], $this->analyticsDatasource->readData(['formId' => 123])['data']);
+	}
 }
