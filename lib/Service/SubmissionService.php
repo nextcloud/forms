@@ -695,7 +695,7 @@ class SubmissionService {
 					if ($question['type'] === Constants::ANSWER_TYPE_LINEARSCALE) {
 						$optionsLowest = $question['extraSettings']['optionsLowest'] ?? 1;
 						$optionsHighest = $question['extraSettings']['optionsHighest'] ?? 5;
-						if (!ctype_digit((string)$answer) || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
+						if (!is_scalar($answer) || is_bool($answer) || !ctype_digit((string)$answer) || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
 							throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be an integer between %d and %d.', $question['text'], $optionsLowest, $optionsHighest));
 						}
 					}
