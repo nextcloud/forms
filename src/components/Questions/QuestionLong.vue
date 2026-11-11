@@ -5,6 +5,7 @@
 
 <template>
 	<Question
+		ref="rootElement"
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
@@ -59,7 +60,8 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const textarea = ref<HTMLTextAreaElement | null>(null)
-		const question = useQuestion(props, { emit })
+		const rootElement = ref<{ $el?: HTMLElement } | null>(null)
+		const question = useQuestion(props, { emit, rootElement })
 		const values = computed(() => {
 			return props.values as Array<
 				string | number | readonly string[] | null | undefined
@@ -127,6 +129,7 @@ export default defineComponent({
 
 		return {
 			...question,
+			rootElement,
 			textarea,
 			submissionInputPlaceholder,
 			textareaValue,

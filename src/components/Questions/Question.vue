@@ -378,19 +378,22 @@ export default defineComponent({
 		}
 
 		/**
-		 * Reorder question but keep focus on the button
+		 * Reorder question but keep focus on the button, or on the other move button once the question is the last one
 		 */
 		const onMoveDown = (): void => {
 			emit('moveDown')
 			nextTick(() => {
-				buttonDown.value?.$el?.focus()
+				;(props.canMoveDown ? buttonDown : buttonUp).value?.$el?.focus()
 			})
 		}
 
+		/**
+		 * Reorder question but keep focus on the button, or on the other move button once the question is the first one
+		 */
 		const onMoveUp = (): void => {
 			emit('moveUp')
 			nextTick(() => {
-				buttonUp.value?.$el?.focus()
+				;(props.canMoveUp ? buttonUp : buttonDown).value?.$el?.focus()
 			})
 		}
 

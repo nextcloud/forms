@@ -5,6 +5,7 @@
 
 <template>
 	<Question
+		ref="rootElement"
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
@@ -112,7 +113,7 @@
 <script lang="ts">
 import { t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcDateTimePicker from '@nextcloud/vue/components/NcDateTimePicker'
@@ -155,7 +156,8 @@ export default defineComponent({
 	emits: [...QUESTION_EMITS, 'update:values'],
 
 	setup(props, { emit }) {
-		const question = useQuestion(props, { emit })
+		const rootElement = ref<{ $el?: HTMLElement } | null>(null)
+		const question = useQuestion(props, { emit, rootElement })
 		const values = computed(() => {
 			return props.values as Array<string | undefined>
 		})
@@ -460,6 +462,7 @@ export default defineComponent({
 
 		return {
 			...question,
+			rootElement,
 			extraSettingsFormatter: {
 				stringify: stringifyDate,
 				parse: parseTimestampToDate,
