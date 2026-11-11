@@ -98,6 +98,7 @@ class AnalyticsDatasource implements IDatasource {
 	public function readData($option): array {
 		$questionMap = [];
 		$answerCounts = [];
+		$results = [];
 
 		$formId = $option['formId'];
 
@@ -109,19 +110,17 @@ class AnalyticsDatasource implements IDatasource {
 		$submissions = $this->submissionService->getSubmissions($formId);
 		foreach ($submissions as $submission) {
 			foreach ($submission['answers'] as $answer) {
-				$questionText = $questionMap[$answer['questionId']];
-				$key = $questionText . '|' . $answer['text'];
-				if (isset($answerCounts[$key])) {
-					$answerCounts[$key]++;
-				} else {
-					$answerCounts[$key] = 1;
+				if (!isset($questionMap[$answer['questionId']])) {
+					continue;
 				}
+				$answerCounts[$answer['questionId']][$answer['text']] = ($answerCounts[$answer['questionId']][$answer['text']] ?? 0) + 1;
 			}
 		}
 
-		foreach ($answerCounts as $key => $count) {
-			[$questionText, $text] = explode('|', $key);
-			$results[] = [$questionText, $text, $count];
+		foreach ($answerCounts as $questionId => $counts) {
+			foreach ($counts as $text => $count) {
+				$results[] = [$questionMap[$questionId], (string)$text, $count];
+			}
 		}
 
 		// Sort by questionText ascending and count descending
