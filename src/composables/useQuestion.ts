@@ -209,13 +209,23 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		saveQuestionProperty('isRequired', isRequiredValue)
 	}, INPUT_DEBOUNCE_MS)
 
-	const onExtraSettingsChange = debounce(function (
-		newSettings: Record<string, unknown>,
-	) {
-		const newExtraSettings = { ...props.extraSettings, ...newSettings }
+	let pendingExtraSettings: Record<string, unknown> = {}
+	const saveExtraSettings = debounce(function () {
+		const newExtraSettings = { ...props.extraSettings, ...pendingExtraSettings }
+		pendingExtraSettings = {}
 		options.emit('update:extraSettings', newExtraSettings)
 		saveQuestionProperty('extraSettings', newExtraSettings)
 	}, INPUT_DEBOUNCE_MS)
+
+	/**
+	 * Save changed extra settings; changes within the debounce time are saved together
+	 *
+	 * @param newSettings the changed extra settings
+	 */
+	const onExtraSettingsChange = (newSettings: Record<string, unknown>): void => {
+		pendingExtraSettings = { ...pendingExtraSettings, ...newSettings }
+		saveExtraSettings()
+	}
 
 	const onNameChange = debounce(function (name: string) {
 		options.emit('update:name', name)
