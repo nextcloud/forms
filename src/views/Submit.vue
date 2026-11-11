@@ -20,7 +20,14 @@
 		<NcEmptyContent
 			v-if="isLoadingForm"
 			class="forms-emptycontent"
-			:name="t('forms', 'Loading {title} …', { title: form.title })">
+			:name="
+				t(
+					'forms',
+					'Loading {title} …',
+					{ title: form.title },
+					{ escape: false, sanitize: false },
+				)
+			">
 			<template #icon>
 				<NcLoadingIcon :size="64" />
 			</template>
