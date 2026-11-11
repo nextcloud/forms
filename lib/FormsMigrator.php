@@ -77,7 +77,6 @@ class FormsMigrator implements IMigrator {
 					// Do NOT unset ID of question here, as it is necessary for answers.
 					unset($formData['questions'][$qKey]['formId']);
 					foreach ($question['options'] as $oKey => $option) {
-						unset($formData['questions'][$qKey]['options'][$oKey]['id']);
 						unset($formData['questions'][$qKey]['options'][$oKey]['questionId']);
 					}
 				}
@@ -164,6 +163,8 @@ class FormsMigrator implements IMigrator {
 				$this->formMapper->insert($form);
 
 				$questionIdMap = [];
+				$questionTypeMap = [];
+				$optionIdMap = [];
 				foreach ($formData['questions'] as $questionData) {
 					$question = new Question();
 					$question->setFormId($form->getId());
@@ -178,13 +179,20 @@ class FormsMigrator implements IMigrator {
 
 					// Store QuestionId to map Answers.
 					$questionIdMap[$questionData['id']] = $question->getId();
+					$questionTypeMap[$questionData['id']] = $questionData['type'];
 
 					foreach ($questionData['options'] as $optionData) {
 						$option = new Option();
 						$option->setQuestionId($question->getId());
 						$option->setText($optionData['text']);
+						$option->setOrder($optionData['order'] ?? null);
+						$option->setOptionType($optionData['optionType'] ?? null);
 
 						$this->optionMapper->insert($option);
+
+						if (isset($optionData['id'])) {
+							$optionIdMap[$optionData['id']] = $option->getId();
+						}
 					}
 				}
 
@@ -210,7 +218,11 @@ class FormsMigrator implements IMigrator {
 						$answer = new Answer();
 						$answer->setSubmissionId($submission->getId());
 						$answer->setQuestionId($questionIdMap[$answerData['questionId']]);
-						$answer->setText($answerData['text']);
+						$answerText = $answerData['text'];
+						if ($optionIdMap !== [] && in_array($questionTypeMap[$answerData['questionId']], [Constants::ANSWER_TYPE_GRID, Constants::ANSWER_TYPE_RANKING], true)) {
+							$answerText = $this->mapOptionIdsOfAnswer($answerText, $optionIdMap);
+						}
+						$answer->setText($answerText);
 
 						$this->answerMapper->insert($answer);
 					}
@@ -219,6 +231,40 @@ class FormsMigrator implements IMigrator {
 		} catch (Throwable $e) {
 			throw new UserMigrationException('Could not properly import forms information', 0, $e);
 		}
+	}
+
+	/**
+	 * Replaces the exported option ids in the answer of a grid or ranking question with the ids of the imported options
+	 *
+	 * Ranking answers are a list of option ids. Grid answers map row ids to a column id, a list of column ids, or column ids with numbers.
+	 *
+	 * @param string $answerText JSON answer as stored
+	 * @param array<int, int> $optionIdMap exported option id to imported option id
+	 * @return string JSON answer with the imported option ids, or the text unchanged if it is no JSON array
+	 */
+	private function mapOptionIdsOfAnswer(string $answerText, array $optionIdMap): string {
+		$value = json_decode($answerText, true);
+		if (!is_array($value) || $value === []) {
+			return $answerText;
+		}
+
+		$map = static fn (mixed $id): mixed => (is_int($id) || is_string($id)) ? ($optionIdMap[$id] ?? $id) : $id;
+		if (array_is_list($value)) {
+			return json_encode(array_map($map, $value));
+		}
+
+		$mapped = [];
+		foreach ($value as $rowId => $cell) {
+			if (is_array($cell) && array_is_list($cell)) {
+				$cell = array_map($map, $cell);
+			} elseif (is_array($cell)) {
+				$cell = array_combine(array_map($map, array_keys($cell)), $cell);
+			} else {
+				$cell = $map($cell);
+			}
+			$mapped[$map($rowId)] = $cell;
+		}
+		return json_encode($mapped);
 	}
 
 	/**

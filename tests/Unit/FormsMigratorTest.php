@@ -11,6 +11,7 @@ namespace OCA\Forms\Tests\Unit;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\SubmissionMapper;
@@ -109,6 +110,7 @@ class FormsMigratorTest extends TestCase {
         "extraSettings": {},
         "options": [
           {
+            "id": 35,
             "text": "ans1"
           }
         ]
@@ -332,6 +334,86 @@ JSON
 			});
 
 		$this->formsMigrator->import($user, $importSource, $this->createMock(OutputInterface::class));
+	}
+
+	public static function dataImportMapsOptionsOfGridAndRankingQuestions(): array {
+		return [
+			'current archive' => [
+				'options' => [
+					['id' => 11, 'order' => 1, 'text' => 'Row', 'optionType' => 'row'],
+					['id' => 12, 'order' => 1, 'text' => 'Yes', 'optionType' => 'column'],
+					['id' => 13, 'order' => 2, 'text' => 'No', 'optionType' => 'column'],
+				],
+				'rankingOptions' => [
+					['id' => 21, 'order' => 1, 'text' => 'A', 'optionType' => 'choice'],
+					['id' => 22, 'order' => 2, 'text' => 'B', 'optionType' => 'choice'],
+				],
+				'expectedOptions' => [[1, 'row'], [1, 'column'], [2, 'column'], [1, 'choice'], [2, 'choice']],
+				'expectedAnswers' => ['{"500":501}', '{"500":[501,502]}', '{"500":{"501":12,"502":"13"}}', '[504,503]'],
+			],
+			'archive without option ids, order and type' => [
+				'options' => [['text' => 'Row'], ['text' => 'Yes'], ['text' => 'No']],
+				'rankingOptions' => [['text' => 'A'], ['text' => 'B']],
+				'expectedOptions' => [[null, null], [null, null], [null, null], [null, null], [null, null]],
+				'expectedAnswers' => ['{"11":12}', '{"11":[12,13]}', '{"11":{"12":12,"13":"13"}}', '[22,21]'],
+			],
+		];
+	}
+
+	/**
+	 * @param list<array<string, mixed>> $options exported options of the grid question
+	 * @param list<array<string, mixed>> $rankingOptions exported options of the ranking question
+	 * @param list<array{0: ?int, 1: ?string}> $expectedOptions order and type of each imported option
+	 * @param list<string> $expectedAnswers texts of the imported answers
+	 */
+	#[DataProvider('dataImportMapsOptionsOfGridAndRankingQuestions')]
+	public function testImportMapsOptionsOfGridAndRankingQuestions(array $options, array $rankingOptions, array $expectedOptions, array $expectedAnswers): void {
+		$question = ['isRequired' => false, 'description' => '', 'extraSettings' => []];
+		$formData = [[
+			'title' => 'Grid', 'description' => '', 'access' => ['permitAllUsers' => false, 'showToAllUsers' => false], 'expires' => 0,
+			'isAnonymous' => false, 'submitMultiple' => false, 'allowEditSubmissions' => false, 'showExpiration' => false,
+			'questions' => [
+				$question + ['id' => 1, 'order' => 1, 'type' => 'grid', 'text' => 'Grid', 'options' => $options],
+				$question + ['id' => 2, 'order' => 2, 'type' => 'ranking', 'text' => 'Ranking', 'options' => $rankingOptions],
+			],
+			'submissions' => [[
+				'userId' => 'anyUser@localhost', 'timestamp' => 1651354059,
+				'answers' => [
+					['questionId' => 1, 'text' => '{"11":12}'],
+					['questionId' => 1, 'text' => '{"11":[12,13]}'],
+					['questionId' => 1, 'text' => '{"11":{"12":12,"13":"13"}}'],
+					['questionId' => 2, 'text' => '[22,21]'],
+				],
+			]],
+		]];
+
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('someUser');
+		$importSource = $this->createMock(IImportSource::class);
+		$importSource->method('getMigratorVersion')->willReturn(1);
+		$importSource->method('getFileContents')->willReturn(json_encode($formData));
+		$questionId = 100;
+		$this->questionMapper->method('insert')->willReturnCallback(function ($question) use (&$questionId) {
+			$question->setId($questionId++);
+			return $question;
+		});
+		$optionId = 500;
+		$insertedOptions = [];
+		$this->optionMapper->method('insert')->willReturnCallback(function (Option $option) use (&$optionId, &$insertedOptions) {
+			$option->setId($optionId++);
+			$insertedOptions[] = [$option->getOrder(), $option->getOptionType()];
+			return $option;
+		});
+		$insertedAnswers = [];
+		$this->answerMapper->method('insert')->willReturnCallback(function ($answer) use (&$insertedAnswers) {
+			$insertedAnswers[] = $answer->getText();
+			return $answer;
+		});
+
+		$this->formsMigrator->import($user, $importSource, $this->createMock(OutputInterface::class));
+
+		$this->assertSame($expectedOptions, $insertedOptions);
+		$this->assertSame($expectedAnswers, $insertedAnswers);
 	}
 
 	public function testImport_NoVersion() {
