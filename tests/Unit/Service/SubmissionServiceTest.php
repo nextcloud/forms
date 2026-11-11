@@ -1337,6 +1337,24 @@ file2.txt"
 				// Expected Result
 				'The answer for question "q1" must be an integer between 0 and 5.',
 			],
+			'boolean-linearscale-answer' => [
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]]
+				],
+				[
+					'1' => [true]
+				],
+				'The answer for question "q1" must be an integer between 0 and 5.',
+			],
+			'list-linearscale-answer' => [
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]]
+				],
+				[
+					'1' => [['3']]
+				],
+				'The answer for question "q1" must be an integer between 0 and 5.',
+			],
 			'invalid-color-question' => [
 				// Questions
 				[
