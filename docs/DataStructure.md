@@ -271,7 +271,7 @@ Optional extra settings for some [Question Types](#question-types)
 | `rows`                  | `grid`                                         | Array            | -                                           | Array of row identifiers / labels for grid questions                        |
 | `questionType`          | `grid`                                         | String           | `checkbox`, `number`, `radio`               | Type of cell for grid questions (checkbox, numeric input, or radio)         |
 | `goTo`                  | `dropdown, multiple_unique`                    | Array            | see [Jumps](#jumps)                         | Where to go next for an answer                                              |
-| `next`                  | `color, file, grid, long, multiple, ranking, short` | Integer / string | question id, `'submit'`                | Where to go after the question, see [Jumps](#jumps)                         |
+| `next`                  | `color, date, file, grid, long, multiple, ranking, short, time` | Integer / string | question id, `'submit'` | Where to go after the question, see [Jumps](#jumps) |
 
 ### Jumps
 

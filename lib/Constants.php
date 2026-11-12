@@ -216,12 +216,14 @@ class Constants {
 		'dateMax' => ['string', 'integer', 'NULL'],
 		'dateMin' => ['string', 'integer', 'NULL'],
 		'dateRange' => ['boolean', 'NULL'],
+		'next' => ['integer', 'string'],
 	];
 
 	public const EXTRA_SETTINGS_TIME = [
 		'timeMax' => ['string', 'NULL'],
 		'timeMin' => ['string', 'NULL'],
 		'timeRange' => ['boolean', 'NULL'],
+		'next' => ['integer', 'string'],
 	];
 
 	// should be in sync with FileTypes.js
