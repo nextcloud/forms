@@ -1440,6 +1440,55 @@ class ApiControllerTest extends TestCase {
 		$this->assertSame('removed-jumps=(7)', $response->getHeaders()['X-Forms-Adjusted']);
 	}
 
+	public static function dataUpdateQuestionRemovesJumpsOutsideTheScale(): array {
+		return [
+			'narrowed scale' => [
+				['optionsLowest' => 1, 'optionsHighest' => 3, 'goTo' => [['value' => 0, 'target' => 'submit'], ['value' => 2, 'target' => 'submit'], ['value' => 4, 'target' => 'submit']]],
+				['optionsLowest' => 1, 'optionsHighest' => 3, 'goTo' => [['value' => 2, 'target' => 'submit']]],
+				'removed-jumps=(7)',
+			],
+			'default bounds' => [
+				['goTo' => [['value' => 5, 'target' => 'submit'], ['value' => 6, 'target' => 'submit']]],
+				['goTo' => [['value' => 5, 'target' => 'submit']]],
+				'removed-jumps=(7)',
+			],
+			'within the scale' => [
+				['optionsHighest' => 10, 'goTo' => [['value' => 10, 'target' => 'submit']]],
+				['optionsHighest' => 10, 'goTo' => [['value' => 10, 'target' => 'submit']]],
+				null,
+			],
+		];
+	}
+
+	/**
+	 * @dataProvider dataUpdateQuestionRemovesJumpsOutsideTheScale
+	 */
+	public function testUpdateQuestionRemovesJumpsOutsideTheScale(array $extraSettings, array $expectedSettings, ?string $expectedHeader): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_LINEARSCALE);
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->formsService->method('areExtraSettingsValid')->willReturn(true);
+		$this->formsService->method('areJumpsOfForm')->willReturn(true);
+		$this->questionMapper->method('findById')->with(7)->willReturn($question);
+		$this->questionMapper->method('findByForm')->with(1, true)->willReturn([$question]);
+		$this->questionMapper->expects($this->once())
+			->method('update')
+			->with($this->callback(fn (Question $updatedQuestion): bool => $updatedQuestion->getExtraSettings() === $expectedSettings));
+
+		$response = $this->apiController->updateQuestion(1, 7, ['extraSettings' => $extraSettings]);
+
+		$this->assertSame($expectedHeader, $response->getHeaders()['X-Forms-Adjusted'] ?? null);
+	}
+
 	public function testDeleteOptionRemovesItsJumps(): void {
 		$form = new Form();
 		$form->setId(1);

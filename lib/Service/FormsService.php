@@ -1085,7 +1085,7 @@ class FormsService {
 	}
 
 	/**
-	 * Whether the value is a list of jumps per answer, each with one answer key and a target, at most one per answer
+	 * Whether the value is a list of jumps per answer, each with one answer key (`value` from 0 to 10 on linear scales, else `optionId` or `other`) and a target, at most one per answer
 	 *
 	 * @param mixed $goTo the value of `goTo`
 	 * @param string $questionType the question type
@@ -1101,7 +1101,12 @@ class FormsService {
 				return false;
 			}
 
-			if (is_int($jump['optionId'] ?? null) && $jump['optionId'] > 0) {
+			if ($questionType === Constants::ANSWER_TYPE_LINEARSCALE) {
+				if (!is_int($jump['value'] ?? null) || $jump['value'] < 0 || $jump['value'] > 10) {
+					return false;
+				}
+				$answer = 'value:' . $jump['value'];
+			} elseif (is_int($jump['optionId'] ?? null) && $jump['optionId'] > 0) {
 				$answer = 'option:' . $jump['optionId'];
 			} elseif (($jump['other'] ?? null) === true) {
 				$answer = 'other';
@@ -1223,6 +1228,7 @@ class FormsService {
 					$extraSettings['goTo'] = $goTo;
 				}
 				$question->setExtraSettings($extraSettings);
+				self::removeJumpsOutsideScale($question);
 				$copiesWithJumps[] = $question;
 			}
 		}
@@ -1267,6 +1273,30 @@ class FormsService {
 		}
 
 		return $changed;
+	}
+
+	/**
+	 * Remove the jumps of a linear scale for values outside its bounds
+	 *
+	 * @param Question $question the question
+	 * @return bool whether jumps were removed, with the new extra settings set
+	 */
+	public static function removeJumpsOutsideScale(Question $question): bool {
+		$extraSettings = $question->getExtraSettings();
+		if ($question->getType() !== Constants::ANSWER_TYPE_LINEARSCALE || !is_array($extraSettings['goTo'] ?? null)) {
+			return false;
+		}
+
+		$lowest = $extraSettings['optionsLowest'] ?? 1;
+		$highest = $extraSettings['optionsHighest'] ?? 5;
+		$goTo = array_values(array_filter($extraSettings['goTo'], static fn (mixed $jump): bool => !is_int(is_array($jump) ? ($jump['value'] ?? null) : null) || ($jump['value'] >= $lowest && $jump['value'] <= $highest)));
+		if (count($goTo) === count($extraSettings['goTo'])) {
+			return false;
+		}
+
+		$extraSettings['goTo'] = $goTo;
+		$question->setExtraSettings($extraSettings);
+		return true;
 	}
 
 	/**

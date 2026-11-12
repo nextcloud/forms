@@ -871,7 +871,8 @@ class SubmissionService {
 		if (is_int($value) || is_float($value) || is_string($value)) {
 			foreach (is_array($extraSettings['goTo'] ?? null) ? $extraSettings['goTo'] : [] as $jump) {
 				if ((isset($jump['optionId']) && (string)$jump['optionId'] === (string)$value)
-					|| (($jump['other'] ?? false) === true && self::isOtherAnswer($question, $value))) {
+					|| (($jump['other'] ?? false) === true && self::isOtherAnswer($question, $value))
+					|| (isset($jump['value']) && ctype_digit((string)$value) && (int)$value === $jump['value'])) {
 					$target = $jump['target'] ?? null;
 					return is_int($target) || is_string($target) ? $target : null;
 				}

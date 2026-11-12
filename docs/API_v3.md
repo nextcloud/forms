@@ -37,7 +37,7 @@ Some requests succeed with their usual status, and their payload keeps its shape
 
 | Key | Value | Set by | Meaning |
 |-----|-------|--------|---------|
-| `removed-jumps` | Inner list of question ids, e.g. `(3 7)` | Updating, reordering and copying questions; deleting options | Jumps to the question itself or to an earlier question, or jumps of the deleted option, were removed from the `extraSettings` of these questions, see [Jumps](DataStructure.md#jumps) |
+| `removed-jumps` | Inner list of question ids, e.g. `(3 7)` | Updating, reordering and copying questions; deleting options; changing the bounds of a linear scale | Jumps to the question itself or to an earlier question, jumps of the deleted option, or jumps for values outside the scale, were removed from the `extraSettings` of these questions, see [Jumps](DataStructure.md#jumps) |
 
 ```
 X-Forms-Adjusted: removed-jumps=(3 7)
@@ -62,7 +62,7 @@ X-Forms-Adjusted: removed-jumps=(3 7)
 
 ### Other API changes
 
-- Questions can jump to a later question or to the end of the form with the extra settings `goTo` (per answer, on dropdown and radio questions) or `next` (after the question, on the other types with jumps), never both (see [Jumps](DataStructure.md#jumps)). Jumps to questions of other forms or to options that are not options of the question are rejected, and deleting an option removes its jumps. Submissions and submission updates ignore answers to the questions the jumps skip, and an answer "Other" needs a text. Updating, reordering and copying questions removes jumps to the question itself or to an earlier question; the response header `X-Forms-Adjusted` then lists the questions concerned under `removed-jumps` (see [Adjustments by the server](#adjustments-by-the-server)). Copying or importing a form drops such jumps as well, without the header, as these create a new form.
+- Questions can jump to a later question or to the end of the form with the extra settings `goTo` (per answer, on dropdown, radio and linear scale questions) or `next` (after the question, on the other types with jumps), never both (see [Jumps](DataStructure.md#jumps)). Jumps to questions of other forms or to options that are not options of the question are rejected, deleting an option removes its jumps, and narrowing a linear scale removes the jumps of the values that are gone. Submissions and submission updates ignore answers to the questions the jumps skip, and an answer "Other" needs a text. Updating, reordering and copying questions removes jumps to the question itself or to an earlier question; the response header `X-Forms-Adjusted` then lists the questions concerned under `removed-jumps` (see [Adjustments by the server](#adjustments-by-the-server)). Copying or importing a form drops such jumps as well, without the header, as these create a new form.
 - In API version 3.0 the following endpoints were introduced/changed:
     - `GET /api/v3/forms/{formId}/questions` to get all questions of a form
     - `GET /api/v3/forms/{formId}/questions/{questionId}` to get a single question
@@ -466,7 +466,7 @@ Update a single or multiple properties of a question-object.
   |-----------|---------|-------------|
   | _keyValuePairs_ | Array | Array of key-value pairs to update |
 - Restrictions: It is **not allowed** to update one of the following key-value pairs: _id, formId, order, type_.
-- Response: **Status-Code OK**, as well as the id of the updated question. Jumps in `extraSettings` that go to the question itself or to an earlier question are removed before saving (see [Jumps](DataStructure.md#jumps)), and the response header `X-Forms-Adjusted` then holds `removed-jumps=(<question id>)` (see [Adjustments by the server](#adjustments-by-the-server)). Jumps with an invalid structure, `goTo` or `next` on a question type without it, and ids of questions of other forms or of options that are not options of the question are rejected with **Status-Code Bad Request** "Invalid extraSettings, will not update."
+- Response: **Status-Code OK**, as well as the id of the updated question. Jumps in `extraSettings` that go to the question itself or to an earlier question, and jumps of a linear scale for values outside its bounds, are removed before saving (see [Jumps](DataStructure.md#jumps)), and the response header `X-Forms-Adjusted` then holds `removed-jumps=(<question id>)` (see [Adjustments by the server](#adjustments-by-the-server)). Jumps with an invalid structure, `goTo` or `next` on a question type without it, and ids of questions of other forms or of options that are not options of the question are rejected with **Status-Code Bad Request** "Invalid extraSettings, will not update."
 
 ```
 "data": 1

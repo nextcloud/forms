@@ -236,3 +236,28 @@ test('jump issues: a jump of the answer "Other" breaks while "Other" is off', ()
 		),
 	).toEqual([2])
 })
+
+test('jump issues: a required scale whose values all jump past a question makes it unreachable', () => {
+	const scale = (goTo: Array<{ value: number; target: number }>) =>
+		({
+			id: 1,
+			text: 'Question 1',
+			type: 'linearscale',
+			isRequired: true,
+			extraSettings: { optionsLowest: 1, optionsHighest: 2, goTo },
+		}) as FormsQuestion
+	expect(
+		issues([scale([{ value: 1, target: 3 }]), short(2), short(3)]).unreachable,
+	).toEqual([])
+	expect(
+		issues([
+			scale([
+				{ value: 1, target: 3 },
+				{ value: 2, target: 3 },
+				{ value: 3, target: 2 },
+			]),
+			short(2),
+			short(3),
+		]).unreachable,
+	).toEqual([2])
+})
