@@ -183,6 +183,7 @@ class Constants {
 		'optionsLimitMax' => ['integer'],
 		'optionsLimitMin' => ['integer'],
 		'shuffleOptions' => ['boolean'],
+		'next' => ['integer', 'string'],
 	];
 
 	public const EXTRA_SETTINGS_MULTIPLEUNIQUE = [
