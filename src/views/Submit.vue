@@ -60,6 +60,9 @@
 			<div class="hidden-visually" aria-live="polite">
 				{{ successAnnouncement }}
 			</div>
+			<div class="hidden-visually" aria-live="polite">
+				{{ jumpAnnouncement }}
+			</div>
 
 			<NcEmptyContent
 				v-if="loading"
@@ -144,22 +147,23 @@
 			<!-- Questions list -->
 			<form v-else ref="formElement" @submit.prevent="onSubmit">
 				<ul>
-					<component
-						:is="answerTypes[question.type].component"
-						v-for="(question, index) in validQuestions"
-						ref="questionRefs"
-						:key="question.id"
-						v-bind="question"
-						readOnly
-						:answerType="answerTypes[question.type]"
-						:index="index + 1"
-						:maxStringLengths="maxStringLengths"
-						:values="answers[question.id]"
-						@keydown.enter="onKeydownEnter"
-						@keydown.ctrl.enter="onKeydownCtrlEnter"
-						@update:values="
-							(values: AnswerValue) => onUpdate(question, values)
-						" />
+					<KeepAlive v-for="question in validQuestions" :key="question.id">
+						<component
+							:is="answerTypes[question.type].component"
+							v-if="visibleQuestionIds.has(question.id)"
+							ref="questionRefs"
+							v-bind="question"
+							readOnly
+							:answerType="answerTypes[question.type]"
+							:index="shownQuestions.indexOf(question) + 1"
+							:maxStringLengths="maxStringLengths"
+							:values="answers[question.id]"
+							@keydown.enter="onKeydownEnter"
+							@keydown.ctrl.enter="onKeydownCtrlEnter"
+							@update:values="
+								(values: AnswerValue) => onUpdate(question, values)
+							" />
+					</KeepAlive>
 				</ul>
 				<div class="form-buttons">
 					<NcButton
@@ -250,7 +254,7 @@ import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit as emitEvent } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
-import { t } from '@nextcloud/l10n'
+import { getLanguage, n, t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import {
@@ -288,6 +292,7 @@ import {
 	QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 } from '../models/Constants.ts'
 import { PERMISSION_TYPES } from '../models/Permissions.ts'
+import { formatList, getVisibleQuestions } from '../utils/Jumps.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
@@ -423,7 +428,7 @@ export default defineComponent({
 		const confirmButtonCallback = ref<(val: boolean) => void>(() => {})
 
 		const validQuestions = computed<SubmitQuestion[]>(() => {
-			return props.form.questions.filter((question: FormsQuestion) => {
+			return (props.form.questions ?? []).filter((question: FormsQuestion) => {
 				// All questions must have a valid title
 				if (question.text?.trim() === '') {
 					return false
@@ -441,6 +446,77 @@ export default defineComponent({
 		const validQuestionsIds = computed<Set<number>>(() => {
 			return new Set(validQuestions.value.map((question) => question.id))
 		})
+
+		const visibleQuestionIds = computed<Set<number>>(() => {
+			return new Set(
+				getVisibleQuestions(props.form.questions ?? [], answers.value).map(
+					(question) => question.id,
+				),
+			)
+		})
+
+		const shownQuestions = computed<SubmitQuestion[]>(() => {
+			return validQuestions.value.filter((question) =>
+				visibleQuestionIds.value.has(question.id),
+			)
+		})
+
+		const submittedAnswers = computed<AnswersMap>(() => {
+			return Object.fromEntries(
+				Object.entries(answers.value).filter(([questionId]) =>
+					visibleQuestionIds.value.has(Number(questionId)),
+				),
+			)
+		})
+
+		const jumpAnnouncement = ref('')
+
+		/**
+		 * Announce the questions an answer added to or skipped from the path
+		 *
+		 * @param oldQuestions the questions shown before the answer
+		 * @param newQuestions the questions shown after the answer
+		 */
+		function announcePathChange(
+			oldQuestions: SubmitQuestion[],
+			newQuestions: SubmitQuestion[],
+		): void {
+			const oldIds = new Set(oldQuestions.map((question) => question.id))
+			const newIds = new Set(newQuestions.map((question) => question.id))
+			const added = newQuestions.filter((question) => !oldIds.has(question.id))
+			const removed = oldQuestions.filter(
+				(question) => !newIds.has(question.id),
+			)
+			if (added.length === 0 && removed.length === 0) {
+				return
+			}
+
+			const status = formatList(
+				[
+					added.length > 0
+						? n(
+								'forms',
+								'%n question added',
+								'%n questions added',
+								added.length,
+							)
+						: '',
+					removed.length > 0
+						? n(
+								'forms',
+								'%n question skipped',
+								'%n questions skipped',
+								removed.length,
+							)
+						: '',
+				].filter(Boolean),
+				getLanguage(),
+			)
+			jumpAnnouncement.value = ''
+			setTimeout(() => {
+				jumpAnnouncement.value = status
+			}, 100)
+		}
 
 		const isRequiredUsed = computed<boolean>(() => {
 			return props.form.questions.some((question: FormsQuestion) =>
@@ -897,10 +973,12 @@ export default defineComponent({
 		 * @param values The new values
 		 */
 		function onUpdate(question: SubmitQuestion, values: AnswerValue): void {
+			const shownBefore = shownQuestions.value
 			answers.value = {
 				...answers.value,
 				[question.id]: values,
 			}
+			announcePathChange(shownBefore, shownQuestions.value)
 			addFormFieldToLocalStorage(question)
 		}
 
@@ -1018,8 +1096,8 @@ export default defineComponent({
 
 				// in case no answer is set or all are empty show the confirmation dialog
 				if (
-					Object.keys(answers.value).length === 0
-					|| Object.values(answers.value).every((localAnswers) =>
+					Object.keys(submittedAnswers.value).length === 0
+					|| Object.values(submittedAnswers.value).every((localAnswers) =>
 						Array.isArray(localAnswers)
 							? localAnswers.length === 0
 							: Object.keys(localAnswers).length === 0,
@@ -1054,7 +1132,7 @@ export default defineComponent({
 							},
 						),
 						{
-							answers: answers.value,
+							answers: submittedAnswers.value,
 						},
 					)
 				} else {
@@ -1063,7 +1141,7 @@ export default defineComponent({
 							id: props.form.id,
 						}),
 						{
-							answers: answers.value,
+							answers: submittedAnswers.value,
 							shareHash: props.shareHash,
 						},
 					)
@@ -1230,6 +1308,8 @@ export default defineComponent({
 			...viewForm,
 			answerTypes,
 			answers,
+			jumpAnnouncement,
+			shownQuestions,
 			confirmClearFormButtons,
 			confirmEmptyModalButtons,
 			confirmLeaveFormButtons,
@@ -1259,6 +1339,7 @@ export default defineComponent({
 			successAnnouncement,
 			updateQuestionValues,
 			validQuestions,
+			visibleQuestionIds,
 			title,
 			IconCheckSvg: IconCheck,
 			IconScheduleSvg: IconSchedule,

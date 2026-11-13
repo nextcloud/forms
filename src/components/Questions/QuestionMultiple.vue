@@ -153,13 +153,26 @@
 						@focusNext="focusNextInput"
 						@moveUp="onOptionMoveUp(index, OptionType.Choice)"
 						@moveDown="onOptionMoveDown(index, OptionType.Choice)"
-						@tabbedOut="checkValidOption" />
+						@tabbedOut="checkValidOption">
+						<template v-if="jumps.showTargets && !answer.local" #default>
+							<JumpTargetSelect
+								:modelValue="
+									jumps.getTarget({ optionId: answer.id })
+								"
+								:options="jumps.targetOptions"
+								:inputLabel="jumps.getTargetLabel(answer.text)"
+								@update:modelValue="
+									jumps.setTarget({ optionId: answer.id }, $event)
+								" />
+						</template>
+					</AnswerInput>
 				</TransitionGroup>
 			</Draggable>
 			<div
 				v-if="allowOtherAnswer"
 				key="option-add-other"
-				class="question__item">
+				class="question__item question__item--other"
+				:class="{ 'question__item--with-target': jumps.showTargets }">
 				<NcIconSvgWrapper
 					:svg="pseudoIcon"
 					inline
@@ -173,6 +186,12 @@
 					minlength="1"
 					type="text"
 					:readonly="!readOnly" />
+				<JumpTargetSelect
+					v-if="jumps.showTargets"
+					:modelValue="jumps.getTarget({ other: true })"
+					:options="jumps.targetOptions"
+					:inputLabel="jumps.getTargetLabel(t('forms', 'Other'))"
+					@update:modelValue="jumps.setTarget({ other: true }, $event)" />
 			</div>
 		</template>
 
@@ -205,6 +224,7 @@ import NcInputField from '@nextcloud/vue/components/NcInputField'
 import NcLoadingIcon from '@nextcloud/vue/components/NcLoadingIcon'
 import OptionInputDialog from '../OptionInputDialog.vue'
 import AnswerInput from './AnswerInput.vue'
+import JumpTargetSelect from './JumpTargetSelect.vue'
 import Question from './Question.vue'
 import {
 	QUESTION_EMITS,
@@ -233,6 +253,7 @@ export default defineComponent({
 	components: {
 		AnswerInput,
 		Draggable,
+		JumpTargetSelect,
 		NcIconSvgWrapper,
 		NcActionButton,
 		NcActionCheckbox,
@@ -722,6 +743,29 @@ export default defineComponent({
 			margin-inline: -30px 14px !important;
 			margin-block-end: 0;
 		}
+	}
+}
+
+.question__item--other.question__item--with-target {
+	container-type: inline-size;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: var(--default-grid-baseline);
+	padding-inline-end: calc(
+		2 * var(--default-clickable-area) + 2 * var(--default-grid-baseline)
+	);
+
+	.question__input {
+		flex: 1 1 0;
+		width: auto;
+		min-width: 0;
+		margin-inline-end: calc(-1 * var(--default-clickable-area)) !important;
+	}
+}
+
+@container (max-width: 480px) {
+	.question__item--other.question__item--with-target .question__input {
+		flex-basis: 100%;
 	}
 }
 

@@ -346,6 +346,24 @@ export function useQuestionMultiple(
 						},
 					),
 				)
+				.then(() => {
+					const goTo = props.extraSettings?.goTo
+					if (
+						Array.isArray(goTo)
+						&& goTo.some(
+							(jump: { optionId?: number }) =>
+								jump?.optionId === option.id,
+						)
+					) {
+						options.emit('update:extraSettings', {
+							...props.extraSettings,
+							goTo: goTo.filter(
+								(jump: { optionId?: number }) =>
+									jump?.optionId !== option.id,
+							),
+						})
+					}
+				})
 				.catch((error) => {
 					logger.error('Error while deleting an option', {
 						error,

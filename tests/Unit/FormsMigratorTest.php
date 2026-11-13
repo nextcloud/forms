@@ -416,6 +416,36 @@ JSON
 		$this->assertSame($expectedAnswers, $insertedAnswers);
 	}
 
+	public function testImportMapsJumps(): void {
+		$inputJson = '[{"title":"Link","description":"","created":1646251830,"access":{"permitAllUsers":false,"showToAllUsers":false},"expires":0,"state":0,"isAnonymous":false,"submitMultiple":false,"allowEditSubmissions":false,"showExpiration":false,"lastUpdated":123456789,'
+			. '"questions":[{"id":14,"order":1,"type":"multiple_unique","isRequired":false,"text":"Pet?","description":"","extraSettings":{"goTo":[{"optionId":35,"target":15},{"optionId":36,"target":15}],"next":"submit"},"options":[{"id":35,"text":"Yes"},{"text":"No"}]},'
+			. '{"id":15,"order":2,"type":"short","isRequired":false,"text":"Which?","description":"","extraSettings":{},"options":[]}],'
+			. '"submissions":[]}]';
+
+		$user = $this->createMock(IUser::class);
+		$user->method('getUID')->willReturn('someUser');
+		$importSource = $this->createMock(IImportSource::class);
+		$importSource->method('getMigratorVersion')->willReturn(1);
+		$importSource->method('getFileContents')->willReturn($inputJson);
+		$questionIds = [100, 101];
+		$this->questionMapper->method('insert')->willReturnCallback(function ($question) use (&$questionIds) {
+			$question->setId(array_shift($questionIds));
+			return $question;
+		});
+		$optionIds = [500, 501];
+		$this->optionMapper->method('insert')->willReturnCallback(function ($option) use (&$optionIds) {
+			$option->setId(array_shift($optionIds));
+			return $option;
+		});
+
+		$this->questionMapper->expects($this->once())
+			->method('update')
+			->with($this->callback(fn ($question) => $question->getId() === 100
+				&& $question->getExtraSettings() === ['goTo' => [['optionId' => 500, 'target' => 101]]]));
+
+		$this->formsMigrator->import($user, $importSource, $this->createMock(OutputInterface::class));
+	}
+
 	public function testImport_NoVersion() {
 		$user = $this->createMock(IUser::class);
 		$importSource = $this->createMock(IImportSource::class);

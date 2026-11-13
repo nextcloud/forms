@@ -1058,6 +1058,56 @@ file2.txt"
 				// Expected Result
 				'Answer for non-existent question with ID 2.',
 			],
+			'question-id-in-other-notation' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'email']]
+				],
+				// Answers
+				[
+					'1.0' => ['not an email']
+				],
+				// Expected Result
+				'Answer for non-existent question with ID 1.0.',
+			],
+			'option-id-in-other-notation' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => false, 'options' => [
+						['id' => 3],
+						['id' => 5]
+					]],
+				],
+				// Answers
+				[
+					'1' => ['03']
+				],
+				// Expected Result
+				'Answer "03" for question "q1" is not a valid option.',
+			],
+			'option-id-in-other-notation-with-other-answer' => [
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['allowOtherAnswer' => true], 'options' => [
+						['id' => 3],
+						['id' => 5]
+					]],
+				],
+				[
+					'1' => ['05']
+				],
+				'Answer "05" for question "q1" is not a valid option.',
+			],
+			'unknown-option-with-other-answer' => [
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => true, 'extraSettings' => ['allowOtherAnswer' => true], 'options' => [
+						['id' => 3]
+					]],
+				],
+				[
+					'1' => ['not an option']
+				],
+				'Answer "not an option" for question "q1" is not a valid option.',
+			],
 			'invalid-multiple-too-many-answers' => [
 				// Questions
 				[
@@ -1663,5 +1713,99 @@ file2.txt"
 		$this->expectExceptionMessage('File "victim.rtf" for question "File question" not exists anymore. Please delete and re-upload the file.');
 
 		$this->submissionService->validateSubmission($questions, $answers, 'alice', 7);
+	}
+
+	public static function dataJumpPaths(): array {
+		$cases = json_decode(file_get_contents(__DIR__ . '/../../fixtures/jump-paths.json'), true, 512, JSON_THROW_ON_ERROR);
+		return array_combine(array_column($cases, 'name'), array_map(static fn (array $case) => [$case['questions'], $case['answers'], $case['visible']], $cases));
+	}
+
+	/**
+	 * Runs the cases of tests/fixtures/jump-paths.json, shared with playwright/e2e/jump-paths.spec.ts
+	 */
+	#[\PHPUnit\Framework\Attributes\DataProvider('dataJumpPaths')]
+	public function testJumpPaths(array $questions, array $answers, array $visible): void {
+		$visibleIds = array_column($this->submissionService->getVisibleQuestions($questions, $answers), 'id');
+
+		$this->assertSame($visible, $visibleIds);
+	}
+
+	private static function getJumpQuestions(): array {
+		return [
+			[
+				'id' => 1,
+				'type' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'text' => 'Do you have a pet?',
+				'isRequired' => true,
+				'extraSettings' => ['goTo' => [['optionId' => 12, 'target' => 3]]],
+				'options' => [['id' => 11, 'text' => 'Yes'], ['id' => 12, 'text' => 'No']],
+			],
+			[
+				'id' => 2,
+				'type' => Constants::ANSWER_TYPE_SHORT,
+				'text' => 'Which one?',
+				'isRequired' => true,
+				'extraSettings' => [],
+			],
+			[
+				'id' => 3,
+				'type' => Constants::ANSWER_TYPE_SHORT,
+				'text' => 'Anything else?',
+				'isRequired' => false,
+				'extraSettings' => [],
+			],
+		];
+	}
+
+	public function testValidateSubmissionDoesNotRequireSkippedQuestions(): void {
+		$this->submissionService->validateSubmission(self::getJumpQuestions(), [1 => ['12']], 'alice', 7);
+		$this->addToAssertionCount(1);
+	}
+
+	public function testValidateSubmissionRequiresQuestionsOnThePath(): void {
+		$this->expectException(\InvalidArgumentException::class);
+		$this->expectExceptionMessage('Question "Which one?" is required.');
+
+		$this->submissionService->validateSubmission(self::getJumpQuestions(), [1 => ['11']], 'alice', 7);
+	}
+
+	public function testValidateSubmissionIgnoresAnswersToSkippedQuestions(): void {
+		$this->submissionService->validateSubmission(self::getJumpQuestions(), [1 => ['12'], 2 => ['Rex']], 'alice', 7);
+		$this->submissionService->validateSubmission(self::getJumpQuestions(), [1 => ['12'], 2 => ['']], 'alice', 7);
+		$this->submissionService->validateSubmission(self::getJumpQuestions(), [1 => ['12'], 2 => []], 'alice', 7);
+		$this->submissionService->validateSubmission(self::getJumpQuestions(), [1 => ['12'], 2 => [null]], 'alice', 7);
+		$this->addToAssertionCount(1);
+	}
+
+	public function testGetAnswersOnPathDropsAnswersToSkippedQuestions(): void {
+		$this->assertSame(
+			[1 => ['12'], 3 => ['Thanks']],
+			SubmissionService::getAnswersOnPath(self::getJumpQuestions(), [1 => ['12'], 2 => ['Rex'], 3 => ['Thanks']]),
+		);
+	}
+
+	public function testAnswersToQuestionsTheSubmitViewDoesNotShowDoNotDecideThePath(): void {
+		$questions = self::getJumpQuestions();
+		$questions[0]['text'] = ' ';
+
+		$this->assertSame(
+			[1 => ['12'], 2 => ['Rex']],
+			SubmissionService::getAnswersOnPath($questions, [1 => ['12'], 2 => ['Rex']]),
+		);
+		$this->expectException(\InvalidArgumentException::class);
+		$this->expectExceptionMessage('Question "Which one?" is required.');
+
+		$this->submissionService->validateSubmission($questions, [1 => ['12']], 'alice', 7);
+	}
+
+	public function testValidateSubmissionRejectsOtherAnswerWithoutText(): void {
+		$questions = self::getJumpQuestions();
+		$questions[0]['isRequired'] = false;
+		$questions[0]['extraSettings'] = ['allowOtherAnswer' => true, 'goTo' => [['other' => true, 'target' => 3]]];
+
+		$this->expectException(\InvalidArgumentException::class);
+		$this->expectExceptionMessage('The answer "Other" for question "Do you have a pet?" needs a text.');
+
+		$this->submissionService->validateSubmission($questions, [1 => [Constants::QUESTION_EXTRASETTINGS_OTHER_PREFIX]], 'alice', 7);
 	}
 };
