@@ -52,6 +52,44 @@
 			</ol>
 		</div>
 
+		<!-- Summary figures for scale questions, shown above the per-value bars -->
+		<dl v-if="numericStats" class="question-summary__figures">
+			<div>
+				<dt>{{ t('forms', 'Average') }}</dt>
+				<dd>{{ numericStats.mean }}</dd>
+			</div>
+			<div>
+				<dt>{{ t('forms', 'Median') }}</dt>
+				<dd>{{ numericStats.median }}</dd>
+			</div>
+			<div>
+				<dt>{{ t('forms', 'Lowest') }}</dt>
+				<dd>{{ numericStats.min }}</dd>
+			</div>
+			<div>
+				<dt>{{ t('forms', 'Highest') }}</dt>
+				<dd>{{ numericStats.max }}</dd>
+			</div>
+			<div v-if="npsScore !== null">
+				<dt>{{ t('forms', 'Net Promoter Score') }}</dt>
+				<dd>
+					{{ npsScore }}
+					<span class="question-summary__figures-detail">
+						{{
+							t(
+								'forms',
+								'{promoters}% promoters, {detractors}% detractors',
+								{
+									promoters: npsBreakdown.promoters,
+									detractors: npsBreakdown.detractors,
+								},
+							)
+						}}
+					</span>
+				</dd>
+			</div>
+		</dl>
+
 		<!-- Answers with countable results for visualization -->
 		<ol
 			v-else-if="answerTypes[question.type].predefined"
@@ -613,9 +651,97 @@ export default defineComponent({
 			return answersModels
 		})
 
+		/**
+		 * Every numeric answer given to this question.
+		 */
+		const numericValues = computed<number[]>(() => {
+			if (props.question.type !== 'linearscale') {
+				return []
+			}
+			const values: number[] = []
+			for (const submission of props.submissions) {
+				for (const answer of submission.answers ?? []) {
+					if (answer.questionId !== props.question.id) {
+						continue
+					}
+					const value = parseFloat(answer.text)
+					if (!isNaN(value)) {
+						values.push(value)
+					}
+				}
+			}
+			return values
+		})
+
+		/**
+		 * Summary statistics for a scale question.
+		 *
+		 * The median is reported next to the average because a single extreme answer moves
+		 * an average a long way at the response counts most forms see.
+		 */
+		const numericStats = computed(() => {
+			const values = numericValues.value
+			if (values.length === 0) {
+				return null
+			}
+			const sorted = [...values].sort((a, b) => a - b)
+			const middle = Math.floor(sorted.length / 2)
+			const median =
+				sorted.length % 2
+					? sorted[middle]
+					: (sorted[middle - 1] + sorted[middle]) / 2
+			const round = (value: number) => Math.round(value * 100) / 100
+
+			return {
+				count: values.length,
+				mean: round(values.reduce((a, b) => a + b, 0) / values.length),
+				median: round(median),
+				min: round(sorted[0]),
+				max: round(sorted[sorted.length - 1]),
+			}
+		})
+
+		/**
+		 * Promoter and detractor shares for a question shaped like a Net Promoter Score
+		 * question, i.e. a 0-10 scale, using the usual 9-10 / 7-8 / 0-6 split.
+		 */
+		const npsBreakdown = computed(() => {
+			if (
+				props.question.extraSettings?.optionsLowest !== 0
+				|| props.question.extraSettings?.optionsHighest !== 10
+			) {
+				return null
+			}
+			const values = numericValues.value
+			if (values.length === 0) {
+				return null
+			}
+			const share = (count: number) =>
+				Math.round((count / values.length) * 100)
+			return {
+				promoters: share(values.filter((value) => value >= 9).length),
+				passives: share(
+					values.filter((value) => value >= 7 && value <= 8).length,
+				),
+				detractors: share(values.filter((value) => value <= 6).length),
+			}
+		})
+
+		/**
+		 * The Net Promoter Score itself: promoters minus detractors.
+		 */
+		const npsScore = computed(() =>
+			npsBreakdown.value
+				? npsBreakdown.value.promoters - npsBreakdown.value.detractors
+				: null,
+		)
+
 		return {
 			IconFile,
 			answerTypes,
+			numericStats,
+			npsBreakdown,
+			npsScore,
 			questionTypeLabel,
 			questionOptions,
 			rankingStats,
@@ -766,6 +892,31 @@ export default defineComponent({
 			position: sticky;
 			inset-inline-start: 0;
 		}
+	}
+}
+
+.question-summary__figures {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin: 0 0 8px;
+
+	dt {
+		color: var(--color-text-maxcontrast);
+		font-size: 0.9em;
+	}
+
+	dd {
+		font-size: 1.2em;
+		font-weight: bold;
+		margin: 0;
+	}
+
+	&-detail {
+		color: var(--color-text-maxcontrast);
+		display: block;
+		font-size: 0.75em;
+		font-weight: normal;
 	}
 }
 </style>
