@@ -92,6 +92,7 @@ OC.L10N.register(
     "Image" : "Gambar",
     "Document" : "Dokumen",
     "Presentation" : "Presentasi",
+    "Spreadsheet" : "Lembar kerja",
     "Phone number" : "Nomor telepon",
     "Email address" : "Alamat email",
     "Enter an email address" : "Masukkan alamat email",

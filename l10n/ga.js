@@ -187,6 +187,7 @@ OC.L10N.register(
     "Other:" : "Eile:",
     "Other" : "Eile",
     "You must rank all options" : "Ní mór duit na roghanna go léir a rangú",
+    "Unranked options" : "Roghanna gan rangú",
     "All options ranked" : "Gach rogha rangaithe",
     "Your ranking" : "Do rangú",
     "Remove from ranking" : "Bain den rangú",

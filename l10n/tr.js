@@ -187,6 +187,7 @@ OC.L10N.register(
     "Other:" : "Diğer:",
     "Other" : "Diğer",
     "You must rank all options" : "Tüm seçenekleri sıralamalısınız",
+    "Unranked options" : "Sıralanmamış seçenekler",
     "All options ranked" : "Tüm seçenekler sıralandı",
     "Your ranking" : "Sıralamanız",
     "Remove from ranking" : "Sıralamadan çıkar",
