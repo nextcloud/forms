@@ -1522,6 +1522,46 @@ file2.txt"
 				['1' => ['10' => ['21' => '1']]],
 				'Column "21" for question "Number grid" is not a valid option.',
 			],
+			'invalid-number-grid-row-in-other-notation' => [
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Number grid', 'isRequired' => false, 'extraSettings' => ['questionType' => Constants::ANSWER_GRID_TYPE_NUMBER], 'options' => [
+						['id' => 10, 'optionType' => 'row'],
+						['id' => 20, 'optionType' => 'column'],
+					]],
+				],
+				['1' => ['010' => ['20' => '1']]],
+				'Row "010" for question "Number grid" is not a valid option.',
+			],
+			'valid-radio-grid' => [
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Radio grid', 'isRequired' => false, 'extraSettings' => ['questionType' => Constants::ANSWER_GRID_TYPE_RADIO], 'options' => [
+						['id' => 10, 'optionType' => 'row'],
+						['id' => 20, 'optionType' => 'column'],
+					]],
+				],
+				['1' => ['10' => '20']],
+				null,
+			],
+			'invalid-radio-grid-column-in-other-notation' => [
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Radio grid', 'isRequired' => false, 'extraSettings' => ['questionType' => Constants::ANSWER_GRID_TYPE_RADIO], 'options' => [
+						['id' => 10, 'optionType' => 'row'],
+						['id' => 20, 'optionType' => 'column'],
+					]],
+				],
+				['1' => ['10' => '020']],
+				'Column "020" for question "Radio grid" is not a valid option.',
+			],
+			'invalid-checkbox-grid-column-in-other-notation' => [
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Checkbox grid', 'isRequired' => false, 'extraSettings' => ['questionType' => Constants::ANSWER_GRID_TYPE_CHECKBOX], 'options' => [
+						['id' => 10, 'optionType' => 'row'],
+						['id' => 20, 'optionType' => 'column'],
+					]],
+				],
+				['1' => ['10' => ['20', '020']]],
+				'Column "020" for question "Checkbox grid" is not a valid option.',
+			],
 			'invalid-ranking-missing-option' => [
 				// Questions
 				[
