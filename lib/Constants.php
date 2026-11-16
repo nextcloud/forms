@@ -136,6 +136,13 @@ class Constants {
 		self::ANSWER_TYPE_SHORT,
 		self::ANSWER_TYPE_TIME,
 	];
+	
+	// AnswerTypes for date/time questions
+	public const ANSWER_TYPES_DATETIME = [
+			self::ANSWER_TYPE_DATE,
+			self::ANSWER_TYPE_DATETIME,
+			self::ANSWER_TYPE_TIME,
+	];
 
 	// AnswerTypes, that need/have predefined Options
 	public const ANSWER_TYPES_PREDEFINED = [
@@ -147,18 +154,16 @@ class Constants {
 		self::ANSWER_TYPE_RANKING,
 	];
 
-	// AnswerTypes for date/time questions
-	public const ANSWER_TYPES_DATETIME = [
-		self::ANSWER_TYPE_DATE,
-		self::ANSWER_TYPE_DATETIME,
-		self::ANSWER_TYPE_TIME
+	// AnswerTypes for scale questions
+	public const ANSWER_TYPES_SCALE = [
+		self::ANSWER_TYPE_RANKING,
 	];
 
 	// Formats for AnswerTypes date/datetime/time
 	public const ANSWER_PHPDATETIME_FORMAT = [
 		self::ANSWER_TYPE_DATE => 'Y-m-d',
 		self::ANSWER_TYPE_DATETIME => 'Y-m-d H:i',
-		self::ANSWER_TYPE_TIME => 'H:i'
+		self::ANSWER_TYPE_TIME => 'H:i',
 	];
 
 	/**
@@ -170,7 +175,7 @@ class Constants {
 		'phone',
 		'email',
 		'regex',
-		'number'
+		'number',
 	];
 
 	// This are allowed extra settings
@@ -251,12 +256,6 @@ class Constants {
 		'next' => ['integer', 'string'],
 	];
 
-	/**
-	 * A rating is a linear scale that always starts at 1 and is drawn as icons, so it
-	 * shares the linear scale's key for its top end (and that key's bounds) rather than
-	 * having one of its own. optionsLowest is deliberately absent: a rating's lowest end
-	 * is always 1. ratingIcon is one of 'star' (default), 'heart' or 'thumb'.
-	 */
 	public const EXTRA_SETTINGS_RATING = [
 		'optionsHighest' => ['integer', 'NULL'],
 		'ratingIcon' => ['string', 'NULL'],

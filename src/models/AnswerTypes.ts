@@ -273,7 +273,7 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 		component: markRaw(QuestionRating),
 		icon: IconStar,
 		label: t('forms', 'Rating'),
-		predefined: false,
+		predefined: true,
 
 		titlePlaceholder: t('forms', 'Rating question title'),
 		warningInvalid: t('forms', 'This question needs a title!'),

@@ -15,13 +15,13 @@
 				:modelValue="optionsHighest"
 				type="multiselect"
 				:clearable="false"
-				:label="t('forms', 'Number of icons')"
+				:label="t('forms', 'Highest rating')"
 				labelOutside
 				:options="[2, 3, 4, 5, 6, 7, 8, 9, 10]"
 				required
 				@update:modelValue="onOptionsHighestChange">
 				<template #icon>
-					<NcIconSvgWrapper :svg="outlineIcon" />
+					<NcIconSvgWrapper :svg="currentIconChoice.outline" />
 				</template>
 			</NcActionInput>
 			<NcActionRadio
@@ -35,7 +35,10 @@
 			</NcActionRadio>
 		</template>
 
-		<fieldset class="rating" :disabled="!readOnly">
+		<fieldset
+			class="rating"
+			:style="`--rating-color: ${currentIconChoice.color}`"
+			:disabled="!readOnly">
 			<legend class="hidden-visually">
 				{{ text || t('forms', 'Rating') }}
 			</legend>
@@ -49,7 +52,7 @@
 					type="radio"
 					:name="`rating_${id}`"
 					:aria-label="
-						n('forms', '%n of {max}', '%n of {max}', value, {
+						t('forms', '%n of {max}', {
 							max: optionsHighest,
 						})
 					"
@@ -58,14 +61,12 @@
 					:required="isRequired && !currentValue"
 					@change="onPick(value)" />
 				<NcIconSvgWrapper
-					:svg="value <= currentValue ? filledIcon : outlineIcon" />
+					:svg="
+						value <= currentValue
+							? currentIconChoice.filled
+							: currentIconChoice.outline
+					" />
 			</label>
-			<NcButton
-				v-if="readOnly && currentValue"
-				variant="tertiary"
-				@click="onPick(0)">
-				{{ t('forms', 'Clear') }}
-			</NcButton>
 		</fieldset>
 	</Question>
 </template>
@@ -77,11 +78,10 @@ import IconStarFilled from '@material-symbols/svg-400/outlined/star-fill.svg?raw
 import IconStar from '@material-symbols/svg-400/outlined/star.svg?raw'
 import IconThumbFilled from '@material-symbols/svg-400/outlined/thumb_up-fill.svg?raw'
 import IconThumb from '@material-symbols/svg-400/outlined/thumb_up.svg?raw'
-import { n, t } from '@nextcloud/l10n'
+import { t } from '@nextcloud/l10n'
 import { computed, defineComponent } from 'vue'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
-import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Question from './Question.vue'
 import {
@@ -90,8 +90,42 @@ import {
 	useQuestion,
 } from '../../composables/useQuestion.ts'
 
-/** Matches the linear scale default the server assumes when optionsHighest is unset. */
 const DEFAULT_OPTIONS_HIGHEST = 5
+
+interface IconChoice {
+	id: 'star' | 'heart' | 'thumb'
+	label: string
+	outline: string
+	filled: string
+	color: string
+}
+
+const ICON_CHOICES: IconChoice[] = [
+	{
+		id: 'star',
+		label: t('forms', 'Stars'),
+		outline: IconStar,
+		filled: IconStarFilled,
+		color: 'var(--color-element-warning)',
+	},
+	{
+		id: 'heart',
+		label: t('forms', 'Hearts'),
+		outline: IconHeart,
+		filled: IconHeartFilled,
+		color: 'var(--color-element-error)',
+	},
+	{
+		id: 'thumb',
+		label: t('forms', 'Thumbs up'),
+		outline: IconThumb,
+		filled: IconThumbFilled,
+		color: 'var(--color-element-info)',
+	},
+]
+
+const VALID_ICONS = ICON_CHOICES.map((choice) => choice.id)
+const DEFAULT_ICON = ICON_CHOICES[0].id
 
 export default defineComponent({
 	name: 'QuestionRating',
@@ -99,7 +133,6 @@ export default defineComponent({
 	components: {
 		NcActionInput,
 		NcActionRadio,
-		NcButton,
 		NcIconSvgWrapper,
 		Question,
 	},
@@ -125,32 +158,13 @@ export default defineComponent({
 
 		const ratingIcon = computed<string>(() => {
 			const icon = extraSettings.value.ratingIcon
-			return typeof icon === 'string'
-				&& ['star', 'heart', 'thumb'].includes(icon)
+			return typeof icon === 'string' && VALID_ICONS.includes(icon as never)
 				? icon
-				: 'star'
+				: DEFAULT_ICON
 		})
 
-		const iconChoices = computed(() => [
-			{ id: 'star', label: t('forms', 'Stars') },
-			{ id: 'heart', label: t('forms', 'Hearts') },
-			{ id: 'thumb', label: t('forms', 'Thumbs up') },
-		])
-
-		const outlineIcon = computed(
-			() =>
-				({ star: IconStar, heart: IconHeart, thumb: IconThumb })[
-					ratingIcon.value
-				],
-		)
-
-		const filledIcon = computed(
-			() =>
-				({
-					star: IconStarFilled,
-					heart: IconHeartFilled,
-					thumb: IconThumbFilled,
-				})[ratingIcon.value],
+		const currentIconChoice = computed(() =>
+			ICON_CHOICES.find((choice) => choice.id === ratingIcon.value)!,
 		)
 
 		const currentValue = computed<number>(
@@ -179,7 +193,7 @@ export default defineComponent({
 		 */
 		function onRatingIconChange(icon: string): void {
 			question.onExtraSettingsChange({
-				ratingIcon: icon === 'star' ? null : icon,
+				ratingIcon: icon === DEFAULT_ICON ? null : icon,
 			})
 		}
 
@@ -201,15 +215,13 @@ export default defineComponent({
 
 		return {
 			...question,
+			currentIconChoice,
 			currentValue,
-			filledIcon,
-			iconChoices,
+			iconChoices: ICON_CHOICES,
 			optionsHighest,
-			n,
 			onOptionsHighestChange,
 			onPick,
 			onRatingIconChange,
-			outlineIcon,
 			ratingIcon,
 			t,
 			validate,
@@ -243,10 +255,6 @@ export default defineComponent({
 			color 0.1s ease-in-out,
 			transform 0.1s ease-in-out;
 
-		&--on {
-			color: var(--color-favorite, var(--color-warning));
-		}
-
 		&:hover {
 			transform: scale(1.1);
 		}
@@ -254,6 +262,10 @@ export default defineComponent({
 		&:focus-within {
 			outline: 2px solid var(--color-primary-element);
 			outline-offset: -2px;
+		}
+
+		&--on {
+			color: var(--rating-color);
 		}
 
 		@media (prefers-reduced-motion: reduce) {

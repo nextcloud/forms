@@ -705,19 +705,17 @@ class SubmissionService {
 			 * Otherwise, validate the single answer for the date/time question
 			 */
 			if (in_array($question['type'], Constants::ANSWER_TYPES_DATETIME)) {
-				$this->validateDateTime($answers[$questionId], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']], $question['text'] ?? null, $question['extraSettings'] ?? null);
+				$this->validateDateTimeQuestion($answers[$questionId], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']], $question['text'] ?? null, $question['extraSettings'] ?? null);
 			}
 
-			// Check if all answers are within the possible options
-			// A rating carries no options, so it cannot go through the predefined-option
-			// branch below, but its answer is a point on a scale exactly as a linear scale's
-			// is, so it is held to the same rule.
-			if ($question['type'] === Constants::ANSWER_TYPE_RATING) {
+			// Check if answers to scale questions are within the limits
+			if (in_array($question['type'], Constants::ANSWER_TYPES_SCALE)) {
 				foreach ($answers[$questionId] as $answer) {
-					$this->validateScaleAnswer($question, $answer);
+					$this->validateScaleQuestion($question, $answer);
 				}
 			}
 
+			// Check if all answers are within the possible options
 			if (in_array($question['type'], Constants::ANSWER_TYPES_PREDEFINED)) {
 				// Normalize option IDs once for consistent comparison (DB may return ints, request may send strings)
 				$optionIds = $this->normalizeOptionIds($question['options'] ?? []);
@@ -725,7 +723,7 @@ class SubmissionService {
 				foreach ($answers[$questionId] as $answer) {
 					// Handle linear scale questions
 					if ($question['type'] === Constants::ANSWER_TYPE_LINEARSCALE) {
-						$this->validateScaleAnswer($question, $answer);
+						$this->validateScaleQuestion($question, $answer);
 					}
 					// Check if all grid rows, columns and values match the configured grid subtype
 					elseif ($question['type'] === Constants::ANSWER_TYPE_GRID) {
@@ -947,7 +945,7 @@ class SubmissionService {
 	 * @param mixed $answer one submitted value
 	 * @throws \InvalidArgumentException if the answer is not a whole number within range
 	 */
-	private function validateScaleAnswer(array $question, mixed $answer): void {
+	private function validateScaleQuestion(array $question, mixed $answer): void {
 		$optionsLowest = $question['extraSettings']['optionsLowest'] ?? 1;
 		$optionsHighest = $question['extraSettings']['optionsHighest'] ?? 5;
 		if (!ctype_digit((string)$answer) || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
@@ -962,7 +960,7 @@ class SubmissionService {
 	 * @param string|null $text String with the title of the question
 	 * @param array|null $extraSettings Array with extra settings for validation
 	 */
-	private function validateDateTime(array $answers, string $format, ?string $text = null, ?array $extraSettings = null): void {
+	private function validateDateTimeQuestion(array $answers, string $format, ?string $text = null, ?array $extraSettings = null): void {
 		$previousDate = null;
 
 		foreach ($answers as $dateStr) {
