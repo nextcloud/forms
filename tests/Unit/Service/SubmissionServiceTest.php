@@ -885,6 +885,47 @@ file2.txt"
 				// Expected Result
 				null,
 			],
+			'empty-answers-to-optional-questions' => [
+				[
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false],
+					['id' => 2, 'type' => 'multiple', 'text' => 'q2', 'isRequired' => false, 'extraSettings' => ['optionsLimitMin' => 2], 'options' => [
+						['id' => 3],
+						['id' => 5],
+					]],
+				],
+				['1' => [], '2' => []],
+				null,
+			],
+			'empty-answer-to-required-question' => [
+				[
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => true],
+				],
+				['1' => []],
+				'Question "q1" is required.',
+			],
+			'answer-that-is-no-list' => [
+				[
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false],
+				],
+				['1' => ['first' => 'text']],
+				'Invalid answer for question "q1".',
+			],
+			'answer-with-a-value-that-is-no-text' => [
+				[
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false],
+				],
+				['1' => [null]],
+				'Invalid answer for question "q1".',
+			],
+			'answer-that-is-no-array' => [
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => false, 'options' => [
+						['id' => 3],
+					]],
+				],
+				['1' => '3'],
+				'Invalid answer for question "q1".',
+			],
 			'invalid-short-phone' => [
 				// Questions
 				[
