@@ -255,6 +255,27 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		await expect(page.locator('#q1_desc')).toContainText('Upload your file')
 	})
 
+	test('File question upload button has an accessible name', async ({
+		appNavigation,
+		form,
+		topBar,
+		page,
+	}) => {
+		await appNavigation.clickNewForm()
+		await form.fillTitle('Test form')
+
+		await form.addQuestion(QuestionType.File)
+		const questions = await form.getQuestions()
+		await questions[0].fillTitle('My file question')
+
+		await topBar.toggleView(FormsView.View)
+
+		const question = page.getByRole('listitem', { name: /Question number 1/ })
+		await expect(
+			question.getByRole('button', { name: 'Upload a file' }),
+		).toBeVisible()
+	})
+
 	test('Color question with description has aria-labelledby and aria-describedby', async ({
 		appNavigation,
 		form,

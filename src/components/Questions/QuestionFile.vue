@@ -134,6 +134,7 @@
 								@input="onFileInput" />
 						</label>
 						<NcButton
+							:aria-label="uploadButtonLabel"
 							:disabled="
 								!readOnly || values.length >= maxAllowedFilesCount
 							"
@@ -266,6 +267,12 @@ export default defineComponent({
 
 		const maxAllowedFilesCount = computed<number>(() => {
 			return extraSettings.value.maxAllowedFilesCount ?? 1
+		})
+
+		const uploadButtonLabel = computed<string>(() => {
+			return maxAllowedFilesCount.value > 1
+				? t('forms', 'Upload files')
+				: t('forms', 'Upload a file')
 		})
 
 		const allowedFileExtensions = computed<string[]>(() => {
@@ -532,6 +539,7 @@ export default defineComponent({
 			availableUnits,
 			uploadedFiles,
 			maxAllowedFilesCount,
+			uploadButtonLabel,
 			allowedFileExtensions,
 			allowedFileTypes,
 			allowedFileTypesLabel,
