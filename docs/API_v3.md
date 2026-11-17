@@ -407,6 +407,7 @@ Returns the requested question and options of the given form (without submission
   | _questionId_ | Integer | ID of the question |
  - Response: An object of the requested question including options.
    Before the opening date (`opens`) of the form, users who can neither edit the form nor see its results get a **Forbidden** response.
+   A deleted question gets a **Not Found** response.
 
 ```
 "data": {
