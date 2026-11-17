@@ -1650,6 +1650,51 @@ file2.txt"
 				],
 				'Answer "99" for question "When can you meet?" is not a valid option.',
 			],
+			'valid-datepoll-yes-within-person-limit' => [
+				[
+					['id' => 1, 'type' => 'datepoll', 'text' => 'When can you meet?', 'isRequired' => false, 'extraSettings' => ['allowMaybe' => true, 'yesLimitPerPerson' => 1], 'options' => [
+						['id' => 10],
+						['id' => 11],
+					]]
+				],
+				[
+					'1' => [
+						10 => 'yes',
+						11 => 'no',
+					],
+				],
+				null,
+			],
+			'invalid-datepoll-too-many-yes' => [
+				[
+					['id' => 1, 'type' => 'datepoll', 'text' => 'When can you meet?', 'isRequired' => false, 'extraSettings' => ['allowMaybe' => true, 'yesLimitPerPerson' => 1], 'options' => [
+						['id' => 10],
+						['id' => 11],
+					]]
+				],
+				[
+					'1' => [
+						10 => 'yes',
+						11 => 'yes',
+					],
+				],
+				'Question "When can you meet?" allows at most 1 yes.',
+			],
+			'valid-datepoll-unlimited-yes' => [
+				[
+					['id' => 1, 'type' => 'datepoll', 'text' => 'When can you meet?', 'isRequired' => false, 'extraSettings' => ['allowMaybe' => true, 'yesLimitPerPerson' => null], 'options' => [
+						['id' => 10],
+						['id' => 11],
+					]]
+				],
+				[
+					'1' => [
+						10 => 'yes',
+						11 => 'yes',
+					],
+				],
+				null,
+			],
 		];
 	}
 

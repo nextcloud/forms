@@ -817,6 +817,8 @@ class SubmissionService {
 
 		$optionIds = $this->normalizeOptionIds($question['options'] ?? []);
 		$allowMaybe = !empty($question['extraSettings']['allowMaybe']);
+		$yesLimit = $question['extraSettings']['yesLimitPerPerson'] ?? null;
+		$yesCount = 0;
 
 		foreach ($votes as $optionId => $vote) {
 			$normalizedId = $this->normalizeNumericOptionId($optionId);
@@ -831,6 +833,15 @@ class SubmissionService {
 			if ($vote === Constants::DATEPOLL_VOTE_MAYBE && !$allowMaybe) {
 				throw new \InvalidArgumentException(sprintf('Question "%s" does not allow maybe.', $question['text']));
 			}
+
+			if ($vote === Constants::DATEPOLL_VOTE_YES) {
+				$yesCount++;
+			}
+		}
+
+		// An empty limit means unlimited. no and maybe do not count.
+		if (is_int($yesLimit) && $yesCount > $yesLimit) {
+			throw new \InvalidArgumentException(sprintf('Question "%s" allows at most %d yes.', $question['text'], $yesLimit));
 		}
 	}
 
