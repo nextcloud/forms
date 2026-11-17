@@ -1900,6 +1900,48 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
 				'expected' => false
 			],
+			'valid-datepoll-settings' => [
+				'extraSettings' => [
+					'allowMaybe' => true,
+					'yesLimitPerPerson' => 1,
+					'yesLimitPerSlot' => 3,
+				],
+				'questionType' => Constants::ANSWER_TYPE_DATEPOLL,
+				'expected' => true
+			],
+			'valid-datepoll-unlimited' => [
+				'extraSettings' => [
+					'allowMaybe' => false,
+					'yesLimitPerPerson' => null,
+					'yesLimitPerSlot' => null,
+				],
+				'questionType' => Constants::ANSWER_TYPE_DATEPOLL,
+				'expected' => true
+			],
+			'invalid-datepoll-limit' => [
+				'extraSettings' => [
+					'yesLimitPerPerson' => 0,
+					'yesLimitPerSlot' => -1,
+				],
+				'questionType' => Constants::ANSWER_TYPE_DATEPOLL,
+				'expected' => false
+			],
+			'invalid-datepoll-settings' => [
+				'extraSettings' => [
+					'allowMaybe' => 'yes',
+					'yesLimitPerPerson' => '1',
+				],
+				'questionType' => Constants::ANSWER_TYPE_DATEPOLL,
+				'expected' => false
+			],
+			'unknown-datepoll-setting' => [
+				'extraSettings' => [
+					'allowMaybe' => true,
+					'someInvalidOption' => true,
+				],
+				'questionType' => Constants::ANSWER_TYPE_DATEPOLL,
+				'expected' => false
+			],
 		];
 	}
 

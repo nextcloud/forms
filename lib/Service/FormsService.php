@@ -907,6 +907,7 @@ class FormsService {
 			Constants::ANSWER_TYPE_SHORT => Constants::EXTRA_SETTINGS_SHORT,
 			Constants::ANSWER_TYPE_FILE => Constants::EXTRA_SETTINGS_FILE,
 			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
+			Constants::ANSWER_TYPE_DATEPOLL => Constants::EXTRA_SETTINGS_DATEPOLL,
 			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
 			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
 			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
@@ -1050,6 +1051,13 @@ class FormsService {
 			if (isset($extraSettings['optionsLowest']) && ($extraSettings['optionsLowest'] < 0 || $extraSettings['optionsLowest'] > 1)
 				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
 				return false;
+			}
+		} elseif ($questionType === Constants::ANSWER_TYPE_DATEPOLL) {
+			// Empty means unlimited. a set limit is at least one yes vote.
+			foreach (['yesLimitPerPerson', 'yesLimitPerSlot'] as $limitKey) {
+				if (isset($extraSettings[$limitKey]) && $extraSettings[$limitKey] < 1) {
+					return false;
+				}
 			}
 		}
 		return true;

@@ -21,6 +21,7 @@ namespace OCA\Forms;
  * }
  *
  * @psalm-type FormsQuestionExtraSettings = array{
+ *   allowMaybe?: bool,
  *   allowOtherAnswer?: bool,
  *   allowedFileExtensions?: list<string>,
  *   allowedFileTypes?: list<string>,
@@ -41,10 +42,12 @@ namespace OCA\Forms;
  *   timeRange?: bool,
  *   validationRegex?: string,
  *   validationType?: string,
+ *   yesLimitPerPerson?: int|null,
+ *   yesLimitPerSlot?: int|null,
  *   questionType?: string,
  * }
  *
- * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"time"|"short"|"long"|"file"|"datetime"|"grid"
+ * @psalm-type FormsQuestionType = "dropdown"|"multiple"|"multiple_unique"|"date"|"datepoll"|"time"|"short"|"long"|"file"|"datetime"|"grid"
  * @psalm-type FormsQuestionGridCellType = "checkbox"|"number"|"radio"
  *
  * @psalm-type FormsQuestion = array{

@@ -490,6 +490,9 @@
             "QuestionExtraSettings": {
                 "type": "object",
                 "properties": {
+                    "allowMaybe": {
+                        "type": "boolean"
+                    },
                     "allowOtherAnswer": {
                         "type": "boolean"
                     },
@@ -593,6 +596,28 @@
                     "validationType": {
                         "type": "string"
                     },
+                    "yesLimitPerPerson": {
+                        "oneOf": [
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
+                    "yesLimitPerSlot": {
+                        "oneOf": [
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            {
+                                "type": "null"
+                            }
+                        ]
+                    },
                     "questionType": {
                         "type": "string"
                     }
@@ -613,6 +638,7 @@
                     "multiple",
                     "multiple_unique",
                     "date",
+                    "datepoll",
                     "time",
                     "short",
                     "long",

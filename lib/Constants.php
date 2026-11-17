@@ -103,6 +103,7 @@ class Constants {
 	public const ANSWER_TYPE_COLOR = 'color';
 	public const ANSWER_TYPE_DATE = 'date';
 	public const ANSWER_TYPE_DATETIME = 'datetime';
+	public const ANSWER_TYPE_DATEPOLL = 'datepoll';
 	public const ANSWER_TYPE_DROPDOWN = 'dropdown';
 	public const ANSWER_TYPE_FILE = 'file';
 	public const ANSWER_TYPE_GRID = 'grid';
@@ -123,6 +124,7 @@ class Constants {
 		self::ANSWER_TYPE_COLOR,
 		self::ANSWER_TYPE_DATE,
 		self::ANSWER_TYPE_DATETIME,
+		self::ANSWER_TYPE_DATEPOLL,
 		self::ANSWER_TYPE_DROPDOWN,
 		self::ANSWER_TYPE_FILE,
 		self::ANSWER_TYPE_GRID,
@@ -194,6 +196,12 @@ class Constants {
 		'allowedFileExtensions' => ['array'],
 		'maxAllowedFilesCount' => ['integer'],
 		'maxFileSize' => ['integer'],
+	];
+
+	public const EXTRA_SETTINGS_DATEPOLL = [
+		'allowMaybe' => ['boolean'],
+		'yesLimitPerPerson' => ['integer', 'NULL'],
+		'yesLimitPerSlot' => ['integer', 'NULL'],
 	];
 
 	public const EXTRA_SETTINGS_DATE = [
