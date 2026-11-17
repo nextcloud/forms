@@ -1859,6 +1859,26 @@ class ApiControllerTest extends TestCase {
 		);
 	}
 
+	public function testGetDeletedQuestion(): void {
+		$form = new Form();
+		$form->setId(1);
+		$this->formMapper->method('findById')
+			->with(1)
+			->willReturn($form);
+		$this->formsService->method('hasUserAccess')
+			->with($form)
+			->willReturn(true);
+		$this->formsService->method('canSeeQuestions')
+			->with($form)
+			->willReturn(true);
+		$this->formsService->method('getQuestion')
+			->with(2)
+			->willReturn(['id' => 2, 'formId' => 1, 'order' => 0, 'text' => 'Deleted', 'extraSettings' => []]);
+
+		$this->expectException(OCSNotFoundException::class);
+		$this->apiController->getQuestion(1, 2);
+	}
+
 	public function testUpdateFormLogsLinkedResultsFile(): void {
 		$form = $this->createUpdatableForm();
 		$file = $this->createMock(File::class);
