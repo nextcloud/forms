@@ -286,13 +286,39 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		return shuffled
 	}
 
+	const queuedValues = new Map<string, unknown>()
+	const savingKeys = new Set<string>()
+
+	/**
+	 * Persist a single question field to the backend once its earlier change is saved; of the values queued meanwhile only the latest is saved.
+	 *
+	 * @param key Question property name.
+	 * @param value Question property value.
+	 */
+	async function saveQuestionProperty(key: string, value: unknown): Promise<void> {
+		queuedValues.set(key, value)
+		if (savingKeys.has(key)) {
+			return
+		}
+		savingKeys.add(key)
+		try {
+			while (queuedValues.has(key)) {
+				const queuedValue = queuedValues.get(key)
+				queuedValues.delete(key)
+				await patchQuestionProperty(key, queuedValue)
+			}
+		} finally {
+			savingKeys.delete(key)
+		}
+	}
+
 	/**
 	 * Persist a single question field to the backend.
 	 *
 	 * @param key Question property name.
 	 * @param value Question property value.
 	 */
-	async function saveQuestionProperty(
+	async function patchQuestionProperty(
 		key: string,
 		value:
 			| string
