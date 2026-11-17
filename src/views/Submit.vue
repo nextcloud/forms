@@ -632,6 +632,91 @@ export default defineComponent({
 		}
 
 		/**
+		 * The values of a grid answer for rows and columns the question still has
+		 *
+		 * @param question the grid question
+		 * @param gridValues the values by row
+		 */
+		function withExistingGridCells(
+			question: SubmitQuestion,
+			gridValues: GridQuestionValues,
+		): GridQuestionValues {
+			const optionIdsByType = (optionType: OptionType) =>
+				new Set(
+					(question.options ?? [])
+						.filter((option) => option.optionType === optionType)
+						.map((option) => option.id),
+				)
+			const rowIds = optionIdsByType(OptionType.Row)
+			const columnIds = optionIdsByType(OptionType.Column)
+
+			const existingValues: GridQuestionValues = {}
+			for (const [rowId, rowValue] of Object.entries(gridValues)) {
+				if (!rowIds.has(Number(rowId))) {
+					continue
+				}
+				if (Array.isArray(rowValue)) {
+					const columns = rowValue.filter((columnId) =>
+						columnIds.has(Number(columnId)),
+					)
+					if (columns.length > 0) {
+						existingValues[Number(rowId)] = columns
+					}
+				} else if (typeof rowValue === 'object' && rowValue !== null) {
+					const cells = Object.fromEntries(
+						Object.entries(rowValue).filter(([columnId]) =>
+							columnIds.has(Number(columnId)),
+						),
+					)
+					if (Object.keys(cells).length > 0) {
+						existingValues[Number(rowId)] = cells
+					}
+				} else if (columnIds.has(Number(rowValue))) {
+					existingValues[Number(rowId)] = rowValue
+				}
+			}
+			return existingValues
+		}
+
+		/**
+		 * The values of an answer the question still offers: its options or an answer "Other" while it allows one, the rows and columns of a grid, the values within the bounds of a linear scale
+		 *
+		 * @param question the question
+		 * @param value the values of the answer
+		 */
+		function withOfferedValues(
+			question: SubmitQuestion,
+			value: AnswerValue,
+		): AnswerValue {
+			if (!Array.isArray(value)) {
+				return question.type === 'grid'
+					? withExistingGridCells(question, value)
+					: value
+			}
+			if (question.type === 'linearscale') {
+				const lowest = Number(question.extraSettings?.optionsLowest ?? 1)
+				const highest = Number(question.extraSettings?.optionsHighest ?? 5)
+				return value.filter(
+					(choice) =>
+						Number(choice) >= lowest && Number(choice) <= highest,
+				)
+			}
+			if (!answerTypes[question.type]?.predefined) {
+				return value
+			}
+			return value.filter(
+				(choice) =>
+					(question.options ?? []).some(
+						(option) => String(option.id) === String(choice),
+					)
+					|| (!!question.extraSettings?.allowOtherAnswer
+						&& String(choice).startsWith(
+							QUESTION_EXTRASETTINGS_OTHER_PREFIX,
+						)),
+			)
+		}
+
+		/**
 		 * Initialize answers from saved state in LocalStorage
 		 */
 		function initFromLocalStorage(): void {
@@ -640,10 +725,14 @@ export default defineComponent({
 				return
 			}
 
+			const questions = new Map(
+				validQuestions.value.map((question) => [question.id, question]),
+			)
 			const localAnswers: AnswersMap = {}
 			for (const [questionId, answer] of Object.entries(savedState)) {
+				const question = questions.get(parseInt(questionId, 10))
 				// Clean up answers for questions that do not exist anymore
-				if (!validQuestionsIds.value.has(parseInt(questionId, 10))) {
+				if (!question) {
 					showClearFormDueToChangeDialog.value = true
 					logger.debug('Question does not exist anymore', {
 						questionId,
@@ -651,12 +740,12 @@ export default defineComponent({
 					continue
 				}
 
-				localAnswers[parseInt(questionId, 10)] = [
-					'QuestionMultiple',
-					'QuestionRanking',
-				].includes(answer.type)
+				const value = ['QuestionMultiple', 'QuestionRanking'].includes(
+					answer.type,
+				)
 					? (answer.value as string[]).map(String)
 					: answer.value
+				localAnswers[question.id] = withOfferedValues(question, value)
 			}
 			answers.value = localAnswers
 		}
@@ -785,55 +874,7 @@ export default defineComponent({
 						}
 					} else if (question.type === 'grid') {
 						try {
-							const gridValues = JSON.parse(text) as GridQuestionValues
-							const optionIdsByType = (optionType: OptionType) =>
-								new Set(
-									(question.options ?? [])
-										.filter(
-											(option) =>
-												option.optionType === optionType,
-										)
-										.map((option) => option.id),
-								)
-							const rowIds = optionIdsByType(OptionType.Row)
-							const columnIds = optionIdsByType(OptionType.Column)
-
-							// Drop answers for rows/columns that do not exist anymore
-							const restoredValues: GridQuestionValues = {}
-							for (const [rowId, rowValue] of Object.entries(
-								gridValues,
-							)) {
-								if (!rowIds.has(Number(rowId))) {
-									continue
-								}
-								if (Array.isArray(rowValue)) {
-									// Checkbox grid
-									const columns = rowValue.filter((columnId) =>
-										columnIds.has(Number(columnId)),
-									)
-									if (columns.length > 0) {
-										restoredValues[Number(rowId)] = columns
-									}
-								} else if (
-									typeof rowValue === 'object'
-									&& rowValue !== null
-								) {
-									// Number/text grid
-									const cells = Object.fromEntries(
-										Object.entries(rowValue).filter(
-											([columnId]) =>
-												columnIds.has(Number(columnId)),
-										),
-									)
-									if (Object.keys(cells).length > 0) {
-										restoredValues[Number(rowId)] = cells
-									}
-								} else if (columnIds.has(Number(rowValue))) {
-									// Radio grid
-									restoredValues[Number(rowId)] = rowValue
-								}
-							}
-							loaded[questionId] = restoredValues
+							loaded[questionId] = JSON.parse(text)
 						} catch (error) {
 							logger.debug(
 								`Could not parse grid answer ${text} for question ${questionId}`,
@@ -880,6 +921,14 @@ export default defineComponent({
 					}
 				}
 
+				for (const question of validQuestions.value) {
+					if (loaded[question.id] !== undefined) {
+						loaded[question.id] = withOfferedValues(
+							question,
+							loaded[question.id],
+						)
+					}
+				}
 				answers.value = loaded
 				saveAllAnswersToLocalStorage()
 			} catch (error) {
