@@ -3,7 +3,9 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import type { Page, Response } from '@playwright/test'
+import type { APIRequestContext, Page, Response } from '@playwright/test'
+
+import { expect } from '@playwright/test'
 
 const FORMS_API_PATH = '/api/v3/forms/'
 
@@ -20,4 +22,27 @@ export function waitForApiResponse(page: Page, method: string): Promise<Response
 			response.request().method() === method
 			&& response.request().url().includes(FORMS_API_PATH),
 	)
+}
+
+/**
+ * Call the Forms OCS API as the logged in user
+ *
+ * @param request the request context of the page
+ * @param method the HTTP method
+ * @param path the path below `api/v3`
+ * @param data the JSON body
+ */
+export async function api(
+	request: APIRequestContext,
+	method: string,
+	path: string,
+	data?: unknown,
+) {
+	const response = await request.fetch(`../ocs/v2.php/apps/forms/api/v3${path}`, {
+		method,
+		data,
+		headers: { 'OCS-APIRequest': 'true', Accept: 'application/json' },
+	})
+	expect(response.ok()).toBeTruthy()
+	return (await response.json()).ocs.data
 }
