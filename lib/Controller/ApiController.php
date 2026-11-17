@@ -1897,7 +1897,7 @@ class ApiController extends OCSController {
 	 * @param string[]|array<array{uploadedFileId: string, fileName?: string, uploadToken: string}> $answerArray
 	 */
 	private function storeAnswersForQuestion(Form $form, $submissionId, array $question, array $answerArray): void {
-		if ($question['type'] === Constants::ANSWER_TYPE_GRID || $question['type'] === Constants::ANSWER_TYPE_RANKING) {
+		if ($question['type'] === Constants::ANSWER_TYPE_GRID || $question['type'] === Constants::ANSWER_TYPE_RANKING || $question['type'] === Constants::ANSWER_TYPE_DATEPOLL) {
 			if (!$answerArray) {
 				return;
 			}

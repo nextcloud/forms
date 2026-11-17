@@ -679,6 +679,7 @@ class SubmissionService {
 						&& $question['type'] !== Constants::ANSWER_TYPE_FILE
 						&& $question['type'] !== Constants::ANSWER_TYPE_GRID
 						&& $question['type'] !== Constants::ANSWER_TYPE_RANKING
+						&& $question['type'] !== Constants::ANSWER_TYPE_DATEPOLL
 						&& !($question['type'] === Constants::ANSWER_TYPE_DATE && isset($question['extraSettings']['dateRange'])
 						|| $question['type'] === Constants::ANSWER_TYPE_TIME && isset($question['extraSettings']['timeRange']))) {
 				// Check if non-multiple questions have not more than one answer
@@ -692,6 +693,10 @@ class SubmissionService {
 			 */
 			if (in_array($question['type'], Constants::ANSWER_TYPES_DATETIME)) {
 				$this->validateDateTime($answers[$questionId], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']], $question['text'] ?? null, $question['extraSettings'] ?? null);
+			}
+
+			if ($question['type'] === Constants::ANSWER_TYPE_DATEPOLL) {
+				$this->validateDatePoll($question, $answers[$questionId]);
 			}
 
 			// Check if all answers are within the possible options
@@ -790,6 +795,41 @@ class SubmissionService {
 			// Search corresponding question, return false if not found
 			if (!in_array($id, array_column($questions, 'id'))) {
 				throw new \InvalidArgumentException(sprintf('Answer for non-existent question with ID %d.', $id));
+			}
+		}
+	}
+
+	/**
+	 * Each datepoll answer names a slot and votes yes, no, or maybe.
+	 * Maybe is only valid when the question allows it.
+	 *
+	 * @param array $question the question with its options and settings
+	 * @param array<int|string, mixed> $votes slot id => vote
+	 */
+	private function validateDatePoll(array $question, array $votes): void {
+		if ($votes === []) {
+			return;
+		}
+
+		if (array_is_list($votes)) {
+			throw new \InvalidArgumentException(sprintf('Question "%s" votes must name a slot.', $question['text']));
+		}
+
+		$optionIds = $this->normalizeOptionIds($question['options'] ?? []);
+		$allowMaybe = !empty($question['extraSettings']['allowMaybe']);
+
+		foreach ($votes as $optionId => $vote) {
+			$normalizedId = $this->normalizeNumericOptionId($optionId);
+			if ($normalizedId === null || !in_array($normalizedId, $optionIds, true)) {
+				throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', is_scalar($optionId) ? (string)$optionId : gettype($optionId), $question['text']));
+			}
+
+			if (!is_string($vote) || !in_array($vote, Constants::DATEPOLL_VOTES, true)) {
+				throw new \InvalidArgumentException(sprintf('Answer for question "%s" must be yes, no, or maybe.', $question['text']));
+			}
+
+			if ($vote === Constants::DATEPOLL_VOTE_MAYBE && !$allowMaybe) {
+				throw new \InvalidArgumentException(sprintf('Question "%s" does not allow maybe.', $question['text']));
 			}
 		}
 	}

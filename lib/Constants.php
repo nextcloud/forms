@@ -204,6 +204,15 @@ class Constants {
 		'yesLimitPerSlot' => ['integer', 'NULL'],
 	];
 
+	public const DATEPOLL_VOTE_YES = 'yes';
+	public const DATEPOLL_VOTE_NO = 'no';
+	public const DATEPOLL_VOTE_MAYBE = 'maybe';
+	public const DATEPOLL_VOTES = [
+		self::DATEPOLL_VOTE_YES,
+		self::DATEPOLL_VOTE_NO,
+		self::DATEPOLL_VOTE_MAYBE,
+	];
+
 	public const EXTRA_SETTINGS_DATE = [
 		'dateMax' => ['string', 'integer', 'NULL'],
 		'dateMin' => ['string', 'integer', 'NULL'],

@@ -1596,6 +1596,60 @@ file2.txt"
 				// Expected Result – required question must be answered
 				'Question "Rank these" is required.',
 			],
+			'valid-datepoll-votes' => [
+				[
+					['id' => 1, 'type' => 'datepoll', 'text' => 'When can you meet?', 'isRequired' => false, 'extraSettings' => ['allowMaybe' => true], 'options' => [
+						['id' => 10],
+						['id' => 11],
+					]]
+				],
+				[
+					'1' => [
+						10 => 'yes',
+						11 => 'maybe',
+					],
+				],
+				null,
+			],
+			'invalid-datepoll-maybe-disabled' => [
+				[
+					['id' => 1, 'type' => 'datepoll', 'text' => 'When can you meet?', 'isRequired' => false, 'extraSettings' => [], 'options' => [
+						['id' => 10],
+					]]
+				],
+				[
+					'1' => [
+						10 => 'maybe',
+					],
+				],
+				'Question "When can you meet?" does not allow maybe.',
+			],
+			'invalid-datepoll-vote' => [
+				[
+					['id' => 1, 'type' => 'datepoll', 'text' => 'When can you meet?', 'isRequired' => false, 'extraSettings' => ['allowMaybe' => true], 'options' => [
+						['id' => 10],
+					]]
+				],
+				[
+					'1' => [
+						10 => 'perhaps',
+					],
+				],
+				'Answer for question "When can you meet?" must be yes, no, or maybe.',
+			],
+			'invalid-datepoll-slot' => [
+				[
+					['id' => 1, 'type' => 'datepoll', 'text' => 'When can you meet?', 'isRequired' => false, 'extraSettings' => ['allowMaybe' => true], 'options' => [
+						['id' => 10],
+					]]
+				],
+				[
+					'1' => [
+						99 => 'yes',
+					],
+				],
+				'Answer "99" for question "When can you meet?" is not a valid option.',
+			],
 		];
 	}
 
