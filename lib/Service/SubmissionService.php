@@ -914,7 +914,7 @@ class SubmissionService {
 			}
 
 			foreach ($selectedColumnIds as $columnId) {
-				if ((!is_int($columnId) && (!is_string($columnId) || !ctype_digit($columnId))) || !in_array((int)$columnId, $columnIds, true)) {
+				if (!in_array($this->normalizeNumericOptionId($columnId), $columnIds, true)) {
 					throw new \InvalidArgumentException(sprintf('Column "%s" for question "%s" is not a valid option.', is_scalar($columnId) ? (string)$columnId : gettype($columnId), $question['text']));
 				}
 			}
@@ -926,7 +926,7 @@ class SubmissionService {
 			return $value;
 		}
 
-		if (is_string($value) && ctype_digit($value)) {
+		if (is_string($value) && ctype_digit($value) && (string)(int)$value === $value) {
 			return (int)$value;
 		}
 
