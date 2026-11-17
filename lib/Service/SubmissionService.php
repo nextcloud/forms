@@ -591,7 +591,7 @@ class SubmissionService {
 	 * @param array $question the question with its options
 	 */
 	private static function isShownToRespondents(array $question): bool {
-		if (preg_match('/^[\s\p{Z}\x{FEFF}]*$/u', (string)($question['text'] ?? '')) === 1) {
+		if (preg_match('/^[\t\n\x0B\f\r\p{Z}\x{FEFF}]*$/u', (string)($question['text'] ?? '')) === 1) {
 			return false;
 		}
 
