@@ -1646,6 +1646,23 @@ class FormsServiceTest extends TestCase {
 		$this->assertEquals($expected, $this->formsService->areExtraSettingsValid($extraSettings, $questionType));
 	}
 
+	#[DataProvider('dataIsDatePollSlot')]
+	public function testIsDatePollSlot(string $text, bool $expected) {
+		$this->assertSame($expected, $this->formsService->isDatePollSlot($text));
+	}
+
+	public static function dataIsDatePollSlot(): array {
+		return [
+			'date and time' => ['2026-11-17 10:00', true],
+			'afternoon slot' => ['2026-11-17 14:05', true],
+			'date only' => ['2026-11-17', false],
+			'words' => ['Monday 10:00', false],
+			'impossible day' => ['2026-02-31 10:00', false],
+			'seconds included' => ['2026-11-17 10:00:00', false],
+			'empty' => ['', false],
+		];
+	}
+
 	public function testAreExtraSettingsValidNormalizesLegacyDateLimitsAsUtcDates(): void {
 		$previousTimezone = date_default_timezone_get();
 		date_default_timezone_set('America/Los_Angeles');

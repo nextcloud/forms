@@ -888,6 +888,16 @@ class FormsService {
 		});
 	}
 
+	/**
+	 * A datepoll slot is a date and a time, for example 2026-11-17 10:00.
+	 */
+	public function isDatePollSlot(string $text): bool {
+		$format = Constants::ANSWER_PHPDATETIME_FORMAT[Constants::ANSWER_TYPE_DATETIME];
+		$slot = \DateTime::createFromFormat('!' . $format, $text);
+
+		return $slot !== false && $slot->format($format) === $text;
+	}
+
 	/*
 	 * Validates the extraSettings
 	 *

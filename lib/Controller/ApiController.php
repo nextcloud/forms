@@ -947,6 +947,7 @@ class ApiController extends OCSController {
 	 * @param string|null $optionType the new option type (e.g. 'row'), defaults to 'choice'
 	 * @return DataResponse<Http::STATUS_CREATED, list<FormsOption>, array{}> Returns a DataResponse containing the added options
 	 * @throws OCSBadRequestException This question is not part ot the given form
+	 * @throws OCSBadRequestException A datepoll slot must be a date and time, for example 2026-11-17 10:00
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException Current user has no permission to edit
 	 * @throws OCSNotFoundException Could not find form
@@ -986,6 +987,14 @@ class ApiController extends OCSController {
 				'questionId' => $questionId
 			]);
 			throw new OCSBadRequestException('This question is not part ot the given form');
+		}
+
+		if ($question->getType() === Constants::ANSWER_TYPE_DATEPOLL) {
+			foreach ($optionTexts as $text) {
+				if (!$this->formsService->isDatePollSlot($text)) {
+					throw new OCSBadRequestException('A datepoll slot must be a date and time, for example 2026-11-17 10:00');
+				}
+			}
 		}
 
 		// Retrieve all options sorted by 'order'. Takes the order of the last array-element and adds one.
@@ -1030,6 +1039,7 @@ class ApiController extends OCSController {
 	 * @param array<string, mixed> $keyValuePairs Array of key=>value pairs to update.
 	 * @return DataResponse<Http::STATUS_OK, int, array{}> Returns the id of the updated option
 	 * @throws OCSBadRequestException The given option id doesn't match the question or form
+	 * @throws OCSBadRequestException A datepoll slot must be a date and time, for example 2026-11-17 10:00
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException Current user has no permission to edit
 	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
@@ -1082,6 +1092,12 @@ class ApiController extends OCSController {
 		if (array_key_exists('id', $keyValuePairs) || array_key_exists('questionId', $keyValuePairs)) {
 			$this->logger->debug('Not allowed to update id or questionId');
 			throw new OCSForbiddenException('Not allowed to update id or questionId');
+		}
+
+		if ($question->getType() === Constants::ANSWER_TYPE_DATEPOLL
+			&& array_key_exists('text', $keyValuePairs)
+			&& !$this->formsService->isDatePollSlot((string)$keyValuePairs['text'])) {
+			throw new OCSBadRequestException('A datepoll slot must be a date and time, for example 2026-11-17 10:00');
 		}
 
 		// Create OptionEntity with given Params & Id.
