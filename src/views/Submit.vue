@@ -597,7 +597,7 @@ export default defineComponent({
 		 */
 		function initFromLocalStorage(): void {
 			const savedState = getFormValuesFromLocalStorage()
-			if (!savedState) {
+			if (!savedState || !props.form.questions) {
 				return
 			}
 
@@ -1102,7 +1102,7 @@ export default defineComponent({
 
 		watch(
 			() => props.hash,
-			(): void => {
+			async (hash: string): Promise<void> => {
 				// If public view, abort. Should normally not occur.
 				if (props.publicView) {
 					logger.error('Hash changed on public view. Aborting.')
@@ -1110,7 +1110,10 @@ export default defineComponent({
 				}
 				resetData()
 				// Fetch full form on change
-				void viewForm.fetchFullForm(props.form.id)
+				await viewForm.fetchFullForm(props.form.id)
+				if (hash !== props.hash) {
+					return
+				}
 				initFromLocalStorage()
 				SetWindowTitle(viewForm.formTitle.value)
 			},
