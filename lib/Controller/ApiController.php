@@ -448,6 +448,7 @@ class ApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, FormsQuestion, array{}>
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
 	 * @throws OCSForbiddenException User has no permissions to get this form
+	 * @throws OCSNotFoundException Question doesn\'t exist
 	 * @throws OCSNotFoundException Could not find form
 	 *
 	 * 200: the requested question
@@ -469,7 +470,7 @@ class ApiController extends OCSController {
 		}
 
 		$question = $this->formsService->getQuestion($questionId);
-		if ($question === null) {
+		if ($question === null || $question['order'] === 0) {
 			throw new OCSNotFoundException('Question doesn\'t exist');
 		}
 

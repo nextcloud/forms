@@ -399,6 +399,7 @@ Returns the requested question and options of the given form (without submission
   | _formId_ | Integer | ID of the form |
   | _questionId_ | Integer | ID of the question |
 - Response: An object of the requested question including options.
+  A deleted question gets a **Not Found** response.
 
 ```
 "data": {
