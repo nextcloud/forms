@@ -168,7 +168,7 @@ import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { formatFileSize } from '@nextcloud/files'
 import { loadState } from '@nextcloud/initial-state'
-import { t } from '@nextcloud/l10n'
+import { n, t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import { computed, defineComponent, onMounted, ref } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -270,9 +270,12 @@ export default defineComponent({
 		})
 
 		const uploadButtonLabel = computed<string>(() => {
-			return maxAllowedFilesCount.value > 1
-				? t('forms', 'Upload files')
-				: t('forms', 'Upload a file')
+			return n(
+				'forms',
+				'Upload a file',
+				'Upload files',
+				maxAllowedFilesCount.value,
+			)
 		})
 
 		const allowedFileExtensions = computed<string[]>(() => {
