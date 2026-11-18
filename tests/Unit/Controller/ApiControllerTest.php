@@ -1285,6 +1285,56 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->getQuestion(1, 2);
 	}
 
+	public static function dataChangeDeletedQuestion(): array {
+		return [
+			'update question' => ['updateQuestion', [1, 7, ['text' => 'New text']]],
+			'new option' => ['newOption', [1, 7, ['New option']]],
+			'update option' => ['updateOption', [1, 7, 3, ['text' => 'New text']]],
+			'delete option' => ['deleteOption', [1, 7, 3]],
+			'reorder options' => ['reorderOptions', [1, 7, [3]]],
+		];
+	}
+
+	/**
+	 * @dataProvider dataChangeDeletedQuestion
+	 */
+	public function testChangeDeletedQuestion(string $method, array $arguments): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setType(Constants::ANSWER_TYPE_MULTIPLE);
+		$question->setOrder(0);
+
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+		$this->formsService
+			->method('isFormArchived')
+			->with($form)
+			->willReturn(false);
+		$this->questionMapper
+			->method('findById')
+			->with(7)
+			->willReturn($question);
+		$this->optionMapper
+			->method('findById')
+			->with(3)
+			->willReturn(\OCA\Forms\Db\Option::fromParams(['id' => 3, 'questionId' => 7]));
+		$this->questionMapper->expects($this->never())->method('update');
+		$this->optionMapper->expects($this->never())->method('insert');
+		$this->optionMapper->expects($this->never())->method('update');
+		$this->optionMapper->expects($this->never())->method('delete');
+		$this->formMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSNotFoundException::class);
+		$this->apiController->$method(...$arguments);
+	}
+
 	public function testUpdateQuestionRejectsTypeChange(): void {
 		$form = new Form();
 		$form->setId(1);
