@@ -939,6 +939,13 @@ file2.txt"
 				[],
 				null,
 			],
+			'required-with-next-line-title-is-shown' => [
+				[
+					['id' => 1, 'type' => 'short', 'text' => "\u{0085}\u{180E}", 'isRequired' => true]
+				],
+				[],
+				"Question \"\u{0085}\u{180E}\" is required.",
+			],
 			'required-choice-without-options-is-not-shown' => [
 				[
 					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => true, 'options' => []]
