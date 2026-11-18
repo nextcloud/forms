@@ -86,4 +86,41 @@ test.describe('Edit submission', () => {
 		await submitView.submit()
 		await expect(submitView.successMessage).toBeVisible()
 	})
+
+	test('The draft of a form opened from the navigation while editing a submission is restored', async ({
+		page,
+		appNavigation,
+		form,
+		topBar,
+		resultsView,
+		submitView,
+	}) => {
+		const resultsUrl = page.url().replace(/\/submit.*$/, '/results')
+		await appNavigation.clickNewForm()
+		await expect(form.titleField).toHaveValue('')
+		await form.fillTitle('Draft form')
+		await form.addQuestion(QuestionType.ShortAnswer)
+		const questions = await form.getQuestions()
+		await questions[0].fillTitle('Pet name')
+		await topBar.toggleView(FormsView.View)
+		await submitView.fillText('Pet name', 'Rex')
+
+		page.once('dialog', (dialog) => dialog.accept())
+		await page.goto(resultsUrl)
+		await resultsView.switchToResponses()
+		await resultsView.editSubmission()
+		await expect(
+			await submitView.getGridCellInput('Skills matrix', 'Beginner', 'Python'),
+		).toBeChecked()
+		await appNavigation.getOwnForm('Draft form').click()
+		await page
+			.getByRole('dialog', { name: 'Leave form' })
+			.getByRole('button', { name: 'Leave' })
+			.click()
+
+		await expect(
+			submitView.getQuestion('Pet name').getByRole('textbox'),
+		).toHaveValue('Rex')
+		await expect(page.getByRole('dialog', { name: 'Clear form' })).toHaveCount(0)
+	})
 })

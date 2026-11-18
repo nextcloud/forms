@@ -67,6 +67,34 @@ test.describe('Form submission', () => {
 		await expect(submitView.successMessage).toBeVisible()
 	})
 
+	test('The draft of a form opened from the navigation is restored', async ({
+		page,
+		appNavigation,
+		form,
+		topBar,
+		submitView,
+	}) => {
+		const submitUrl = page.url().replace(/\/edit$/, '/submit')
+		await appNavigation.clickNewForm()
+		await expect(form.titleField).toHaveValue('')
+		await form.fillTitle('Draft form')
+		await form.addQuestion(QuestionType.ShortAnswer)
+		const questions = await form.getQuestions()
+		await questions[0].fillTitle('Pet name')
+		await topBar.toggleView(FormsView.View)
+		await submitView.fillText('Pet name', 'Rex')
+
+		page.once('dialog', (dialog) => dialog.accept())
+		await page.goto(submitUrl)
+		await expect(submitView.getQuestion('Your name')).toBeVisible()
+		await appNavigation.getOwnForm('Draft form').click()
+
+		await expect(
+			submitView.getQuestion('Pet name').getByRole('textbox'),
+		).toHaveValue('Rex')
+		await expect(page.getByRole('dialog', { name: 'Clear form' })).toHaveCount(0)
+	})
+
 	test('Partial submission succeeds when no fields are required', async ({
 		topBar,
 		submitView,
