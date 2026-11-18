@@ -134,6 +134,7 @@
 								@input="onFileInput" />
 						</label>
 						<NcButton
+							:aria-label="uploadButtonLabel"
 							:disabled="
 								!readOnly || values.length >= maxAllowedFilesCount
 							"
@@ -167,7 +168,7 @@ import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { formatFileSize } from '@nextcloud/files'
 import { loadState } from '@nextcloud/initial-state'
-import { t } from '@nextcloud/l10n'
+import { n, t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import { computed, defineComponent, onMounted, ref } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
@@ -266,6 +267,15 @@ export default defineComponent({
 
 		const maxAllowedFilesCount = computed<number>(() => {
 			return extraSettings.value.maxAllowedFilesCount ?? 1
+		})
+
+		const uploadButtonLabel = computed<string>(() => {
+			return n(
+				'forms',
+				'Upload a file',
+				'Upload files',
+				maxAllowedFilesCount.value,
+			)
 		})
 
 		const allowedFileExtensions = computed<string[]>(() => {
@@ -532,6 +542,7 @@ export default defineComponent({
 			availableUnits,
 			uploadedFiles,
 			maxAllowedFilesCount,
+			uploadButtonLabel,
 			allowedFileExtensions,
 			allowedFileTypes,
 			allowedFileTypesLabel,
