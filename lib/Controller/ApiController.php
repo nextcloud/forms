@@ -681,6 +681,10 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Question doesn\'t belong to given Form');
 		}
 
+		if ($question->getOrder() === 0) {
+			throw new OCSNotFoundException('Could not find question');
+		}
+
 		// Don't allow empty array
 		if (count($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update.');
@@ -951,6 +955,10 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('This question is not part ot the given form');
 		}
 
+		if ($question->getOrder() === 0) {
+			throw new OCSNotFoundException('Could not find question');
+		}
+
 		// Retrieve all options sorted by 'order'. Takes the order of the last array-element and adds one.
 		$options = $this->optionMapper->findByQuestion($questionId, $optionType);
 		$lastOption = array_pop($options);
@@ -1035,6 +1043,10 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('The given option id doesn\'t match the question or form.');
 		}
 
+		if ($question->getOrder() === 0) {
+			throw new OCSNotFoundException('Could not find question');
+		}
+
 		// Don't allow empty array
 		if (count($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update');
@@ -1104,6 +1116,10 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('The given option id doesn\'t match the question or form.');
 		}
 
+		if ($question->getOrder() === 0) {
+			throw new OCSNotFoundException('Could not find question');
+		}
+
 		$this->optionMapper->delete($option);
 
 		// Reorder the remaining options
@@ -1160,6 +1176,10 @@ class ApiController extends OCSController {
 		if ($question->getFormId() !== $formId) {
 			$this->logger->debug('The given question id doesn\'t match the form.');
 			throw new OCSBadRequestException('The given question id doesn\'t match the form.');
+		}
+
+		if ($question->getOrder() === 0) {
+			throw new OCSNotFoundException('Could not find question');
 		}
 
 		// Check if array contains duplicates
