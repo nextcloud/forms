@@ -31,12 +31,14 @@ use OCA\Forms\Service\SubmissionService;
 use OCP\AppFramework\Db\DoesNotExistException;
 use OCP\AppFramework\Db\IMapperException;
 use OCP\AppFramework\Http;
+use OCP\AppFramework\Http\Attribute\AnonRateLimit;
 use OCP\AppFramework\Http\Attribute\ApiRoute;
 use OCP\AppFramework\Http\Attribute\BruteForceProtection;
 use OCP\AppFramework\Http\Attribute\CORS;
 use OCP\AppFramework\Http\Attribute\NoAdminRequired;
 use OCP\AppFramework\Http\Attribute\NoCSRFRequired;
 use OCP\AppFramework\Http\Attribute\PublicPage;
+use OCP\AppFramework\Http\Attribute\UserRateLimit;
 use OCP\AppFramework\Http\DataDownloadResponse;
 use OCP\AppFramework\Http\DataResponse;
 use OCP\AppFramework\OCS\OCSBadRequestException;
@@ -1440,6 +1442,8 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
 	#[PublicPage()]
+	#[UserRateLimit(limit: 10, period: 60)]
+	#[AnonRateLimit(limit: 60, period: 60)]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions')]
 	public function newSubmission(int $formId, array $answers, string $shareHash = ''): DataResponse {
 		$this->logger->debug('Inserting submission: formId: {formId}, answers: {answers}, shareHash: {shareHash}', [
@@ -1530,6 +1534,8 @@ class ApiController extends OCSController {
 	#[NoAdminRequired()]
 	#[NoCSRFRequired()]
 	#[PublicPage()]
+	#[UserRateLimit(limit: 10, period: 60)]
+	#[AnonRateLimit(limit: 60, period: 60)]
 	#[ApiRoute(verb: 'PUT', url: '/api/v3/forms/{formId}/submissions/{submissionId}')]
 	public function updateSubmission(int $formId, int $submissionId, array $answers): DataResponse {
 		$this->logger->debug('Updating submission: formId: {formId}, answers: {answers}', [
@@ -1699,6 +1705,8 @@ class ApiController extends OCSController {
 	#[PublicPage()]
 	#[NoAdminRequired()]
 	#[BruteForceProtection(action: 'form')]
+	#[UserRateLimit(limit: 30, period: 60)]
+	#[AnonRateLimit(limit: 180, period: 60)]
 	#[ApiRoute(verb: 'POST', url: '/api/v3/forms/{formId}/submissions/files/{questionId}')]
 	public function uploadFiles(int $formId, int $questionId, string $shareHash = ''): DataResponse {
 		$this->logger->debug('Uploading files for formId: {formId}, questionId: {questionId}', [
