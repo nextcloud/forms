@@ -50,17 +50,11 @@
 				:key="value"
 				class="rating__icon"
 				:class="{ 'rating__icon--on': value <= currentValue }">
-				<!-- TRANSLATORS Accessible name of one option of a rating, e.g. "3 of 5" -->
 				<input
 					class="rating__input"
 					type="radio"
 					:name="`rating_${id}`"
-					:aria-label="
-						t('forms', '{value} of {max}', {
-							value,
-							max: optionsHighest,
-						})
-					"
+					:aria-label="optionLabel(value)"
 					:aria-errormessage="hasError ? errorId : undefined"
 					:aria-invalid="hasError ? 'true' : undefined"
 					:value="value"
@@ -182,6 +176,17 @@ export default defineComponent({
 		)
 
 		/**
+		 * @param value one value of the rating
+		 */
+		function optionLabel(value: number): string {
+			// TRANSLATORS Accessible name of one option of a rating, e.g. "3 of 5"
+			return t('forms', '{value} of {max}', {
+				value,
+				max: optionsHighest.value,
+			})
+		}
+
+		/**
 		 * @param value the chosen rating
 		 */
 		function onPick(value: number): void {
@@ -232,6 +237,7 @@ export default defineComponent({
 			onOptionsHighestChange,
 			onPick,
 			onRatingIconChange,
+			optionLabel,
 			rootElement,
 			t,
 			validate,
