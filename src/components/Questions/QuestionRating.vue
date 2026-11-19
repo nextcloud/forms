@@ -17,6 +17,7 @@
 				type="multiselect"
 				:clearable="false"
 				:label="t('forms', 'Highest rating')"
+				:aria-label-combobox="t('forms', 'Highest rating')"
 				labelOutside
 				:options="[2, 3, 4, 5, 6, 7, 8, 9, 10]"
 				required
@@ -25,6 +26,8 @@
 					<NcIconSvgWrapper :svg="currentIconChoice.outline" />
 				</template>
 			</NcActionInput>
+			<!-- TRANSLATORS Caption of the choice between stars, hearts and thumbs up as the icons of a rating -->
+			<NcActionCaption :name="t('forms', 'Icon')" />
 			<NcActionRadio
 				v-for="icon in iconChoices"
 				:key="icon.id"
@@ -91,6 +94,7 @@ import IconThumbFilled from '@material-symbols/svg-400/outlined/thumb_up-fill.sv
 import IconThumb from '@material-symbols/svg-400/outlined/thumb_up.svg?raw'
 import { t } from '@nextcloud/l10n'
 import { computed, defineComponent, ref } from 'vue'
+import NcActionCaption from '@nextcloud/vue/components/NcActionCaption'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
@@ -142,6 +146,7 @@ export default defineComponent({
 	name: 'QuestionRating',
 
 	components: {
+		NcActionCaption,
 		NcActionInput,
 		NcActionRadio,
 		NcIconSvgWrapper,
