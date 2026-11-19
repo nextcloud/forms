@@ -275,7 +275,7 @@ export default defineComponent({
 			transform: scale(1.1);
 		}
 
-		&:focus-within {
+		&:has(:focus-visible) {
 			outline: 2px solid var(--color-primary-element);
 			outline-offset: -2px;
 		}
