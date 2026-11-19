@@ -305,6 +305,7 @@ export default defineComponent({
 
 	&:disabled &__icon {
 		cursor: default;
+		transform: none;
 	}
 }
 </style>
