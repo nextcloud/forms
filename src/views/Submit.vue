@@ -133,7 +133,11 @@
 			</NcEmptyContent>
 
 			<!-- Questions list -->
-			<form v-else ref="formElement" @submit.prevent="onSubmit">
+			<form
+				v-else
+				ref="formElement"
+				@invalid.capture="onInvalid"
+				@submit.prevent="onSubmit">
 				<ul>
 					<component
 						:is="answerTypes[question.type].component"
@@ -947,6 +951,29 @@ export default defineComponent({
 			formInputs[sourceInputIndex + 1]?.focus()
 		}
 
+		let invalidShown = false
+
+		/**
+		 * Bring the first invalid question of a submit attempt into view and focus
+		 * its input. The questions handle the invalid event themselves, which
+		 * stops the browser from doing so.
+		 *
+		 * @param event The invalid event of one input.
+		 */
+		function onInvalid(event: Event): void {
+			if (invalidShown) {
+				return
+			}
+			invalidShown = true
+			setTimeout(() => {
+				invalidShown = false
+			})
+
+			const input = event.target as HTMLElement
+			input.focus({ preventScroll: true })
+			input.closest('.question')?.scrollIntoView({ block: 'center' })
+		}
+
 		/**
 		 * Ctrl+Enter typically fires submit on forms.
 		 * Some inputs do automatically, while some need explicit handling
@@ -1255,6 +1282,7 @@ export default defineComponent({
 			isExpired,
 			isMaxSubmissionsReached,
 			loading,
+			onInvalid,
 			onKeydownCtrlEnter,
 			onKeydownEnter,
 			onSubmit,
