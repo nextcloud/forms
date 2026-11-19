@@ -47,12 +47,14 @@
 				:key="value"
 				class="rating__icon"
 				:class="{ 'rating__icon--on': value <= currentValue }">
+				<!-- TRANSLATORS Accessible name of one option of a rating, e.g. "3 of 5" -->
 				<input
 					class="hidden-visually"
 					type="radio"
 					:name="`rating_${id}`"
 					:aria-label="
-						t('forms', '%n of {max}', {
+						t('forms', '{value} of {max}', {
+							value,
 							max: optionsHighest,
 						})
 					"
