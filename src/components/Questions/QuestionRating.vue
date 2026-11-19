@@ -49,7 +49,7 @@
 				:class="{ 'rating__icon--on': value <= currentValue }">
 				<!-- TRANSLATORS Accessible name of one option of a rating, e.g. "3 of 5" -->
 				<input
-					class="hidden-visually"
+					class="rating__input"
 					type="radio"
 					:name="`rating_${id}`"
 					:aria-label="
@@ -253,6 +253,7 @@ export default defineComponent({
 		// A comfortable pointer target; the icon itself stays small.
 		min-height: var(--default-clickable-area);
 		min-width: var(--default-clickable-area);
+		position: relative;
 		transition:
 			color 0.1s ease-in-out,
 			transform 0.1s ease-in-out;
@@ -277,6 +278,16 @@ export default defineComponent({
 				transform: none;
 			}
 		}
+	}
+
+	&__input {
+		height: 1px;
+		inset-block-start: 0;
+		inset-inline-start: 0;
+		opacity: 0 !important;
+		pointer-events: none;
+		position: absolute;
+		width: 1px;
 	}
 
 	&:disabled &__icon {
