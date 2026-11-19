@@ -149,6 +149,7 @@
 				v-else
 				ref="formElement"
 				@invalid.capture="onInvalid"
+				@keydown.enter="onKeydownEnter"
 				@submit.prevent="onSubmit">
 				<ul>
 					<KeepAlive v-for="question in validQuestions" :key="question.id">
@@ -167,7 +168,6 @@
 							:index="shownQuestions.indexOf(question) + 1"
 							:maxStringLengths="maxStringLengths"
 							:values="answers[question.id]"
-							@keydown.enter="onKeydownEnter"
 							@keydown.ctrl.enter="onKeydownCtrlEnter"
 							@update:values="
 								(values: AnswerValue) => onUpdate(question, values)
@@ -1186,23 +1186,33 @@ export default defineComponent({
 		}
 
 		/**
-		 * On Enter, focus next form-element
-		 * Last form element is the submit button, the form submits on enter then
+		 * On Enter in an input, focus the next form element instead of submitting.
+		 * Ctrl+Enter, Enter on buttons and text areas, and events already handled
+		 * keep their default.
 		 *
 		 * @param event The fired event.
 		 */
-		function onKeydownEnter(
-			event: KeyboardEvent & { originalTarget?: EventTarget | null },
-		): void {
-			const formInputs = Array.from(
+		function onKeydownEnter(event: KeyboardEvent): void {
+			const source = event.target
+			if (
+				event.defaultPrevented
+				|| event.isComposing
+				|| event.keyCode === 229
+				|| event.ctrlKey
+				|| event.metaKey
+				|| !(source instanceof HTMLInputElement)
+				|| ['button', 'file', 'image', 'reset', 'submit'].includes(
+					source.type,
+				)
+			) {
+				return
+			}
+			event.preventDefault()
+
+			const elements = Array.from(
 				formElement.value?.elements ?? [],
 			) as HTMLElement[]
-			const sourceInputIndex = formInputs.findIndex(
-				(input) => input === (event.originalTarget ?? event.target),
-			)
-
-			// Focus next form element
-			formInputs[sourceInputIndex + 1]?.focus()
+			elements[elements.indexOf(source) + 1]?.focus()
 		}
 
 		let invalidShown = false

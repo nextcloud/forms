@@ -30,8 +30,7 @@
 				:type="validationObject.inputType"
 				:step="validationObject.inputType === 'number' ? 'any' : undefined"
 				@invalid.prevent="validate"
-				@input="onInput"
-				@keydown.enter.exact.prevent="onKeydownEnter" />
+				@input="onInput" />
 			<NcActions
 				v-if="!readOnly"
 				:id="validationTypeMenuId"

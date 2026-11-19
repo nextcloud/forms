@@ -101,9 +101,13 @@ test.describe('Rating question', () => {
 		await submitView.checkRadio('Rate the service', '4 of 5')
 
 		const question = submitView.getQuestion('Rate the service')
-		await question.getByRole('radio', { name: '4 of 5' }).press('Enter')
-
-		await expect(question.getByRole('radio', { name: '5 of 5' })).toBeFocused()
+		const option = question.getByRole('radio', { name: '4 of 5' })
+		for (const key of ['Enter', 'Shift+Enter']) {
+			await option.press(key)
+			await expect(
+				question.getByRole('radio', { name: '5 of 5' }),
+			).toBeFocused()
+		}
 		await expect(submitView.successMessage).toHaveCount(0)
 	})
 
