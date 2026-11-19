@@ -49,6 +49,7 @@ export interface FormsQuestionExtraSettings {
 	optionsLabelHighest?: string
 	optionsLowest?: number
 	optionsHighest?: number
+	ratingIcon?: 'star' | 'heart' | 'thumb'
 	inputType?: string
 	inputValidation?: string
 	isRange?: boolean

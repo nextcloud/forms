@@ -1071,7 +1071,8 @@ class FormsService {
 			// Ensure limits are sane. A rating cannot set optionsLowest at all, so for it
 			// only the top end is checked.
 			if (isset($extraSettings['optionsLowest']) && ($extraSettings['optionsLowest'] < 0 || $extraSettings['optionsLowest'] > 1)
-				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
+				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)
+				|| isset($extraSettings['ratingIcon']) && !in_array($extraSettings['ratingIcon'], Constants::EXTRA_SETTINGS_RATING_ICONS, true)) {
 				return false;
 			}
 		}

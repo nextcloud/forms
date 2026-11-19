@@ -261,6 +261,13 @@ class Constants {
 		'ratingIcon' => ['string', 'NULL'],
 	];
 
+	// should be in sync with ICON_CHOICES in QuestionRating.vue
+	public const EXTRA_SETTINGS_RATING_ICONS = [
+		'star',
+		'heart',
+		'thumb',
+	];
+
 	public const EXTRA_SETTINGS_RANKING = [
 		'shuffleOptions' => ['boolean'],
 		'next' => ['integer', 'string'],

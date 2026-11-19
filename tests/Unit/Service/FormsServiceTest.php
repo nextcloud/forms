@@ -1835,6 +1835,13 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_RATING,
 				'expected' => true
 			],
+			'rating-unknown-icon' => [
+				'extraSettings' => [
+					'ratingIcon' => 'smiley',
+				],
+				'questionType' => Constants::ANSWER_TYPE_RATING,
+				'expected' => false
+			],
 			'rating-top-above-scale-limit' => [
 				'extraSettings' => [
 					'optionsHighest' => 11,

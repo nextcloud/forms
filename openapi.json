@@ -621,6 +621,14 @@
                             1
                         ]
                     },
+                    "ratingIcon": {
+                        "type": "string",
+                        "enum": [
+                            "star",
+                            "heart",
+                            "thumb"
+                        ]
+                    },
                     "shuffleOptions": {
                         "type": "boolean"
                     },
