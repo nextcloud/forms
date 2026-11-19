@@ -66,7 +66,8 @@
 					:checked="value === currentValue"
 					:required="isRequired"
 					@change="onPick(value)"
-					@invalid.prevent="validate" />
+					@invalid.prevent="validate"
+					@keydown.enter.exact.prevent="onKeydownEnter" />
 				<NcIconSvgWrapper
 					:svg="
 						value <= currentValue
