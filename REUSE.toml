@@ -58,3 +58,9 @@ path = ["screenshots/*"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2023 Christian Hartmann <chris-hartmann@gmx.de>"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
+path = ["CLAUDE.md"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
