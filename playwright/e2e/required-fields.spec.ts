@@ -57,6 +57,21 @@ test.describe('Required field validation', () => {
 		await expect(submitView.successMessage).not.toBeVisible()
 	})
 
+	test('Submit brings an empty required field out of view into focus', async ({
+		page,
+		topBar,
+		submitView,
+	}) => {
+		await page.setViewportSize({ width: 420, height: 400 })
+		await topBar.toggleView(FormsView.View)
+
+		await submitView.submitButton.click()
+
+		const input = submitView.getQuestion('Required field').getByRole('textbox')
+		await expect(input).toBeFocused()
+		await expect(input).toBeInViewport()
+	})
+
 	test('Submit succeeds after filling required field', async ({
 		topBar,
 		submitView,
