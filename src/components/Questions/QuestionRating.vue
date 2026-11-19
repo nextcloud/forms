@@ -269,10 +269,6 @@ export default defineComponent({
 			color 0.1s ease-in-out,
 			transform 0.1s ease-in-out;
 
-		&:hover {
-			transform: scale(1.1);
-		}
-
 		&:has(:focus-visible) {
 			outline: 2px solid var(--color-primary-element);
 			outline-offset: -2px;
@@ -284,10 +280,6 @@ export default defineComponent({
 
 		@media (prefers-reduced-motion: reduce) {
 			transition: none;
-
-			&:hover {
-				transform: none;
-			}
 		}
 	}
 
@@ -303,7 +295,12 @@ export default defineComponent({
 
 	&:disabled &__icon {
 		cursor: default;
-		transform: none;
+	}
+
+	@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+		&:not(:disabled) &__icon:hover {
+			transform: scale(1.1);
+		}
 	}
 }
 </style>
