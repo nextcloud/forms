@@ -967,6 +967,7 @@ Store Submission to Database
     - QuestionID as key
     - An **array** of values as value --> Even for short Text Answers, wrapped into Array.
     - For Question-Types with pre-defined answers (`multiple`, `multiple_unique`, `dropdown`), the array contains the corresponding option-IDs, each as a number or as a string of exactly its digits, e.g. `12` or `"12"`, but not `"012"` or `" 12"`.
+    - For linear scale and rating questions (`linearscale`, `rating`), the array contains one value between `optionsLowest` (always 1 for a rating) and `optionsHighest`, as a number or as a string of exactly its digits, e.g. `4` or `"4"`, but not `"04"` or `4.0`.
     - For File-Uploads, the array contains objects with `uploadedFileId` and `uploadToken` (both from the [Upload a file] endpoint for the same `questionId`).
     - Answers to questions that the [jumps](DataStructure.md#jumps) of the answers skip are ignored, and a skipped required question needs no answer. The path ends at a question that has no answer and a jump per answer past the following question, so the questions after an optional one left empty need no answer either.
     - An answer "Other" is `system-other-answer:` followed by its text, and the text must not be empty.
