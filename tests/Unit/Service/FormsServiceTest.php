@@ -1857,7 +1857,6 @@ class FormsServiceTest extends TestCase {
 				'expected' => false
 			],
 			'rating-has-no-lowest-end' => [
-				// A rating always starts at 1, so the linear scale's lower bound is refused.
 				'extraSettings' => [
 					'optionsLowest' => 0,
 				],

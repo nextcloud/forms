@@ -213,8 +213,7 @@ export default defineComponent({
 		}
 
 		/**
-		 * A rating cannot be partly filled in, so the only failure is a required
-		 * question left unanswered.
+		 * Check that a required rating has an answer, and show or clear its error message
 		 */
 		async function validate(): Promise<boolean> {
 			if (props.isRequired && !currentValue.value) {
@@ -263,7 +262,6 @@ export default defineComponent({
 		cursor: pointer;
 		display: inline-flex;
 		justify-content: center;
-		// A comfortable pointer target; the icon itself stays small.
 		min-height: var(--default-clickable-area);
 		min-width: var(--default-clickable-area);
 		position: relative;

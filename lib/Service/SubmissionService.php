@@ -935,11 +935,8 @@ class SubmissionService {
 	}
 
 	/**
-	 * Check one answer to a question answered on a numbered scale.
-	 *
-	 * Shared by the linear scale and the rating, which differ only in how the scale is
-	 * drawn. The bounds and their defaults are the linear scale's; a rating does not
-	 * accept optionsLowest, so its lowest end always falls back to 1.
+	 * Check one answer to a question answered on a numbered scale, which runs from
+	 * optionsLowest (1 if not set) to optionsHighest (5 if not set)
 	 *
 	 * @param array $question the question being answered
 	 * @param mixed $answer one submitted value
