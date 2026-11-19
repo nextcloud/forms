@@ -136,12 +136,12 @@ class Constants {
 		self::ANSWER_TYPE_SHORT,
 		self::ANSWER_TYPE_TIME,
 	];
-	
+
 	// AnswerTypes for date/time questions
 	public const ANSWER_TYPES_DATETIME = [
-			self::ANSWER_TYPE_DATE,
-			self::ANSWER_TYPE_DATETIME,
-			self::ANSWER_TYPE_TIME,
+		self::ANSWER_TYPE_DATE,
+		self::ANSWER_TYPE_DATETIME,
+		self::ANSWER_TYPE_TIME,
 	];
 
 	// AnswerTypes, that need/have predefined Options
