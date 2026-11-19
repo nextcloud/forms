@@ -5,6 +5,7 @@
 
 <template>
 	<Question
+		ref="rootElement"
 		v-bind="questionProps"
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
@@ -70,6 +71,9 @@
 					" />
 			</label>
 		</fieldset>
+		<template #insert>
+			<slot name="insert" />
+		</template>
 	</Question>
 </template>
 
@@ -81,7 +85,7 @@ import IconStar from '@material-symbols/svg-400/outlined/star.svg?raw'
 import IconThumbFilled from '@material-symbols/svg-400/outlined/thumb_up-fill.svg?raw'
 import IconThumb from '@material-symbols/svg-400/outlined/thumb_up.svg?raw'
 import { t } from '@nextcloud/l10n'
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, ref } from 'vue'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
@@ -143,7 +147,8 @@ export default defineComponent({
 	emits: [...QUESTION_EMITS, 'update:values'],
 
 	setup(props, { emit }) {
-		const question = useQuestion(props, { emit })
+		const rootElement = ref<{ $el?: HTMLElement } | null>(null)
+		const question = useQuestion(props, { emit, rootElement })
 
 		const extraSettings = computed(
 			() => (props.extraSettings as Record<string, unknown> | undefined) ?? {},
@@ -225,6 +230,7 @@ export default defineComponent({
 			onPick,
 			onRatingIconChange,
 			ratingIcon,
+			rootElement,
 			t,
 			validate,
 		}
