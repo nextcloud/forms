@@ -39,6 +39,7 @@
 		<fieldset
 			class="rating"
 			:style="`--rating-color: ${currentIconChoice.color}`"
+			:aria-describedby="description ? descriptionId : undefined"
 			:disabled="!readOnly">
 			<legend class="hidden-visually">
 				{{ text || t('forms', 'Rating') }}
@@ -59,10 +60,13 @@
 							max: optionsHighest,
 						})
 					"
+					:aria-errormessage="hasError ? errorId : undefined"
+					:aria-invalid="hasError ? 'true' : undefined"
 					:value="value"
 					:checked="value === currentValue"
-					:required="isRequired && !currentValue"
-					@change="onPick(value)" />
+					:required="isRequired"
+					@change="onPick(value)"
+					@invalid.prevent="validate" />
 				<NcIconSvgWrapper
 					:svg="
 						value <= currentValue
