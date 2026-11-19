@@ -294,9 +294,9 @@ export default defineComponent({
 
 			// Also record 'No response'
 			questionOptionsStats.unshift({
-				// TRANSLATORS Counts on Results-Summary, how many users did not respond to this question.
 				local: false,
 				id: -2,
+				// TRANSLATORS Counts on Results-Summary, how many users did not respond to this question.
 				text: t('forms', 'No response'),
 				order: 0,
 				questionId: props.question.id,
