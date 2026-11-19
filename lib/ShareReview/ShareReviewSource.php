@@ -185,6 +185,7 @@ class ShareReviewSource implements IShareReviewSource {
 	 */
 	private function permissionCatalog(): array {
 		return $this->permissionCatalog ??= [
+			// TRANSLATORS Name of a share permission shown in the Share Review app: the recipient may open and view the form. Not a button.
 			self::PERMISSION_READ => new ShareReviewPermission(self::PERMISSION_READ, $this->l10n->t('Read'), priority: 80),
 			self::PERMISSION_EDIT => new ShareReviewPermission(self::PERMISSION_EDIT, $this->l10n->t('Edit form'), priority: 70),
 			self::PERMISSION_SUBMIT => new ShareReviewPermission(self::PERMISSION_SUBMIT, $this->l10n->t('Submit'), $this->l10n->t('Fill in the form'), 60),
