@@ -42,8 +42,9 @@
 		<fieldset
 			class="rating"
 			:style="`--rating-color: ${currentIconChoice.color}`"
-			:aria-labelledby="titleId"
-			:aria-describedby="description ? descriptionId : undefined"
+			:aria-label="readOnly ? undefined : text || t('forms', 'Rating')"
+			:aria-labelledby="readOnly ? titleId : undefined"
+			:aria-describedby="readOnly && description ? descriptionId : undefined"
 			:disabled="!readOnly">
 			<label
 				v-for="value in optionsHighest"

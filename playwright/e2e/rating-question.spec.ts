@@ -37,9 +37,13 @@ test.describe('Rating question', () => {
 	})
 
 	test('Names the rating by its question and each option by its value', async ({
+		page,
 		topBar,
 		submitView,
 	}) => {
+		await expect(
+			page.getByRole('group', { name: 'Rate the service' }),
+		).toBeVisible()
 		await topBar.toggleView(FormsView.View)
 
 		const group = submitView.getQuestion('Rate the service').getByRole('group')
