@@ -276,3 +276,59 @@ test('An edited submission leaves out values the questions no longer offer', asy
 		String(options[1].id),
 	])
 })
+
+test('Enter on an option moves on to the next question, past the answer "Other"', async ({
+	page,
+	submitView,
+}) => {
+	const form = await api(page.request, 'POST', '/forms')
+	await api(page.request, 'PATCH', `/forms/${form.id}`, {
+		keyValuePairs: { title: 'Enter form' },
+	})
+	const colour = await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'multiple_unique',
+		text: 'Favourite colour',
+	})
+	await api(page.request, 'PATCH', `/forms/${form.id}/questions/${colour.id}`, {
+		keyValuePairs: { extraSettings: { allowOtherAnswer: true } },
+	})
+	await api(
+		page.request,
+		'POST',
+		`/forms/${form.id}/questions/${colour.id}/options`,
+		{ optionTexts: ['Red', 'Blue'] },
+	)
+	await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'short',
+		text: 'Your name',
+	})
+	await page.goto(`apps/forms/${form.hash}/submit`)
+
+	const question = submitView.getQuestion('Favourite colour')
+	await submitView.checkRadio('Favourite colour', 'Red')
+	await question.getByRole('radio', { name: 'Red' }).press('Enter')
+	await expect(page.getByRole('textbox', { name: 'Your name' })).toBeFocused()
+
+	await submitView.checkRadio('Favourite colour', 'Other:')
+	await question.getByRole('radio', { name: 'Other:' }).press('Enter')
+	await expect(question.getByRole('textbox')).toBeFocused()
+})
+
+test('Ctrl+Enter on an option submits the form', async ({ page, submitView }) => {
+	const form = await api(page.request, 'POST', '/forms')
+	await api(page.request, 'PATCH', `/forms/${form.id}`, {
+		keyValuePairs: { title: 'Ctrl+Enter form' },
+	})
+	await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'rating',
+		text: 'Rate the service',
+	})
+	await page.goto(`apps/forms/${form.hash}/submit`)
+
+	await submitView.checkRadio('Rate the service', '4 of 5')
+	await submitView
+		.getQuestion('Rate the service')
+		.getByRole('radio', { name: '4 of 5' })
+		.press('Control+Enter')
+	await expect(submitView.successMessage).toBeVisible()
+})

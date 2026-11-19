@@ -94,6 +94,7 @@ test.describe('Rating question', () => {
 	})
 
 	test('Moves on from a rating on Enter instead of submitting', async ({
+		page,
 		topBar,
 		submitView,
 	}) => {
@@ -104,11 +105,39 @@ test.describe('Rating question', () => {
 		const option = question.getByRole('radio', { name: '4 of 5' })
 		for (const key of ['Enter', 'Shift+Enter']) {
 			await option.press(key)
-			await expect(
-				question.getByRole('radio', { name: '5 of 5' }),
-			).toBeFocused()
+			await expect(submitView.submitButton).toBeFocused()
 		}
+
+		await option.focus()
+		await page.keyboard.down('Enter')
+		await page.keyboard.down('Enter')
+		await page.keyboard.up('Enter')
+		await expect(submitView.submitButton).toBeFocused()
 		await expect(submitView.successMessage).toHaveCount(0)
+	})
+
+	test('Moves on with Enter to the chosen option of the next rating', async ({
+		form,
+		topBar,
+		submitView,
+	}) => {
+		await form.addQuestion(QuestionType.Rating)
+		const questions = await form.getQuestions()
+		await questions[1].fillTitle('Rate the food')
+		await topBar.toggleView(FormsView.View)
+		await submitView.checkRadio('Rate the service', '4 of 5')
+		await submitView.checkRadio('Rate the food', '3 of 5')
+
+		await submitView
+			.getQuestion('Rate the service')
+			.getByRole('radio', { name: '4 of 5' })
+			.press('Enter')
+
+		await expect(
+			submitView
+				.getQuestion('Rate the food')
+				.getByRole('radio', { name: '3 of 5' }),
+		).toBeFocused()
 	})
 
 	test('Shows an error when a required rating is left empty', async ({

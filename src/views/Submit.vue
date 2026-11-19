@@ -1186,9 +1186,16 @@ export default defineComponent({
 		}
 
 		/**
-		 * On Enter in an input, focus the next form element instead of submitting.
-		 * Ctrl+Enter, Enter on buttons and text areas, and events already handled
-		 * keep their default.
+		 * On Enter in an input, focus the next focusable form element instead of
+		 * submitting. The other options of the same radio group are skipped, and
+		 * a radio group with a checked option is entered at that option. From an
+		 * option other than "Other", the inputs of its question that are not
+		 * options, such as the text of the answer "Other", are skipped as well.
+		 * The button that clears the form is skipped, so Enter in the last
+		 * answer moves on to the button that submits it.
+		 * Ctrl+Enter in an input submits the form. A held Enter acts only once,
+		 * its repeats do nothing outside text areas. Enter on buttons and text
+		 * areas, and events already handled keep their default.
 		 *
 		 * @param event The fired event.
 		 */
@@ -1198,9 +1205,17 @@ export default defineComponent({
 				event.defaultPrevented
 				|| event.isComposing
 				|| event.keyCode === 229
-				|| event.ctrlKey
 				|| event.metaKey
-				|| !(source instanceof HTMLInputElement)
+				|| source instanceof HTMLTextAreaElement
+			) {
+				return
+			}
+			if (event.repeat) {
+				event.preventDefault()
+				return
+			}
+			if (
+				!(source instanceof HTMLInputElement)
 				|| ['button', 'file', 'image', 'reset', 'submit'].includes(
 					source.type,
 				)
@@ -1208,11 +1223,40 @@ export default defineComponent({
 				return
 			}
 			event.preventDefault()
+			if (event.ctrlKey) {
+				formElement.value?.requestSubmit()
+				return
+			}
 
 			const elements = Array.from(
 				formElement.value?.elements ?? [],
-			) as HTMLElement[]
-			elements[elements.indexOf(source) + 1]?.focus()
+			) as HTMLInputElement[]
+			const hasCheckedOption = (name: string) =>
+				elements.some(
+					(other) =>
+						other.type === 'radio'
+						&& other.name === name
+						&& other.checked,
+				)
+			const question = source.closest('.question')
+			const fromOption =
+				source.type === 'radio'
+				&& !source.value.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX)
+			for (const element of elements.slice(elements.indexOf(source) + 1)) {
+				if (
+					element.type === 'reset'
+					|| (element.type === 'radio'
+						? (source.type === 'radio' && element.name === source.name)
+							|| (!element.checked && hasCheckedOption(element.name))
+						: fromOption && element.closest('.question') === question)
+				) {
+					continue
+				}
+				element.focus()
+				if (document.activeElement === element) {
+					return
+				}
+			}
 		}
 
 		let invalidShown = false
