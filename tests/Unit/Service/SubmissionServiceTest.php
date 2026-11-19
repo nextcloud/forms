@@ -1044,6 +1044,18 @@ file2.txt"
 				// Expected Result
 				'The answer for question "r" must be an integer between 1 and 5.',
 			],
+			'rating-leading-zero' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['05'],
+				],
+				// Expected Result
+				'The answer for question "r" must be an integer between 1 and 5.',
+			],
 			'required-not-answered' => [
 				// Questions
 				[
@@ -1542,6 +1554,15 @@ file2.txt"
 					'1' => [['3']]
 				],
 				'Invalid answer for question "q1".',
+			],
+			'leading-zero-linearscale-answer' => [
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]]
+				],
+				[
+					'1' => ['05']
+				],
+				'The answer for question "q1" must be an integer between 0 and 5.',
 			],
 			'invalid-color-question' => [
 				// Questions

@@ -943,12 +943,12 @@ class SubmissionService {
 	 *
 	 * @param array $question the question being answered
 	 * @param mixed $answer one submitted value
-	 * @throws \InvalidArgumentException if the answer is not a whole number within range
+	 * @throws \InvalidArgumentException if the answer is not a whole number within range, written without leading zeros
 	 */
 	private function validateScaleQuestion(array $question, mixed $answer): void {
 		$optionsLowest = $question['extraSettings']['optionsLowest'] ?? 1;
 		$optionsHighest = $question['extraSettings']['optionsHighest'] ?? 5;
-		if (!is_scalar($answer) || is_bool($answer) || !ctype_digit((string)$answer) || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
+		if (!is_scalar($answer) || is_bool($answer) || !ctype_digit((string)$answer) || (string)intval($answer) !== (string)$answer || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
 			throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be an integer between %d and %d.', $question['text'], $optionsLowest, $optionsHighest));
 		}
 	}
