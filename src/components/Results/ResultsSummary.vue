@@ -326,7 +326,7 @@ export default defineComponent({
 						} else {
 							questionOptionsStats.push({
 								local: false,
-								id: -3,
+								id: -1 - questionOptionsStats.length,
 								text: answer.text,
 								order: 0,
 								questionId: props.question.id,
