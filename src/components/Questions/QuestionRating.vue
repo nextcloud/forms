@@ -31,7 +31,7 @@
 			<NcActionRadio
 				v-for="icon in iconChoices"
 				:key="icon.id"
-				:modelValue="ratingIcon"
+				:modelValue="currentIconChoice.id"
 				:name="`ratingIcon_${id}`"
 				:value="icon.id"
 				@change="onRatingIconChange(icon.id)">
@@ -139,8 +139,7 @@ const ICON_CHOICES: IconChoice[] = [
 	},
 ]
 
-const VALID_ICONS = ICON_CHOICES.map((choice) => choice.id)
-const DEFAULT_ICON = ICON_CHOICES[0].id
+const DEFAULT_ICON_CHOICE = ICON_CHOICES[0]
 
 export default defineComponent({
 	name: 'QuestionRating',
@@ -173,15 +172,11 @@ export default defineComponent({
 				: DEFAULT_OPTIONS_HIGHEST
 		})
 
-		const ratingIcon = computed<string>(() => {
-			const icon = extraSettings.value.ratingIcon
-			return typeof icon === 'string' && VALID_ICONS.includes(icon as never)
-				? icon
-				: DEFAULT_ICON
-		})
-
-		const currentIconChoice = computed(() =>
-			ICON_CHOICES.find((choice) => choice.id === ratingIcon.value)!,
+		const currentIconChoice = computed<IconChoice>(
+			() =>
+				ICON_CHOICES.find(
+					(choice) => choice.id === extraSettings.value.ratingIcon,
+				) ?? DEFAULT_ICON_CHOICE,
 		)
 
 		const currentValue = computed<number>(
@@ -189,10 +184,10 @@ export default defineComponent({
 		)
 
 		/**
-		 * @param value the chosen count, or 0 to clear the answer
+		 * @param value the chosen rating
 		 */
 		function onPick(value: number): void {
-			emit('update:values', value ? [String(value)] : [])
+			emit('update:values', [String(value)])
 			question.errorMessage.value = null
 		}
 
@@ -210,7 +205,7 @@ export default defineComponent({
 		 */
 		function onRatingIconChange(icon: string): void {
 			question.onExtraSettingsChange({
-				ratingIcon: icon === DEFAULT_ICON ? null : icon,
+				ratingIcon: icon === DEFAULT_ICON_CHOICE.id ? null : icon,
 			})
 		}
 
@@ -239,7 +234,6 @@ export default defineComponent({
 			onOptionsHighestChange,
 			onPick,
 			onRatingIconChange,
-			ratingIcon,
 			rootElement,
 			t,
 			validate,
@@ -253,7 +247,6 @@ export default defineComponent({
 	align-items: center;
 	border: none;
 	display: flex;
-	// Ten icons plus a Clear button do not fit one line on a narrow screen.
 	flex-wrap: wrap;
 	gap: 2px;
 	margin: 0;
