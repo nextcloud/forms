@@ -4,7 +4,7 @@
 -->
 
 <template>
-	<div>
+	<div class="sharing-search">
 		<NcSelectUsers
 			keepOpen
 			:loading="showLoadingCircle"
@@ -128,6 +128,14 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.sharing-search {
+	// The floating input label sits half above the field border
+	// (NcSelect uses `inset-block-start: calc(-1.5 * font-size / 2)`).
+	// This component is the first element in the sidebar tab, so leave room
+	// for that label, otherwise the tab container clips its upper half.
+	padding-block-start: calc(1.5 * var(--font-size-small, 13px) / 2);
+}
+
 .select {
 	margin-block-end: 8px !important;
 	width: 100%;
