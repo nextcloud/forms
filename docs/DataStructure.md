@@ -238,6 +238,7 @@ Currently supported Question-Types are:
 | `time`            | Showing a dropdown menu to select a time.                                                                                                                                         |
 | `file`            | One or multiple files. It is possible to specify which mime types are allowed                                                                                                     |
 | `linearscale`     | A linear or Likert scale question where you choose an option that best fits your opinion                                                                                          |
+| `rating`          | A rating from 1 to the highest value, shown as stars, hearts or thumbs up. The answer is the number of the chosen icon.                                                           |
 | `color`           | A color answer, hex string representation (e. g. `#123456`)                                                                                                                       |
 | `ranking`         | Using pre-defined options, the user ranks them from most to least preferred. Needs at least one option available. Answers are stored in ranked order (one answer row per option). |
 
@@ -264,9 +265,10 @@ Optional extra settings for some [Question Types](#question-types)
 | `timeMin`               | `time`                                         | string           | -                                           | Minimum allowed time to be chosen (as `HH:mm` string)                       |
 | `timeRange`             | `time`                                         | Boolean          | `true/false`                                | The time picker should query a time range                                   |
 | `optionsLowest`         | `linearscale`                                  | Integer          | `0, 1`                                      | Set the lowest value of the scale, default: `1`                             |
-| `optionsHighest`        | `linearscale`                                  | Integer          | `2, 3, 4, 5, 6, 7, 8, 9, 10`                | Set the highest value of the scale, default: `5`                            |
+| `optionsHighest`        | `linearscale, rating`                          | Integer          | `2, 3, 4, 5, 6, 7, 8, 9, 10`                | Set the highest value of the scale, default: `5`                            |
 | `optionsLabelLowest`    | `linearscale`                                  | string           | -                                           | Set the label of the lowest value, default: `'Strongly disagree'`           |
 | `optionsLabelHighest`   | `linearscale`                                  | string           | -                                           | Set the label of the highest value, default: `'Strongly agree'`             |
+| `ratingIcon`            | `rating`                                       | string           | `'star', 'heart', 'thumb'`                  | Set the icon of the rating, default: `'star'`                               |
 | `columns`               | `grid`                                         | Array            | -                                           | Array of column identifiers / labels for grid questions                     |
 | `rows`                  | `grid`                                         | Array            | -                                           | Array of row identifiers / labels for grid questions                        |
 | `questionType`          | `grid`                                         | String           | `checkbox`, `number`, `radio`               | Type of cell for grid questions (checkbox, numeric input, or radio)         |
