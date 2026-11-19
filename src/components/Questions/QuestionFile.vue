@@ -121,7 +121,7 @@
 							{{ t('forms', 'Add new file as answer') }}
 							<input
 								ref="fileInput"
-								class="hidden-visually"
+								class="question__file-input"
 								type="file"
 								:required="isRequired && values.length === 0"
 								:disabled="!readOnly"
@@ -597,6 +597,7 @@ export default defineComponent({
 
 		label {
 			color: var(--color-text-maxcontrast);
+			position: relative;
 
 			&:has(input:disabled) {
 				cursor: default;
@@ -613,6 +614,16 @@ export default defineComponent({
 				)
 				0;
 		}
+	}
+
+	&__file-input {
+		height: 1px;
+		inset-block-start: 0;
+		inset-inline-start: 0;
+		opacity: 0 !important;
+		pointer-events: none;
+		position: absolute;
+		width: 1px;
 	}
 }
 </style>
