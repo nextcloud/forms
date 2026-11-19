@@ -48,6 +48,7 @@ export interface AnswerTypeConfig {
 	icon: string
 	label: string
 	predefined?: boolean
+	scale?: boolean
 	validate?: (question: FormsQuestion) => boolean
 	titlePlaceholder: string
 	createPlaceholder?: string
@@ -264,6 +265,7 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 		icon: IconLinearScale,
 		label: t('forms', 'Linear scale'),
 		predefined: true,
+		scale: true,
 
 		titlePlaceholder: t('forms', 'Linear scale question title'),
 		warningInvalid: t('forms', 'This question needs a title!'),
@@ -274,6 +276,7 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 		icon: IconStar,
 		label: t('forms', 'Rating'),
 		predefined: true,
+		scale: true,
 
 		titlePlaceholder: t('forms', 'Rating question title'),
 		warningInvalid: t('forms', 'This question needs a title!'),

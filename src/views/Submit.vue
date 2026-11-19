@@ -831,7 +831,7 @@ export default defineComponent({
 		}
 
 		/**
-		 * The values of an answer the question still offers: its options or an answer "Other" while it allows one, the rows and columns of a grid, the values within the bounds of a linear scale
+		 * The values of an answer the question still offers: its options or an answer "Other" while it allows one, the rows and columns of a grid, the values within the bounds of a linear scale or rating
 		 *
 		 * @param question the question
 		 * @param value the values of the answer
@@ -845,7 +845,7 @@ export default defineComponent({
 					? withExistingGridCells(question, value)
 					: value
 			}
-			if (question.type === 'linearscale') {
+			if (answerTypes[question.type]?.scale) {
 				const lowest = Number(question.extraSettings?.optionsLowest ?? 1)
 				const highest = Number(question.extraSettings?.optionsHighest ?? 5)
 				return value.filter(

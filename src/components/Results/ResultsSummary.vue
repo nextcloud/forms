@@ -247,10 +247,7 @@ export default defineComponent({
 		const questionOptions = computed<OptionStats[]>(() => {
 			// Build list of question options
 			let questionOptionsStats: OptionStats[]
-			if (
-				props.question.type !== 'linearscale'
-				&& props.question.type !== 'rating'
-			) {
+			if (!answerTypes[props.question.type]?.scale) {
 				questionOptionsStats = (props.question.options ?? []).map(
 					(option) => ({
 						...option,
@@ -345,15 +342,12 @@ export default defineComponent({
 			})
 
 			// Sort options by response count
-			if (
-				props.question.type !== 'linearscale'
-				&& props.question.type !== 'rating'
-			) {
+			if (!answerTypes[props.question.type]?.scale) {
 				questionOptionsStats.sort(
 					(object1, object2) => object2.count - object1.count,
 				)
 			} else {
-				// for linear scale questions move the "No response" element to the end
+				// for scale questions move the "No response" element to the end
 				const noResponse = questionOptionsStats.shift()
 				if (noResponse) {
 					questionOptionsStats.push(noResponse)
