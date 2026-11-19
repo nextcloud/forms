@@ -48,7 +48,6 @@
 							<template v-if="gridCellType === 'radio'">
 								<NcCheckboxRadioSwitch
 									:modelValue="gridValue[row.id]"
-									:name="`${row.id}-answer`"
 									:value="column.id.toString()"
 									disabled
 									type="radio" />
@@ -57,7 +56,6 @@
 							<template v-if="gridCellType === 'checkbox'">
 								<NcCheckboxRadioSwitch
 									:modelValue="gridValue[row.id] || []"
-									:name="`${row.id}-answer`"
 									:value="column.id.toString()"
 									disabled
 									type="checkbox" />
