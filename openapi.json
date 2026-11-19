@@ -695,7 +695,8 @@
                     "long",
                     "file",
                     "datetime",
-                    "grid"
+                    "grid",
+                    "rating"
                 ]
             },
             "Share": {
