@@ -156,7 +156,7 @@ class Constants {
 
 	// AnswerTypes for scale questions
 	public const ANSWER_TYPES_SCALE = [
-		self::ANSWER_TYPE_RANKING,
+		self::ANSWER_TYPE_RATING,
 	];
 
 	// Formats for AnswerTypes date/datetime/time
