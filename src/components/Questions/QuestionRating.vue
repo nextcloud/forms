@@ -42,11 +42,9 @@
 		<fieldset
 			class="rating"
 			:style="`--rating-color: ${currentIconChoice.color}`"
+			:aria-labelledby="titleId"
 			:aria-describedby="description ? descriptionId : undefined"
 			:disabled="!readOnly">
-			<legend class="hidden-visually">
-				{{ text || t('forms', 'Rating') }}
-			</legend>
 			<label
 				v-for="value in optionsHighest"
 				:key="value"
