@@ -1149,15 +1149,24 @@ export default defineComponent({
 				deleteFormFieldFromLocalStorage()
 				emitEvent('forms:last-updated:set', props.form.id)
 			} catch (error) {
-				const errorMessage = (
+				const response = (
 					error as {
 						response?: {
+							status?: number
 							data?: { ocs?: { meta?: { message?: string } } }
 						}
 					}
-				).response?.data?.ocs?.meta?.message
+				).response
+				const errorMessage = response?.data?.ocs?.meta?.message
 				logger.error('Error while submitting the form', { error })
-				if (errorMessage) {
+				if (response?.status === 429) {
+					showError(
+						t(
+							'forms',
+							'Too many submissions. Please wait a minute and try again.',
+						),
+					)
+				} else if (errorMessage) {
 					showError(
 						t(
 							'forms',
