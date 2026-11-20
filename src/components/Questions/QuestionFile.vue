@@ -387,28 +387,35 @@ export default defineComponent({
 				})
 			} catch (error) {
 				logger.error('Error while submitting the form', { error })
-				showError(
-					t(
-						'forms',
-						'There was an error during submitting the file: {message}.',
-						{
-							message:
-								(
-									error as {
-										response?: {
-											data?: {
-												ocs?: {
-													meta?: {
-														message?: string
-													}
-												}
-											}
-										}
-									}
-								).response?.data?.ocs?.meta?.message ?? '',
-						},
-					),
-				)
+				const errorResponse = (
+					error as {
+						response?: {
+							status?: number
+							data?: { ocs?: { meta?: { message?: string } } }
+						}
+					}
+				).response
+				const message = errorResponse?.data?.ocs?.meta?.message
+				if (errorResponse?.status === 429) {
+					showError(
+						t(
+							'forms',
+							'Too many submissions. Please wait a minute and try again.',
+						),
+					)
+				} else if (message) {
+					showError(
+						t(
+							'forms',
+							'There was an error during submitting the file: {message}.',
+							{ message },
+						),
+					)
+				} else {
+					showError(
+						t('forms', 'There was an error during submitting the file.'),
+					)
+				}
 
 				return
 			} finally {
