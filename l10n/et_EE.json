@@ -140,6 +140,7 @@
     "Earliest time" : "Varaseim aeg",
     "Latest time" : "Viimane aeg",
     "Shuffle options" : "Segamise valikud",
+    "_Upload a file_::_Upload files_" : ["Laadi fail üles","Laadi failid üles"],
     "Allowed file types: {fileTypes}." : "Lubatud failitüübid: {fileTypes}.",
     "All file types are allowed." : "Kõik failitüübid on lubatud.",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "„{fileName}“ fail on liiga suur. Failimahu ülempiir on {maxFileSize}.",

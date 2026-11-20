@@ -142,6 +142,7 @@ OC.L10N.register(
     "Earliest time" : "Tidligste tidspunkt",
     "Latest time" : "Seneste tidspunkt",
     "Shuffle options" : "Bland muligheder",
+    "_Upload a file_::_Upload files_" : ["Overfør en fil","Overfør filer"],
     "Allowed file types: {fileTypes}." : "Tilladte filtyper: {fileTypes}.",
     "All file types are allowed." : "Alle filtyper er tilladte.",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "Filen {fileName} er for stor. Den maksimale filstørrelse er {maxFileSize}.",
