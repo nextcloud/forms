@@ -93,18 +93,26 @@
 						<li
 							v-for="(option, index) in rankedOptions"
 							:key="option.id"
-							class="ranking-item">
+							class="ranking-item"
+							:class="{
+								'ranking-item--menu-open':
+									openMenuOptionId === option.id,
+							}">
 							<NcActions
 								:id="`ranking-${option.id}-drag`"
 								:container="`#ranking-${option.id}-drag`"
 								:aria-label="t('forms', 'Move option actions')"
 								class="ranking-item__drag-handle"
-								variant="tertiary-no-background">
+								variant="tertiary-no-background"
+								@update:open="onMenuToggle(option.id, $event)">
 								<template #icon>
 									<NcIconSvgWrapper :svg="IconDragIndicator" />
 								</template>
 								<NcActionButton
-									ref="buttonOptionUp"
+									:ref="
+										(button) =>
+											setMoveButton(`${option.id}-up`, button)
+									"
 									:disabled="index === 0"
 									@click="onMoveUp(index)">
 									<template #icon>
@@ -113,7 +121,13 @@
 									{{ t('forms', 'Move option up') }}
 								</NcActionButton>
 								<NcActionButton
-									ref="buttonOptionDown"
+									:ref="
+										(button) =>
+											setMoveButton(
+												`${option.id}-down`,
+												button,
+											)
+									"
 									:disabled="index === rankedOptions.length - 1"
 									@click="onMoveDown(index)">
 									<template #icon>
@@ -227,6 +241,7 @@ import {
 	useQuestionMultiple,
 } from '../../composables/useQuestionMultiple.ts'
 import { OptionType } from '../../models/Constants.ts'
+import focusActionItem from '../../utils/FocusActionItem.ts'
 
 export default defineComponent({
 	name: 'QuestionRanking',
@@ -265,12 +280,8 @@ export default defineComponent({
 			input,
 			isLoading,
 		})
-		const buttonOptionUp = ref<Array<{ $el?: { focus?: () => void } } | null>>(
-			[],
-		)
-		const buttonOptionDown = ref<Array<{ $el?: { focus?: () => void } } | null>>(
-			[],
-		)
+		const moveButtons = new Map<string, HTMLElement>()
+		const openMenuOptionId = ref<number | null>(null)
 		const isDragging = ref(false)
 		const isRanking = ref(false)
 		const isOptionDialogShown = ref(false)
@@ -400,23 +411,43 @@ export default defineComponent({
 		}
 
 		/**
-		 * Re-focus a button ref inside a v-for after reorder
+		 * Register or unregister the root element of a move button.
 		 *
-		 * @param refName The ref name ('buttonOptionUp' or 'buttonOptionDown')
-		 * @param index The index of the item in the v-for
+		 * @param key The option id and direction, e.g. `12-up`
+		 * @param button The `NcActionButton` instance, or null when unmounted
 		 */
-		const focusButton = (
-			refName: 'buttonOptionUp' | 'buttonOptionDown',
-			index: number,
-		): void => {
+		const setMoveButton = (key: string, button: unknown): void => {
+			const item = (button as { $el?: HTMLElement } | null)?.$el
+			if (item) {
+				moveButtons.set(key, item)
+			} else {
+				moveButtons.delete(key)
+			}
+		}
+
+		/**
+		 * Track which ranked option has its move menu open.
+		 *
+		 * @param optionId The option id of the menu
+		 * @param open Whether the menu is open
+		 */
+		const onMenuToggle = (optionId: number, open: boolean): void => {
+			if (open) {
+				openMenuOptionId.value = optionId
+			} else if (openMenuOptionId.value === optionId) {
+				openMenuOptionId.value = null
+			}
+		}
+
+		/**
+		 * Restore focus to a move button of an option after reordering.
+		 *
+		 * @param direction The move button to focus
+		 * @param optionId The id of the moved option
+		 */
+		const focusButton = (direction: 'up' | 'down', optionId: number): void => {
 			nextTick(() => {
-				const refs =
-					refName === 'buttonOptionUp'
-						? buttonOptionUp.value
-						: buttonOptionDown.value
-				if (Array.isArray(refs) && refs[index]) {
-					refs[index].$el?.focus?.()
-				}
+				focusActionItem(moveButtons.get(`${optionId}-${direction}`))
 			})
 		}
 
@@ -432,10 +463,7 @@ export default defineComponent({
 			rankedOptions.value = items
 			emitValues()
 			const newIndex = index - 1
-			focusButton(
-				newIndex > 0 ? 'buttonOptionUp' : 'buttonOptionDown',
-				newIndex,
-			)
+			focusButton(newIndex > 0 ? 'up' : 'down', items[newIndex].id)
 		}
 
 		/**
@@ -451,10 +479,8 @@ export default defineComponent({
 			emitValues()
 			const newIndex = index + 1
 			focusButton(
-				newIndex < rankedOptions.value.length - 1
-					? 'buttonOptionDown'
-					: 'buttonOptionUp',
-				newIndex,
+				newIndex < items.length - 1 ? 'down' : 'up',
+				items[newIndex].id,
 			)
 		}
 
@@ -492,8 +518,6 @@ export default defineComponent({
 			...question,
 			rootElement,
 			...questionMultiple,
-			buttonOptionDown,
-			buttonOptionUp,
 			choices,
 			input,
 			initRankedOptions,
@@ -508,13 +532,16 @@ export default defineComponent({
 			IconDragIndicator,
 			onDragEnd,
 			onDragStart,
+			onMenuToggle,
 			onMoveDown,
 			onMoveUp,
 			onRankingEnd,
 			onRankingStart,
+			openMenuOptionId,
 			OptionType,
 			rankedOptions,
 			rankOption,
+			setMoveButton,
 			shiftDragHandle,
 			t,
 			unrankedOptions,
@@ -592,6 +619,7 @@ export default defineComponent({
 }
 
 .ranking-item {
+	position: relative;
 	display: flex;
 	align-items: center;
 	min-height: var(--default-clickable-area);
@@ -604,6 +632,10 @@ export default defineComponent({
 	&:hover,
 	&:focus-within {
 		background-color: var(--color-background-hover);
+	}
+
+	&--menu-open {
+		z-index: 1;
 	}
 
 	&__position {
