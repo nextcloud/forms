@@ -5,6 +5,39 @@
 
 # Changelog
 
+## v5.4.3 - 2026-11-19
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.2...v5.4.3)
+
+### Fixed
+
+- [stable5.4] fix(file): keep the file question in view when its input gets focus by @backportbot[bot] in [\#3939](https://github.com/nextcloud/forms/pull/3939)
+- [stable5.4] fix(sharing): keep the search field label visible when it floats by @backportbot[bot] in [\#3938](https://github.com/nextcloud/forms/pull/3938)
+- [stable5.4] fix(grid): keep the radios of a grid apart from other questions by @backportbot[bot] in [\#3936](https://github.com/nextcloud/forms/pull/3936)
+- [stable5.4] fix(submit): show the first unanswered required question on submit by @backportbot[bot] in [\#3934](https://github.com/nextcloud/forms/pull/3934)
+- [stable5.4] fix(results): give every answer outside the options its own id by @backportbot[bot] in [\#3933](https://github.com/nextcloud/forms/pull/3933)
+- [stable5.4] fix(api): rate-limit the public submission endpoints by @backportbot[bot] in [\#3932](https://github.com/nextcloud/forms/pull/3932)
+- [stable5.4] fix(a11y): give the file upload button an accessible name by @backportbot[bot] in [\#3922](https://github.com/nextcloud/forms/pull/3922)
+- [stable5.4] fix(submission): use the same answer checks for validating and storing by @backportbot[bot] in [\#3921](https://github.com/nextcloud/forms/pull/3921)
+- [stable5.4] fix(editor): save the changes of a question one after another by @backportbot[bot] in [\#3920](https://github.com/nextcloud/forms/pull/3920)
+- [stable5.4] fix(submit): leave removed values out of restored answers by @backportbot[bot] in [\#3919](https://github.com/nextcloud/forms/pull/3919)
+- [stable5.4] fix(submission): count the same titles as blank as the submit view by @backportbot[bot] in [\#3918](https://github.com/nextcloud/forms/pull/3918)
+- [stable5.4] fix(submit): restore the draft of a form opened from the navigation by @backportbot[bot] in [\#3917](https://github.com/nextcloud/forms/pull/3917)
+- [stable5.4] fix(api): do not change deleted questions by @backportbot[bot] in [\#3911](https://github.com/nextcloud/forms/pull/3911)
+- [stable5.4] fix(api): do not return deleted questions by @backportbot[bot] in [\#3909](https://github.com/nextcloud/forms/pull/3909)
+- [stable5.4] fix(submission): only accept grid row and column ids as they are by @backportbot[bot] in [\#3906](https://github.com/nextcloud/forms/pull/3906)
+- [stable5.4] fix(submission): only accept a list of values as an answer by @backportbot[bot] in [\#3905](https://github.com/nextcloud/forms/pull/3905)
+- [stable5.4] fix: skip short answer validation for empty optional answers by @backportbot[bot] in [\#3887](https://github.com/nextcloud/forms/pull/3887)
+- [stable5.4] fix(migration): keep the option types and order of grid questions on import by @backportbot[bot] in [\#3885](https://github.com/nextcloud/forms/pull/3885)
+- [stable5.4] fix(submission): keep the text of an answer "Other" as typed by @backportbot[bot] in [\#3883](https://github.com/nextcloud/forms/pull/3883)
+- [stable5.4] fix: show form titles in the loading and lock messages as typed by @backportbot[bot] in [\#3881](https://github.com/nextcloud/forms/pull/3881)
+- [stable5.4] fix(editor): save all extra settings changed in quick succession by @backportbot[bot] in [\#3880](https://github.com/nextcloud/forms/pull/3880)
+- [stable5.4] fix(migration): skip answers of deleted questions on import by @backportbot[bot] in [\#3879](https://github.com/nextcloud/forms/pull/3879)
+- [stable5.4] fix(api): treat deleted questions as not found when deleting or copying them by @backportbot[bot] in [\#3878](https://github.com/nextcloud/forms/pull/3878)
+- [stable5.4] fix(submission): do not require hidden questions, reject booleans on linear scales by @backportbot[bot] in [\#3877](https://github.com/nextcloud/forms/pull/3877)
+- [stable5.4] fix(analytics): count answers per question and handle forms without answers by @backportbot[bot] in [\#3876](https://github.com/nextcloud/forms/pull/3876)
+- [stable5.4] fix(a11y): keep the focus and list structure in the editor by @backportbot[bot] in [\#3875](https://github.com/nextcloud/forms/pull/3875)
+
 ## v5.4.2 - 2026-11-10
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.1...v5.4.2)
