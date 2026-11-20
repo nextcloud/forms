@@ -165,6 +165,8 @@ class FormsMigrator implements IMigrator {
 				$questionIdMap = [];
 				$questionTypeMap = [];
 				$optionIdMap = [];
+				$optionIdMaps = [];
+				$questions = [];
 				foreach ($formData['questions'] as $questionData) {
 					$question = new Question();
 					$question->setFormId($form->getId());
@@ -180,6 +182,7 @@ class FormsMigrator implements IMigrator {
 					// Store QuestionId to map Answers.
 					$questionIdMap[$questionData['id']] = $question->getId();
 					$questionTypeMap[$questionData['id']] = $questionData['type'];
+					$questions[] = $question;
 
 					foreach ($questionData['options'] as $optionData) {
 						$option = new Option();
@@ -192,8 +195,13 @@ class FormsMigrator implements IMigrator {
 
 						if (isset($optionData['id'])) {
 							$optionIdMap[$optionData['id']] = $option->getId();
+							$optionIdMaps[$question->getId()][$optionData['id']] = $option->getId();
 						}
 					}
+				}
+
+				foreach (FormsService::mapJumpsOfCopies($questions, $questionIdMap, $optionIdMaps) as $question) {
+					$this->questionMapper->update($question);
 				}
 
 				if (($formData['confirmationEmailQuestionId'] ?? null) !== null

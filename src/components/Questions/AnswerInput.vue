@@ -6,77 +6,84 @@
 <template>
 	<li
 		class="question__item"
-		:class="{ 'question__item--menu-open': isMenuOpen }"
+		:class="{
+			'question__item--menu-open': isMenuOpen,
+			'question__item--with-target': !!$slots.default,
+		}"
 		@focusout="handleTabbing">
-		<NcIconSvgWrapper
-			v-if="!isDropdown"
-			:svg="pseudoIcon"
-			inline
-			class="question__item__pseudoInput" />
-		<input
-			ref="input"
-			v-model="localText"
-			:aria-label="ariaLabel"
-			:placeholder="placeholder"
-			class="question__input"
-			:class="{ 'question__input--shifted': !isDropdown }"
-			:maxlength="maxOptionLength"
-			type="text"
-			dir="auto"
-			@input="debounceOnInput"
-			@keydown.delete="deleteEntry"
-			@keydown.enter.prevent="onEnter"
-			@compositionstart="onCompositionStart"
-			@compositionend="onCompositionEnd" />
-
-		<!-- Actions for reordering and deleting the option  -->
+		<div class="question__field">
+			<NcIconSvgWrapper
+				v-if="!isDropdown"
+				:svg="pseudoIcon"
+				inline
+				class="question__item__pseudoInput" />
+			<input
+				ref="input"
+				v-model="localText"
+				:aria-label="ariaLabel"
+				:placeholder="placeholder"
+				class="question__input"
+				:class="{ 'question__input--shifted': !isDropdown }"
+				:maxlength="maxOptionLength"
+				type="text"
+				dir="auto"
+				@input="debounceOnInput"
+				@keydown.delete="deleteEntry"
+				@keydown.enter.prevent="onEnter"
+				@compositionstart="onCompositionStart"
+				@compositionend="onCompositionEnd" />
+			<!-- Actions for reordering the option  -->
+			<div v-if="!answer.local" class="option__actions option__actions--move">
+				<NcActions
+					:id="optionDragMenuId"
+					v-model:open="isMenuOpen"
+					:container="`#${optionDragMenuId}`"
+					:aria-label="t('forms', 'Move option actions')"
+					class="option__drag-handle"
+					variant="tertiary-no-background">
+					<template #icon>
+						<NcIconSvgWrapper :svg="IconDragIndicator" />
+					</template>
+					<NcActionButton
+						ref="buttonOptionUp"
+						:disabled="index === 0"
+						@click="onMoveUp">
+						<template #icon>
+							<NcIconSvgWrapper :svg="IconArrowUp" />
+						</template>
+						{{ t('forms', 'Move option up') }}
+					</NcActionButton>
+					<NcActionButton
+						ref="buttonOptionDown"
+						:disabled="index === maxIndex"
+						@click="onMoveDown">
+						<template #icon>
+							<NcIconSvgWrapper :svg="IconArrowDown" />
+						</template>
+						{{ t('forms', 'Move option down') }}
+					</NcActionButton>
+				</NcActions>
+			</div>
+			<div v-else class="option__actions">
+				<NcButton
+					:aria-label="t('forms', 'Add a new answer option')"
+					variant="tertiary"
+					:disabled="isIMEComposing || !canCreateLocalAnswer"
+					@click="createLocalAnswer">
+					<template #icon>
+						<NcIconSvgWrapper :svg="IconPlus" />
+					</template>
+				</NcButton>
+			</div>
+		</div>
+		<slot />
 		<div v-if="!answer.local" class="option__actions">
-			<NcActions
-				:id="optionDragMenuId"
-				v-model:open="isMenuOpen"
-				:container="`#${optionDragMenuId}`"
-				:aria-label="t('forms', 'Move option actions')"
-				class="option__drag-handle"
-				variant="tertiary-no-background">
-				<template #icon>
-					<NcIconSvgWrapper :svg="IconDragIndicator" />
-				</template>
-				<NcActionButton
-					ref="buttonOptionUp"
-					:disabled="index === 0"
-					@click="onMoveUp">
-					<template #icon>
-						<NcIconSvgWrapper :svg="IconArrowUp" />
-					</template>
-					{{ t('forms', 'Move option up') }}
-				</NcActionButton>
-				<NcActionButton
-					ref="buttonOptionDown"
-					:disabled="index === maxIndex"
-					@click="onMoveDown">
-					<template #icon>
-						<NcIconSvgWrapper :svg="IconArrowDown" />
-					</template>
-					{{ t('forms', 'Move option down') }}
-				</NcActionButton>
-			</NcActions>
 			<NcButton
 				:aria-label="t('forms', 'Delete answer')"
 				variant="tertiary"
 				@click="deleteEntry">
 				<template #icon>
 					<NcIconSvgWrapper :svg="IconDelete" />
-				</template>
-			</NcButton>
-		</div>
-		<div v-else class="option__actions">
-			<NcButton
-				:aria-label="t('forms', 'Add a new answer option')"
-				variant="tertiary"
-				:disabled="isIMEComposing || !canCreateLocalAnswer"
-				@click="createLocalAnswer">
-				<template #icon>
-					<NcIconSvgWrapper :svg="IconPlus" />
 				</template>
 			</NcButton>
 		</div>
@@ -603,6 +610,14 @@ export default defineComponent({
 		z-index: 2;
 	}
 
+	&:not(&--with-target) {
+		padding-block: calc(var(--default-grid-baseline) / 2);
+	}
+
+	.question__field {
+		display: contents;
+	}
+
 	&__pseudoInput {
 		color: var(--color-primary-element);
 		margin-inline-start: 2px;
@@ -615,6 +630,12 @@ export default defineComponent({
 		gap: var(--default-grid-baseline);
 		inset-inline-end: 12px;
 		height: 100%;
+
+		&--move {
+			inset-inline-end: calc(
+				12px + var(--default-clickable-area) + var(--default-grid-baseline)
+			);
+		}
 	}
 
 	.option__drag-handle {
@@ -649,6 +670,44 @@ export default defineComponent({
 				var(--default-clickable-area) + var(--default-grid-baseline)
 			) !important;
 		}
+	}
+
+	&--with-target {
+		container-type: inline-size;
+		flex-wrap: wrap;
+		align-items: center;
+		gap: var(--default-grid-baseline);
+		padding-inline-end: calc(var(--clickable-area-large) - 2px);
+
+		.question__field {
+			display: inline-flex;
+			position: relative;
+			flex: 1 1 0;
+			min-width: 0;
+			min-height: var(--default-clickable-area);
+
+			.question__input {
+				flex: 1 1 auto;
+				width: auto;
+				min-width: 0;
+
+				&--shifted {
+					margin-inline-end: calc(
+						-1 * var(--default-clickable-area)
+					) !important;
+				}
+			}
+
+			.option__actions--move {
+				inset-inline-end: var(--default-grid-baseline);
+			}
+		}
+	}
+}
+
+@container (max-width: 480px) {
+	.question__item--with-target .question__field {
+		flex-basis: 100%;
 	}
 }
 </style>

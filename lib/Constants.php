@@ -175,6 +175,7 @@ class Constants {
 	public const EXTRA_SETTINGS_DROPDOWN = [
 		'allowOtherAnswer' => ['boolean'],
 		'shuffleOptions' => ['boolean'],
+		'goTo' => ['array'],
 	];
 
 	public const EXTRA_SETTINGS_MULTIPLE = [
@@ -184,9 +185,22 @@ class Constants {
 		'shuffleOptions' => ['boolean'],
 	];
 
+	public const EXTRA_SETTINGS_MULTIPLEUNIQUE = [
+		'allowOtherAnswer' => ['boolean'],
+		'optionsLimitMax' => ['integer'],
+		'optionsLimitMin' => ['integer'],
+		'shuffleOptions' => ['boolean'],
+		'goTo' => ['array'],
+	];
+
 	public const EXTRA_SETTINGS_SHORT = [
 		'validationType' => ['string'],
 		'validationRegex' => ['string'],
+		'next' => ['integer', 'string'],
+	];
+
+	public const EXTRA_SETTINGS_LONG = [
+		'next' => ['integer', 'string'],
 	];
 
 	public const EXTRA_SETTINGS_FILE = [
@@ -194,6 +208,7 @@ class Constants {
 		'allowedFileExtensions' => ['array'],
 		'maxAllowedFilesCount' => ['integer'],
 		'maxFileSize' => ['integer'],
+		'next' => ['integer', 'string'],
 	];
 
 	public const EXTRA_SETTINGS_DATE = [
@@ -227,10 +242,16 @@ class Constants {
 		'columns' => ['array'],
 		'questionType' => ['string'],
 		'rows' => ['array'],
+		'next' => ['integer', 'string'],
 	];
 
 	public const EXTRA_SETTINGS_RANKING = [
 		'shuffleOptions' => ['boolean'],
+		'next' => ['integer', 'string'],
+	];
+
+	public const EXTRA_SETTINGS_COLOR = [
+		'next' => ['integer', 'string'],
 	];
 
 	public const EXTRA_SETTINGS_GRID_QUESTION_TYPE = [
@@ -281,6 +302,7 @@ class Constants {
 	 * Constants related to extra settings for questions
 	 */
 	public const QUESTION_EXTRASETTINGS_OTHER_PREFIX = 'system-other-answer:';
+	public const JUMP_TARGET_SUBMIT = 'submit';
 
 	/**
 	 * Maximum number of submissions returned per paginated API request.

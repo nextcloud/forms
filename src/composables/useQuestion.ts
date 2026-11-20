@@ -4,7 +4,8 @@
  */
 
 import type { Ref } from 'vue'
-import type { FormsOption } from '../types/Entities.d.ts'
+import type { FormsOption, FormsQuestion } from '../types/Entities.d.ts'
+import type { Jumps } from './useJumps.ts'
 
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
@@ -12,9 +13,11 @@ import { emit as emitEvent } from '@nextcloud/event-bus'
 import { t } from '@nextcloud/l10n'
 import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, onDeactivated, ref, toRaw, watch } from 'vue'
 import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import logger from '../utils/Logger.ts'
+import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
+import { useJumps } from './useJumps.ts'
 
 export const QUESTION_EMITS = [
 	'update:text',
@@ -108,6 +111,40 @@ export const QUESTION_PROPS = {
 		type: Boolean,
 		default: false,
 	},
+	/**
+	 * Error shown instead of the error of the last validation, `null` for none
+	 */
+	answerError: {
+		type: String,
+		default: null,
+	},
+}
+
+const questionRequests = new Map<number, Promise<unknown>>()
+
+/**
+ * Send a request once the earlier requests of the questions have finished; later requests of these questions wait for it.
+ *
+ * @param questionIds the ids of the questions the request changes
+ * @param request sends the request
+ */
+export function queueQuestionRequest<T>(
+	questionIds: number[],
+	request: () => Promise<T>,
+): Promise<T> {
+	const result = Promise.allSettled(
+		questionIds.map((id) => questionRequests.get(id)),
+	).then(request)
+	const done = result.catch(() => undefined)
+	questionIds.forEach((id) => {
+		questionRequests.set(id, done)
+		done.then(() => {
+			if (questionRequests.get(id) === done) {
+				questionRequests.delete(id)
+			}
+		})
+	})
+	return result
 }
 
 interface RootElementLike {
@@ -134,6 +171,7 @@ interface QuestionPropsLike {
 	canMoveDown: boolean
 	extraSettings: Record<string, unknown>
 	options: FormsOption[]
+	answerError?: string | null
 	[key: string]: unknown
 }
 
@@ -147,6 +185,7 @@ interface QuestionForwardedProps {
 	name: string
 	canMoveUp: boolean
 	canMoveDown: boolean
+	jumps: Jumps
 }
 
 /**
@@ -156,7 +195,47 @@ interface QuestionForwardedProps {
  * @param options Emits bridge for forwarding events to parent components.
  */
 export function useQuestion(props: QuestionPropsLike, options: UseQuestionOptions) {
-	const errorMessage = ref<string | null>(null)
+	const validationError = ref<string | null>(null)
+	const errorMessage = computed<string | null>({
+		get: () => props.answerError ?? validationError.value,
+		set: (message) => {
+			validationError.value = message
+		},
+	})
+	watch(
+		() => props.answerError,
+		(current, previous) => {
+			if (previous && !current) {
+				validationError.value = null
+			}
+		},
+	)
+	onDeactivated(() => {
+		errorMessage.value = null
+	})
+
+	let pendingExtraSettings: Record<string, unknown> = {}
+	const saveExtraSettings = debounce(function () {
+		const newExtraSettings = { ...props.extraSettings, ...pendingExtraSettings }
+		pendingExtraSettings = {}
+		options.emit('update:extraSettings', newExtraSettings)
+		saveQuestionProperty('extraSettings', newExtraSettings)
+	}, INPUT_DEBOUNCE_MS)
+
+	/**
+	 * Save changed extra settings; changes within the debounce time are saved together
+	 *
+	 * @param newSettings the changed extra settings
+	 */
+	const onExtraSettingsChange = (newSettings: Record<string, unknown>): void => {
+		pendingExtraSettings = { ...pendingExtraSettings, ...newSettings }
+		saveExtraSettings()
+	}
+
+	const jumps = useJumps(props, (newSettings: Record<string, unknown>): void => {
+		onExtraSettingsChange(newSettings)
+		saveExtraSettings.flush()
+	})
 
 	const questionProps = computed<QuestionForwardedProps>(() => ({
 		index: props.index,
@@ -168,6 +247,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		name: props.name,
 		canMoveUp: props.canMoveUp,
 		canMoveDown: props.canMoveDown,
+		jumps,
 	}))
 
 	const titleId = computed(() => {
@@ -208,24 +288,6 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		options.emit('update:isRequired', isRequiredValue)
 		saveQuestionProperty('isRequired', isRequiredValue)
 	}, INPUT_DEBOUNCE_MS)
-
-	let pendingExtraSettings: Record<string, unknown> = {}
-	const saveExtraSettings = debounce(function () {
-		const newExtraSettings = { ...props.extraSettings, ...pendingExtraSettings }
-		pendingExtraSettings = {}
-		options.emit('update:extraSettings', newExtraSettings)
-		saveQuestionProperty('extraSettings', newExtraSettings)
-	}, INPUT_DEBOUNCE_MS)
-
-	/**
-	 * Save changed extra settings; changes within the debounce time are saved together
-	 *
-	 * @param newSettings the changed extra settings
-	 */
-	const onExtraSettingsChange = (newSettings: Record<string, unknown>): void => {
-		pendingExtraSettings = { ...pendingExtraSettings, ...newSettings }
-		saveExtraSettings()
-	}
 
 	const onNameChange = debounce(function (name: string) {
 		options.emit('update:name', name)
@@ -290,7 +352,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 	const savingKeys = new Set<string>()
 
 	/**
-	 * Persist a single question field to the backend once its earlier change is saved; of the values queued meanwhile only the latest is saved.
+	 * Persist a single question field to the backend once its earlier change and the earlier requests of the question are done; of the values queued meanwhile only the latest is saved.
 	 *
 	 * @param key Question property name.
 	 * @param value Question property value.
@@ -305,7 +367,9 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 			while (queuedValues.has(key)) {
 				const queuedValue = queuedValues.get(key)
 				queuedValues.delete(key)
-				await patchQuestionProperty(key, queuedValue)
+				await queueQuestionRequest([props.id], () =>
+					patchQuestionProperty(key, queuedValue),
+				)
 			}
 		} finally {
 			savingKeys.delete(key)
@@ -314,6 +378,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 
 	/**
 	 * Persist a single question field to the backend.
+	 * Extra settings the server adjusted replace the local ones, unless these changed in the meantime.
 	 *
 	 * @param key Question property name.
 	 * @param value Question property value.
@@ -329,22 +394,38 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 			| null
 			| unknown,
 	): Promise<void> {
+		const url = generateOcsUrl(
+			'apps/forms/api/v3/forms/{id}/questions/{questionId}',
+			{
+				id: props.formId,
+				questionId: props.id,
+			},
+		)
 		try {
-			await axios.patch(
-				generateOcsUrl(
-					'apps/forms/api/v3/forms/{id}/questions/{questionId}',
-					{
-						id: props.formId,
-						questionId: props.id,
-					},
-				),
-				{
-					keyValuePairs: {
-						[key]: value,
-					},
+			const response = await axios.patch(url, {
+				keyValuePairs: {
+					[key]: value,
 				},
-			)
+			})
 			emitEvent('forms:last-updated:set', props.formId)
+			if (
+				String(response.headers['x-forms-adjusted'] ?? '').includes(
+					'removed-jumps',
+				)
+			) {
+				const question = await axios
+					.get(url)
+					.then((reply) => OcsResponse2Data<FormsQuestion>(reply))
+					.catch((error) => {
+						logger.error('Error while loading the adjusted question', {
+							error,
+						})
+						return null
+					})
+				if (question && toRaw(props.extraSettings) === value) {
+					options.emit('update:extraSettings', question.extraSettings)
+				}
+			}
 		} catch (error) {
 			logger.error('Error while saving question', { error })
 			showError(t('forms', 'Error while saving question'))
@@ -366,6 +447,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 
 	return {
 		errorMessage,
+		jumps,
 		questionProps,
 		titleId,
 		descriptionId,
