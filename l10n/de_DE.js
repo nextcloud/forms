@@ -142,6 +142,7 @@ OC.L10N.register(
     "Earliest time" : "Früheste Zeit",
     "Latest time" : "Späteste Zeit",
     "Shuffle options" : "Optionen mischen",
+    "_Upload a file_::_Upload files_" : ["Eine Datei hochladen","Dateien hochladen"],
     "Allowed file types: {fileTypes}." : "Erlaubte Dateitypen: {fileTypes}.",
     "All file types are allowed." : "Alle Dateitypen sind zulässig.",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "Die Datei {fileName} ist zu groß. Die maximale Dateigröße beträgt {maxFileSize}.",

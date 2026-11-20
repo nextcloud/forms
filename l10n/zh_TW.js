@@ -142,6 +142,7 @@ OC.L10N.register(
     "Earliest time" : "最早時間",
     "Latest time" : "最晚時間",
     "Shuffle options" : "隨機排序選項",
+    "_Upload a file_::_Upload files_" : ["上傳檔案"],
     "Allowed file types: {fileTypes}." : "允許的檔案類型：{fileTypes}。",
     "All file types are allowed." : "允許所有檔案類型。",
     "The file {fileName} is too large. The maximum file size is {maxFileSize}." : "檔案 {fileName} 太大。最大檔案大小為 {maxFileSize}。",
