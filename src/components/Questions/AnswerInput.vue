@@ -4,7 +4,10 @@
 -->
 
 <template>
-	<li class="question__item" @focusout="handleTabbing">
+	<li
+		class="question__item"
+		:class="{ 'question__item--menu-open': isMenuOpen }"
+		@focusout="handleTabbing">
 		<NcIconSvgWrapper
 			v-if="!isDropdown"
 			:svg="pseudoIcon"
@@ -30,6 +33,7 @@
 		<div v-if="!answer.local" class="option__actions">
 			<NcActions
 				:id="optionDragMenuId"
+				v-model:open="isMenuOpen"
 				:container="`#${optionDragMenuId}`"
 				:aria-label="t('forms', 'Move option actions')"
 				class="option__drag-handle"
@@ -104,6 +108,7 @@ import NcActions from '@nextcloud/vue/components/NcActions'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import { INPUT_DEBOUNCE_MS, OptionType } from '../../models/Constants.ts'
+import focusActionItem from '../../utils/FocusActionItem.ts'
 import logger from '../../utils/Logger.ts'
 import OcsResponse2Data from '../../utils/OcsResponse2Data.ts'
 
@@ -181,6 +186,7 @@ export default defineComponent({
 		const buttonOptionDown = ref<{ $el?: HTMLElement } | null>(null)
 		const buttonOptionUp = ref<{ $el?: HTMLElement } | null>(null)
 		const isIMEComposing = ref(false)
+		const isMenuOpen = ref(false)
 		const answer = computed(() => props.answer)
 		const localText = ref(answer.value.text ?? '')
 
@@ -527,7 +533,7 @@ export default defineComponent({
 					refName === 'buttonOptionDown'
 						? buttonOptionDown.value
 						: buttonOptionUp.value
-				button?.$el?.focus()
+				focusActionItem(button?.$el)
 			})
 		}
 
@@ -569,6 +575,7 @@ export default defineComponent({
 			input,
 			localText,
 			isIMEComposing,
+			isMenuOpen,
 			debounceOnInput,
 			handleTabbing,
 			focus,
@@ -591,6 +598,10 @@ export default defineComponent({
 	display: inline-flex;
 	min-height: var(--default-clickable-area);
 	width: 100%;
+
+	&--menu-open {
+		z-index: 2;
+	}
 
 	&__pseudoInput {
 		color: var(--color-primary-element);
