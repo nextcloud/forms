@@ -379,6 +379,36 @@
 		"visible": [1]
 	},
 	{
+		"name": "a rating value jumps",
+		"questions": [
+			{ "id": 1, "type": "rating", "extraSettings": { "goTo": [{ "value": 5, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["5"] },
+		"visible": [1, 3]
+	},
+	{
+		"name": "a rating value without a jump goes to the following question",
+		"questions": [
+			{ "id": 1, "type": "rating", "extraSettings": { "goTo": [{ "value": 5, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["4"] },
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "an unanswered rating with jumps ends the path",
+		"questions": [
+			{ "id": 1, "type": "rating", "extraSettings": { "goTo": [{ "value": 5, "target": 3 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": {},
+		"visible": [1]
+	},
+	{
 		"name": "the jumps of skipped questions do not count",
 		"questions": [
 			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 3 }] } },

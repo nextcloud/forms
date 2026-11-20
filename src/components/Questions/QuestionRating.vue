@@ -72,6 +72,15 @@
 					:size="34" />
 			</label>
 		</fieldset>
+		<ul v-if="jumps.showTargets" class="rating__targets">
+			<li v-for="value in optionsHighest" :key="value" class="rating__target">
+				<JumpTargetSelect
+					:modelValue="jumps.getTarget({ value })"
+					:options="jumps.targetOptions"
+					:inputLabel="getTargetInputLabel(value)"
+					@update:modelValue="jumps.setTarget({ value }, $event)" />
+			</li>
+		</ul>
 		<template #insert>
 			<slot name="insert" />
 		</template>
@@ -91,6 +100,7 @@ import NcActionCaption from '@nextcloud/vue/components/NcActionCaption'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
+import JumpTargetSelect from './JumpTargetSelect.vue'
 import Question from './Question.vue'
 import {
 	QUESTION_EMITS,
@@ -142,6 +152,7 @@ export default defineComponent({
 		NcActionInput,
 		NcActionRadio,
 		NcIconSvgWrapper,
+		JumpTargetSelect,
 		Question,
 	},
 
@@ -185,6 +196,15 @@ export default defineComponent({
 				value,
 				max: optionsHighest.value,
 			})
+		}
+
+		/**
+		 * Visible label of the select where a value of the rating goes, e.g. "Option 3 go to"
+		 *
+		 * @param value one value of the rating
+		 */
+		function getTargetInputLabel(value: number): string {
+			return t('forms', 'Option {value} go to', { value })
 		}
 
 		/**
@@ -232,6 +252,7 @@ export default defineComponent({
 			...question,
 			currentIconChoice,
 			currentValue,
+			getTargetInputLabel,
 			iconChoices: ICON_CHOICES,
 			optionsHighest,
 			onOptionsHighestChange,
@@ -296,6 +317,20 @@ export default defineComponent({
 
 	&:disabled &__icon {
 		cursor: default;
+	}
+
+	&__targets {
+		display: flex;
+		flex-direction: column;
+		gap: var(--default-grid-baseline);
+		margin-block-start: calc(2 * var(--default-grid-baseline));
+		max-width: 440px;
+		padding-inline-end: calc(var(--default-clickable-area) + 12px);
+	}
+
+	&__target {
+		display: flex;
+		container-type: inline-size;
 	}
 
 	@media (hover: hover) and (prefers-reduced-motion: no-preference) {

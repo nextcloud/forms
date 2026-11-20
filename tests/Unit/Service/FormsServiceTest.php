@@ -1772,6 +1772,21 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
 				'expected' => false,
 			],
+			'jump: goTo per rating value' => [
+				'extraSettings' => ['optionsHighest' => 3, 'goTo' => [['value' => 1, 'target' => 5], ['value' => 3, 'target' => 'submit']]],
+				'questionType' => Constants::ANSWER_TYPE_RATING,
+				'expected' => true,
+			],
+			'jump: next not offered on ratings' => [
+				'extraSettings' => ['next' => 6],
+				'questionType' => Constants::ANSWER_TYPE_RATING,
+				'expected' => false,
+			],
+			'jump: goTo with an option on a rating' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_RATING,
+				'expected' => false,
+			],
 			'jump: two jumps for one scale value' => [
 				'extraSettings' => ['goTo' => [['value' => 1, 'target' => 5], ['value' => 1, 'target' => 6]]],
 				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
@@ -2356,6 +2371,18 @@ class FormsServiceTest extends TestCase {
 		FormsService::mapJumpsOfCopies([$question], [], []);
 
 		$this->assertSame(['optionsLowest' => 1, 'optionsHighest' => 3, 'goTo' => [['value' => 3, 'target' => 'submit']]], $question->getExtraSettings());
+	}
+
+	public function testMapJumpsOfCopiesRemovesJumpsOutsideTheRating(): void {
+		$question = new Question();
+		$question->setId(10);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_RATING);
+		$question->setExtraSettings(['optionsHighest' => 3, 'goTo' => [['value' => 0, 'target' => 'submit'], ['value' => 3, 'target' => 'submit'], ['value' => 4, 'target' => 'submit']]]);
+
+		FormsService::mapJumpsOfCopies([$question], [], []);
+
+		$this->assertSame(['optionsHighest' => 3, 'goTo' => [['value' => 3, 'target' => 'submit']]], $question->getExtraSettings());
 	}
 
 	public function testMapJumpsOfCopiesWithoutJumpsLeavesTheCopiesAlone(): void {

@@ -259,6 +259,7 @@ class Constants {
 	public const EXTRA_SETTINGS_RATING = [
 		'optionsHighest' => ['integer', 'NULL'],
 		'ratingIcon' => ['string', 'NULL'],
+		'goTo' => ['array'],
 	];
 
 	// should be in sync with ICON_CHOICES in QuestionRating.vue

@@ -341,3 +341,27 @@ test('jump issues: a required scale whose values all jump past a question makes 
 		]).unreachable,
 	).toEqual([2])
 })
+
+test('jump issues: a required rating whose values all jump past a question makes it unreachable', () => {
+	const rating = (goTo: Array<{ value: number; target: number }>) =>
+		({
+			id: 1,
+			text: 'Question 1',
+			type: 'rating',
+			isRequired: true,
+			extraSettings: { optionsHighest: 2, goTo },
+		}) as FormsQuestion
+	expect(
+		issues([rating([{ value: 2, target: 3 }]), short(2), short(3)]).unreachable,
+	).toEqual([])
+	expect(
+		issues([
+			rating([
+				{ value: 1, target: 3 },
+				{ value: 2, target: 3 },
+			]),
+			short(2),
+			short(3),
+		]).unreachable,
+	).toEqual([2])
+})

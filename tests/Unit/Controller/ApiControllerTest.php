@@ -1527,13 +1527,25 @@ class ApiControllerTest extends TestCase {
 				['optionsHighest' => 10, 'goTo' => [['value' => 10, 'target' => 'submit']]],
 				null,
 			],
+			'lowered highest rating' => [
+				['optionsHighest' => 3, 'goTo' => [['value' => 0, 'target' => 'submit'], ['value' => 3, 'target' => 'submit'], ['value' => 5, 'target' => 'submit']]],
+				['optionsHighest' => 3, 'goTo' => [['value' => 3, 'target' => 'submit']]],
+				'removed-jumps=(7)',
+				Constants::ANSWER_TYPE_RATING,
+			],
+			'rating with the default highest value' => [
+				['goTo' => [['value' => 1, 'target' => 'submit'], ['value' => 5, 'target' => 'submit']]],
+				['goTo' => [['value' => 1, 'target' => 'submit'], ['value' => 5, 'target' => 'submit']]],
+				null,
+				Constants::ANSWER_TYPE_RATING,
+			],
 		];
 	}
 
 	/**
 	 * @dataProvider dataUpdateQuestionRemovesJumpsOutsideTheScale
 	 */
-	public function testUpdateQuestionRemovesJumpsOutsideTheScale(array $extraSettings, array $expectedSettings, ?string $expectedHeader): void {
+	public function testUpdateQuestionRemovesJumpsOutsideTheScale(array $extraSettings, array $expectedSettings, ?string $expectedHeader, string $type = Constants::ANSWER_TYPE_LINEARSCALE): void {
 		$form = new Form();
 		$form->setId(1);
 		$form->setOwnerId('currentUser');
@@ -1542,7 +1554,7 @@ class ApiControllerTest extends TestCase {
 		$question->setId(7);
 		$question->setFormId(1);
 		$question->setOrder(1);
-		$question->setType(Constants::ANSWER_TYPE_LINEARSCALE);
+		$question->setType($type);
 
 		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
 		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);

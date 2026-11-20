@@ -893,4 +893,70 @@ test.describe('Jumps', () => {
 		await submitView.checkRadio('How do you like it?', '4')
 		await expect(submitView.getQuestion('What can we improve?')).toBeVisible()
 	})
+
+	test('A value of a rating jumps past a question, set in the editor', async ({
+		page,
+		submitView,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		await api(page.request, 'PATCH', `/forms/${form.id}`, {
+			keyValuePairs: { title: 'Rating form' },
+		})
+		const rating = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'rating',
+				text: 'Rate the service',
+			},
+		)
+		await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'short',
+			text: 'What can we improve?',
+		})
+		const comments = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'short',
+				text: 'Comments',
+			},
+		)
+		await page.goto(`apps/forms/${form.hash}/edit`)
+
+		const question = page.getByRole('listitem', { name: 'Question number 1' })
+		await question.getByRole('button', { name: 'Actions', exact: true }).click()
+		await page
+			.getByRole('checkbox', { name: 'Go to based on answer' })
+			.click({ force: true })
+		await page.keyboard.press('Escape')
+
+		await question.getByRole('combobox', { name: 'Option 5 go to' }).click()
+		await page
+			.getByRole('option')
+			.filter({ hasText: 'Question 3: Comments' })
+			.click()
+
+		await expect(async () => {
+			const stored = await api(
+				page.request,
+				'GET',
+				`/forms/${form.id}/questions/${rating.id}`,
+			)
+			expect(stored.extraSettings.goTo).toEqual([
+				{ value: 5, target: comments.id },
+			])
+		}).toPass()
+
+		await page.goto(`apps/forms/${form.hash}/submit`)
+		await expect(submitView.getQuestion('Rate the service')).toBeVisible()
+		await expect(submitView.getQuestion('What can we improve?')).toBeHidden()
+		await submitView.checkRadio('Rate the service', '5 of 5')
+		await expect(submitView.getQuestion('Comments')).toBeVisible()
+		await expect(submitView.getQuestion('What can we improve?')).toBeHidden()
+		await submitView.checkRadio('Rate the service', '4 of 5')
+		await expect(submitView.getQuestion('What can we improve?')).toBeVisible()
+	})
 })

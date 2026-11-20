@@ -1111,7 +1111,7 @@ class FormsService {
 	}
 
 	/**
-	 * The answer of a jump per answer with one answer key and a target: `value:<value>` for a value from 0 to 10 of a linear scale, `option:<id>` for an option, `other` for the answer "Other" of a radio question
+	 * The answer of a jump per answer with one answer key and a target: `value:<value>` for a value from 0 to 10 of a linear scale or rating, `option:<id>` for an option, `other` for the answer "Other" of a radio question
 	 *
 	 * @param mixed $jump the jump
 	 * @param string $questionType the question type
@@ -1121,7 +1121,7 @@ class FormsService {
 		if (!is_array($jump) || count($jump) !== 2 || !self::isJumpTarget($jump['target'] ?? null)) {
 			return null;
 		}
-		if ($questionType === Constants::ANSWER_TYPE_LINEARSCALE) {
+		if ($questionType === Constants::ANSWER_TYPE_LINEARSCALE || $questionType === Constants::ANSWER_TYPE_RATING) {
 			return is_int($jump['value'] ?? null) && $jump['value'] >= 0 && $jump['value'] <= 10 ? 'value:' . $jump['value'] : null;
 		}
 		if (is_int($jump['optionId'] ?? null) && $jump['optionId'] > 0) {
@@ -1303,14 +1303,14 @@ class FormsService {
 	}
 
 	/**
-	 * Remove the jumps of a linear scale for values outside its bounds
+	 * Remove the jumps of a linear scale or rating for values outside its bounds
 	 *
 	 * @param Question $question the question
 	 * @return bool whether jumps were removed, with the new extra settings set
 	 */
 	public static function removeJumpsOutsideScale(Question $question): bool {
 		$extraSettings = $question->getExtraSettings();
-		if ($question->getType() !== Constants::ANSWER_TYPE_LINEARSCALE || !is_array($extraSettings['goTo'] ?? null)) {
+		if (!in_array($question->getType(), [Constants::ANSWER_TYPE_LINEARSCALE, Constants::ANSWER_TYPE_RATING], true) || !is_array($extraSettings['goTo'] ?? null)) {
 			return false;
 		}
 

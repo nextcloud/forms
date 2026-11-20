@@ -70,7 +70,7 @@ export interface FormsQuestionExtraSettings {
 /** A later question by id, or the end of the form */
 export type FormsJumpTarget = number | 'submit'
 
-/** Where an answer leads: an option, the answer "Other", or a value of a linear scale */
+/** Where an answer leads: an option, the answer "Other", or a value of a linear scale or rating */
 export interface FormsJump {
 	optionId?: number
 	other?: true
