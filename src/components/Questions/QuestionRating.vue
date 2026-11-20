@@ -68,7 +68,8 @@
 						value <= currentValue
 							? currentIconChoice.filled
 							: currentIconChoice.outline
-					" />
+					"
+					:size="34" />
 			</label>
 		</fieldset>
 		<template #insert>
@@ -251,7 +252,7 @@ export default defineComponent({
 	border: none;
 	display: flex;
 	flex-wrap: wrap;
-	gap: 2px;
+	gap: calc(4 * var(--default-grid-baseline));
 	margin: 0;
 	padding: 0;
 
