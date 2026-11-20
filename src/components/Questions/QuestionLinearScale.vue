@@ -366,6 +366,7 @@ export default defineComponent({
 
 	&__edit {
 		margin-inline-start: -12px;
+		margin-inline-end: calc(var(--clickable-area-large) - 2px);
 		display: grid;
 		grid-template-columns: 120px 1fr 120px;
 		grid-template-areas:
@@ -376,10 +377,6 @@ export default defineComponent({
 		@media (max-width: 768px) {
 			grid-template-columns: 1fr;
 			grid-template-areas: 'lowest-title' 'lowest' 'options' 'highest-title' 'highest';
-		}
-
-		@media (max-width: 768px) {
-			margin-inline-end: calc(var(--clickable-area-large) - 2px);
 		}
 	}
 
