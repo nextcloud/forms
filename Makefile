@@ -51,6 +51,8 @@ appstore:
 	--exclude-vcs \
 	$(project_dir)/appinfo \
 	$(project_dir)/COPYING \
+	$(project_dir)/LICENSES \
+	$(project_dir)/REUSE.toml \
 	$(project_dir)/css \
 	$(project_dir)/img \
 	$(project_dir)/js \
