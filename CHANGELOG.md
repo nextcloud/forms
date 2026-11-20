@@ -5,6 +5,39 @@
 
 # Changelog
 
+## v5.4.3 - 2026-11-20
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.2...v5.4.3)
+
+### Fixed
+
+- fix(grid): keep the radios of a grid apart from other questions by @AndyScherzinger in [\#3935](https://github.com/nextcloud/forms/pull/3935)
+- fix(api): rate-limit the public submission endpoints by @AndyScherzinger in [\#3931](https://github.com/nextcloud/forms/pull/3931)
+- fix(file): keep the file question in view when its input gets focus by @AndyScherzinger in [\#3929](https://github.com/nextcloud/forms/pull/3929)
+- fix(results): give every answer outside the options its own id by @AndyScherzinger in [\#3928](https://github.com/nextcloud/forms/pull/3928)
+- fix(submit): show the first unanswered required question on submit by @AndyScherzinger in [\#3927](https://github.com/nextcloud/forms/pull/3927)
+- fix(sharing): keep the search field label visible when it floats by @bhardwajhimanshu2515 in [\#3926](https://github.com/nextcloud/forms/pull/3926)
+- fix(submission): use the same answer checks for validating and storing by @AndyScherzinger in [\#3916](https://github.com/nextcloud/forms/pull/3916)
+- fix(editor): save the changes of a question one after another by @AndyScherzinger in [\#3915](https://github.com/nextcloud/forms/pull/3915)
+- fix(submit): leave removed values out of restored answers by @AndyScherzinger in [\#3914](https://github.com/nextcloud/forms/pull/3914)
+- fix(submission): count the same titles as blank as the submit view by @AndyScherzinger in [\#3913](https://github.com/nextcloud/forms/pull/3913)
+- fix(submit): restore the draft of a form opened from the navigation by @AndyScherzinger in [\#3912](https://github.com/nextcloud/forms/pull/3912)
+- fix(api): do not change deleted questions by @AndyScherzinger in [\#3910](https://github.com/nextcloud/forms/pull/3910)
+- fix(api): do not return deleted questions by @AndyScherzinger in [\#3908](https://github.com/nextcloud/forms/pull/3908)
+- fix(submission): only accept a list of values as an answer by @AndyScherzinger in [\#3904](https://github.com/nextcloud/forms/pull/3904)
+- fix(submission): only accept grid row and column ids as they are by @AndyScherzinger in [\#3903](https://github.com/nextcloud/forms/pull/3903)
+- fix(a11y): give the file upload button an accessible name by @v01dst in [\#3902](https://github.com/nextcloud/forms/pull/3902)
+- fix(migration): keep the option types and order of grid questions on import by @AndyScherzinger in [\#3884](https://github.com/nextcloud/forms/pull/3884)
+- fix(submission): keep the text of an answer "Other" as typed by @AndyScherzinger in [\#3882](https://github.com/nextcloud/forms/pull/3882)
+- fix: show form titles in the loading and lock messages as typed by @AndyScherzinger in [\#3874](https://github.com/nextcloud/forms/pull/3874)
+- fix(editor): save all extra settings changed in quick succession by @AndyScherzinger in [\#3873](https://github.com/nextcloud/forms/pull/3873)
+- fix(migration): skip answers of deleted questions on import by @AndyScherzinger in [\#3872](https://github.com/nextcloud/forms/pull/3872)
+- fix(api): treat deleted questions as not found when deleting or copying them by @AndyScherzinger in [\#3871](https://github.com/nextcloud/forms/pull/3871)
+- fix(submission): do not require hidden questions, reject booleans on linear scales by @AndyScherzinger in [\#3870](https://github.com/nextcloud/forms/pull/3870)
+- fix(analytics): count answers per question and handle forms without answers by @AndyScherzinger in [\#3869](https://github.com/nextcloud/forms/pull/3869)
+- fix(a11y): keep the focus and list structure in the editor by @AndyScherzinger in [\#3868](https://github.com/nextcloud/forms/pull/3868)
+- fix: skip short answer validation for empty optional answers by @orshih6 in [\#3803](https://github.com/nextcloud/forms/pull/3803)
+
 ## v5.4.2 - 2026-11-10
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.1...v5.4.2)
