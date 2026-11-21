@@ -15,6 +15,10 @@
 		<!-- Summary figures for scale questions, shown above the per-value bars -->
 		<dl v-if="numericStats" class="question-summary__figures">
 			<div>
+				<dt>{{ t('forms', 'Answers') }}</dt>
+				<dd>{{ formatNumber(numericStats.count) }}</dd>
+			</div>
+			<div>
 				<dt>{{ t('forms', 'Average') }}</dt>
 				<dd>{{ formatNumber(numericStats.mean) }}</dd>
 			</div>
@@ -693,6 +697,7 @@ export default defineComponent({
 			const sum = values.reduce((a, b) => a + b, 0)
 
 			return {
+				count: values.length,
 				mean: Math.round((sum * 100) / values.length) / 100,
 				median,
 				min: sorted[0],
