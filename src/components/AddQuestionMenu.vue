@@ -35,6 +35,7 @@
 
 		<template v-else>
 			<NcActionButton
+				:aria-label="backLabel(activeQuestionType)"
 				:disabled="isLoadingQuestions"
 				class="question-menu__question"
 				@click="activeQuestionType = null">
@@ -73,6 +74,7 @@ import type { AnswerTypeConfig } from '../models/AnswerTypes.ts'
 
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
+import { t } from '@nextcloud/l10n'
 import { defineComponent, ref, watch } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -156,11 +158,24 @@ export default defineComponent({
 			openLocal.value = false
 		}
 
+		/**
+		 * Accessible name of the entry that leaves the sub types of a question type
+		 *
+		 * @param type the question type whose sub types are shown
+		 */
+		const backLabel = (type: string): string => {
+			// TRANSLATORS Name of the entry that leaves the sub types of a question type, e.g. "Grid, back to all question types"
+			return t('forms', '{type}, back to all question types', {
+				type: props.answerTypesFilter[type].label,
+			})
+		}
+
 		return {
 			activeQuestionType,
 			openLocal,
 			onPrimaryClick,
 			onSubtypeClick,
+			backLabel,
 			IconChevronLeft,
 			IconPlus,
 		}
