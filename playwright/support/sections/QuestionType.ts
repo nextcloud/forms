@@ -26,3 +26,11 @@ export enum GridSubtype {
 	Number = 'Number',
 	RadioButtons = 'Radio buttons',
 }
+
+/**
+ * Labels of the entries in the linear scale subtype menu.
+ */
+export enum LinearScaleSubtype {
+	Numbers = 'Numbers',
+	Rating = 'Rating',
+}

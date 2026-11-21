@@ -17,6 +17,7 @@ import IconPalette from '@material-symbols/svg-400/outlined/palette.svg?raw'
 import IconRadioboxMarked from '@material-symbols/svg-400/outlined/radio_button_checked.svg?raw'
 import IconClockOutline from '@material-symbols/svg-400/outlined/schedule.svg?raw'
 import IconTextShort from '@material-symbols/svg-400/outlined/short_text.svg?raw'
+import IconStar from '@material-symbols/svg-400/outlined/star.svg?raw'
 import IconTextLong from '@material-symbols/svg-400/outlined/subject.svg?raw'
 import IconSwapVertical from '@material-symbols/svg-400/outlined/swap_vert.svg?raw'
 import { t } from '@nextcloud/l10n'
@@ -31,13 +32,13 @@ import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionRanking from '../components/Questions/QuestionRanking.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
-import { OptionType } from './Constants.ts'
+import { LinearScaleType, OptionType } from './Constants.ts'
 
 export interface AnswerTypeSubtype {
 	icon: string
 	label: string
 	extraSettings: {
-		questionType: string
+		questionType?: string
 	}
 }
 
@@ -262,6 +263,21 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 		icon: IconLinearScale,
 		label: t('forms', 'Linear scale'),
 		predefined: true,
+
+		subtypes: {
+			numbers: {
+				icon: IconNumeric,
+				label: t('forms', 'Numbers'),
+				extraSettings: {},
+			},
+			rating: {
+				icon: IconStar,
+				label: t('forms', 'Rating'),
+				extraSettings: {
+					questionType: LinearScaleType.Rating,
+				},
+			},
+		},
 
 		titlePlaceholder: t('forms', 'Linear scale question title'),
 		warningInvalid: t('forms', 'This question needs a title!'),

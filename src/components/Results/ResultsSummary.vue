@@ -186,7 +186,7 @@ import { generateUrl } from '@nextcloud/router'
 import { computed, defineComponent } from 'vue'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import answerTypes from '../../models/AnswerTypes.ts'
-import { GridCellType, OptionType } from '../../models/Constants.ts'
+import { GridCellType, LinearScaleType, OptionType } from '../../models/Constants.ts'
 
 const locale = getCanonicalLocale()
 const formatCount = new Intl.NumberFormat(locale).format
@@ -246,6 +246,14 @@ export default defineComponent({
 				) {
 					return `${label} (${t('forms', 'Radio')})`
 				}
+			}
+
+			if (
+				props.question.type === 'linearscale'
+				&& props.question.extraSettings?.questionType
+					=== LinearScaleType.Rating
+			) {
+				return `${label} (${t('forms', 'Rating')})`
 			}
 
 			if (props.question.type === 'linearscale') {

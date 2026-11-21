@@ -1915,6 +1915,21 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
 				'expected' => false
 			],
+			'linearscale-unknown-subtype' => [
+				'extraSettings' => ['questionType' => 'stars'],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'linearscale-subtype-not-a-string' => [
+				'extraSettings' => ['questionType' => null],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'rating-default-settings' => [
+				'extraSettings' => ['questionType' => 'rating'],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true
+			],
 		];
 	}
 

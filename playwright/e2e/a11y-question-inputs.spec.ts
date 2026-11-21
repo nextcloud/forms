@@ -8,7 +8,11 @@ import { test as formTest } from '../support/fixtures/form.ts'
 import { test as appNavigationTest } from '../support/fixtures/navigation.ts'
 import { test as randomUserTest } from '../support/fixtures/random-user.ts'
 import { test as topBarTest } from '../support/fixtures/topBar.ts'
-import { GridSubtype, QuestionType } from '../support/sections/QuestionType.ts'
+import {
+	GridSubtype,
+	LinearScaleSubtype,
+	QuestionType,
+} from '../support/sections/QuestionType.ts'
 import { FormsView } from '../support/sections/TopBarSection.ts'
 
 const test = mergeTests(randomUserTest, appNavigationTest, formTest, topBarTest)
@@ -196,7 +200,7 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		await appNavigation.clickNewForm()
 		await form.fillTitle('Test form')
 
-		await form.addQuestion(QuestionType.LinearScale)
+		await form.addQuestion(QuestionType.LinearScale, LinearScaleSubtype.Numbers)
 		const questions = await form.getQuestions()
 		await questions[0].fillTitle('Rate your experience')
 		await questions[0].fillDescription('From 1 to 5')

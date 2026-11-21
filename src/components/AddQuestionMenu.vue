@@ -41,18 +41,23 @@
 				<template #icon>
 					<NcIconSvgWrapper :svg="IconChevronLeft" />
 				</template>
-				{{ t('forms', 'Grid') }}
+				{{ answerTypesFilter[activeQuestionType].label }}
 			</NcActionButton>
 			<NcActionSeparator />
 
 			<NcActionButton
-				v-for="(answer, type) in answerTypesFilter[activeQuestionType]
-					.subtypes"
+				v-for="answer in answerTypesFilter[activeQuestionType].subtypes"
 				:key="'subtype-' + answer.label"
 				closeAfterClick
 				:disabled="isLoadingQuestions"
 				class="question-menu__question"
-				@click="onSubtypeClick(activeQuestionType, type, position)">
+				@click="
+					onSubtypeClick(
+						activeQuestionType,
+						answer.extraSettings.questionType ?? null,
+						position,
+					)
+				">
 				<template #icon>
 					<NcIconSvgWrapper :svg="answer.icon" />
 				</template>
@@ -68,7 +73,6 @@ import type { AnswerTypeConfig } from '../models/AnswerTypes.ts'
 
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
 import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
-import { t } from '@nextcloud/l10n'
 import { defineComponent, ref, watch } from 'vue'
 import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -145,7 +149,7 @@ export default defineComponent({
 
 		const onSubtypeClick = (
 			type: string,
-			subtype: string | number,
+			subtype: string | null,
 			position: number | null,
 		) => {
 			emit('addQuestion', type, subtype, position)
@@ -157,7 +161,6 @@ export default defineComponent({
 			openLocal,
 			onPrimaryClick,
 			onSubtypeClick,
-			t,
 			IconChevronLeft,
 			IconPlus,
 		}

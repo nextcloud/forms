@@ -377,6 +377,7 @@ Returns the questions and options of the given form (without submissions).
   |-----------|---------|----------|-------------|
   | _type_ | [QuestionType](DataStructure.md#question-types) | | The question-type of the new question |
   | _text_ | String | yes | _Optional_ The text of the new question. |
+  | _subtype_ | String | yes | _Optional_ The sub type, stored as `extraSettings.questionType`: `checkbox`, `number` or `radio` for `grid`, `rating` for `linearscale` (a 1 to N scale drawn as icons). Any other value is rejected. |
   | _position_ | Integer | yes | _(optional)_ 1-based position to insert the new question. When omitted the question is appended at the end. |
 - Response: The new question object.
 

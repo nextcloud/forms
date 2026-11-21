@@ -263,13 +263,14 @@ Optional extra settings for some [Question Types](#question-types)
 | `timeMax`               | `time`                                         | string           | -                                           | Maximum allowed time to be chosen (as `HH:mm` string)                       |
 | `timeMin`               | `time`                                         | string           | -                                           | Minimum allowed time to be chosen (as `HH:mm` string)                       |
 | `timeRange`             | `time`                                         | Boolean          | `true/false`                                | The time picker should query a time range                                   |
-| `optionsLowest`         | `linearscale`                                  | Integer          | `0, 1`                                      | Set the lowest value of the scale, default: `1`                             |
+| `optionsLowest`         | `linearscale`                                  | Integer          | `0, 1`                                      | Set the lowest value of the scale, default: `1`; always `1` for the `rating` sub type |
 | `optionsHighest`        | `linearscale`                                  | Integer          | `2, 3, 4, 5, 6, 7, 8, 9, 10`                | Set the highest value of the scale, default: `5`                            |
 | `optionsLabelLowest`    | `linearscale`                                  | string           | -                                           | Set the label of the lowest value, default: `'Strongly disagree'`           |
 | `optionsLabelHighest`   | `linearscale`                                  | string           | -                                           | Set the label of the highest value, default: `'Strongly agree'`             |
 | `columns`               | `grid`                                         | Array            | -                                           | Array of column identifiers / labels for grid questions                     |
 | `rows`                  | `grid`                                         | Array            | -                                           | Array of row identifiers / labels for grid questions                        |
 | `questionType`          | `grid`                                         | String           | `checkbox`, `number`, `radio`               | Type of cell for grid questions (checkbox, numeric input, or radio)         |
+| `questionType`          | `linearscale`                                  | String           | `rating`                                    | Sub type, fixed at creation; `rating` is a 1 to N scale drawn as icons; absent for a plain scale |
 
 ### Option Types
 
