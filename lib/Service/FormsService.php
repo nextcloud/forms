@@ -1051,6 +1051,11 @@ class FormsService {
 				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
 				return false;
 			}
+
+			if (($extraSettings['showPromoterScore'] ?? false) === true
+				&& (($extraSettings['optionsLowest'] ?? 1) !== 0 || ($extraSettings['optionsHighest'] ?? 5) !== 10)) {
+				return false;
+			}
 		}
 		return true;
 	}

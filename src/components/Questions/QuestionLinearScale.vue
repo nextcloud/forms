@@ -20,6 +20,7 @@
 				:aria-label-combobox="t('forms', 'Lowest value')"
 				labelOutside
 				:options="[0, 1]"
+				:disabled="showPromoterScore"
 				required
 				@update:modelValue="onOptionsLowestChange">
 				<template #icon>
@@ -34,12 +35,19 @@
 				:aria-label-combobox="t('forms', 'Highest value')"
 				labelOutside
 				:options="[2, 3, 4, 5, 6, 7, 8, 9, 10]"
+				:disabled="showPromoterScore"
 				required
 				@update:modelValue="onOptionsHighestChange">
 				<template #icon>
 					<NcIconSvgWrapper :svg="IconPencil" />
 				</template>
 			</NcActionInput>
+			<NcActionCheckbox
+				:modelValue="showPromoterScore"
+				:disabled="!showPromoterScore && !isZeroToTenScale"
+				@update:modelValue="onShowPromoterScoreChange">
+				{{ t('forms', 'Promoter score (0 to 10 scale)') }}
+			</NcActionCheckbox>
 		</template>
 
 		<div
@@ -137,7 +145,8 @@
 <script lang="ts">
 import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
 import { t } from '@nextcloud/l10n'
-import { computed, defineComponent, nextTick, onMounted, ref } from 'vue'
+import { computed, defineComponent, nextTick, onMounted, ref, watch } from 'vue'
+import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
@@ -154,6 +163,7 @@ type LinearScaleExtraSettings = {
 	optionsHighest?: number | null
 	optionsLabelLowest?: string | null
 	optionsLabelHighest?: string | null
+	showPromoterScore?: boolean
 }
 
 export default defineComponent({
@@ -161,6 +171,7 @@ export default defineComponent({
 
 	components: {
 		NcIconSvgWrapper,
+		NcActionCheckbox,
 		NcActionInput,
 		NcCheckboxRadioSwitch,
 		NcTextArea,
@@ -176,11 +187,32 @@ export default defineComponent({
 		const values = computed<string[]>(() => {
 			return props.values as string[]
 		})
-		const extraSettings = computed<LinearScaleExtraSettings>(() => {
-			return (
-				(props.extraSettings as LinearScaleExtraSettings | undefined) ?? {}
-			)
-		})
+		const unsavedExtraSettings = ref<LinearScaleExtraSettings>({})
+		watch(
+			() => props.extraSettings,
+			() => {
+				unsavedExtraSettings.value = {}
+			},
+		)
+		const extraSettings = computed<LinearScaleExtraSettings>(() => ({
+			...((props.extraSettings as LinearScaleExtraSettings | undefined) ?? {}),
+			...unsavedExtraSettings.value,
+		}))
+
+		/**
+		 * Apply changed extra settings at once and save them.
+		 *
+		 * @param newSettings the changed extra settings
+		 */
+		const changeExtraSettings = (
+			newSettings: LinearScaleExtraSettings,
+		): void => {
+			unsavedExtraSettings.value = {
+				...unsavedExtraSettings.value,
+				...newSettings,
+			}
+			question.onExtraSettingsChange(newSettings)
+		}
 		const lowest = ref<{ $refs: { input: HTMLTextAreaElement } } | null>(null)
 		const highest = ref<{ $refs: { input: HTMLTextAreaElement } } | null>(null)
 
@@ -192,7 +224,7 @@ export default defineComponent({
 				return extraSettings.value.optionsLowest ?? 1
 			},
 			set: (value: number) => {
-				question.onExtraSettingsChange({
+				changeExtraSettings({
 					optionsLowest: value === 1 ? null : value,
 				})
 			},
@@ -203,18 +235,26 @@ export default defineComponent({
 				return extraSettings.value.optionsHighest ?? 5
 			},
 			set: (value: number) => {
-				question.onExtraSettingsChange({
+				changeExtraSettings({
 					optionsHighest: value === 5 ? null : value,
 				})
 			},
 		})
+
+		const showPromoterScore = computed<boolean>(
+			() => extraSettings.value.showPromoterScore === true,
+		)
+
+		const isZeroToTenScale = computed<boolean>(
+			() => optionsLowest.value === 0 && optionsHighest.value === 10,
+		)
 
 		const optionsLabelLowest = computed<string>({
 			get: () => {
 				return extraSettings.value.optionsLabelLowest ?? defaultLowestLabel
 			},
 			set: (value: string) => {
-				question.onExtraSettingsChange({
+				changeExtraSettings({
 					optionsLabelLowest: value === defaultLowestLabel ? null : value,
 				})
 			},
@@ -225,7 +265,7 @@ export default defineComponent({
 				return extraSettings.value.optionsLabelHighest ?? defaultHighestLabel
 			},
 			set: (value: string) => {
-				question.onExtraSettingsChange({
+				changeExtraSettings({
 					optionsLabelHighest:
 						value === defaultHighestLabel ? null : value,
 				})
@@ -300,6 +340,15 @@ export default defineComponent({
 			optionsHighest.value = value
 		}
 
+		/**
+		 * Switch the promoter score of a 0 to 10 scale on or off.
+		 *
+		 * @param value whether the promoter score is shown in the results
+		 */
+		const onShowPromoterScoreChange = (value: boolean): void => {
+			changeExtraSettings({ showPromoterScore: value })
+		}
+
 		const onOptionsLabelLowestChange = (value: string): void => {
 			optionsLabelLowest.value = value
 		}
@@ -343,10 +392,13 @@ export default defineComponent({
 			optionsHighest,
 			optionsLabelLowest,
 			optionsLabelHighest,
+			showPromoterScore,
+			isZeroToTenScale,
 			validate,
 			onChange,
 			onOptionsLowestChange,
 			onOptionsHighestChange,
+			onShowPromoterScoreChange,
 			onOptionsLabelLowestChange,
 			onOptionsLabelHighestChange,
 			resizeLabel,

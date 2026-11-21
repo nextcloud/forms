@@ -12,6 +12,48 @@
 			{{ questionTypeLabel }}
 		</p>
 
+		<!-- Summary figures for scale questions, shown above the per-value bars -->
+		<dl v-if="numericStats" class="question-summary__figures">
+			<div>
+				<dt>{{ t('forms', 'Answers') }}</dt>
+				<dd>{{ formatNumber(numericStats.count) }}</dd>
+			</div>
+			<div>
+				<dt>{{ t('forms', 'Average') }}</dt>
+				<dd>{{ formatNumber(numericStats.mean) }}</dd>
+			</div>
+			<div>
+				<dt>{{ t('forms', 'Median') }}</dt>
+				<dd>{{ formatNumber(numericStats.median) }}</dd>
+			</div>
+			<div>
+				<dt>{{ t('forms', 'Minimum') }}</dt>
+				<dd>{{ formatNumber(numericStats.min) }}</dd>
+			</div>
+			<div>
+				<dt>{{ t('forms', 'Maximum') }}</dt>
+				<dd>{{ formatNumber(numericStats.max) }}</dd>
+			</div>
+			<div v-if="promoterBreakdown">
+				<dt>{{ t('forms', 'Promoter score (promoters − detractors)') }}</dt>
+				<dd>{{ formatNumber(promoterBreakdown.score) }}</dd>
+				<dd class="question-summary__figures-detail">
+					{{
+						t(
+							'forms',
+							'{promoters}% promoters, {detractors}% detractors',
+							{
+								promoters: formatNumber(promoterBreakdown.promoters),
+								detractors: formatNumber(
+									promoterBreakdown.detractors,
+								),
+							},
+						)
+					}}
+				</dd>
+			</div>
+		</dl>
+
 		<!-- Ranking questions: Borda count with average rank -->
 		<div v-if="question.type === 'ranking'" class="question-summary__statistic">
 			<p class="question-summary__ranking-description">
@@ -167,7 +209,7 @@ import type {
 } from '../../types/Entities.d.ts'
 
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
-import { t } from '@nextcloud/l10n'
+import { getCanonicalLocale, t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
 import { computed, defineComponent } from 'vue'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
@@ -613,9 +655,96 @@ export default defineComponent({
 			return answersModels
 		})
 
+		/**
+		 * The numeric answers given to a linear scale question in ascending order, taken from
+		 * the answer counts of the bars; empty for other question types.
+		 */
+		const numericValues = computed<number[]>(() => {
+			if (props.question.type !== 'linearscale') {
+				return []
+			}
+			return questionOptions.value
+				.filter((option) => option.id !== -2)
+				.map((option) => ({
+					value: parseFloat(option.text),
+					count: option.count,
+				}))
+				.filter(({ value }) => !isNaN(value))
+				.sort((a, b) => a.value - b.value)
+				.flatMap(({ value, count }) => Array<number>(count).fill(value))
+		})
+
+		/**
+		 * Answer count, average, median, minimum and maximum of a linear scale question;
+		 * null without answers.
+		 */
+		const numericStats = computed(() => {
+			const values = numericValues.value
+			if (values.length === 0) {
+				return null
+			}
+			const middle = Math.floor(values.length / 2)
+			const median =
+				values.length % 2
+					? values[middle]
+					: (values[middle - 1] + values[middle]) / 2
+			const sum = values.reduce((a, b) => a + b, 0)
+
+			return {
+				count: values.length,
+				mean: Math.round((sum * 100) / values.length) / 100,
+				median,
+				min: values[0],
+				max: values[values.length - 1],
+			}
+		})
+
+		const numberFormat = new Intl.NumberFormat(getCanonicalLocale(), {
+			maximumFractionDigits: 2,
+		})
+
+		/**
+		 * Format a number for the user's locale with at most two decimals.
+		 *
+		 * @param value the number to format
+		 */
+		const formatNumber = (value: number): string => numberFormat.format(value)
+
+		/**
+		 * Promoter and detractor shares in percent and the promoter score, the difference of
+		 * the two, using the 9-10 / 7-8 / 0-6 split. Null unless the promoter score is switched
+		 * on for a 0-10 scale that has answers.
+		 */
+		const promoterBreakdown = computed(() => {
+			if (
+				props.question.extraSettings?.showPromoterScore !== true
+				|| props.question.extraSettings?.optionsLowest !== 0
+				|| props.question.extraSettings?.optionsHighest !== 10
+			) {
+				return null
+			}
+			const values = numericValues.value
+			if (values.length === 0) {
+				return null
+			}
+			const promoters = values.filter((value) => value >= 9).length
+			const detractors = values.filter((value) => value <= 6).length
+			const share = (count: number) =>
+				Math.sign(count)
+					* Math.round((Math.abs(count) * 100) / values.length) || 0
+			return {
+				promoters: share(promoters),
+				detractors: share(detractors),
+				score: share(promoters - detractors),
+			}
+		})
+
 		return {
 			IconFile,
 			answerTypes,
+			formatNumber,
+			numericStats,
+			promoterBreakdown,
 			questionTypeLabel,
 			questionOptions,
 			rankingStats,
@@ -766,6 +895,40 @@ export default defineComponent({
 			position: sticky;
 			inset-inline-start: 0;
 		}
+	}
+}
+
+.question-summary__figures {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 16px;
+	margin: 0 0 8px;
+	padding: 0;
+
+	dt,
+	dd {
+		display: block;
+		width: auto;
+		margin: 0;
+		padding: 0;
+		white-space: normal;
+		text-align: start;
+	}
+
+	dt {
+		color: var(--color-text-maxcontrast);
+		font-size: 0.9em;
+	}
+
+	dd {
+		font-size: 1.2em;
+		font-weight: bold;
+	}
+
+	dd.question-summary__figures-detail {
+		color: var(--color-text-maxcontrast);
+		font-size: 0.9em;
+		font-weight: normal;
 	}
 }
 </style>

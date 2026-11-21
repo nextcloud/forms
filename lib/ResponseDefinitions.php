@@ -35,6 +35,7 @@ namespace OCA\Forms;
  *   optionsLimitMax?: int,
  *   optionsLimitMin?: int,
  *   optionsLowest?: 0|1,
+ *   showPromoterScore?: bool,
  *   shuffleOptions?: bool,
  *   timeMax?: string,
  *   timeMin?: string,
