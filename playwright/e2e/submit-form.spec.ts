@@ -276,3 +276,35 @@ test('An edited submission leaves out values the questions no longer offer', asy
 		String(options[1].id),
 	])
 })
+
+test('Enter in the last answer moves on to the submit button', async ({
+	page,
+	submitView,
+}) => {
+	const form = await api(page.request, 'POST', '/forms')
+	await api(page.request, 'PATCH', `/forms/${form.id}`, {
+		keyValuePairs: { title: 'Enter form' },
+	})
+	await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'multiple_unique',
+		text: 'Favourite color',
+	}).then((question) =>
+		api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions/${question.id}/options`,
+			{
+				optionTexts: ['Red', 'Blue'],
+			},
+		),
+	)
+	await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'short',
+		text: 'Your name',
+	})
+	await page.goto(`apps/forms/${form.hash}/submit`)
+
+	await submitView.fillText('Your name', 'Alice')
+	await submitView.getQuestion('Your name').getByRole('textbox').press('Enter')
+	await expect(submitView.submitButton).toBeFocused()
+})
