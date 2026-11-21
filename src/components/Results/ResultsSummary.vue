@@ -33,6 +33,24 @@
 				<dt>{{ t('forms', 'Maximum') }}</dt>
 				<dd>{{ formatCount(numericStats.max) }}</dd>
 			</div>
+			<div v-if="promoterBreakdown">
+				<dt>{{ t('forms', 'Promoter score (promoters − detractors)') }}</dt>
+				<dd>{{ formatCount(promoterBreakdown.score) }}</dd>
+				<dd class="question-summary__figures-detail">
+					{{
+						t(
+							'forms',
+							'{promoters}% promoters, {detractors}% detractors',
+							{
+								promoters: formatCount(promoterBreakdown.promoters),
+								detractors: formatCount(
+									promoterBreakdown.detractors,
+								),
+							},
+						)
+					}}
+				</dd>
+			</div>
 		</dl>
 
 		<div
@@ -867,10 +885,36 @@ export default defineComponent({
 			}
 		})
 
+		/**
+		 * Promoter and detractor shares in percent and the promoter score, the difference of
+		 * the two, using the 9-10 / 7-8 / 0-6 split. Null unless the question has the promoter
+		 * sub type and answers.
+		 */
+		const promoterBreakdown = computed(() => {
+			if (props.question.extraSettings?.questionType !== 'promoter') {
+				return null
+			}
+			const values = numericValues.value
+			if (values.length === 0) {
+				return null
+			}
+			const promoters = values.filter((value) => value >= 9).length
+			const detractors = values.filter((value) => value <= 6).length
+			const share = (count: number) =>
+				Math.sign(count)
+					* Math.round((Math.abs(count) * 100) / values.length) || 0
+			return {
+				promoters: share(promoters),
+				detractors: share(detractors),
+				score: share(promoters - detractors),
+			}
+		})
+
 		return {
 			IconFile,
 			answerTypes,
 			numericStats,
+			promoterBreakdown,
 			questionTypeLabel,
 			averageRating,
 			ratingSummary,
@@ -1135,6 +1179,12 @@ export default defineComponent({
 	dd {
 		font-size: 1.5em;
 		font-weight: bold;
+	}
+
+	dd.question-summary__figures-detail {
+		color: var(--color-text-maxcontrast);
+		font-size: 0.9em;
+		font-weight: normal;
 	}
 }
 </style>
