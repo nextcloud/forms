@@ -235,6 +235,28 @@ test('A restored draft leaves out values the questions no longer offer', async (
 	expect(answers[grid.id]).toEqual({ [rows[0].id]: [columns[0].id] })
 })
 
+test('A restored draft sends a linear scale answer as its plain number', async ({
+	page,
+	submitView,
+}) => {
+	const { form, scale } = await createOfferedValuesForm(page.request)
+	await page.goto(`apps/forms/${form.hash}/submit`)
+	await page.evaluate(
+		([key, draft]) => localStorage.setItem(key, draft),
+		[
+			`nextcloud_forms_${form.hash}`,
+			JSON.stringify({
+				[scale.id]: { value: ['05'], type: 'QuestionLinearScale' },
+			}),
+		],
+	)
+	await page.reload()
+
+	const response = await submitView.submit()
+	expect(response.status()).toBe(201)
+	expect(response.request().postDataJSON().answers[scale.id]).toEqual(['5'])
+})
+
 test('An edited submission leaves out values the questions no longer offer', async ({
 	page,
 	submitView,

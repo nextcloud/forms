@@ -683,7 +683,7 @@ export default defineComponent({
 		}
 
 		/**
-		 * The values of an answer the question still offers: its options or an answer "Other" while it allows one, the rows and columns of a grid, the values within the bounds of a linear scale
+		 * The values of an answer the question still offers: its options or an answer "Other" while it allows one, the rows and columns of a grid, the values within the bounds of a linear scale as their plain number
 		 *
 		 * @param question the question
 		 * @param value the values of the answer
@@ -700,10 +700,13 @@ export default defineComponent({
 			if (question.type === 'linearscale') {
 				const lowest = Number(question.extraSettings?.optionsLowest ?? 1)
 				const highest = Number(question.extraSettings?.optionsHighest ?? 5)
-				return value.filter(
-					(choice) =>
-						Number(choice) >= lowest && Number(choice) <= highest,
-				)
+				return value
+					.filter((choice) => /^\d+$/.test(String(choice)))
+					.map((choice) => String(Number(choice)))
+					.filter(
+						(choice) =>
+							Number(choice) >= lowest && Number(choice) <= highest,
+					)
 			}
 			if (!answerTypes[question.type]?.predefined) {
 				return value

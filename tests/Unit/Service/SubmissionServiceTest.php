@@ -1451,7 +1451,7 @@ file2.txt"
 					'1' => ['6']
 				],
 				// Expected Result
-				'The answer for question "q1" must be an integer between 0 and 5.',
+				'The answer for question "q1" must be a whole number from 0 to 5, written without leading zeros or a decimal point.',
 			],
 			'boolean-linearscale-answer' => [
 				[
@@ -1460,7 +1460,7 @@ file2.txt"
 				[
 					'1' => [true]
 				],
-				'The answer for question "q1" must be an integer between 0 and 5.',
+				'The answer for question "q1" must be a whole number from 0 to 5, written without leading zeros or a decimal point.',
 			],
 			'list-linearscale-answer' => [
 				[
@@ -1470,6 +1470,48 @@ file2.txt"
 					'1' => [['3']]
 				],
 				'Invalid answer for question "q1".',
+			],
+			'valid-linearscale-answers' => [
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]],
+					['id' => 2, 'type' => 'linearscale', 'text' => 'q2', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]],
+					['id' => 3, 'type' => 'linearscale', 'text' => 'q3', 'isRequired' => false, 'extraSettings' => ['optionsHighest' => 10]],
+					['id' => 4, 'type' => 'linearscale', 'text' => 'q4', 'isRequired' => false],
+				],
+				[
+					'1' => ['0'],
+					'2' => [0],
+					'3' => ['10'],
+					'4' => [5],
+				],
+				null,
+			],
+			'zero-linearscale-answer-below-default-lowest' => [
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'q1', 'isRequired' => false]
+				],
+				[
+					'1' => ['0']
+				],
+				'The answer for question "q1" must be a whole number from 1 to 5, written without leading zeros or a decimal point.',
+			],
+			'leading-zero-linearscale-answer' => [
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]]
+				],
+				[
+					'1' => ['05']
+				],
+				'The answer for question "q1" must be a whole number from 0 to 5, written without leading zeros or a decimal point.',
+			],
+			'float-linearscale-answer' => [
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]]
+				],
+				[
+					'1' => [4.0]
+				],
+				'The answer for question "q1" must be a whole number from 0 to 5, written without leading zeros or a decimal point.',
 			],
 			'invalid-color-question' => [
 				// Questions

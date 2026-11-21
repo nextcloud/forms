@@ -708,8 +708,9 @@ class SubmissionService {
 					if ($question['type'] === Constants::ANSWER_TYPE_LINEARSCALE) {
 						$optionsLowest = $question['extraSettings']['optionsLowest'] ?? 1;
 						$optionsHighest = $question['extraSettings']['optionsHighest'] ?? 5;
-						if (!is_scalar($answer) || is_bool($answer) || !ctype_digit((string)$answer) || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
-							throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be an integer between %d and %d.', $question['text'], $optionsLowest, $optionsHighest));
+						$value = $this->normalizeNumericOptionId($answer);
+						if ($value === null || $value < $optionsLowest || $value > $optionsHighest) {
+							throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be a whole number from %d to %d, written without leading zeros or a decimal point.', $question['text'], $optionsLowest, $optionsHighest));
 						}
 					}
 					// Check if all grid rows, columns and values match the configured grid subtype
