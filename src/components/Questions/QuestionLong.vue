@@ -29,8 +29,7 @@
 				:name="name || undefined"
 				@invalid.prevent="validate"
 				@input="onInput"
-				@keypress="autoSizeText"
-				@keydown.ctrl.enter="onKeydownCtrlEnter" />
+				@keypress="autoSizeText" />
 		</div>
 		<template #insert>
 			<slot name="insert" />
@@ -56,7 +55,7 @@ export default defineComponent({
 	},
 
 	props: QUESTION_PROPS,
-	emits: [...QUESTION_EMITS, 'update:values', 'keydown'],
+	emits: [...QUESTION_EMITS, 'update:values'],
 
 	setup(props, { emit }) {
 		const textarea = ref<HTMLTextAreaElement | null>(null)
@@ -123,10 +122,6 @@ export default defineComponent({
 			emit('update:values', [field.value])
 		}
 
-		const onKeydownCtrlEnter = (event: KeyboardEvent): void => {
-			emit('keydown', event)
-		}
-
 		return {
 			...question,
 			rootElement,
@@ -136,7 +131,6 @@ export default defineComponent({
 			autoSizeText,
 			validate,
 			onInput,
-			onKeydownCtrlEnter,
 		}
 	},
 })

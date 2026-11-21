@@ -100,8 +100,7 @@
 						type="radio"
 						:required="isRequired"
 						@invalid.prevent="validate"
-						@update:modelValue="onChange"
-						@keydown.enter.exact.prevent="onKeydownEnter" />
+						@update:modelValue="onChange" />
 				</div>
 			</fieldset>
 			<template v-if="!readOnly">

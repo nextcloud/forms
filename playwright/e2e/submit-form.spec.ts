@@ -308,3 +308,56 @@ test('Enter in the last answer moves on to the submit button', async ({
 	await submitView.getQuestion('Your name').getByRole('textbox').press('Enter')
 	await expect(submitView.submitButton).toBeFocused()
 })
+
+test('Shift+Enter moves on and Ctrl+Enter or Cmd+Enter submits the form', async ({
+	page,
+	submitView,
+}) => {
+	const form = await api(page.request, 'POST', '/forms')
+	await api(page.request, 'PATCH', `/forms/${form.id}`, {
+		keyValuePairs: { title: 'Ctrl+Enter form' },
+	})
+	await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'multiple_unique',
+		text: 'Favourite color',
+	}).then((question) =>
+		api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions/${question.id}/options`,
+			{
+				optionTexts: ['Red', 'Blue'],
+			},
+		),
+	)
+	await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'short',
+		text: 'Your name',
+	})
+	await page.goto(`apps/forms/${form.hash}/submit`)
+
+	await submitView.checkRadio('Favourite color', 'Red')
+	await submitView.fillText('Your name', 'Alice')
+	const name = submitView.getQuestion('Your name').getByRole('textbox')
+	await name.press('Shift+Enter')
+	await expect(submitView.submitButton).toBeFocused()
+	await expect(submitView.successMessage).toBeHidden()
+	await name.press('Control+Enter')
+	await expect(submitView.successMessage).toBeVisible()
+
+	await page.goto(`apps/forms/${form.hash}/submit`)
+	await submitView.checkRadio('Favourite color', 'Blue')
+	await submitView
+		.getQuestion('Favourite color')
+		.getByRole('radio', { name: 'Blue' })
+		.press('Control+Enter')
+	await expect(submitView.successMessage).toBeVisible()
+
+	await page.goto(`apps/forms/${form.hash}/submit`)
+	await submitView.fillText('Your name', 'Bob')
+	await submitView
+		.getQuestion('Your name')
+		.getByRole('textbox')
+		.press('Meta+Enter')
+	await expect(submitView.successMessage).toBeVisible()
+})
