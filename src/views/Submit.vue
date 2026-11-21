@@ -149,6 +149,7 @@
 				v-else
 				ref="formElement"
 				@invalid.capture="onInvalid"
+				@keydown.enter="onKeydownEnter"
 				@submit.prevent="onSubmit">
 				<ul>
 					<KeepAlive v-for="question in validQuestions" :key="question.id">
@@ -167,7 +168,6 @@
 							:index="shownQuestions.indexOf(question) + 1"
 							:maxStringLengths="maxStringLengths"
 							:values="answers[question.id]"
-							@keydown.enter="onKeydownEnter"
 							@keydown.ctrl.enter="onKeydownCtrlEnter"
 							@update:values="
 								(values: AnswerValue) => onUpdate(question, values)
@@ -831,7 +831,7 @@ export default defineComponent({
 		}
 
 		/**
-		 * The values of an answer the question still offers: its options or an answer "Other" while it allows one, the rows and columns of a grid, the values within the bounds of a linear scale
+		 * The values of an answer the question still offers: its options or an answer "Other" while it allows one, the rows and columns of a grid, the values within the bounds of a linear scale or rating
 		 *
 		 * @param question the question
 		 * @param value the values of the answer
@@ -845,7 +845,7 @@ export default defineComponent({
 					? withExistingGridCells(question, value)
 					: value
 			}
-			if (question.type === 'linearscale') {
+			if (answerTypes[question.type]?.scale) {
 				const lowest = Number(question.extraSettings?.optionsLowest ?? 1)
 				const highest = Number(question.extraSettings?.optionsHighest ?? 5)
 				return value.filter(
@@ -1186,23 +1186,77 @@ export default defineComponent({
 		}
 
 		/**
-		 * On Enter, focus next form-element
-		 * Last form element is the submit button, the form submits on enter then
+		 * On Enter in an input, focus the next focusable form element instead of
+		 * submitting. The other options of the same radio group are skipped, and
+		 * a radio group with a checked option is entered at that option. From an
+		 * option other than "Other", the inputs of its question that are not
+		 * options, such as the text of the answer "Other", are skipped as well.
+		 * The button that clears the form is skipped, so Enter in the last
+		 * answer moves on to the button that submits it.
+		 * Ctrl+Enter in an input submits the form. A held Enter acts only once,
+		 * its repeats do nothing outside text areas. Enter on buttons and text
+		 * areas, and events already handled keep their default.
 		 *
 		 * @param event The fired event.
 		 */
-		function onKeydownEnter(
-			event: KeyboardEvent & { originalTarget?: EventTarget | null },
-		): void {
-			const formInputs = Array.from(
-				formElement.value?.elements ?? [],
-			) as HTMLElement[]
-			const sourceInputIndex = formInputs.findIndex(
-				(input) => input === (event.originalTarget ?? event.target),
-			)
+		function onKeydownEnter(event: KeyboardEvent): void {
+			const source = event.target
+			if (
+				event.defaultPrevented
+				|| event.isComposing
+				|| event.keyCode === 229
+				|| event.metaKey
+				|| source instanceof HTMLTextAreaElement
+			) {
+				return
+			}
+			if (event.repeat) {
+				event.preventDefault()
+				return
+			}
+			if (
+				!(source instanceof HTMLInputElement)
+				|| ['button', 'file', 'image', 'reset', 'submit'].includes(
+					source.type,
+				)
+			) {
+				return
+			}
+			event.preventDefault()
+			if (event.ctrlKey) {
+				formElement.value?.requestSubmit()
+				return
+			}
 
-			// Focus next form element
-			formInputs[sourceInputIndex + 1]?.focus()
+			const elements = Array.from(
+				formElement.value?.elements ?? [],
+			) as HTMLInputElement[]
+			const hasCheckedOption = (name: string) =>
+				elements.some(
+					(other) =>
+						other.type === 'radio'
+						&& other.name === name
+						&& other.checked,
+				)
+			const question = source.closest('.question')
+			const fromOption =
+				source.type === 'radio'
+				&& !source.value.startsWith(QUESTION_EXTRASETTINGS_OTHER_PREFIX)
+			for (const element of elements.slice(elements.indexOf(source) + 1)) {
+				if (
+					element.type === 'reset'
+					|| (element.type === 'radio'
+						? (source.type === 'radio' && element.name === source.name)
+							|| (!element.checked && hasCheckedOption(element.name))
+						: fromOption && element.closest('.question') === question)
+				) {
+					continue
+				}
+				element.focus()
+				if (document.activeElement === element) {
+					return
+				}
+			}
 		}
 
 		let invalidShown = false

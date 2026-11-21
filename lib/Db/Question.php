@@ -66,7 +66,7 @@ class Question extends Entity {
 	public function setExtraSettings(array $extraSettings): void {
 		// Remove extraSettings that are not set
 		foreach ($extraSettings as $key => $value) {
-			if ($value === false) {
+			if ($value === false || $value === null) {
 				unset($extraSettings[$key]);
 			}
 		}

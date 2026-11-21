@@ -13,6 +13,7 @@ export enum QuestionType {
 	LinearScale = 'Linear scale',
 	LongAnswer = 'Long text',
 	Ranking = 'Ranking',
+	Rating = 'Rating',
 	RadioButtons = 'Radio buttons',
 	ShortAnswer = 'Short answer',
 }

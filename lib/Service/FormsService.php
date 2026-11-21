@@ -905,6 +905,7 @@ class FormsService {
 			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
 			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
 			Constants::ANSWER_TYPE_RANKING => Constants::EXTRA_SETTINGS_RANKING,
+			Constants::ANSWER_TYPE_RATING => Constants::EXTRA_SETTINGS_RATING,
 			Constants::ANSWER_TYPE_COLOR => Constants::EXTRA_SETTINGS_COLOR,
 			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
 			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
@@ -1064,11 +1065,13 @@ class FormsService {
 				}
 			}
 
-			// Special handling of linear scale validation
-		} elseif ($questionType === Constants::ANSWER_TYPE_LINEARSCALE) {
-			// Ensure limits are sane
+			// Special handling of linear scale and rating validation
+		} elseif ($questionType === Constants::ANSWER_TYPE_LINEARSCALE
+			|| $questionType === Constants::ANSWER_TYPE_RATING) {
+			// Ensure limits are sane and the rating icon is known
 			if (isset($extraSettings['optionsLowest']) && ($extraSettings['optionsLowest'] < 0 || $extraSettings['optionsLowest'] > 1)
-				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
+				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)
+				|| isset($extraSettings['ratingIcon']) && !in_array($extraSettings['ratingIcon'], Constants::EXTRA_SETTINGS_RATING_ICONS, true)) {
 				return false;
 			}
 		}
@@ -1108,7 +1111,7 @@ class FormsService {
 	}
 
 	/**
-	 * The answer of a jump per answer with one answer key and a target: `value:<value>` for a value from 0 to 10 of a linear scale, `option:<id>` for an option, `other` for the answer "Other" of a radio question
+	 * The answer of a jump per answer with one answer key and a target: `value:<value>` for a value from 0 to 10 of a linear scale or rating, `option:<id>` for an option, `other` for the answer "Other" of a radio question
 	 *
 	 * @param mixed $jump the jump
 	 * @param string $questionType the question type
@@ -1118,7 +1121,7 @@ class FormsService {
 		if (!is_array($jump) || count($jump) !== 2 || !self::isJumpTarget($jump['target'] ?? null)) {
 			return null;
 		}
-		if ($questionType === Constants::ANSWER_TYPE_LINEARSCALE) {
+		if ($questionType === Constants::ANSWER_TYPE_LINEARSCALE || $questionType === Constants::ANSWER_TYPE_RATING) {
 			return is_int($jump['value'] ?? null) && $jump['value'] >= 0 && $jump['value'] <= 10 ? 'value:' . $jump['value'] : null;
 		}
 		if (is_int($jump['optionId'] ?? null) && $jump['optionId'] > 0) {
@@ -1300,14 +1303,14 @@ class FormsService {
 	}
 
 	/**
-	 * Remove the jumps of a linear scale for values outside its bounds
+	 * Remove the jumps of a linear scale or rating for values outside its bounds
 	 *
 	 * @param Question $question the question
 	 * @return bool whether jumps were removed, with the new extra settings set
 	 */
 	public static function removeJumpsOutsideScale(Question $question): bool {
 		$extraSettings = $question->getExtraSettings();
-		if ($question->getType() !== Constants::ANSWER_TYPE_LINEARSCALE || !is_array($extraSettings['goTo'] ?? null)) {
+		if (!in_array($question->getType(), [Constants::ANSWER_TYPE_LINEARSCALE, Constants::ANSWER_TYPE_RATING], true) || !is_array($extraSettings['goTo'] ?? null)) {
 			return false;
 		}
 

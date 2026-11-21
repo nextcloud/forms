@@ -18,6 +18,7 @@ export const QUESTION_TYPES_WITH_GOTO = [
 	'dropdown',
 	'linearscale',
 	'multiple_unique',
+	'rating',
 ]
 
 export const QUESTION_TYPES_WITH_NEXT = [
@@ -32,7 +33,7 @@ export const QUESTION_TYPES_WITH_NEXT = [
 	'time',
 ]
 
-/** The answer a jump belongs to: an option, the answer "Other", or a value of a linear scale */
+/** The answer a jump belongs to: an option, the answer "Other", or a value of a linear scale or rating */
 export type JumpAnswer = { optionId: number } | { other: true } | { value: number }
 
 /**
@@ -230,7 +231,7 @@ export interface JumpIssues {
 }
 
 /**
- * The answers a respondent can give to a question with one answer, for which `goTo` can hold a jump: the values of a linear scale, or the options of a choice question and the answer "Other" of a radio question; none for a question without a title or a choice question without options
+ * The answers a respondent can give to a question with one answer, for which `goTo` can hold a jump: the values of a linear scale or rating, or the options of a choice question and the answer "Other" of a radio question; none for a question without a title or a choice question without options
  *
  * @param question the question
  */
@@ -238,7 +239,7 @@ function getPossibleAnswers(question: FormsQuestion): JumpAnswer[] | null {
 	if (!question.text?.trim()) {
 		return []
 	}
-	if (question.type === 'linearscale') {
+	if (question.type === 'linearscale' || question.type === 'rating') {
 		const lowest = Number(question.extraSettings?.optionsLowest ?? 1)
 		const highest = Number(question.extraSettings?.optionsHighest ?? 5)
 		return Array.from(

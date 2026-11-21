@@ -87,8 +87,7 @@
 					:type="isUnique ? 'radio' : 'checkbox'"
 					:required="checkRequired"
 					@invalid.prevent="validate"
-					@update:modelValue="onChange"
-					@keydown.enter.exact.prevent="onKeydownEnter">
+					@update:modelValue="onChange">
 					{{ answer.text }}
 				</NcCheckboxRadioSwitch>
 				<div v-if="allowOtherAnswer" class="question__other-answer">
@@ -102,8 +101,7 @@
 						:required="checkRequired"
 						class="question__label"
 						@invalid.prevent="validate"
-						@update:modelValue="onChangeOther"
-						@keydown.enter.exact.prevent="onKeydownEnter">
+						@update:modelValue="onChangeOther">
 						{{ t('forms', 'Other:') }}
 					</NcCheckboxRadioSwitch>
 					<NcInputField

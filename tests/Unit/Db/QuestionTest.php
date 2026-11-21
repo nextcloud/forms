@@ -60,4 +60,15 @@ class QuestionTest extends TestCase {
 		$question->setExtraSettings(['validationType' => 'text']);
 		$this->assertFalse($question->isEmailType());
 	}
+
+	public function testSetExtraSettingsDropsUnsetValues(): void {
+		$question = new Question();
+		$question->setExtraSettings([
+			'optionsHighest' => null,
+			'ratingIcon' => 'heart',
+			'shuffleOptions' => false,
+		]);
+
+		$this->assertSame(['ratingIcon' => 'heart'], $question->getExtraSettings());
+	}
 }

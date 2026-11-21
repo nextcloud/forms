@@ -972,6 +972,102 @@ file2.txt"
 				[],
 				'Question "q1" is required.',
 			],
+			'rating-within-configured-top' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false, 'extraSettings' => ['optionsHighest' => 10]],
+				],
+				// Answers
+				[
+					'1' => ['7'],
+				],
+				// Expected Result
+				null,
+			],
+			'rating-at-default-top' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['5'],
+				],
+				// Expected Result
+				null,
+			],
+			'rating-above-default-top' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['6'],
+				],
+				// Expected Result
+				'The answer for question "r" must be an integer between 1 and 5.',
+			],
+			'rating-above-configured-top' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false, 'extraSettings' => ['optionsHighest' => 3]],
+				],
+				// Answers
+				[
+					'1' => ['4'],
+				],
+				// Expected Result
+				'The answer for question "r" must be an integer between 1 and 3.',
+			],
+			'rating-zero' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['0'],
+				],
+				// Expected Result
+				'The answer for question "r" must be an integer between 1 and 5.',
+			],
+			'rating-not-a-number' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['three'],
+				],
+				// Expected Result
+				'The answer for question "r" must be an integer between 1 and 5.',
+			],
+			'rating-leading-zero' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['05'],
+				],
+				// Expected Result
+				'The answer for question "r" must be an integer between 1 and 5.',
+			],
+			'rating-float' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'rating', 'text' => 'r', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => [4.0],
+				],
+				// Expected Result
+				'The answer for question "r" must be an integer between 1 and 5.',
+			],
 			'required-not-answered' => [
 				// Questions
 				[
@@ -1470,6 +1566,24 @@ file2.txt"
 					'1' => [['3']]
 				],
 				'Invalid answer for question "q1".',
+			],
+			'leading-zero-linearscale-answer' => [
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]]
+				],
+				[
+					'1' => ['05']
+				],
+				'The answer for question "q1" must be an integer between 0 and 5.',
+			],
+			'float-linearscale-answer' => [
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['optionsLowest' => 0]]
+				],
+				[
+					'1' => [4.0]
+				],
+				'The answer for question "q1" must be an integer between 0 and 5.',
 			],
 			'invalid-color-question' => [
 				// Questions

@@ -111,6 +111,7 @@ class Constants {
 	public const ANSWER_TYPE_MULTIPLE = 'multiple';
 	public const ANSWER_TYPE_MULTIPLEUNIQUE = 'multiple_unique';
 	public const ANSWER_TYPE_RANKING = 'ranking';
+	public const ANSWER_TYPE_RATING = 'rating';
 	public const ANSWER_TYPE_SHORT = 'short';
 	public const ANSWER_TYPE_TIME = 'time';
 
@@ -131,7 +132,15 @@ class Constants {
 		self::ANSWER_TYPE_MULTIPLE,
 		self::ANSWER_TYPE_MULTIPLEUNIQUE,
 		self::ANSWER_TYPE_RANKING,
+		self::ANSWER_TYPE_RATING,
 		self::ANSWER_TYPE_SHORT,
+		self::ANSWER_TYPE_TIME,
+	];
+
+	// AnswerTypes for date/time questions
+	public const ANSWER_TYPES_DATETIME = [
+		self::ANSWER_TYPE_DATE,
+		self::ANSWER_TYPE_DATETIME,
 		self::ANSWER_TYPE_TIME,
 	];
 
@@ -145,18 +154,16 @@ class Constants {
 		self::ANSWER_TYPE_RANKING,
 	];
 
-	// AnswerTypes for date/time questions
-	public const ANSWER_TYPES_DATETIME = [
-		self::ANSWER_TYPE_DATE,
-		self::ANSWER_TYPE_DATETIME,
-		self::ANSWER_TYPE_TIME
+	// AnswerTypes for scale questions
+	public const ANSWER_TYPES_SCALE = [
+		self::ANSWER_TYPE_RATING,
 	];
 
 	// Formats for AnswerTypes date/datetime/time
 	public const ANSWER_PHPDATETIME_FORMAT = [
 		self::ANSWER_TYPE_DATE => 'Y-m-d',
 		self::ANSWER_TYPE_DATETIME => 'Y-m-d H:i',
-		self::ANSWER_TYPE_TIME => 'H:i'
+		self::ANSWER_TYPE_TIME => 'H:i',
 	];
 
 	/**
@@ -168,7 +175,7 @@ class Constants {
 		'phone',
 		'email',
 		'regex',
-		'number'
+		'number',
 	];
 
 	// This are allowed extra settings
@@ -247,6 +254,19 @@ class Constants {
 		'questionType' => ['string'],
 		'rows' => ['array'],
 		'next' => ['integer', 'string'],
+	];
+
+	public const EXTRA_SETTINGS_RATING = [
+		'optionsHighest' => ['integer', 'NULL'],
+		'ratingIcon' => ['string', 'NULL'],
+		'goTo' => ['array'],
+	];
+
+	// should be in sync with ICON_CHOICES in QuestionRating.vue
+	public const EXTRA_SETTINGS_RATING_ICONS = [
+		'star',
+		'heart',
+		'thumb',
 	];
 
 	public const EXTRA_SETTINGS_RANKING = [

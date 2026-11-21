@@ -37,7 +37,7 @@ Some requests succeed with their usual status, and their payload keeps its shape
 
 | Key | Value | Set by | Meaning |
 |-----|-------|--------|---------|
-| `removed-jumps` | Inner list of question ids, e.g. `(3 7)` | Updating, reordering and copying questions; deleting options; changing the bounds of a linear scale | Jumps to the question itself or to an earlier question, jumps of the deleted option or of options that are not options of the question, or jumps for values outside the scale, were removed from the `extraSettings` of these questions, see [Jumps](DataStructure.md#jumps) |
+| `removed-jumps` | Inner list of question ids, e.g. `(3 7)` | Updating, reordering and copying questions; deleting options; changing the bounds of a linear scale or the highest rating | Jumps to the question itself or to an earlier question, jumps of the deleted option or of options that are not options of the question, or jumps for values outside the scale or rating, were removed from the `extraSettings` of these questions, see [Jumps](DataStructure.md#jumps) |
 
 ```
 X-Forms-Adjusted: removed-jumps=(3 7)
@@ -64,7 +64,7 @@ When more than 100 questions lost jumps, which only a reorder can cause, `remove
 
 ### Other API changes
 
-- Questions can jump to a later question or to the end of the form with the extra settings `goTo` (per answer, on dropdown, radio and linear scale questions) or `next` (after the question, on the other types with jumps), never both (see [Jumps](DataStructure.md#jumps)). Jumps to questions of other forms are rejected, jumps for options that are not options of the question are removed, deleting an option removes its jumps, and narrowing a linear scale removes the jumps of the values that are gone. Submissions and submission updates ignore answers to the questions the jumps skip and do not require them, the path ends at an unanswered question with a jump per answer past the following question, and an answer "Other" needs a text. Updating, reordering and copying questions removes jumps to the question itself or to an earlier question; the response header `X-Forms-Adjusted` then lists the questions concerned under `removed-jumps` (see [Adjustments by the server](#adjustments-by-the-server)). Copying or importing a form drops such jumps as well, without the header, as these create a new form.
+- Questions can jump to a later question or to the end of the form with the extra settings `goTo` (per answer, on dropdown, radio, linear scale and rating questions) or `next` (after the question, on the other types with jumps), never both (see [Jumps](DataStructure.md#jumps)). Jumps to questions of other forms are rejected, jumps for options that are not options of the question are removed, deleting an option removes its jumps, and narrowing a linear scale or lowering the highest rating removes the jumps of the values that are gone. Submissions and submission updates ignore answers to the questions the jumps skip and do not require them, the path ends at an unanswered question with a jump per answer past the following question, and an answer "Other" needs a text. Updating, reordering and copying questions removes jumps to the question itself or to an earlier question; the response header `X-Forms-Adjusted` then lists the questions concerned under `removed-jumps` (see [Adjustments by the server](#adjustments-by-the-server)). Copying or importing a form drops such jumps as well, without the header, as these create a new form.
 - In API version 3.0 the following endpoints were introduced/changed:
     - `GET /api/v3/forms/{formId}/questions` to get all questions of a form
     - `GET /api/v3/forms/{formId}/questions/{questionId}` to get a single question
@@ -469,7 +469,7 @@ Update a single or multiple properties of a question-object.
   |-----------|---------|-------------|
   | _keyValuePairs_ | Array | Array of key-value pairs to update |
 - Restrictions: It is **not allowed** to update one of the following key-value pairs: _id, formId, order, type_.
-- Response: **Status-Code OK**, as well as the id of the updated question. Jumps in `extraSettings` that go to the question itself or to an earlier question, and jumps of a linear scale for values outside its bounds, are removed before saving (see [Jumps](DataStructure.md#jumps)), and the response header `X-Forms-Adjusted` then holds `removed-jumps=(<question id>)` (see [Adjustments by the server](#adjustments-by-the-server)). Jumps with an invalid structure, `goTo` or `next` on a question type without it, and ids of questions of other forms are rejected with **Status-Code Bad Request** "Invalid extraSettings, will not update." Jumps for options that are not options of the question are removed before saving, with the same header.
+- Response: **Status-Code OK**, as well as the id of the updated question. Jumps in `extraSettings` that go to the question itself or to an earlier question, and jumps of a linear scale or rating for values outside its bounds, are removed before saving (see [Jumps](DataStructure.md#jumps)), and the response header `X-Forms-Adjusted` then holds `removed-jumps=(<question id>)` (see [Adjustments by the server](#adjustments-by-the-server)). Jumps with an invalid structure, `goTo` or `next` on a question type without it, and ids of questions of other forms are rejected with **Status-Code Bad Request** "Invalid extraSettings, will not update." Jumps for options that are not options of the question are removed before saving, with the same header.
 
 ```
 "data": 1
@@ -967,6 +967,7 @@ Store Submission to Database
     - QuestionID as key
     - An **array** of values as value --> Even for short Text Answers, wrapped into Array.
     - For Question-Types with pre-defined answers (`multiple`, `multiple_unique`, `dropdown`), the array contains the corresponding option-IDs, each as a number or as a string of exactly its digits, e.g. `12` or `"12"`, but not `"012"` or `" 12"`.
+    - For linear scale and rating questions (`linearscale`, `rating`), the array contains one value between `optionsLowest` (always 1 for a rating) and `optionsHighest`, as a number or as a string of exactly its digits, e.g. `4` or `"4"`, but not `"04"` or `4.0`.
     - For File-Uploads, the array contains objects with `uploadedFileId` and `uploadToken` (both from the [Upload a file] endpoint for the same `questionId`).
     - Answers to questions that the [jumps](DataStructure.md#jumps) of the answers skip are ignored, and a skipped required question needs no answer. The path ends at a question that has no answer and a jump per answer past the following question, so the questions after an optional one left empty need no answer either.
     - An answer "Other" is `system-other-answer:` followed by its text, and the text must not be empty.

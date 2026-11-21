@@ -705,7 +705,14 @@ class SubmissionService {
 			 * Otherwise, validate the single answer for the date/time question
 			 */
 			if (in_array($question['type'], Constants::ANSWER_TYPES_DATETIME)) {
-				$this->validateDateTime($answers[$questionId], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']], $question['text'] ?? null, $question['extraSettings'] ?? null);
+				$this->validateDateTimeQuestion($answers[$questionId], Constants::ANSWER_PHPDATETIME_FORMAT[$question['type']], $question['text'] ?? null, $question['extraSettings'] ?? null);
+			}
+
+			// Check if answers to scale questions are within the limits
+			if (in_array($question['type'], Constants::ANSWER_TYPES_SCALE)) {
+				foreach ($answers[$questionId] as $answer) {
+					$this->validateScaleQuestion($question, $answer);
+				}
 			}
 
 			// Check if all answers are within the possible options
@@ -716,11 +723,7 @@ class SubmissionService {
 				foreach ($answers[$questionId] as $answer) {
 					// Handle linear scale questions
 					if ($question['type'] === Constants::ANSWER_TYPE_LINEARSCALE) {
-						$optionsLowest = $question['extraSettings']['optionsLowest'] ?? 1;
-						$optionsHighest = $question['extraSettings']['optionsHighest'] ?? 5;
-						if (!is_scalar($answer) || is_bool($answer) || !ctype_digit((string)$answer) || intval($answer) < $optionsLowest || intval($answer) > $optionsHighest) {
-							throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be an integer between %d and %d.', $question['text'], $optionsLowest, $optionsHighest));
-						}
+						$this->validateScaleQuestion($question, $answer);
 					}
 					// Check if all grid rows, columns and values match the configured grid subtype
 					elseif ($question['type'] === Constants::ANSWER_TYPE_GRID) {
@@ -932,13 +935,30 @@ class SubmissionService {
 	}
 
 	/**
+	 * Check one answer to a question answered on a numbered scale, which runs from
+	 * optionsLowest (1 if not set) to optionsHighest (5 if not set)
+	 *
+	 * @param array $question the question being answered
+	 * @param mixed $answer one submitted value
+	 * @throws \InvalidArgumentException if the answer is not a whole number within range, written without leading zeros
+	 */
+	private function validateScaleQuestion(array $question, mixed $answer): void {
+		$optionsLowest = $question['extraSettings']['optionsLowest'] ?? 1;
+		$optionsHighest = $question['extraSettings']['optionsHighest'] ?? 5;
+		$value = $this->normalizeNumericOptionId($answer);
+		if ($value === null || $value < $optionsLowest || $value > $optionsHighest) {
+			throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be an integer between %d and %d.', $question['text'], $optionsLowest, $optionsHighest));
+		}
+	}
+
+	/**
 	 * Validate correct date/time formats
 	 * @param array $answers Array with date from answer
 	 * @param string $format String with the format to validate
 	 * @param string|null $text String with the title of the question
 	 * @param array|null $extraSettings Array with extra settings for validation
 	 */
-	private function validateDateTime(array $answers, string $format, ?string $text = null, ?array $extraSettings = null): void {
+	private function validateDateTimeQuestion(array $answers, string $format, ?string $text = null, ?array $extraSettings = null): void {
 		$previousDate = null;
 
 		foreach ($answers as $dateStr) {

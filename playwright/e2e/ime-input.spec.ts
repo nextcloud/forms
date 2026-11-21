@@ -7,6 +7,7 @@ import { expect, mergeTests } from '@playwright/test'
 import { test as formTest } from '../support/fixtures/form.ts'
 import { test as appNavigationTest } from '../support/fixtures/navigation.ts'
 import { test as randomUserTest } from '../support/fixtures/random-user.ts'
+import { api } from '../support/helpers.ts'
 import { QuestionType } from '../support/sections/QuestionType.ts'
 
 const test = mergeTests(randomUserTest, appNavigationTest, formTest)
@@ -85,3 +86,41 @@ test(
 		await expect(question.answerInputs).toHaveValue('さ')
 	},
 )
+
+test('Enter that confirms IME input keeps the focus in the answer', async ({
+	browserName,
+	page,
+}) => {
+	test.skip(
+		browserName !== 'chromium',
+		'IME testing is currently only implemented in Chromium API',
+	)
+
+	const form = await api(page.request, 'POST', '/forms')
+	await api(page.request, 'PATCH', `/forms/${form.id}`, {
+		keyValuePairs: { title: 'IME answer' },
+	})
+	await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'short',
+		text: 'City',
+	})
+	await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'short',
+		text: 'Country',
+	})
+	await page.goto(`apps/forms/${form.hash}/submit`)
+
+	const city = page.getByRole('textbox', { name: 'City' })
+	await city.fill('東京')
+	const client = await page.context().newCDPSession(page)
+	await client.send('Input.dispatchKeyEvent', {
+		type: 'rawKeyDown',
+		key: 'Enter',
+		code: 'Enter',
+		windowsVirtualKeyCode: 229,
+	})
+	await expect(city).toBeFocused()
+
+	await city.press('Enter')
+	await expect(page.getByRole('textbox', { name: 'Country' })).toBeFocused()
+})
