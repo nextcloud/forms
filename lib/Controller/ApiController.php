@@ -681,6 +681,7 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException Invalid extraSettings, will not update.
 	 * @throws OCSForbiddenException Empty keyValuePairs, will not update
 	 * @throws OCSForbiddenException Not allowed to update `id`, `formId` or `type`
+	 * @throws OCSForbiddenException Not allowed to update `extraSettings.questionType`
 	 * @throws OCSForbiddenException Please use reorderQuestions() to change order
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException User has no permissions to get this form
@@ -745,6 +746,12 @@ class ApiController extends OCSController {
 
 		if (array_key_exists('extraSettings', $keyValuePairs) && !$this->formsService->areExtraSettingsValid($keyValuePairs['extraSettings'], $question->getType())) {
 			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
+		}
+
+		if (array_key_exists('extraSettings', $keyValuePairs)
+			&& ($keyValuePairs['extraSettings']['questionType'] ?? null) !== ($question->getExtraSettings()['questionType'] ?? null)) {
+			$this->logger->debug('Not allowed to update \'extraSettings.questionType\'');
+			throw new OCSForbiddenException('Not allowed to update \'extraSettings.questionType\'');
 		}
 
 		if ($form->getConfirmationEmailQuestionId() === $question->getId()
