@@ -38,12 +38,59 @@
 				required
 				@update:modelValue="onOptionsHighestChange">
 				<template #icon>
-					<NcIconSvgWrapper :svg="IconPencil" />
+					<NcIconSvgWrapper
+						:svg="isRating ? ratingIcon.outline : IconPencil" />
 				</template>
 			</NcActionInput>
+			<template v-if="isRating">
+				<!-- TRANSLATORS Caption of the choice between stars, hearts and thumbs up as the icons of a rating -->
+				<NcActionCaption :name="t('forms', 'Icon')" />
+				<NcActionRadio
+					v-for="icon in ratingIcons"
+					:key="icon.id"
+					:modelValue="ratingIcon.id"
+					:name="`ratingIcon_${id}`"
+					:value="icon.id"
+					@change="onRatingIconChange(icon.id)">
+					{{ icon.label }}
+				</NcActionRadio>
+			</template>
 		</template>
 
+		<fieldset
+			v-if="isRating"
+			class="question-rating"
+			:aria-label="readOnly ? undefined : text || t('forms', 'Rating')"
+			:aria-labelledby="readOnly ? titleId : undefined"
+			:aria-describedby="readOnly && description ? descriptionId : undefined"
+			:disabled="!readOnly">
+			<label
+				v-for="option in scaleOptions"
+				:key="option"
+				class="question-rating__option"
+				:class="{ 'question-rating__option--on': option <= ratingValue }">
+				<input
+					class="question-rating__input"
+					type="radio"
+					:name="`${id}-answer`"
+					:aria-label="ratingOptionLabel(option)"
+					:aria-errormessage="hasError ? errorId : undefined"
+					:aria-invalid="hasError ? 'true' : undefined"
+					:value="option.toString()"
+					:checked="option === ratingValue"
+					:required="isRequired"
+					@change="onChange(option.toString())"
+					@invalid.prevent="validate" />
+				<NcIconSvgWrapper
+					:svg="
+						option <= ratingValue
+							? ratingIcon.filled
+							: ratingIcon.outline
+					" />
+			</label>
+		</fieldset>
 		<div
+			v-else
 			class="question__content question-linear-scale"
 			:class="{
 				question__content__edit: !readOnly,
@@ -145,9 +192,17 @@
 
 <script lang="ts">
 import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
+import IconHeartFilled from '@material-symbols/svg-400/outlined/favorite-fill.svg?raw'
+import IconHeart from '@material-symbols/svg-400/outlined/favorite.svg?raw'
+import IconStarFilled from '@material-symbols/svg-400/outlined/star-fill.svg?raw'
+import IconStar from '@material-symbols/svg-400/outlined/star.svg?raw'
+import IconThumbFilled from '@material-symbols/svg-400/outlined/thumb_up-fill.svg?raw'
+import IconThumb from '@material-symbols/svg-400/outlined/thumb_up.svg?raw'
 import { t } from '@nextcloud/l10n'
 import { computed, defineComponent, nextTick, onMounted, ref } from 'vue'
+import NcActionCaption from '@nextcloud/vue/components/NcActionCaption'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
+import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
@@ -165,14 +220,45 @@ type LinearScaleExtraSettings = {
 	optionsLabelLowest?: string | null
 	optionsLabelHighest?: string | null
 	questionType?: string
+	ratingIcon?: string | null
 }
+
+interface RatingIcon {
+	id: 'star' | 'heart' | 'thumb'
+	label: string
+	outline: string
+	filled: string
+}
+
+const RATING_ICONS: RatingIcon[] = [
+	{
+		id: 'star',
+		label: t('forms', 'Stars'),
+		outline: IconStar,
+		filled: IconStarFilled,
+	},
+	{
+		id: 'heart',
+		label: t('forms', 'Hearts'),
+		outline: IconHeart,
+		filled: IconHeartFilled,
+	},
+	{
+		id: 'thumb',
+		label: t('forms', 'Thumbs up'),
+		outline: IconThumb,
+		filled: IconThumbFilled,
+	},
+]
 
 export default defineComponent({
 	name: 'QuestionLinearScale',
 
 	components: {
 		NcIconSvgWrapper,
+		NcActionCaption,
 		NcActionInput,
+		NcActionRadio,
 		NcCheckboxRadioSwitch,
 		NcTextArea,
 		Question,
@@ -194,6 +280,15 @@ export default defineComponent({
 		})
 		const isRating = computed<boolean>(
 			() => extraSettings.value.questionType === LinearScaleType.Rating,
+		)
+		const ratingIcon = computed<RatingIcon>(
+			() =>
+				RATING_ICONS.find(
+					(icon) => icon.id === extraSettings.value.ratingIcon,
+				) ?? RATING_ICONS[0],
+		)
+		const ratingValue = computed<number>(
+			() => parseInt(values.value?.[0] ?? '') || 0,
 		)
 		const highestLabel = computed<string>(() =>
 			isRating.value
@@ -317,7 +412,7 @@ export default defineComponent({
 		}
 
 		onMounted(() => {
-			if (!props.readOnly) {
+			if (!props.readOnly && !isRating.value) {
 				resizeLabel('lowest')
 				resizeLabel('highest')
 			}
@@ -339,6 +434,25 @@ export default defineComponent({
 		const onChange = (option: string): void => {
 			emit('update:values', [option])
 			question.errorMessage.value = null
+		}
+
+		/**
+		 * Accessible name of one option of a rating, e.g. "3 of 5"
+		 *
+		 * @param option the value of the option
+		 */
+		const ratingOptionLabel = (option: number): string => {
+			// TRANSLATORS Accessible name of one option of a rating, e.g. "3 of 5"
+			return t('forms', '{value} of {max}', {
+				value: option,
+				max: optionsHighest.value,
+			})
+		}
+
+		const onRatingIconChange = (icon: RatingIcon['id']): void => {
+			question.onExtraSettingsChange({
+				ratingIcon: icon === RATING_ICONS[0].id ? null : icon,
+			})
 		}
 
 		const onOptionsLowestChange = (value: number): void => {
@@ -396,6 +510,11 @@ export default defineComponent({
 			optionsLabelHighest,
 			isRating,
 			highestLabel,
+			ratingIcon,
+			ratingIcons: RATING_ICONS,
+			ratingValue,
+			ratingOptionLabel,
+			onRatingIconChange,
 			validate,
 			onChange,
 			onOptionsLowestChange,
@@ -410,6 +529,64 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.question-rating {
+	align-items: center;
+	border: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 2px;
+	margin: 0;
+	padding: 0;
+
+	&__option {
+		align-items: center;
+		border-radius: var(--border-radius);
+		color: var(--color-text-maxcontrast);
+		cursor: pointer;
+		display: inline-flex;
+		justify-content: center;
+		min-height: var(--default-clickable-area);
+		min-width: var(--default-clickable-area);
+		position: relative;
+		transition:
+			color 0.1s ease-in-out,
+			transform 0.1s ease-in-out;
+
+		&:has(:focus-visible) {
+			outline: 2px solid var(--color-primary-element);
+			outline-offset: -2px;
+		}
+
+		&--on {
+			color: var(--color-favorite, var(--color-warning));
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
+		}
+	}
+
+	&__input {
+		height: 1px;
+		inset-block-start: 0;
+		inset-inline-start: 0;
+		opacity: 0 !important;
+		pointer-events: none;
+		position: absolute;
+		width: 1px;
+	}
+
+	&:disabled &__option {
+		cursor: default;
+	}
+
+	@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+		&:not(:disabled) &__option:hover {
+			transform: scale(1.1);
+		}
+	}
+}
+
 .question__content {
 	display: flex;
 

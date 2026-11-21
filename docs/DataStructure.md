@@ -271,6 +271,7 @@ Optional extra settings for some [Question Types](#question-types)
 | `rows`                  | `grid`                                         | Array            | -                                           | Array of row identifiers / labels for grid questions                        |
 | `questionType`          | `grid`                                         | String           | `checkbox`, `number`, `radio`               | Type of cell for grid questions (checkbox, numeric input, or radio)         |
 | `questionType`          | `linearscale`                                  | String           | `rating`                                    | Sub type, fixed at creation; `rating` is a 1 to N scale drawn as icons; absent for a plain scale |
+| `ratingIcon`            | `linearscale` with `questionType` `rating`     | string           | `'star', 'heart', 'thumb'`                  | Set the icon of the rating, default: `'star'`                               |
 
 ### Option Types
 

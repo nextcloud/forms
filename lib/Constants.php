@@ -240,6 +240,13 @@ class Constants {
 		'optionsLabelLowest' => ['string', 'NULL'],
 		'optionsLabelHighest' => ['string', 'NULL'],
 		'questionType' => ['string'],
+		'ratingIcon' => ['string', 'NULL'],
+	];
+
+	public const RATING_ICONS = [
+		'star',
+		'heart',
+		'thumb',
 	];
 
 	public const EXTRA_SETTINGS_GRID = [
