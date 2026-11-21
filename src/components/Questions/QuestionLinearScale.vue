@@ -38,23 +38,24 @@
 				required
 				@update:modelValue="onOptionsHighestChange">
 				<template #icon>
-					<NcIconSvgWrapper
-						:svg="isRating ? ratingIcon.outline : IconPencil" />
+					<NcIconSvgWrapper :svg="IconPencil" />
 				</template>
 			</NcActionInput>
-			<template v-if="isRating">
-				<!-- TRANSLATORS Caption of the choice between stars, hearts and thumbs up as the icons of a rating -->
-				<NcActionCaption :name="t('forms', 'Icon')" />
-				<NcActionRadio
-					v-for="icon in ratingIcons"
-					:key="icon.id"
-					:modelValue="ratingIcon.id"
-					:name="`ratingIcon_${id}`"
-					:value="icon.id"
-					@update:modelValue="onRatingIconChange(icon.id)">
-					{{ icon.label }}
-				</NcActionRadio>
-			</template>
+			<NcActionInput
+				v-if="isRating"
+				:modelValue="ratingIcon.id"
+				type="multiselect"
+				:clearable="false"
+				:label="ratingIconLabel"
+				:aria-label-combobox="ratingIconLabel"
+				labelOutside
+				:options="ratingIcons"
+				:reduce="ratingIconId"
+				@update:modelValue="onRatingIconChange">
+				<template #icon>
+					<NcIconSvgWrapper :svg="ratingIcon.outline" />
+				</template>
+			</NcActionInput>
 		</template>
 
 		<fieldset
@@ -199,9 +200,7 @@ import IconThumbFilled from '@material-symbols/svg-400/outlined/thumb_up-fill.sv
 import IconThumb from '@material-symbols/svg-400/outlined/thumb_up.svg?raw'
 import { t } from '@nextcloud/l10n'
 import { computed, defineComponent, nextTick, onMounted, ref } from 'vue'
-import NcActionCaption from '@nextcloud/vue/components/NcActionCaption'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
-import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcCheckboxRadioSwitch from '@nextcloud/vue/components/NcCheckboxRadioSwitch'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcTextArea from '@nextcloud/vue/components/NcTextArea'
@@ -259,9 +258,7 @@ export default defineComponent({
 
 	components: {
 		NcIconSvgWrapper,
-		NcActionCaption,
 		NcActionInput,
-		NcActionRadio,
 		NcCheckboxRadioSwitch,
 		NcTextArea,
 		Question,
@@ -293,6 +290,8 @@ export default defineComponent({
 		const ratingValue = computed<number>(
 			() => parseInt(values.value?.[0] ?? '') || 0,
 		)
+		// TRANSLATORS Label of the choice between stars, hearts and thumbs up as the icons of a rating
+		const ratingIconLabel = t('forms', 'Icon')
 		const highestLabel = computed<string>(() =>
 			isRating.value
 				? t('forms', 'Highest rating')
@@ -410,6 +409,13 @@ export default defineComponent({
 			question.errorMessage.value = null
 		}
 
+		/**
+		 * The id of a rating icon, the value the icon dropdown stands for
+		 *
+		 * @param icon the rating icon
+		 */
+		const ratingIconId = (icon: RatingIcon): RatingIcon['id'] => icon.id
+
 		const onRatingIconChange = (icon: RatingIcon['id']): void => {
 			question.onExtraSettingsChange({
 				ratingIcon: icon === RATING_ICONS[0].id ? null : icon,
@@ -470,6 +476,8 @@ export default defineComponent({
 			isRating,
 			highestLabel,
 			ratingIcon,
+			ratingIconLabel,
+			ratingIconId,
 			ratingIcons: RATING_ICONS,
 			ratingValue,
 			onRatingIconChange,
