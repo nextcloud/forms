@@ -15,6 +15,7 @@ import IconGrid from '@material-symbols/svg-400/outlined/grid_view.svg?raw'
 import IconLinearScale from '@material-symbols/svg-400/outlined/linear_scale.svg?raw'
 import IconPalette from '@material-symbols/svg-400/outlined/palette.svg?raw'
 import IconRadioboxMarked from '@material-symbols/svg-400/outlined/radio_button_checked.svg?raw'
+import IconRecommend from '@material-symbols/svg-400/outlined/recommend.svg?raw'
 import IconClockOutline from '@material-symbols/svg-400/outlined/schedule.svg?raw'
 import IconTextShort from '@material-symbols/svg-400/outlined/short_text.svg?raw'
 import IconStar from '@material-symbols/svg-400/outlined/star.svg?raw'
@@ -275,6 +276,13 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 				label: t('forms', 'Rating'),
 				extraSettings: {
 					questionType: LinearScaleType.Rating,
+				},
+			},
+			promoter: {
+				icon: IconRecommend,
+				label: t('forms', 'Promoter score'),
+				extraSettings: {
+					questionType: LinearScaleType.Promoter,
 				},
 			},
 		},

@@ -612,7 +612,8 @@
                     "checkbox",
                     "number",
                     "radio",
-                    "rating"
+                    "rating",
+                    "promoter"
                 ]
             },
             "QuestionType": {

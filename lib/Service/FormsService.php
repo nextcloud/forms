@@ -1061,6 +1061,12 @@ class FormsService {
 				return false;
 			}
 
+			if ($subtype === Constants::ANSWER_LINEARSCALE_TYPE_PROMOTER
+				&& (($extraSettings['optionsLowest'] ?? null) !== Constants::LINEARSCALE_PROMOTER_RANGE['optionsLowest']
+				|| ($extraSettings['optionsHighest'] ?? null) !== Constants::LINEARSCALE_PROMOTER_RANGE['optionsHighest'])) {
+				return false;
+			}
+
 			if (isset($extraSettings['ratingIcon'])
 				&& ($subtype !== Constants::ANSWER_LINEARSCALE_TYPE_RATING || !in_array($extraSettings['ratingIcon'], Constants::RATING_ICONS, true))) {
 				return false;

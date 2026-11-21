@@ -119,6 +119,7 @@ class Constants {
 	public const ANSWER_GRID_TYPE_RADIO = 'radio';
 
 	public const ANSWER_LINEARSCALE_TYPE_RATING = 'rating';
+	public const ANSWER_LINEARSCALE_TYPE_PROMOTER = 'promoter';
 
 	// All AnswerTypes
 	public const ANSWER_TYPES = [
@@ -251,6 +252,15 @@ class Constants {
 
 	public const EXTRA_SETTINGS_LINEARSCALE_QUESTION_TYPE = [
 		self::ANSWER_LINEARSCALE_TYPE_RATING,
+		self::ANSWER_LINEARSCALE_TYPE_PROMOTER,
+	];
+
+	/**
+	 * The fixed range of a linear scale with the promoter score sub type
+	 */
+	public const LINEARSCALE_PROMOTER_RANGE = [
+		'optionsLowest' => 0,
+		'optionsHighest' => 10,
 	];
 
 	/**

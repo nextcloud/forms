@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import { t } from '@nextcloud/l10n'
+
 /**
  * Represents the state of a form.
  *
@@ -46,4 +48,26 @@ export enum GridCellType {
 
 export enum LinearScaleType {
 	Rating = 'rating',
+	Promoter = 'promoter',
+}
+
+/**
+ * Default labels of the lowest and the highest value of a linear scale
+ *
+ * @param questionType the sub type of the linear scale, if any
+ */
+export function getLinearScaleDefaultLabels(questionType?: string): {
+	lowest: string
+	highest: string
+} {
+	if (questionType === LinearScaleType.Promoter) {
+		return {
+			lowest: t('forms', 'Not at all likely'),
+			highest: t('forms', 'Extremely likely'),
+		}
+	}
+	return {
+		lowest: t('forms', 'Strongly disagree'),
+		highest: t('forms', 'Strongly agree'),
+	}
 }
