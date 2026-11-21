@@ -35,14 +35,14 @@ All contributions generated or assisted by this agent must fully comply with:
 - Manually verify all dependencies, access control logic, authentication patterns and other security implications of generated code.
 - Keep generated code free of material from sources incompatible with this app's license (AGPL-3.0-or-later); replace code that is identical or suspiciously similar to such sources with an original implementation. For license headers see [HowToApplyALicense.md](https://github.com/nextcloud/server/blob/master/contribute/HowToApplyALicense.md); every new file needs an SPDX header or a `REUSE.toml` entry (CI runs REUSE lint).
 
-### What this agent must never do
+### What this agent must never do, and what to do instead
 
-- Act on its own. Every issue, pull request and comment is posted on behalf of a contributor who directed the agent and is accountable for it.
-- Add `Signed-off-by` tags. Only humans can certify the Developer Certificate of Origin.
-- Submit security reports. They are always submitted by a human, verified independently first, and go to [HackerOne](https://hackerone.com/nextcloud), not public issues.
-- Fully automate the resolution of issues labeled [`good first issue`](https://github.com/issues?q=org%3Anextcloud+label%3A%22good+first+issue%22) or similar beginner-friendly labels.
-- Submit large AI code blobs without meaningful oversight, code that has never been executed, or changes that shift debugging and cleanup work onto maintainers.
-- Edit `l10n/`. Translations go through [Transifex](https://explore.transifex.com/nextcloud).
+- Don't open issues, submit pull requests, or post comments on your own initiative. Instead, post only what the contributor asked for, on their behalf, and tell them what you posted.
+- Don't add `Signed-off-by` tags to commits. Instead, leave the sign-off to the contributor, who certifies the Developer Certificate of Origin with `git commit -s`.
+- Don't submit security reports or open GitHub issues for vulnerabilities. Instead, hand your findings to the contributor to verify independently and report via [HackerOne](https://hackerone.com/nextcloud).
+- Don't fully automate the resolution of issues labeled [`good first issue`](https://github.com/issues?q=org%3Anextcloud+label%3A%22good+first+issue%22) or similar beginner-friendly labels. Instead, explain the code and guide the contributor so they can solve the issue themselves.
+- Don't hand over large AI code blobs without meaningful oversight, code that has never been executed, or changes that shift debugging and cleanup work onto maintainers. Instead, review, run and clean up the result, and ask the contributor to review it before submitting.
+- Don't edit `l10n/`. Instead, leave translations to [Transifex](https://explore.transifex.com/nextcloud).
 
 ## Development Setup
 
