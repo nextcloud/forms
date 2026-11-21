@@ -953,6 +953,7 @@ Store Submission to Database
     - QuestionID as key
     - An **array** of values as value --> Even for short Text Answers, wrapped into Array.
     - For Question-Types with pre-defined answers (`multiple`, `multiple_unique`, `dropdown`), the array contains the corresponding option-IDs, each as a number or as a string of exactly its digits, e.g. `12` or `"12"`, but not `"012"` or `" 12"`.
+    - For linear scale questions (`linearscale`), the array contains one value between `optionsLowest` and `optionsHighest`, as a number or as a string of exactly its digits, e.g. `4` or `"4"`, but not `"04"` or `4.0`.
     - For File-Uploads, the array contains objects with `uploadedFileId` and `uploadToken` (both from the [Upload a file] endpoint for the same `questionId`).
 
 ```
