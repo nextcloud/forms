@@ -10,7 +10,7 @@ import { test as randomUserTest } from '../support/fixtures/random-user.ts'
 import { test as resultsTest } from '../support/fixtures/results.ts'
 import { test as submitTest } from '../support/fixtures/submit.ts'
 import { test as topBarTest } from '../support/fixtures/topBar.ts'
-import { waitForApiResponse } from '../support/helpers.ts'
+import { api, waitForApiResponse } from '../support/helpers.ts'
 import {
 	LinearScaleSubtype,
 	QuestionType,
@@ -192,4 +192,34 @@ test.describe('Rating question', () => {
 		await savedStars
 		await expect(page.getByRole('radio', { name: 'Stars' })).toBeChecked()
 	})
+})
+
+test('The results show the average rating', async ({ page, resultsView }) => {
+	const created = await api(page.request, 'POST', '/forms')
+	await api(page.request, 'PATCH', `/forms/${created.id}`, {
+		keyValuePairs: { submitMultiple: true },
+	})
+	const rating = await api(
+		page.request,
+		'POST',
+		`/forms/${created.id}/questions`,
+		{
+			type: 'linearscale',
+			subtype: 'rating',
+			text: 'Rate the service',
+		},
+	)
+	for (const answer of ['5', '4', '4']) {
+		await api(page.request, 'POST', `/forms/${created.id}/submissions`, {
+			answers: { [rating.id]: [answer] },
+		})
+	}
+	await page.goto(`apps/forms/${created.hash}/results`)
+	await page.waitForURL(/\/results\/summary$/)
+
+	await expect(
+		resultsView
+			.getSummaryForQuestion('Rate the service')
+			.getByText('Average rating 4.3 of 5, from 3 ratings'),
+	).toBeVisible()
 })

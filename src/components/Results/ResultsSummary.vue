@@ -11,6 +11,9 @@
 		<p class="question-summary__detail">
 			{{ questionTypeLabel }}
 		</p>
+		<p v-if="averageRating" class="question-summary__rating">
+			{{ averageRating }}
+		</p>
 
 		<!-- Ranking questions: Borda count with average rank -->
 		<div v-if="question.type === 'ranking'" class="question-summary__statistic">
@@ -181,7 +184,7 @@ import type {
 } from '../../types/Entities.d.ts'
 
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
-import { getCanonicalLocale, t } from '@nextcloud/l10n'
+import { getCanonicalLocale, n, t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
 import { computed, defineComponent } from 'vue'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
@@ -595,6 +598,40 @@ export default defineComponent({
 			return matrix
 		})
 
+		const averageRating = computed<string | null>(() => {
+			if (
+				props.question.type !== 'linearscale'
+				|| props.question.extraSettings?.questionType
+					!== LinearScaleType.Rating
+			) {
+				return null
+			}
+			let count = 0
+			let sum = 0
+			for (const option of questionOptions.value) {
+				if (option.id >= 0) {
+					count += option.count
+					sum += Number(option.text) * option.count
+				}
+			}
+			if (count === 0) {
+				return null
+			}
+			return n(
+				'forms',
+				'Average rating {average} of {highest}, from {count} rating',
+				'Average rating {average} of {highest}, from {count} ratings',
+				count,
+				{
+					average: oneDecimal.format(sum / count),
+					highest: formatCount(
+						props.question.extraSettings?.optionsHighest ?? 5,
+					),
+					count: formatCount(count),
+				},
+			)
+		})
+
 		// For text answers like short answer and long text
 		const answers = computed<(FormsAnswer & { url?: string })[]>(() => {
 			const answersModels: (FormsAnswer & { url?: string })[] = []
@@ -657,6 +694,7 @@ export default defineComponent({
 			IconFile,
 			answerTypes,
 			questionTypeLabel,
+			averageRating,
 			questionOptions,
 			rankingStats,
 			maxBordaScore,
@@ -683,6 +721,10 @@ export default defineComponent({
 	&__detail {
 		color: var(--color-text-lighter);
 		margin-block-start: -8px;
+	}
+
+	&__rating {
+		font-weight: bold;
 	}
 
 	&__text,
