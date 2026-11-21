@@ -401,9 +401,7 @@ export default defineComponent({
 
 		const onChange = (option: string): void => {
 			emit('update:values', [option])
-			if (isRating.value) {
-				question.errorMessage.value = null
-			}
+			question.errorMessage.value = null
 		}
 
 		const onRatingIconChange = (icon: RatingIcon['id']): void => {
