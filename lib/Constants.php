@@ -221,6 +221,7 @@ class Constants {
 		'optionsHighest' => ['integer', 'NULL'],
 		'optionsLabelLowest' => ['string', 'NULL'],
 		'optionsLabelHighest' => ['string', 'NULL'],
+		'showPromoterScore' => ['boolean', 'NULL'],
 	];
 
 	public const EXTRA_SETTINGS_GRID = [

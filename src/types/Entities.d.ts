@@ -49,6 +49,7 @@ export interface FormsQuestionExtraSettings {
 	optionsLabelHighest?: string
 	optionsLowest?: number
 	optionsHighest?: number
+	showPromoterScore?: boolean
 	inputType?: string
 	inputValidation?: string
 	isRange?: boolean

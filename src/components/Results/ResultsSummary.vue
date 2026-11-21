@@ -701,11 +701,14 @@ export default defineComponent({
 		})
 
 		/**
-		 * Promoter and detractor shares for a 0-10 scale, using the usual 9-10 / 7-8 / 0-6 split.
+		 * Promoter and detractor shares in percent and the promoter score, the difference of
+		 * the two, using the 9-10 / 7-8 / 0-6 split. Null unless the promoter score is switched
+		 * on for a 0-10 scale that has answers.
 		 */
 		const promoterBreakdown = computed(() => {
 			if (
-				props.question.extraSettings?.optionsLowest !== 0
+				props.question.extraSettings?.showPromoterScore !== true
+				|| props.question.extraSettings?.optionsLowest !== 0
 				|| props.question.extraSettings?.optionsHighest !== 10
 			) {
 				return null

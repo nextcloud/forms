@@ -575,6 +575,9 @@
                             1
                         ]
                     },
+                    "showPromoterScore": {
+                        "type": "boolean"
+                    },
                     "shuffleOptions": {
                         "type": "boolean"
                     },
