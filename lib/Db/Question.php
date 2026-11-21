@@ -54,10 +54,13 @@ class Question extends Entity {
 	}
 
 	/**
+	 * The extra settings, without the ones that are not set (false or null)
+	 *
 	 * @return FormsQuestionExtraSettings
 	 */
 	public function getExtraSettings(): array {
-		return json_decode($this->getExtraSettingsJson() ?: '{}', true, 512, JSON_THROW_ON_ERROR);
+		$extraSettings = json_decode($this->getExtraSettingsJson() ?: '{}', true, 512, JSON_THROW_ON_ERROR);
+		return array_filter($extraSettings, static fn (mixed $value): bool => $value !== false && $value !== null);
 	}
 
 	/**
