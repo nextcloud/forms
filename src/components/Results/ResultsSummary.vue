@@ -32,20 +32,18 @@
 			</div>
 			<div v-if="promoterBreakdown">
 				<dt>{{ t('forms', 'Promoter score (promoters − detractors)') }}</dt>
-				<dd>
-					{{ promoterBreakdown.score }}
-					<span class="question-summary__figures-detail">
-						{{
-							t(
-								'forms',
-								'{promoters}% promoters, {detractors}% detractors',
-								{
-									promoters: promoterBreakdown.promoters,
-									detractors: promoterBreakdown.detractors,
-								},
-							)
-						}}
-					</span>
+				<dd>{{ promoterBreakdown.score }}</dd>
+				<dd class="question-summary__figures-detail">
+					{{
+						t(
+							'forms',
+							'{promoters}% promoters, {detractors}% detractors',
+							{
+								promoters: promoterBreakdown.promoters,
+								detractors: promoterBreakdown.detractors,
+							},
+						)
+					}}
 				</dd>
 			</div>
 		</dl>
@@ -892,6 +890,17 @@ export default defineComponent({
 	flex-wrap: wrap;
 	gap: 16px;
 	margin: 0 0 8px;
+	padding: 0;
+
+	dt,
+	dd {
+		display: block;
+		width: auto;
+		margin: 0;
+		padding: 0;
+		white-space: normal;
+		text-align: start;
+	}
 
 	dt {
 		color: var(--color-text-maxcontrast);
@@ -901,13 +910,11 @@ export default defineComponent({
 	dd {
 		font-size: 1.2em;
 		font-weight: bold;
-		margin: 0;
 	}
 
-	&-detail {
+	dd.question-summary__figures-detail {
 		color: var(--color-text-maxcontrast);
-		display: block;
-		font-size: 0.75em;
+		font-size: 0.9em;
 		font-weight: normal;
 	}
 }
