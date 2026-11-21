@@ -193,13 +193,9 @@
 </template>
 
 <script lang="ts">
+import type { RatingIcon } from '../../models/RatingIcons.ts'
+
 import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
-import IconHeartFilled from '@material-symbols/svg-400/outlined/favorite-fill.svg?raw'
-import IconHeart from '@material-symbols/svg-400/outlined/favorite.svg?raw'
-import IconStarFilled from '@material-symbols/svg-400/outlined/star-fill.svg?raw'
-import IconStar from '@material-symbols/svg-400/outlined/star.svg?raw'
-import IconThumbFilled from '@material-symbols/svg-400/outlined/thumb_up-fill.svg?raw'
-import IconThumb from '@material-symbols/svg-400/outlined/thumb_up.svg?raw'
 import { t } from '@nextcloud/l10n'
 import { computed, defineComponent, nextTick, onMounted, ref } from 'vue'
 import NcActionCaption from '@nextcloud/vue/components/NcActionCaption'
@@ -215,6 +211,7 @@ import {
 	useQuestion,
 } from '../../composables/useQuestion.ts'
 import { LinearScaleType } from '../../models/Constants.ts'
+import { getRatingIcon, RATING_ICONS } from '../../models/RatingIcons.ts'
 
 type LinearScaleExtraSettings = {
 	optionsLowest?: number | null
@@ -224,38 +221,6 @@ type LinearScaleExtraSettings = {
 	questionType?: string
 	ratingIcon?: string | null
 }
-
-interface RatingIcon {
-	id: 'star' | 'heart' | 'thumb'
-	label: string
-	outline: string
-	filled: string
-	color: string
-}
-
-const RATING_ICONS: RatingIcon[] = [
-	{
-		id: 'star',
-		label: t('forms', 'Stars'),
-		outline: IconStar,
-		filled: IconStarFilled,
-		color: 'var(--color-element-warning)',
-	},
-	{
-		id: 'heart',
-		label: t('forms', 'Hearts'),
-		outline: IconHeart,
-		filled: IconHeartFilled,
-		color: 'var(--color-element-error)',
-	},
-	{
-		id: 'thumb',
-		label: t('forms', 'Thumbs up'),
-		outline: IconThumb,
-		filled: IconThumbFilled,
-		color: 'var(--color-element-info)',
-	},
-]
 
 export default defineComponent({
 	name: 'QuestionLinearScale',
@@ -287,11 +252,8 @@ export default defineComponent({
 		const isRating = computed<boolean>(
 			() => extraSettings.value.questionType === LinearScaleType.Rating,
 		)
-		const ratingIcon = computed<RatingIcon>(
-			() =>
-				RATING_ICONS.find(
-					(icon) => icon.id === extraSettings.value.ratingIcon,
-				) ?? RATING_ICONS[0],
+		const ratingIcon = computed<RatingIcon>(() =>
+			getRatingIcon(extraSettings.value.ratingIcon),
 		)
 		const ratingValue = computed<number>(
 			() => parseInt(values.value?.[0] ?? '') || 0,

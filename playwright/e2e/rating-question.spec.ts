@@ -10,7 +10,7 @@ import { test as randomUserTest } from '../support/fixtures/random-user.ts'
 import { test as resultsTest } from '../support/fixtures/results.ts'
 import { test as submitTest } from '../support/fixtures/submit.ts'
 import { test as topBarTest } from '../support/fixtures/topBar.ts'
-import { waitForApiResponse } from '../support/helpers.ts'
+import { api, waitForApiResponse } from '../support/helpers.ts'
 import {
 	LinearScaleSubtype,
 	QuestionType,
@@ -192,4 +192,60 @@ test.describe('Rating question', () => {
 		await savedStars
 		await expect(page.getByRole('radio', { name: 'Stars' })).toBeChecked()
 	})
+})
+
+test('The results show the average rating', async ({ page, resultsView }) => {
+	const created = await api(page.request, 'POST', '/forms')
+	await api(page.request, 'PATCH', `/forms/${created.id}`, {
+		keyValuePairs: { submitMultiple: true },
+	})
+	const rating = await api(
+		page.request,
+		'POST',
+		`/forms/${created.id}/questions`,
+		{
+			type: 'linearscale',
+			subtype: 'rating',
+			text: 'Rate the service',
+		},
+	)
+	for (const answer of ['5', '4', '4']) {
+		await api(page.request, 'POST', `/forms/${created.id}/submissions`, {
+			answers: { [rating.id]: [answer] },
+		})
+	}
+	await api(page.request, 'POST', `/forms/${created.id}/submissions`, {
+		answers: {},
+	})
+	const ratingUrl = `/forms/${created.id}/questions/${rating.id}`
+	await api(page.request, 'PATCH', ratingUrl, {
+		keyValuePairs: {
+			extraSettings: { questionType: 'rating', optionsHighest: 7 },
+		},
+	})
+	await api(page.request, 'POST', `/forms/${created.id}/submissions`, {
+		answers: { [rating.id]: ['7'] },
+	})
+	await api(page.request, 'PATCH', ratingUrl, {
+		keyValuePairs: { extraSettings: { questionType: 'rating' } },
+	})
+	await page.goto(`apps/forms/${created.hash}/results`)
+	await page.waitForURL(/\/results\/summary$/)
+
+	const summary = resultsView.getSummaryForQuestion('Rate the service')
+	await expect(summary.getByText('4.3 of 5', { exact: true })).toBeVisible()
+	await expect(summary.getByText('3 ratings', { exact: true })).toBeVisible()
+	await expect(
+		summary.getByText('1 rating outside the scale is not counted'),
+	).toBeVisible()
+	await expect(
+		summary.getByText('Average rating 4.3 of 5, from 3 ratings'),
+	).toHaveCount(1)
+	const bars = summary.getByRole('meter')
+	await expect(bars).toHaveCount(7)
+	await expect(bars.nth(0)).toHaveAccessibleName('0 (0%): 1')
+	await expect(bars.nth(3)).toHaveAccessibleName('2 (40%): 4')
+	await expect(bars.nth(4)).toHaveAccessibleName('1 (20%): 5')
+	await expect(bars.nth(5)).toHaveAccessibleName('1 (20%): 7')
+	await expect(bars.nth(6)).toHaveAccessibleName('1 (20%): No response')
 })
