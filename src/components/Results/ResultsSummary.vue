@@ -27,11 +27,11 @@
 				<dd>{{ formatNumber(numericStats.median) }}</dd>
 			</div>
 			<div>
-				<dt>{{ t('forms', 'Lowest') }}</dt>
+				<dt>{{ t('forms', 'Minimum') }}</dt>
 				<dd>{{ formatNumber(numericStats.min) }}</dd>
 			</div>
 			<div>
-				<dt>{{ t('forms', 'Highest') }}</dt>
+				<dt>{{ t('forms', 'Maximum') }}</dt>
 				<dd>{{ formatNumber(numericStats.max) }}</dd>
 			</div>
 			<div v-if="promoterBreakdown">
@@ -656,7 +656,7 @@ export default defineComponent({
 		})
 
 		/**
-		 * Every numeric answer given to this question.
+		 * The numeric answers given to a linear scale question; empty for other question types.
 		 */
 		const numericValues = computed<number[]>(() => {
 			if (props.question.type !== 'linearscale') {
@@ -664,7 +664,7 @@ export default defineComponent({
 			}
 			const values: number[] = []
 			for (const submission of props.submissions) {
-				for (const answer of submission.answers ?? []) {
+				for (const answer of submission.answers) {
 					if (answer.questionId !== props.question.id) {
 						continue
 					}
@@ -678,10 +678,8 @@ export default defineComponent({
 		})
 
 		/**
-		 * Summary statistics for a scale question.
-		 *
-		 * The median is reported next to the average because a single extreme answer moves
-		 * an average a long way at the response counts most forms see.
+		 * Answer count, average, median, minimum and maximum of a linear scale question;
+		 * null without answers.
 		 */
 		const numericStats = computed(() => {
 			const values = numericValues.value
