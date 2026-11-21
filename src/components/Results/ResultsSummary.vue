@@ -70,18 +70,18 @@
 				<dt>{{ t('forms', 'Highest') }}</dt>
 				<dd>{{ numericStats.max }}</dd>
 			</div>
-			<div v-if="npsScore !== null">
-				<dt>{{ t('forms', 'Net Promoter Score') }}</dt>
+			<div v-if="promoterScore !== null">
+				<dt>{{ t('forms', 'Promoter score (promoters − detractors)') }}</dt>
 				<dd>
-					{{ npsScore }}
+					{{ promoterScore }}
 					<span class="question-summary__figures-detail">
 						{{
 							t(
 								'forms',
 								'{promoters}% promoters, {detractors}% detractors',
 								{
-									promoters: npsBreakdown.promoters,
-									detractors: npsBreakdown.detractors,
+									promoters: promoterBreakdown.promoters,
+									detractors: promoterBreakdown.detractors,
 								},
 							)
 						}}
@@ -702,10 +702,9 @@ export default defineComponent({
 		})
 
 		/**
-		 * Promoter and detractor shares for a question shaped like a Net Promoter Score
-		 * question, i.e. a 0-10 scale, using the usual 9-10 / 7-8 / 0-6 split.
+		 * Promoter and detractor shares for a 0-10 scale, using the usual 9-10 / 7-8 / 0-6 split.
 		 */
-		const npsBreakdown = computed(() => {
+		const promoterBreakdown = computed(() => {
 			if (
 				props.question.extraSettings?.optionsLowest !== 0
 				|| props.question.extraSettings?.optionsHighest !== 10
@@ -728,11 +727,12 @@ export default defineComponent({
 		})
 
 		/**
-		 * The Net Promoter Score itself: promoters minus detractors.
+		 * The promoter score: promoters minus detractors.
 		 */
-		const npsScore = computed(() =>
-			npsBreakdown.value
-				? npsBreakdown.value.promoters - npsBreakdown.value.detractors
+		const promoterScore = computed(() =>
+			promoterBreakdown.value
+				? promoterBreakdown.value.promoters
+					- promoterBreakdown.value.detractors
 				: null,
 		)
 
@@ -740,8 +740,8 @@ export default defineComponent({
 			IconFile,
 			answerTypes,
 			numericStats,
-			npsBreakdown,
-			npsScore,
+			promoterBreakdown,
+			promoterScore,
 			questionTypeLabel,
 			questionOptions,
 			rankingStats,
