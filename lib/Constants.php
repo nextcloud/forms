@@ -118,6 +118,8 @@ class Constants {
 	public const ANSWER_GRID_TYPE_NUMBER = 'number';
 	public const ANSWER_GRID_TYPE_RADIO = 'radio';
 
+	public const ANSWER_LINEARSCALE_TYPE_RATING = 'rating';
+
 	// Option types
 	public const OPTION_TYPE_CHOICE = 'choice';
 	public const OPTION_TYPE_ROW = 'row';
@@ -237,6 +239,7 @@ class Constants {
 		'optionsHighest' => ['integer', 'NULL'],
 		'optionsLabelLowest' => ['string', 'NULL'],
 		'optionsLabelHighest' => ['string', 'NULL'],
+		'questionType' => ['string'],
 	];
 
 	public const EXTRA_SETTINGS_GRID = [
@@ -253,6 +256,10 @@ class Constants {
 		self::ANSWER_GRID_TYPE_CHECKBOX,
 		self::ANSWER_GRID_TYPE_NUMBER,
 		self::ANSWER_GRID_TYPE_RADIO,
+	];
+
+	public const EXTRA_SETTINGS_LINEARSCALE_QUESTION_TYPE = [
+		self::ANSWER_LINEARSCALE_TYPE_RATING,
 	];
 
 	/**

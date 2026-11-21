@@ -42,18 +42,23 @@
 				<template #icon>
 					<NcIconSvgWrapper :svg="IconChevronLeft" />
 				</template>
-				{{ t('forms', 'Grid') }}
+				{{ answerTypesFilter[activeQuestionType].label }}
 			</NcActionButton>
 			<NcActionSeparator />
 
 			<NcActionButton
-				v-for="(answer, type) in answerTypesFilter[activeQuestionType]
-					.subtypes"
+				v-for="answer in answerTypesFilter[activeQuestionType].subtypes"
 				:key="'subtype-' + answer.label"
 				closeAfterClick
 				:disabled="isLoadingQuestions"
 				class="question-menu__question"
-				@click="onSubtypeClick(activeQuestionType, type, position)">
+				@click="
+					onSubtypeClick(
+						activeQuestionType,
+						answer.extraSettings.questionType ?? null,
+						position,
+					)
+				">
 				<template #icon>
 					<NcIconSvgWrapper :svg="answer.icon" />
 				</template>
@@ -146,7 +151,7 @@ export default defineComponent({
 
 		const onSubtypeClick = (
 			type: string,
-			subtype: string | number,
+			subtype: string | null,
 			position: number | null,
 		) => {
 			emit('addQuestion', type, subtype, position)
@@ -174,7 +179,6 @@ export default defineComponent({
 			onPrimaryClick,
 			onSubtypeClick,
 			backLabel,
-			t,
 			IconChevronLeft,
 			IconPlus,
 		}

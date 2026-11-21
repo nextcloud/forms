@@ -67,7 +67,7 @@ use Psr\Log\LoggerInterface;
  * @psalm-import-type FormsPartialForm from ResponseDefinitions
  * @psalm-import-type FormsQuestion from ResponseDefinitions
  * @psalm-import-type FormsQuestionType from ResponseDefinitions
- * @psalm-import-type FormsQuestionGridCellType from ResponseDefinitions
+ * @psalm-import-type FormsQuestionSubtype from ResponseDefinitions
  * @psalm-import-type FormsSubmission from ResponseDefinitions
  * @psalm-import-type FormsSubmissions from ResponseDefinitions
  * @psalm-import-type FormsUploadedFile from ResponseDefinitions
@@ -530,7 +530,7 @@ class ApiController extends OCSController {
 	 *
 	 * @param int $formId the form id
 	 * @param FormsQuestionType $type the new question type
-	 * @param FormsQuestionGridCellType $subtype the new question subtype
+	 * @param FormsQuestionSubtype $subtype the new question subtype
 	 * @param string $text the new question title
 	 * @param ?int $fromId (optional) id of the question that should be cloned
 	 * @param ?int $position (optional) the position of the new question

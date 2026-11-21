@@ -231,7 +231,6 @@ export default defineComponent({
 								string | string[] | Record<string, string | number>
 							>)
 						: undefined
-					// fixme: rename `questionType` to `gridCellType` everywhere in BE and FE
 					if (
 						gridValue
 						&& question.extraSettings?.questionType === 'radio'

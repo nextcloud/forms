@@ -598,12 +598,13 @@
                     }
                 }
             },
-            "QuestionGridCellType": {
+            "QuestionSubtype": {
                 "type": "string",
                 "enum": [
                     "checkbox",
                     "number",
-                    "radio"
+                    "radio",
+                    "rating"
                 ]
             },
             "QuestionType": {
@@ -1700,7 +1701,7 @@
                                         "description": "the new question type"
                                     },
                                     "subtype": {
-                                        "$ref": "#/components/schemas/QuestionGridCellType",
+                                        "$ref": "#/components/schemas/QuestionSubtype",
                                         "default": null,
                                         "description": "the new question subtype"
                                     },

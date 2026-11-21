@@ -13,6 +13,7 @@
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionInput
+				v-if="!isRating"
 				:modelValue="optionsLowest"
 				type="multiselect"
 				:clearable="false"
@@ -30,8 +31,8 @@
 				:modelValue="optionsHighest"
 				type="multiselect"
 				:clearable="false"
-				:label="t('forms', 'Highest value')"
-				:aria-label-combobox="t('forms', 'Highest value')"
+				:label="highestLabel"
+				:aria-label-combobox="highestLabel"
 				labelOutside
 				:options="[2, 3, 4, 5, 6, 7, 8, 9, 10]"
 				required
@@ -156,12 +157,14 @@ import {
 	QUESTION_PROPS,
 	useQuestion,
 } from '../../composables/useQuestion.ts'
+import { LinearScaleType } from '../../models/Constants.ts'
 
 type LinearScaleExtraSettings = {
 	optionsLowest?: number | null
 	optionsHighest?: number | null
 	optionsLabelLowest?: string | null
 	optionsLabelHighest?: string | null
+	questionType?: string
 }
 
 export default defineComponent({
@@ -189,6 +192,15 @@ export default defineComponent({
 				(props.extraSettings as LinearScaleExtraSettings | undefined) ?? {}
 			)
 		})
+		const isRating = computed<boolean>(
+			() => extraSettings.value.questionType === LinearScaleType.Rating,
+		)
+		const highestLabel = computed<string>(() =>
+			isRating.value
+				? // TRANSLATORS Label of the choice of how many icons a rating offers, the highest rating that can be given
+					t('forms', 'Highest rating')
+				: t('forms', 'Highest value'),
+		)
 		const lowest = ref<{ $refs: { input: HTMLTextAreaElement } } | null>(null)
 		const highest = ref<{ $refs: { input: HTMLTextAreaElement } } | null>(null)
 
@@ -382,6 +394,8 @@ export default defineComponent({
 			optionsHighest,
 			optionsLabelLowest,
 			optionsLabelHighest,
+			isRating,
+			highestLabel,
 			validate,
 			onChange,
 			onOptionsLowestChange,
