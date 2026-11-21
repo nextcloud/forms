@@ -932,7 +932,7 @@ export default defineComponent({
 		}
 
 		/**
-		 * On Enter, focus next form-element
+		 * On Enter, focus next form-element, skipping the button that clears the form
 		 * Last form element is the submit button, the form submits on enter then
 		 *
 		 * @param event The fired event.
@@ -947,8 +947,10 @@ export default defineComponent({
 				(input) => input === (event.originalTarget ?? event.target),
 			)
 
-			// Focus next form element
-			formInputs[sourceInputIndex + 1]?.focus()
+			formInputs
+				.slice(sourceInputIndex + 1)
+				.find((input) => (input as HTMLButtonElement).type !== 'reset')
+				?.focus()
 		}
 
 		let invalidShown = false
