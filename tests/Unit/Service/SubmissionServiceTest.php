@@ -972,6 +972,18 @@ file2.txt"
 				[],
 				'Question "q1" is required.',
 			],
+			'rating-within-configured-top' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'r', 'isRequired' => false, 'extraSettings' => ['questionType' => 'rating', 'optionsHighest' => 10]],
+				],
+				// Answers
+				[
+					'1' => ['7'],
+				],
+				// Expected Result
+				null,
+			],
 			'required-not-answered' => [
 				// Questions
 				[
@@ -1512,6 +1524,24 @@ file2.txt"
 					'1' => [4.0]
 				],
 				'The answer for question "q1" must be a whole number from 0 to 5, written without leading zeros or a decimal point.',
+			],
+			'rating-above-configured-top' => [
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'r', 'isRequired' => false, 'extraSettings' => ['questionType' => 'rating', 'optionsHighest' => 3]]
+				],
+				[
+					'1' => ['4']
+				],
+				'The answer for question "r" must be a whole number from 1 to 3, written without leading zeros or a decimal point.',
+			],
+			'rating-zero' => [
+				[
+					['id' => 1, 'type' => 'linearscale', 'text' => 'r', 'isRequired' => false, 'extraSettings' => ['questionType' => 'rating']]
+				],
+				[
+					'1' => ['0']
+				],
+				'The answer for question "r" must be a whole number from 1 to 5, written without leading zeros or a decimal point.',
 			],
 			'invalid-color-question' => [
 				// Questions
