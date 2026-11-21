@@ -656,25 +656,22 @@ export default defineComponent({
 		})
 
 		/**
-		 * The numeric answers given to a linear scale question; empty for other question types.
+		 * The numeric answers given to a linear scale question in ascending order, taken from
+		 * the answer counts of the bars; empty for other question types.
 		 */
 		const numericValues = computed<number[]>(() => {
 			if (props.question.type !== 'linearscale') {
 				return []
 			}
-			const values: number[] = []
-			for (const submission of props.submissions) {
-				for (const answer of submission.answers) {
-					if (answer.questionId !== props.question.id) {
-						continue
-					}
-					const value = parseFloat(answer.text)
-					if (!isNaN(value)) {
-						values.push(value)
-					}
-				}
-			}
-			return values
+			return questionOptions.value
+				.filter((option) => option.id !== -2)
+				.map((option) => ({
+					value: parseFloat(option.text),
+					count: option.count,
+				}))
+				.filter(({ value }) => !isNaN(value))
+				.sort((a, b) => a.value - b.value)
+				.flatMap(({ value, count }) => Array<number>(count).fill(value))
 		})
 
 		/**
@@ -686,20 +683,19 @@ export default defineComponent({
 			if (values.length === 0) {
 				return null
 			}
-			const sorted = [...values].sort((a, b) => a - b)
-			const middle = Math.floor(sorted.length / 2)
+			const middle = Math.floor(values.length / 2)
 			const median =
-				sorted.length % 2
-					? sorted[middle]
-					: (sorted[middle - 1] + sorted[middle]) / 2
+				values.length % 2
+					? values[middle]
+					: (values[middle - 1] + values[middle]) / 2
 			const sum = values.reduce((a, b) => a + b, 0)
 
 			return {
 				count: values.length,
 				mean: Math.round((sum * 100) / values.length) / 100,
 				median,
-				min: sorted[0],
-				max: sorted[sorted.length - 1],
+				min: values[0],
+				max: values[values.length - 1],
 			}
 		})
 
