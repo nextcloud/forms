@@ -12,6 +12,44 @@
 			{{ questionTypeLabel }}
 		</p>
 
+		<!-- Summary figures for scale questions, shown above the per-value bars -->
+		<dl v-if="numericStats" class="question-summary__figures">
+			<div>
+				<dt>{{ t('forms', 'Average') }}</dt>
+				<dd>{{ numericStats.mean }}</dd>
+			</div>
+			<div>
+				<dt>{{ t('forms', 'Median') }}</dt>
+				<dd>{{ numericStats.median }}</dd>
+			</div>
+			<div>
+				<dt>{{ t('forms', 'Lowest') }}</dt>
+				<dd>{{ numericStats.min }}</dd>
+			</div>
+			<div>
+				<dt>{{ t('forms', 'Highest') }}</dt>
+				<dd>{{ numericStats.max }}</dd>
+			</div>
+			<div v-if="promoterScore !== null">
+				<dt>{{ t('forms', 'Promoter score (promoters − detractors)') }}</dt>
+				<dd>
+					{{ promoterScore }}
+					<span class="question-summary__figures-detail">
+						{{
+							t(
+								'forms',
+								'{promoters}% promoters, {detractors}% detractors',
+								{
+									promoters: promoterBreakdown.promoters,
+									detractors: promoterBreakdown.detractors,
+								},
+							)
+						}}
+					</span>
+				</dd>
+			</div>
+		</dl>
+
 		<!-- Ranking questions: Borda count with average rank -->
 		<div v-if="question.type === 'ranking'" class="question-summary__statistic">
 			<p class="question-summary__ranking-description">
@@ -51,44 +89,6 @@
 				</li>
 			</ol>
 		</div>
-
-		<!-- Summary figures for scale questions, shown above the per-value bars -->
-		<dl v-if="numericStats" class="question-summary__figures">
-			<div>
-				<dt>{{ t('forms', 'Average') }}</dt>
-				<dd>{{ numericStats.mean }}</dd>
-			</div>
-			<div>
-				<dt>{{ t('forms', 'Median') }}</dt>
-				<dd>{{ numericStats.median }}</dd>
-			</div>
-			<div>
-				<dt>{{ t('forms', 'Lowest') }}</dt>
-				<dd>{{ numericStats.min }}</dd>
-			</div>
-			<div>
-				<dt>{{ t('forms', 'Highest') }}</dt>
-				<dd>{{ numericStats.max }}</dd>
-			</div>
-			<div v-if="promoterScore !== null">
-				<dt>{{ t('forms', 'Promoter score (promoters − detractors)') }}</dt>
-				<dd>
-					{{ promoterScore }}
-					<span class="question-summary__figures-detail">
-						{{
-							t(
-								'forms',
-								'{promoters}% promoters, {detractors}% detractors',
-								{
-									promoters: promoterBreakdown.promoters,
-									detractors: promoterBreakdown.detractors,
-								},
-							)
-						}}
-					</span>
-				</dd>
-			</div>
-		</dl>
 
 		<!-- Answers with countable results for visualization -->
 		<ol
