@@ -536,6 +536,7 @@ class ApiController extends OCSController {
 	 * @param ?int $position (optional) the position of the new question
 	 * @return DataResponse<Http::STATUS_CREATED, FormsQuestion, array{}>
 	 * @throws OCSBadRequestException Invalid type
+	 * @throws OCSBadRequestException Invalid subtype
 	 * @throws OCSBadRequestException Datetime question type no longer supported
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
@@ -575,6 +576,11 @@ class ApiController extends OCSController {
 				throw new OCSBadRequestException('Datetime question type no longer supported');
 			}
 
+			$extraSettings = $subtype ? ['questionType' => $subtype] : [];
+			if (!$this->formsService->areExtraSettingsValid($extraSettings, $type)) {
+				throw new OCSBadRequestException('Invalid subtype');
+			}
+
 			// Retrieve all active questions sorted by Order.
 			$questions = $this->questionMapper->findByForm($formId);
 
@@ -599,7 +605,7 @@ class ApiController extends OCSController {
 			$question->setText($text);
 			$question->setDescription('');
 			$question->setIsRequired(false);
-			$question->setExtraSettings($subtype ? ['questionType' => $subtype] : []);
+			$question->setExtraSettings($extraSettings);
 
 			$question = $this->questionMapper->insert($question);
 

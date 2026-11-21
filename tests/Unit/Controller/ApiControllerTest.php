@@ -1607,6 +1607,22 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->deleteQuestion(1, 7);
 	}
 
+	public function testNewQuestionRejectsUnknownGridCellType(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->formsService->method('areExtraSettingsValid')
+			->with(['questionType' => 'stars'], Constants::ANSWER_TYPE_GRID)
+			->willReturn(false);
+		$this->questionMapper->expects($this->never())->method('insert');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->newQuestion(1, Constants::ANSWER_TYPE_GRID, 'stars');
+	}
+
 	public function testCloneQuestionRejectsDeletedQuestion(): void {
 		$form = new Form();
 		$form->setId(1);
