@@ -25,7 +25,6 @@ export const QUESTION_EMITS = [
 	'update:values',
 	'delete',
 	'clone',
-	'keydown',
 	'moveDown',
 	'moveUp',
 ]
@@ -257,10 +256,6 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		options.emit('clone')
 	}
 
-	const onKeydownEnter = (event: KeyboardEvent): void => {
-		options.emit('keydown', event)
-	}
-
 	const focus = (): void => {
 		const raw = options.rootElement?.value
 		const element = (raw && '$el' in raw ? raw.$el : raw) as
@@ -383,7 +378,6 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		onValuesChange,
 		onDelete,
 		onClone,
-		onKeydownEnter,
 		focus,
 		shuffleArray,
 		saveQuestionProperty,
