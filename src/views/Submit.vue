@@ -146,6 +146,7 @@
 				v-else
 				ref="formElement"
 				@invalid.capture="onInvalid"
+				@keydown.enter="onKeydownEnter"
 				@submit.prevent="onSubmit">
 				<ul>
 					<component
@@ -159,8 +160,6 @@
 						:index="index + 1"
 						:maxStringLengths="maxStringLengths"
 						:values="answers[question.id]"
-						@keydown.enter="onKeydownEnter"
-						@keydown.ctrl.enter="onKeydownCtrlEnter"
 						@update:values="
 							(values: AnswerValue) => onUpdate(question, values)
 						" />
@@ -181,6 +180,7 @@
 					<NcButton
 						alignment="center-reverse"
 						class="submit-button"
+						aria-keyshortcuts="Control+Enter Meta+Enter"
 						:disabled="loading"
 						type="submit"
 						variant="primary">
@@ -971,24 +971,47 @@ export default defineComponent({
 		}
 
 		/**
-		 * On Enter, focus next form-element, skipping the button that clears the form
-		 * Last form element is the submit button, the form submits on enter then
+		 * Submit the form on Ctrl+Enter or Cmd+Enter in any input or text area.
+		 * On Enter with other or no modifiers in a single-line input, focus the
+		 * next form control instead of submitting, skipping field sets and the
+		 * button that clears the form. Enter that confirms an IME composition
+		 * is left to the input method.
 		 *
 		 * @param event The fired event.
 		 */
-		function onKeydownEnter(
-			event: KeyboardEvent & { originalTarget?: EventTarget | null },
-		): void {
+		function onKeydownEnter(event: KeyboardEvent): void {
+			const target = event.target
+			if (
+				event.defaultPrevented
+				|| event.isComposing
+				|| event.keyCode === 229
+				|| !(
+					target instanceof HTMLInputElement
+					|| target instanceof HTMLTextAreaElement
+				)
+			) {
+				return
+			}
+			if (event.ctrlKey || event.metaKey) {
+				event.preventDefault()
+				formElement.value?.requestSubmit()
+				return
+			}
+			if (target instanceof HTMLTextAreaElement || target.type === 'file') {
+				return
+			}
+			event.preventDefault()
+
 			const formInputs = Array.from(
 				formElement.value?.elements ?? [],
 			) as HTMLElement[]
-			const sourceInputIndex = formInputs.findIndex(
-				(input) => input === (event.originalTarget ?? event.target),
-			)
-
 			formInputs
-				.slice(sourceInputIndex + 1)
-				.find((input) => (input as HTMLButtonElement).type !== 'reset')
+				.slice(formInputs.indexOf(target) + 1)
+				.find(
+					(input) =>
+						!(input instanceof HTMLFieldSetElement)
+						&& (input as HTMLButtonElement).type !== 'reset',
+				)
 				?.focus()
 		}
 
@@ -1013,14 +1036,6 @@ export default defineComponent({
 			const input = event.target as HTMLElement
 			input.focus({ preventScroll: true })
 			input.closest('.question')?.scrollIntoView({ block: 'center' })
-		}
-
-		/**
-		 * Ctrl+Enter typically fires submit on forms.
-		 * Some inputs do automatically, while some need explicit handling
-		 */
-		function onKeydownCtrlEnter(): void {
-			formElement.value?.requestSubmit()
 		}
 
 		/*
@@ -1335,7 +1350,6 @@ export default defineComponent({
 			isMaxSubmissionsReached,
 			loading,
 			onInvalid,
-			onKeydownCtrlEnter,
 			onKeydownEnter,
 			onSubmit,
 			onUpdate,
