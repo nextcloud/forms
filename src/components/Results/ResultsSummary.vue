@@ -20,8 +20,8 @@
 						'forms',
 						'Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred.',
 						{
-							n: (question.options ?? []).length,
-							n1: (question.options ?? []).length - 1,
+							n: formatCount((question.options ?? []).length),
+							n1: formatCount((question.options ?? []).length - 1),
 						},
 					)
 				}}
@@ -30,7 +30,7 @@
 				<li v-for="option in rankingStats" :key="option.id">
 					<label>
 						<span class="question-summary__statistic-score">
-							{{ option.bordaTotal }}
+							{{ formatCount(option.bordaTotal) }}
 						</span>
 						<span class="question-summary__statistic-percentage">
 							({{
@@ -58,9 +58,9 @@
 			class="question-summary__statistic">
 			<li v-for="option in questionOptions" :key="option.id">
 				<label :for="`option-${option.questionId}-${option.id}`">
-					{{ option.count }}
+					{{ formatCount(option.count) }}
 					<span class="question-summary__statistic-percentage">
-						({{ option.percentage }}%):
+						({{ formatPercent(option.percentage) }}):
 					</span>
 					<span
 						:class="{
@@ -96,9 +96,16 @@
 								v-if="
 									question.extraSettings?.questionType === 'radio'
 								">
-								{{ gridValue[row.id][column.id].answersCount }} ({{
-									gridValue[row.id][column.id].percentage
-								}}%)
+								{{
+									formatCount(
+										gridValue[row.id][column.id].answersCount,
+									)
+								}}
+								({{
+									formatPercent(
+										gridValue[row.id][column.id].percentage,
+									)
+								}})
 							</template>
 
 							<template
@@ -106,9 +113,16 @@
 									question.extraSettings?.questionType
 									=== 'checkbox'
 								">
-								{{ gridValue[row.id][column.id].answersCount }} ({{
-									gridValue[row.id][column.id].percentage
-								}}%)
+								{{
+									formatCount(
+										gridValue[row.id][column.id].answersCount,
+									)
+								}}
+								({{
+									formatPercent(
+										gridValue[row.id][column.id].percentage,
+									)
+								}})
 							</template>
 
 							<template
@@ -167,12 +181,29 @@ import type {
 } from '../../types/Entities.d.ts'
 
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
-import { t } from '@nextcloud/l10n'
+import { getCanonicalLocale, t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
 import { computed, defineComponent } from 'vue'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import answerTypes from '../../models/AnswerTypes.ts'
 import { GridCellType, OptionType } from '../../models/Constants.ts'
+
+const locale = getCanonicalLocale()
+const formatCount = new Intl.NumberFormat(locale).format
+const oneDecimal = new Intl.NumberFormat(locale, {
+	minimumFractionDigits: 1,
+	maximumFractionDigits: 1,
+})
+const percent = new Intl.NumberFormat(locale, { style: 'percent' })
+
+/**
+ * Format a percentage from 0 to 100 for the user's locale
+ *
+ * @param percentage the percentage to format
+ */
+function formatPercent(percentage: number): string {
+	return percent.format(percentage / 100)
+}
 
 export default defineComponent({
 	name: 'ResultsSummary',
@@ -405,7 +436,8 @@ export default defineComponent({
 			const result = Object.values(stats)
 				.map((s) => ({
 					...s,
-					avgRank: s.count > 0 ? (s.rankSum / s.count).toFixed(1) : '-',
+					avgRank:
+						s.count > 0 ? oneDecimal.format(s.rankSum / s.count) : '-',
 				}))
 				.sort((a, b) => b.bordaTotal - a.bordaTotal)
 
@@ -544,10 +576,10 @@ export default defineComponent({
 							=== GridCellType.Number
 						&& matrix[rowId][columnId].answersCount > 0
 					) {
-						matrix[rowId][columnId].averageValue = (
+						matrix[rowId][columnId].averageValue = oneDecimal.format(
 							matrix[rowId][columnId].totalValue
-							/ matrix[rowId][columnId].answersCount
-						).toFixed(1)
+								/ matrix[rowId][columnId].answersCount,
+						)
 					}
 				}
 			}
@@ -607,7 +639,7 @@ export default defineComponent({
 			answersModels.unshift({
 				id: -1,
 				questionId: props.question.id,
-				text: `${noResponseCount} (${noResponsePercentage}%): ${t('forms', 'No response')}`,
+				text: `${formatCount(noResponseCount)} (${formatPercent(noResponsePercentage)}): ${t('forms', 'No response')}`,
 			})
 
 			return answersModels
@@ -624,6 +656,8 @@ export default defineComponent({
 			gridRows,
 			gridValue,
 			answers,
+			formatCount,
+			formatPercent,
 			t,
 		}
 	},
