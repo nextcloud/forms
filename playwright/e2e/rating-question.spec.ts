@@ -181,16 +181,26 @@ test.describe('Rating question', () => {
 	test('Saves the icon chosen last in the editor', async ({ form, page }) => {
 		const questions = await form.getQuestions()
 		await questions[0].openActionsMenu()
-		const savedStars = page.waitForResponse(
-			(response) =>
-				response.request().method() === 'PATCH'
-				&& response.request().postDataJSON()?.keyValuePairs?.extraSettings
-					?.ratingIcon === null,
-		)
-		await page.getByRole('radio', { name: 'Hearts' }).click({ force: true })
-		await page.getByRole('radio', { name: 'Stars' }).click({ force: true })
-		await savedStars
-		await expect(page.getByRole('radio', { name: 'Stars' })).toBeChecked()
+		const savedIcon = (icon: string | null) =>
+			page.waitForResponse(
+				(response) =>
+					response.request().method() === 'PATCH'
+					&& response.request().postDataJSON()?.keyValuePairs
+						?.extraSettings?.ratingIcon === icon,
+			)
+		const iconInput = page.getByRole('combobox', { name: 'Icon' })
+
+		const savedHearts = savedIcon('heart')
+		await iconInput.click()
+		await page.getByRole('option', { name: 'Hearts' }).click()
+		expect((await savedHearts).ok()).toBeTruthy()
+		const savedStars = savedIcon(null)
+		await iconInput.click()
+		await page.getByRole('option', { name: 'Stars' }).click()
+		expect((await savedStars).ok()).toBeTruthy()
+		await expect(
+			page.getByRole('listitem').filter({ has: iconInput }),
+		).toContainText('Stars')
 	})
 })
 
