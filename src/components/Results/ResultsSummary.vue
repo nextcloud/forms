@@ -30,10 +30,10 @@
 				<dt>{{ t('forms', 'Highest') }}</dt>
 				<dd>{{ numericStats.max }}</dd>
 			</div>
-			<div v-if="promoterScore !== null">
+			<div v-if="promoterBreakdown">
 				<dt>{{ t('forms', 'Promoter score (promoters − detractors)') }}</dt>
 				<dd>
-					{{ promoterScore }}
+					{{ promoterBreakdown.score }}
 					<span class="question-summary__figures-detail">
 						{{
 							t(
@@ -693,7 +693,6 @@ export default defineComponent({
 			const round = (value: number) => Math.round(value * 100) / 100
 
 			return {
-				count: values.length,
 				mean: round(values.reduce((a, b) => a + b, 0) / values.length),
 				median: round(median),
 				min: round(sorted[0]),
@@ -715,33 +714,23 @@ export default defineComponent({
 			if (values.length === 0) {
 				return null
 			}
+			const promoters = values.filter((value) => value >= 9).length
+			const detractors = values.filter((value) => value <= 6).length
 			const share = (count: number) =>
-				Math.round((count / values.length) * 100)
+				Math.sign(count)
+					* Math.round((Math.abs(count) * 100) / values.length) || 0
 			return {
-				promoters: share(values.filter((value) => value >= 9).length),
-				passives: share(
-					values.filter((value) => value >= 7 && value <= 8).length,
-				),
-				detractors: share(values.filter((value) => value <= 6).length),
+				promoters: share(promoters),
+				detractors: share(detractors),
+				score: share(promoters - detractors),
 			}
 		})
-
-		/**
-		 * The promoter score: promoters minus detractors.
-		 */
-		const promoterScore = computed(() =>
-			promoterBreakdown.value
-				? promoterBreakdown.value.promoters
-					- promoterBreakdown.value.detractors
-				: null,
-		)
 
 		return {
 			IconFile,
 			answerTypes,
 			numericStats,
 			promoterBreakdown,
-			promoterScore,
 			questionTypeLabel,
 			questionOptions,
 			rankingStats,
