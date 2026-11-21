@@ -444,7 +444,9 @@ Update a single or multiple properties of a question-object.
   | Parameter | Type | Description |
   |-----------|---------|-------------|
   | _keyValuePairs_ | Array | Array of key-value pairs to update |
-- Restrictions: It is **not allowed** to update one of the following key-value pairs: _id, formId, order, type_.
+- Restrictions:
+    - It is **not allowed** to update one of the following key-value pairs: _id, formId, order, type_.
+    - The sub type `extraSettings.questionType` is fixed when the question is created. An `extraSettings` value that adds, removes or changes `questionType` is rejected with **403 Forbidden**, so send the stored `questionType` with every `extraSettings` update.
 - Response: **Status-Code OK**, as well as the id of the updated question.
 
 ```

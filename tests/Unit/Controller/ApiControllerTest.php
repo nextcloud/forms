@@ -1365,6 +1365,62 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->updateQuestion(1, 7, ['type' => Constants::ANSWER_TYPE_LONG]);
 	}
 
+	public static function dataUpdateQuestionSubtype(): array {
+		return [
+			'grid sub type changed' => [Constants::ANSWER_TYPE_GRID, ['questionType' => 'radio'], ['questionType' => 'number'], false],
+			'grid sub type removed' => [Constants::ANSWER_TYPE_GRID, ['questionType' => 'radio'], ['rows' => []], false],
+			'sub type added' => [Constants::ANSWER_TYPE_LINEARSCALE, [], ['questionType' => 'rating'], false],
+			'grid sub type unchanged' => [Constants::ANSWER_TYPE_GRID, ['questionType' => 'radio'], ['questionType' => 'radio', 'rows' => []], true],
+			'no sub type' => [Constants::ANSWER_TYPE_LINEARSCALE, ['optionsHighest' => 5], ['optionsHighest' => 7], true],
+		];
+	}
+
+	/**
+	 * @dataProvider dataUpdateQuestionSubtype
+	 */
+	public function testUpdateQuestionSubtype(string $type, array $storedSettings, array $newSettings, bool $allowed): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setOrder(1);
+		$question->setType($type);
+		$question->setExtraSettings($storedSettings);
+
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+		$this->formsService
+			->method('isFormArchived')
+			->with($form)
+			->willReturn(false);
+		$this->formsService
+			->method('areExtraSettingsValid')
+			->with($newSettings, $type)
+			->willReturn(true);
+
+		$this->questionMapper->expects($this->once())
+			->method('findById')
+			->with(7)
+			->willReturn($question);
+
+		if (!$allowed) {
+			$this->questionMapper->expects($this->never())->method('update');
+			$this->formMapper->expects($this->never())->method('update');
+			$this->expectException(OCSForbiddenException::class);
+		} else {
+			$this->questionMapper->expects($this->once())
+				->method('update')
+				->with($this->callback(fn (Question $updatedQuestion): bool => $updatedQuestion->getExtraSettings() === $newSettings));
+		}
+
+		$this->assertEquals(new DataResponse(7), $this->apiController->updateQuestion(1, 7, ['extraSettings' => $newSettings]));
+	}
+
 	public function testUpdateQuestionClearsConfirmationEmailQuestionIdWhenQuestionStopsBeingEmail(): void {
 		$form = new Form();
 		$form->setId(1);

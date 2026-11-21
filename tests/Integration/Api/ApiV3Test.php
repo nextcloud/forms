@@ -911,6 +911,45 @@ class ApiV3Test extends IntegrationBase {
 		$this->testGetFullForm($fullFormExpected);
 	}
 
+	public function testUpdateQuestionRejectsSubtypeChange(): void {
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions", [
+			'json' => [
+				'type' => 'grid',
+				'subtype' => 'radio',
+				'text' => 'Grid question',
+			],
+		]);
+		$question = $this->OcsResponse2Data($resp);
+		$this->testForms[0]['questions'][] = $question;
+		$url = "api/v3/forms/{$this->testForms[0]['id']}/questions/{$question['id']}";
+
+		foreach ([['questionType' => 'number'], []] as $extraSettings) {
+			$resp = $this->http->request('PATCH', $url, [
+				'json' => [
+					'keyValuePairs' => [
+						'extraSettings' => $extraSettings,
+					],
+				],
+				'http_errors' => false,
+			]);
+			$this->assertEquals(403, $resp->getStatusCode());
+		}
+
+		$resp = $this->http->request('PATCH', $url, [
+			'json' => [
+				'keyValuePairs' => [
+					'text' => 'Renamed grid question',
+					'extraSettings' => ['questionType' => 'radio'],
+				],
+			],
+		]);
+		$this->assertEquals(200, $resp->getStatusCode());
+
+		$data = $this->OcsResponse2Data($this->http->request('GET', $url));
+		$this->assertEquals('Renamed grid question', $data['text']);
+		$this->assertEquals(['questionType' => 'radio'], $data['extraSettings']);
+	}
+
 	public static function dataReorderQuestions() {
 		$fullFormExpected = self::dataGetFullForm()['getFullForm']['expected'];
 		$fullFormExpected['questions'][0]['order'] = 2;
