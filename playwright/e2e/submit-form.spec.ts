@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import type { APIRequestContext } from '@playwright/test'
+import type { APIRequestContext, Page } from '@playwright/test'
 
 import { expect, mergeTests } from '@playwright/test'
 import { test as formTest } from '../support/fixtures/form.ts'
@@ -307,4 +307,148 @@ test('Enter in the last answer moves on to the submit button', async ({
 	await submitView.fillText('Your name', 'Alice')
 	await submitView.getQuestion('Your name').getByRole('textbox').press('Enter')
 	await expect(submitView.submitButton).toBeFocused()
+})
+
+test('Shift+Enter moves on and Ctrl+Enter or Cmd+Enter submits the form', async ({
+	page,
+	submitView,
+}) => {
+	const form = await api(page.request, 'POST', '/forms')
+	await api(page.request, 'PATCH', `/forms/${form.id}`, {
+		keyValuePairs: { title: 'Ctrl+Enter form' },
+	})
+	await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'multiple_unique',
+		text: 'Favourite color',
+	}).then((question) =>
+		api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions/${question.id}/options`,
+			{
+				optionTexts: ['Red', 'Blue'],
+			},
+		),
+	)
+	await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'short',
+		text: 'Your name',
+	})
+	await page.goto(`apps/forms/${form.hash}/submit`)
+
+	await submitView.checkRadio('Favourite color', 'Red')
+	await submitView.fillText('Your name', 'Alice')
+	const name = submitView.getQuestion('Your name').getByRole('textbox')
+	await name.press('Shift+Enter')
+	await expect(submitView.submitButton).toBeFocused()
+	await expect(submitView.successMessage).toBeHidden()
+	await name.press('Control+Enter')
+	await expect(submitView.successMessage).toBeVisible()
+
+	await page.goto(`apps/forms/${form.hash}/submit`)
+	await submitView.checkRadio('Favourite color', 'Blue')
+	await submitView
+		.getQuestion('Favourite color')
+		.getByRole('radio', { name: 'Blue' })
+		.press('Control+Enter')
+	await expect(submitView.successMessage).toBeVisible()
+
+	await page.goto(`apps/forms/${form.hash}/submit`)
+	await submitView.fillText('Your name', 'Bob')
+	await submitView
+		.getQuestion('Your name')
+		.getByRole('textbox')
+		.press('Meta+Enter')
+	await expect(submitView.successMessage).toBeVisible()
+})
+
+/**
+ * Create a form with the short answers "City" and "Country" and open it for submission
+ *
+ * @param page the page to open the form in
+ */
+async function openImeForm(page: Page) {
+	const form = await api(page.request, 'POST', '/forms')
+	for (const text of ['City', 'Country']) {
+		await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'short',
+			text,
+		})
+	}
+	await page.goto(`apps/forms/${form.hash}/submit`)
+}
+
+test('Enter that confirms IME input neither moves on nor submits', async ({
+	page,
+	submitView,
+}) => {
+	await openImeForm(page)
+	const submissions: string[] = []
+	page.on('request', (request) => {
+		if (request.url().includes('/submissions')) {
+			submissions.push(request.method())
+		}
+	})
+
+	const city = submitView.getQuestion('City').getByRole('textbox')
+	await city.fill('東京')
+	for (const composition of [{ isComposing: true }, { keyCode: 229 }]) {
+		for (const ctrlKey of [false, true]) {
+			await city.evaluate(
+				(input, { composition, ctrlKey }) => {
+					const event = new KeyboardEvent('keydown', {
+						key: 'Enter',
+						code: 'Enter',
+						ctrlKey,
+						isComposing: composition.isComposing ?? false,
+						bubbles: true,
+						cancelable: true,
+					})
+					if (composition.keyCode) {
+						Object.defineProperty(event, 'keyCode', {
+							value: composition.keyCode,
+						})
+					}
+					input.dispatchEvent(event)
+				},
+				{ composition, ctrlKey },
+			)
+			await expect(city).toBeFocused()
+		}
+	}
+
+	await city.press('Enter')
+	await expect(
+		submitView.getQuestion('Country').getByRole('textbox'),
+	).toBeFocused()
+	await expect(submitView.successMessage).toBeHidden()
+	expect(submissions).toEqual([])
+})
+
+test('Enter with the IME key code 229 keeps the focus in the answer', async ({
+	browserName,
+	page,
+	submitView,
+}) => {
+	test.skip(
+		browserName !== 'chromium',
+		'Trusted IME key events need the Chromium DevTools protocol',
+	)
+
+	await openImeForm(page)
+	const city = submitView.getQuestion('City').getByRole('textbox')
+	await city.fill('東京')
+	const client = await page.context().newCDPSession(page)
+	await client.send('Input.dispatchKeyEvent', {
+		type: 'rawKeyDown',
+		key: 'Enter',
+		code: 'Enter',
+		windowsVirtualKeyCode: 229,
+	})
+	await expect(city).toBeFocused()
+
+	await city.press('Enter')
+	await expect(
+		submitView.getQuestion('Country').getByRole('textbox'),
+	).toBeFocused()
 })
