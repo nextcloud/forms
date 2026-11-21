@@ -123,8 +123,10 @@
 			</div>
 			<fieldset
 				class="question-linear-scale__options"
-				:aria-labelledby="titleId"
-				:aria-describedby="description ? descriptionId : undefined">
+				:aria-labelledby="readOnly ? titleId : undefined"
+				:aria-describedby="
+					readOnly && description ? descriptionId : undefined
+				">
 				<legend class="hidden-visually">
 					{{
 						t('forms', 'From {firstOption} to {lastOption}', {
@@ -140,7 +142,11 @@
 					<label :for="`linear-scale-${id}-${option}`">{{ option }}</label>
 					<NcCheckboxRadioSwitch
 						:id="`linear-scale-${id}-${option}`"
-						:aria-describedby="index === 0 ? labelId : undefined"
+						:aria-describedby="
+							index === 0 && readOnly && optionsLabelLowest !== ''
+								? labelId
+								: undefined
+						"
 						:aria-errormessage="hasError ? errorId : undefined"
 						:aria-invalid="hasError ? 'true' : undefined"
 						:disabled="!readOnly"
