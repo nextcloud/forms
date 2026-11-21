@@ -608,7 +608,10 @@
                     "long",
                     "file",
                     "datetime",
-                    "grid"
+                    "grid",
+                    "linearscale",
+                    "color",
+                    "ranking"
                 ]
             },
             "Share": {
