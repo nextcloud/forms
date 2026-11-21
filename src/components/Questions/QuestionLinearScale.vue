@@ -11,7 +11,7 @@
 		:warningInvalid="answerType.warningInvalid"
 		:errorMessage="errorMessage"
 		v-on="commonListeners">
-		<template #actions>
+		<template v-if="!isPromoter" #actions>
 			<NcActionInput
 				v-if="!isRating"
 				:modelValue="optionsLowest"
@@ -209,7 +209,10 @@ import {
 	QUESTION_PROPS,
 	useQuestion,
 } from '../../composables/useQuestion.ts'
-import { LinearScaleType } from '../../models/Constants.ts'
+import {
+	getLinearScaleDefaultLabels,
+	LinearScaleType,
+} from '../../models/Constants.ts'
 import { getRatingIcon, RATING_ICONS } from '../../models/RatingIcons.ts'
 
 type LinearScaleExtraSettings = {
@@ -263,11 +266,14 @@ export default defineComponent({
 					t('forms', 'Highest rating')
 				: t('forms', 'Highest value'),
 		)
+		const isPromoter = computed<boolean>(
+			() => extraSettings.value.questionType === LinearScaleType.Promoter,
+		)
 		const lowest = ref<{ $refs: { input: HTMLTextAreaElement } } | null>(null)
 		const highest = ref<{ $refs: { input: HTMLTextAreaElement } } | null>(null)
 
-		const defaultLowestLabel = t('forms', 'Strongly disagree')
-		const defaultHighestLabel = t('forms', 'Strongly agree')
+		const { lowest: defaultLowestLabel, highest: defaultHighestLabel } =
+			getLinearScaleDefaultLabels(extraSettings.value.questionType)
 
 		const optionsLowest = computed<number>({
 			get: () => {
@@ -477,6 +483,7 @@ export default defineComponent({
 			ratingIcons: RATING_ICONS,
 			ratingValue,
 			onRatingIconChange,
+			isPromoter,
 			validate,
 			onChange,
 			onOptionsLowestChange,

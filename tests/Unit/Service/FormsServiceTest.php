@@ -1990,6 +1990,68 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'expected' => false
 			],
+			'promoter-linearscale' => [
+				'extraSettings' => [
+					'questionType' => 'promoter',
+					'optionsLowest' => 0,
+					'optionsHighest' => 10,
+				],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true
+			],
+			'promoter-linearscale-with-labels' => [
+				'extraSettings' => [
+					'questionType' => 'promoter',
+					'optionsLowest' => 0,
+					'optionsHighest' => 10,
+					'optionsLabelLowest' => 'unlikely',
+					'optionsLabelHighest' => 'likely',
+				],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true
+			],
+			'promoter-linearscale-default-range' => [
+				'extraSettings' => [
+					'questionType' => 'promoter',
+				],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'promoter-linearscale-1-10' => [
+				'extraSettings' => [
+					'questionType' => 'promoter',
+					'optionsLowest' => 1,
+					'optionsHighest' => 10,
+				],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'promoter-linearscale-0-9' => [
+				'extraSettings' => [
+					'questionType' => 'promoter',
+					'optionsLowest' => 0,
+					'optionsHighest' => 9,
+				],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'promoter-linearscale-range-cleared' => [
+				'extraSettings' => [
+					'questionType' => 'promoter',
+					'optionsLowest' => null,
+					'optionsHighest' => null,
+				],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'plain-linearscale-0-10' => [
+				'extraSettings' => [
+					'optionsLowest' => 0,
+					'optionsHighest' => 10,
+				],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true
+			],
 		];
 	}
 

@@ -233,7 +233,12 @@ import { generateUrl } from '@nextcloud/router'
 import { computed, defineComponent } from 'vue'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import answerTypes from '../../models/AnswerTypes.ts'
-import { GridCellType, LinearScaleType, OptionType } from '../../models/Constants.ts'
+import {
+	getLinearScaleDefaultLabels,
+	GridCellType,
+	LinearScaleType,
+	OptionType,
+} from '../../models/Constants.ts'
 import { getRatingIcon } from '../../models/RatingIcons.ts'
 
 const RATING_ICON_SIZE = 28
@@ -315,12 +320,15 @@ export default defineComponent({
 			}
 
 			if (props.question.type === 'linearscale') {
+				const defaultLabels = getLinearScaleDefaultLabels(
+					props.question.extraSettings?.questionType,
+				)
 				const labelLowest =
 					props.question.extraSettings?.optionsLabelLowest
-					?? t('forms', 'Strongly disagree')
+					?? defaultLabels.lowest
 				const labelHighest =
 					props.question.extraSettings?.optionsLabelHighest
-					?? t('forms', 'Strongly agree')
+					?? defaultLabels.highest
 				const optionsLowest =
 					props.question.extraSettings?.optionsLowest?.toString() ?? '1'
 				const optionsHighest =
