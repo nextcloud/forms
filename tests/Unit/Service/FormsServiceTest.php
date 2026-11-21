@@ -1900,6 +1900,61 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
 				'expected' => false
 			],
+			'linearscale-unknown-subtype' => [
+				'extraSettings' => ['questionType' => 'stars'],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'rating-default-settings' => [
+				'extraSettings' => ['questionType' => 'rating'],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true
+			],
+			'rating-valid-settings' => [
+				'extraSettings' => [
+					'questionType' => 'rating',
+					'optionsLowest' => 1,
+					'optionsHighest' => 10,
+					'ratingIcon' => 'heart',
+				],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true
+			],
+			'rating-default-icon' => [
+				'extraSettings' => ['questionType' => 'rating', 'ratingIcon' => null],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true
+			],
+			'rating-starting-at-zero' => [
+				'extraSettings' => ['questionType' => 'rating', 'optionsLowest' => 0],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'rating-top-above-limit' => [
+				'extraSettings' => ['questionType' => 'rating', 'optionsHighest' => 11],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'rating-top-below-limit' => [
+				'extraSettings' => ['questionType' => 'rating', 'optionsHighest' => 1],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'rating-unknown-icon' => [
+				'extraSettings' => ['questionType' => 'rating', 'ratingIcon' => 'smiley'],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'rating-icon-without-rating-subtype' => [
+				'extraSettings' => ['ratingIcon' => 'star'],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'rating-icon-on-another-type' => [
+				'extraSettings' => ['ratingIcon' => 'star'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
 		];
 	}
 

@@ -1051,6 +1051,20 @@ class FormsService {
 				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
 				return false;
 			}
+
+			$subtype = $extraSettings['questionType'] ?? null;
+			if ($subtype !== null && $subtype !== 'rating') {
+				return false;
+			}
+
+			if ($subtype === 'rating' && ($extraSettings['optionsLowest'] ?? 1) !== 1) {
+				return false;
+			}
+
+			if (isset($extraSettings['ratingIcon'])
+				&& ($subtype !== 'rating' || !in_array($extraSettings['ratingIcon'], Constants::RATING_ICONS, true))) {
+				return false;
+			}
 		}
 		return true;
 	}

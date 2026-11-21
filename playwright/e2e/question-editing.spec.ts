@@ -7,7 +7,10 @@ import { expect, mergeTests } from '@playwright/test'
 import { test as formTest } from '../support/fixtures/form.ts'
 import { test as appNavigationTest } from '../support/fixtures/navigation.ts'
 import { test as randomUserTest } from '../support/fixtures/random-user.ts'
-import { QuestionType } from '../support/sections/QuestionType.ts'
+import {
+	LinearScaleSubtype,
+	QuestionType,
+} from '../support/sections/QuestionType.ts'
 
 const test = mergeTests(randomUserTest, appNavigationTest, formTest)
 
@@ -32,7 +35,12 @@ test.describe('Question editing lifecycle', () => {
 
 	for (const type of questionTypes) {
 		test(`Add a ${type} question`, async ({ form }) => {
-			await form.addQuestion(type)
+			await form.addQuestion(
+				type,
+				type === QuestionType.LinearScale
+					? LinearScaleSubtype.Numbers
+					: undefined,
+			)
 
 			const questions = await form.getQuestions()
 			expect(questions).toHaveLength(1)

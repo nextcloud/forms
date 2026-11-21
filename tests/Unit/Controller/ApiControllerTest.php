@@ -1570,6 +1570,54 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->newQuestion(1, null, null, '', 7);
 	}
 
+	public function testNewQuestionRatingSubtypeStoresSubtype(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$expectedSettings = ['questionType' => 'rating'];
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->formsService->expects($this->once())
+			->method('areExtraSettingsValid')
+			->with($expectedSettings, Constants::ANSWER_TYPE_LINEARSCALE)
+			->willReturn(true);
+		$this->questionMapper->method('findByForm')->with(1)->willReturn([]);
+
+		$stored = null;
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function (Question $question) use (&$stored) {
+				$question->setId(5);
+				$stored = $question;
+				return $question;
+			});
+		$this->formsService->method('getQuestion')->with(5)->willReturnCallback(function () use (&$stored) {
+			return $stored->read();
+		});
+
+		$response = $this->apiController->newQuestion(1, Constants::ANSWER_TYPE_LINEARSCALE, 'rating');
+
+		$this->assertSame($expectedSettings, $stored->getExtraSettings());
+		$this->assertSame($expectedSettings, $response->getData()['extraSettings']);
+	}
+
+	public function testNewQuestionRejectsInvalidSubtype(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->formsService->method('areExtraSettingsValid')
+			->with(['questionType' => 'stars'], Constants::ANSWER_TYPE_LINEARSCALE)
+			->willReturn(false);
+		$this->questionMapper->expects($this->never())->method('insert');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->newQuestion(1, Constants::ANSWER_TYPE_LINEARSCALE, 'stars');
+	}
+
 	public function testCloneFormWithConfirmationEmailQuestionId(): void {
 		$this->configService->method('canCreateForms')->willReturn(true);
 

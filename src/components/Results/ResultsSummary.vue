@@ -248,6 +248,13 @@ export default defineComponent({
 				}
 			}
 
+			if (
+				props.question.type === 'linearscale'
+				&& props.question.extraSettings?.questionType === 'rating'
+			) {
+				return `${label} (${t('forms', 'Rating')})`
+			}
+
 			if (props.question.type === 'linearscale') {
 				const labelLowest =
 					props.question.extraSettings?.optionsLabelLowest
