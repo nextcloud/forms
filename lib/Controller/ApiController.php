@@ -750,14 +750,14 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('Please use reorderQuestions() to change order');
 		}
 
-		if (array_key_exists('extraSettings', $keyValuePairs) && !$this->formsService->areExtraSettingsValid($keyValuePairs['extraSettings'], $question->getType())) {
-			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
-		}
-
 		if (array_key_exists('extraSettings', $keyValuePairs)
 			&& ($keyValuePairs['extraSettings']['questionType'] ?? null) !== ($question->getExtraSettings()['questionType'] ?? null)) {
 			$this->logger->debug('Not allowed to update \'extraSettings.questionType\'');
 			throw new OCSForbiddenException('Not allowed to update \'extraSettings.questionType\'');
+		}
+
+		if (array_key_exists('extraSettings', $keyValuePairs) && !$this->formsService->areExtraSettingsValid($keyValuePairs['extraSettings'], $question->getType())) {
+			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
 		}
 
 		if ($form->getConfirmationEmailQuestionId() === $question->getId()
