@@ -16,31 +16,33 @@
 		<dl v-if="numericStats" class="question-summary__figures">
 			<div>
 				<dt>{{ t('forms', 'Average') }}</dt>
-				<dd>{{ numericStats.mean }}</dd>
+				<dd>{{ formatNumber(numericStats.mean) }}</dd>
 			</div>
 			<div>
 				<dt>{{ t('forms', 'Median') }}</dt>
-				<dd>{{ numericStats.median }}</dd>
+				<dd>{{ formatNumber(numericStats.median) }}</dd>
 			</div>
 			<div>
 				<dt>{{ t('forms', 'Lowest') }}</dt>
-				<dd>{{ numericStats.min }}</dd>
+				<dd>{{ formatNumber(numericStats.min) }}</dd>
 			</div>
 			<div>
 				<dt>{{ t('forms', 'Highest') }}</dt>
-				<dd>{{ numericStats.max }}</dd>
+				<dd>{{ formatNumber(numericStats.max) }}</dd>
 			</div>
 			<div v-if="promoterBreakdown">
 				<dt>{{ t('forms', 'Promoter score (promoters − detractors)') }}</dt>
-				<dd>{{ promoterBreakdown.score }}</dd>
+				<dd>{{ formatNumber(promoterBreakdown.score) }}</dd>
 				<dd class="question-summary__figures-detail">
 					{{
 						t(
 							'forms',
 							'{promoters}% promoters, {detractors}% detractors',
 							{
-								promoters: promoterBreakdown.promoters,
-								detractors: promoterBreakdown.detractors,
+								promoters: formatNumber(promoterBreakdown.promoters),
+								detractors: formatNumber(
+									promoterBreakdown.detractors,
+								),
 							},
 						)
 					}}
@@ -203,7 +205,7 @@ import type {
 } from '../../types/Entities.d.ts'
 
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
-import { t } from '@nextcloud/l10n'
+import { getCanonicalLocale, t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
 import { computed, defineComponent } from 'vue'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
@@ -688,15 +690,26 @@ export default defineComponent({
 				sorted.length % 2
 					? sorted[middle]
 					: (sorted[middle - 1] + sorted[middle]) / 2
-			const round = (value: number) => Math.round(value * 100) / 100
+			const sum = values.reduce((a, b) => a + b, 0)
 
 			return {
-				mean: round(values.reduce((a, b) => a + b, 0) / values.length),
-				median: round(median),
-				min: round(sorted[0]),
-				max: round(sorted[sorted.length - 1]),
+				mean: Math.round((sum * 100) / values.length) / 100,
+				median,
+				min: sorted[0],
+				max: sorted[sorted.length - 1],
 			}
 		})
+
+		const numberFormat = new Intl.NumberFormat(getCanonicalLocale(), {
+			maximumFractionDigits: 2,
+		})
+
+		/**
+		 * Format a number for the user's locale with at most two decimals.
+		 *
+		 * @param value the number to format
+		 */
+		const formatNumber = (value: number): string => numberFormat.format(value)
 
 		/**
 		 * Promoter and detractor shares in percent and the promoter score, the difference of
@@ -730,6 +743,7 @@ export default defineComponent({
 		return {
 			IconFile,
 			answerTypes,
+			formatNumber,
 			numericStats,
 			promoterBreakdown,
 			questionTypeLabel,
