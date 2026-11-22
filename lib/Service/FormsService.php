@@ -1062,7 +1062,7 @@ class FormsService {
 			}
 
 			if (isset($extraSettings['ratingIcon'])
-				&& ($subtype !== 'rating' || !in_array($extraSettings['ratingIcon'], Constants::RATING_ICONS, true))) {
+				&& ($subtype !== Constants::ANSWER_LINEARSCALE_TYPE_RATING || !in_array($extraSettings['ratingIcon'], Constants::RATING_ICONS, true))) {
 				return false;
 			}
 		} elseif ($questionType === Constants::ANSWER_TYPE_GRID) {
