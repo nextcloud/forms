@@ -892,6 +892,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .question-summary {
+	container-type: inline-size;
 	padding-inline: var(--default-clickable-area) 16px;
 
 	h3 {
@@ -1090,11 +1091,31 @@ export default defineComponent({
 }
 
 .question-summary__figures {
-	display: flex;
-	flex-wrap: wrap;
-	gap: 16px;
-	margin: 0 0 8px;
+	display: grid;
+	gap: calc(var(--default-grid-baseline) * 2);
+	grid-template-columns: repeat(5, 1fr);
+	margin-block: calc(var(--default-grid-baseline) * 3)
+		calc(var(--default-grid-baseline) * 4);
 	padding: 0;
+
+	@container (max-width: 631px) {
+		grid-template-columns: repeat(3, 1fr);
+	}
+
+	@container (max-width: 375px) {
+		grid-template-columns: repeat(2, 1fr);
+
+		> div:nth-child(5) {
+			grid-column: span 2;
+		}
+	}
+
+	> div {
+		background-color: var(--color-background-hover);
+		border-radius: var(--border-radius-large);
+		padding: calc(var(--default-grid-baseline) * 2)
+			calc(var(--default-grid-baseline) * 3);
+	}
 
 	dt,
 	dd {
@@ -1108,11 +1129,11 @@ export default defineComponent({
 
 	dt {
 		color: var(--color-text-maxcontrast);
-		font-size: 0.9em;
+		font-size: var(--default-font-size);
 	}
 
 	dd {
-		font-size: 1.2em;
+		font-size: 1.5em;
 		font-weight: bold;
 	}
 }
