@@ -891,7 +891,10 @@ export default defineComponent({
 		 * sub type and answers.
 		 */
 		const promoterBreakdown = computed(() => {
-			if (props.question.extraSettings?.questionType !== 'promoter') {
+			if (
+				props.question.extraSettings?.questionType
+				!== LinearScaleType.Promoter
+			) {
 				return null
 			}
 			const values = numericValues.value
