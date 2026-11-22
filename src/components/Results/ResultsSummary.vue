@@ -842,11 +842,13 @@ export default defineComponent({
 		 * null without answers and for a rating.
 		 */
 		const numericStats = computed(() => {
-			const values = numericValues.value
 			if (
-				values.length === 0
-				|| props.question.extraSettings?.questionType === 'rating'
+				props.question.extraSettings?.questionType === LinearScaleType.Rating
 			) {
+				return null
+			}
+			const values = numericValues.value
+			if (values.length === 0) {
 				return null
 			}
 			const middle = Math.floor(values.length / 2)
