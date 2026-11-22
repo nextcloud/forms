@@ -934,9 +934,9 @@ export default defineComponent({
 		/**
 		 * Submit the form on Ctrl+Enter or Cmd+Enter in any input or text area.
 		 * On Enter with other or no modifiers in a single-line input, focus the
-		 * next form control instead of submitting, skipping field sets and the
-		 * button that clears the form. Enter that confirms an IME composition
-		 * is left to the input method.
+		 * next form control instead of submitting, skipping field sets, the other
+		 * radio buttons of the same group and the button that clears the form.
+		 * Enter that confirms an IME composition is left to the input method.
 		 *
 		 * @param event The fired event.
 		 */
@@ -971,7 +971,11 @@ export default defineComponent({
 				.find(
 					(input) =>
 						!(input instanceof HTMLFieldSetElement)
-						&& (input as HTMLButtonElement).type !== 'reset',
+						&& (input as HTMLButtonElement).type !== 'reset'
+						&& !(
+							target.type === 'radio'
+							&& (input as HTMLInputElement).name === target.name
+						),
 				)
 				?.focus()
 		}
