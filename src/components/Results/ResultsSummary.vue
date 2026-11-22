@@ -732,6 +732,8 @@ export default defineComponent({
 
 				&::-webkit-meter-bar {
 					height: calc(var(--border-radius) * 2);
+					background: var(--color-background-dark);
+					border-radius: var(--border-radius);
 				}
 
 				// The pseudo-classes of -moz and -webkit have to stay separated even with SCSS, otherwise they don’t work
