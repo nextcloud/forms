@@ -15,23 +15,23 @@
 		<dl v-if="numericStats" class="question-summary__figures">
 			<div>
 				<dt>{{ t('forms', 'Answers') }}</dt>
-				<dd>{{ formatNumber(numericStats.count) }}</dd>
+				<dd>{{ formatCount(numericStats.count) }}</dd>
 			</div>
 			<div>
 				<dt>{{ t('forms', 'Average') }}</dt>
-				<dd>{{ formatNumber(numericStats.mean) }}</dd>
+				<dd>{{ formatCount(numericStats.mean) }}</dd>
 			</div>
 			<div>
 				<dt>{{ t('forms', 'Median') }}</dt>
-				<dd>{{ formatNumber(numericStats.median) }}</dd>
+				<dd>{{ formatCount(numericStats.median) }}</dd>
 			</div>
 			<div>
 				<dt>{{ t('forms', 'Minimum') }}</dt>
-				<dd>{{ formatNumber(numericStats.min) }}</dd>
+				<dd>{{ formatCount(numericStats.min) }}</dd>
 			</div>
 			<div>
 				<dt>{{ t('forms', 'Maximum') }}</dt>
-				<dd>{{ formatNumber(numericStats.max) }}</dd>
+				<dd>{{ formatCount(numericStats.max) }}</dd>
 			</div>
 		</dl>
 
@@ -865,21 +865,9 @@ export default defineComponent({
 			}
 		})
 
-		const numberFormat = new Intl.NumberFormat(getCanonicalLocale(), {
-			maximumFractionDigits: 2,
-		})
-
-		/**
-		 * Format a number for the user's locale with at most two decimals.
-		 *
-		 * @param value the number to format
-		 */
-		const formatNumber = (value: number): string => numberFormat.format(value)
-
 		return {
 			IconFile,
 			answerTypes,
-			formatNumber,
 			numericStats,
 			questionTypeLabel,
 			averageRating,
