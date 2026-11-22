@@ -536,6 +536,7 @@ class ApiController extends OCSController {
 	 * @param ?int $position (optional) the position of the new question
 	 * @return DataResponse<Http::STATUS_CREATED, FormsQuestion, array{}>
 	 * @throws OCSBadRequestException Invalid type
+	 * @throws OCSBadRequestException Invalid subtype
 	 * @throws OCSBadRequestException Datetime question type no longer supported
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
@@ -575,6 +576,15 @@ class ApiController extends OCSController {
 				throw new OCSBadRequestException('Datetime question type no longer supported');
 			}
 
+			if ($type === Constants::ANSWER_TYPE_GRID && !$subtype) {
+				throw new OCSBadRequestException('Invalid subtype');
+			}
+
+			$extraSettings = $subtype ? ['questionType' => $subtype] : [];
+			if (!$this->formsService->areExtraSettingsValid($extraSettings, $type)) {
+				throw new OCSBadRequestException('Invalid subtype');
+			}
+
 			// Retrieve all active questions sorted by Order.
 			$questions = $this->questionMapper->findByForm($formId);
 
@@ -599,7 +609,7 @@ class ApiController extends OCSController {
 			$question->setText($text);
 			$question->setDescription('');
 			$question->setIsRequired(false);
-			$question->setExtraSettings($subtype ? ['questionType' => $subtype] : []);
+			$question->setExtraSettings($extraSettings);
 
 			$question = $this->questionMapper->insert($question);
 
@@ -744,14 +754,14 @@ class ApiController extends OCSController {
 			throw new OCSForbiddenException('Please use reorderQuestions() to change order');
 		}
 
-		if (array_key_exists('extraSettings', $keyValuePairs) && !$this->formsService->areExtraSettingsValid($keyValuePairs['extraSettings'], $question->getType())) {
-			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
-		}
-
 		if (array_key_exists('extraSettings', $keyValuePairs)
 			&& ($keyValuePairs['extraSettings']['questionType'] ?? null) !== ($question->getExtraSettings()['questionType'] ?? null)) {
 			$this->logger->debug('Not allowed to update \'extraSettings.questionType\'');
 			throw new OCSForbiddenException('Not allowed to update \'extraSettings.questionType\'');
+		}
+
+		if (array_key_exists('extraSettings', $keyValuePairs) && !$this->formsService->areExtraSettingsValid($keyValuePairs['extraSettings'], $question->getType())) {
+			throw new OCSBadRequestException('Invalid extraSettings, will not update.');
 		}
 
 		if ($form->getConfirmationEmailQuestionId() === $question->getId()

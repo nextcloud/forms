@@ -1881,6 +1881,21 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
 				'expected' => true
 			],
+			'grid-cell-type' => [
+				'extraSettings' => ['questionType' => Constants::ANSWER_GRID_TYPE_NUMBER],
+				'questionType' => Constants::ANSWER_TYPE_GRID,
+				'expected' => true
+			],
+			'grid-without-cell-type' => [
+				'extraSettings' => ['columns' => [], 'rows' => []],
+				'questionType' => Constants::ANSWER_TYPE_GRID,
+				'expected' => true
+			],
+			'grid-unknown-cell-type' => [
+				'extraSettings' => ['questionType' => 'rating'],
+				'questionType' => Constants::ANSWER_TYPE_GRID,
+				'expected' => false
+			],
 			'invalid-linearscale-settings' => [
 				'extraSettings' => [
 					'optionsLowest' => 1,
