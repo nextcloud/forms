@@ -1965,6 +1965,21 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
 				'expected' => false
 			],
+			'rating-lowest-label' => [
+				'extraSettings' => ['questionType' => 'rating', 'optionsLabelLowest' => 'Poor'],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'rating-highest-label' => [
+				'extraSettings' => ['questionType' => 'rating', 'optionsLabelHighest' => 'Great'],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => false
+			],
+			'rating-cleared-labels' => [
+				'extraSettings' => ['questionType' => 'rating', 'optionsLabelLowest' => null, 'optionsLabelHighest' => null],
+				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
+				'expected' => true
+			],
 			'rating-icon-without-rating-subtype' => [
 				'extraSettings' => ['ratingIcon' => 'star'],
 				'questionType' => Constants::ANSWER_TYPE_LINEARSCALE,
