@@ -1421,6 +1421,50 @@ class ApiControllerTest extends TestCase {
 		$this->assertEquals(new DataResponse(7), $this->apiController->updateQuestion(1, 7, ['extraSettings' => $newSettings]));
 	}
 
+	public function testUpdateQuestionRejectsChangedSubtypeBeforeValidatingIt(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_GRID);
+		$question->setExtraSettings(['questionType' => 'radio']);
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->formsService->method('areExtraSettingsValid')->willReturn(false);
+		$this->questionMapper->method('findById')->with(7)->willReturn($question);
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSForbiddenException::class);
+		$this->apiController->updateQuestion(1, 7, ['extraSettings' => ['questionType' => 'rating']]);
+	}
+
+	public function testUpdateQuestionRejectsInvalidExtraSettingsWithUnchangedSubtype(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_GRID);
+		$question->setExtraSettings(['questionType' => 'radio']);
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->formsService->method('areExtraSettingsValid')->willReturn(false);
+		$this->questionMapper->method('findById')->with(7)->willReturn($question);
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateQuestion(1, 7, ['extraSettings' => ['questionType' => 'radio', 'rows' => 'invalid']]);
+	}
+
 	public function testUpdateQuestionClearsConfirmationEmailQuestionIdWhenQuestionStopsBeingEmail(): void {
 		$form = new Form();
 		$form->setId(1);
@@ -1522,6 +1566,71 @@ class ApiControllerTest extends TestCase {
 
 		$this->expectException(OCSNotFoundException::class);
 		$this->apiController->deleteQuestion(1, 7);
+	}
+
+	public function testNewQuestionRejectsUnknownGridCellType(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->formsService->method('areExtraSettingsValid')
+			->with(['questionType' => 'stars'], Constants::ANSWER_TYPE_GRID)
+			->willReturn(false);
+		$this->questionMapper->expects($this->never())->method('insert');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->newQuestion(1, Constants::ANSWER_TYPE_GRID, 'stars');
+	}
+
+	public function testNewQuestionStoresGridCellType(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->formsService->method('areExtraSettingsValid')
+			->with(['questionType' => Constants::ANSWER_GRID_TYPE_RADIO], Constants::ANSWER_TYPE_GRID)
+			->willReturn(true);
+		$this->questionMapper->method('findByForm')->with(1)->willReturn([]);
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->with($this->callback(fn (Question $question): bool => $question->getType() === Constants::ANSWER_TYPE_GRID
+				&& $question->getExtraSettings() === ['questionType' => Constants::ANSWER_GRID_TYPE_RADIO]))
+			->willReturnCallback(function (Question $question): Question {
+				$question->setId(9);
+				return $question;
+			});
+		$this->formsService->method('getQuestion')->with(9)->willReturn(['id' => 9]);
+
+		$response = $this->apiController->newQuestion(1, Constants::ANSWER_TYPE_GRID, Constants::ANSWER_GRID_TYPE_RADIO);
+		$this->assertSame(Http::STATUS_CREATED, $response->getStatus());
+	}
+
+	public static function dataNewQuestionGridWithoutSubtype(): array {
+		return [
+			'omitted' => [null],
+			'empty' => [''],
+			'zero' => ['0'],
+		];
+	}
+
+	/**
+	 * @dataProvider dataNewQuestionGridWithoutSubtype
+	 */
+	public function testNewQuestionRejectsGridWithoutSubtype(?string $subtype): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->questionMapper->expects($this->never())->method('insert');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->newQuestion(1, Constants::ANSWER_TYPE_GRID, $subtype);
 	}
 
 	public function testCloneQuestionRejectsDeletedQuestion(): void {
