@@ -750,6 +750,20 @@ export default defineComponent({
 		}
 	}
 
+	@media (forced-colors: active) {
+		li meter {
+			outline: 1px solid CanvasText;
+
+			&::-webkit-meter-optimum-value {
+				background: Highlight;
+			}
+
+			&::-moz-meter-bar {
+				background: Highlight;
+			}
+		}
+	}
+
 	.color__field {
 		width: 100px;
 		height: var(--default-clickable-area);
