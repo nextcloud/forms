@@ -40,10 +40,12 @@
 					{{
 						t(
 							'forms',
-							'{promoters}% promoters, {detractors}% detractors',
+							'{promoters} promoters, {detractors} detractors',
 							{
-								promoters: formatCount(promoterBreakdown.promoters),
-								detractors: formatCount(
+								promoters: formatPercent(
+									promoterBreakdown.promoters,
+								),
+								detractors: formatPercent(
 									promoterBreakdown.detractors,
 								),
 							},
