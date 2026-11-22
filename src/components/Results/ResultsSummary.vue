@@ -33,14 +33,30 @@
 				<dt>{{ t('forms', 'Maximum') }}</dt>
 				<dd>{{ formatCount(numericStats.max) }}</dd>
 			</div>
-			<div v-if="promoterBreakdown">
-				<dt>{{ t('forms', 'Promoter score (promoters − detractors)') }}</dt>
-				<dd>{{ formatCount(promoterBreakdown.score) }}</dd>
+			<div v-if="promoterBreakdown" class="question-summary__figures-promoter">
+				<dt>
+					{{ t('forms', 'Promoter score') }}
+					<span class="hidden-visually">
+						{{ t('forms', '(promoters − detractors)') }}
+					</span>
+				</dt>
+				<dd>
+					<bdi>{{ formatScore(promoterBreakdown.score) }}</bdi>
+				</dd>
+				<dd class="question-summary__figures-split" aria-hidden="true">
+					<span
+						v-for="group in promoterGroups"
+						v-show="promoterBreakdown.counts[group] > 0"
+						:key="group"
+						:class="`question-summary__figures-split--${group}`"
+						:style="{ flexGrow: promoterBreakdown.counts[group] }" />
+				</dd>
 				<dd class="question-summary__figures-detail">
 					{{
 						formatPromoterShares(
-							promoterBreakdown.promoters,
 							promoterBreakdown.detractors,
+							promoterBreakdown.passives,
+							promoterBreakdown.promoters,
 						)
 					}}
 				</dd>
@@ -293,6 +309,7 @@ const oneDecimal = new Intl.NumberFormat(locale, {
 	maximumFractionDigits: 1,
 })
 const percent = new Intl.NumberFormat(locale, { style: 'percent' })
+const signedCount = new Intl.NumberFormat(locale, { signDisplay: 'exceptZero' })
 
 /**
  * Format a percentage from 0 to 100 for the user's locale
@@ -304,17 +321,39 @@ function formatPercent(percentage: number): string {
 }
 
 /**
- * The shares of promoters and detractors as text, e.g. "50% promoters, 25% detractors"
+ * The shares of detractors, passives and promoters as text, e.g. "25% detractors · 25% passives · 50% promoters"
  *
- * @param promoters the share of promoters in percent
  * @param detractors the share of detractors in percent
+ * @param passives the share of passives in percent
+ * @param promoters the share of promoters in percent
  */
-function formatPromoterShares(promoters: number, detractors: number): string {
-	// TRANSLATORS {promoters} and {detractors} are percentages, e.g. "50% promoters, 25% detractors"
-	return t('forms', '{promoters} promoters, {detractors} detractors', {
-		promoters: formatPercent(promoters),
-		detractors: formatPercent(detractors),
-	})
+function formatPromoterShares(
+	detractors: number,
+	passives: number,
+	promoters: number,
+): string {
+	// TRANSLATORS {detractors}, {passives} and {promoters} are percentages, e.g. "25% detractors · 25% passives · 50% promoters"
+	return t(
+		'forms',
+		'{detractors} detractors · {passives} passives · {promoters} promoters',
+		{
+			detractors: formatPercent(detractors),
+			passives: formatPercent(passives),
+			promoters: formatPercent(promoters),
+		},
+	)
+}
+
+/**
+ * The promoter score with its sign, e.g. "+11", "0" or "−25"
+ *
+ * @param score the promoter score
+ */
+function formatScore(score: number): string {
+	return signedCount
+		.formatToParts(score)
+		.map((part) => (part.type === 'minusSign' ? '−' : part.value))
+		.join('')
 }
 
 export default defineComponent({
@@ -894,9 +933,9 @@ export default defineComponent({
 		})
 
 		/**
-		 * Promoter and detractor shares in percent and the promoter score, the difference of
-		 * the two, using the 9-10 / 7-8 / 0-6 split. Null unless the question has the promoter
-		 * sub type and answers.
+		 * Answers per group, detractor, passive and promoter shares in percent and the promoter
+		 * score, the difference of the promoter and detractor shares, using the 9-10 / 7-8 / 0-6
+		 * split. Null unless the question has the promoter sub type and answers.
 		 */
 		const promoterBreakdown = computed(() => {
 			if (
@@ -911,13 +950,15 @@ export default defineComponent({
 			}
 			const promoters = values.filter((value) => value >= 9).length
 			const detractors = values.filter((value) => value <= 6).length
+			const passives = values.length - promoters - detractors
 			const share = (count: number) =>
-				Math.sign(count)
-					* Math.round((Math.abs(count) * 100) / values.length) || 0
+				Math.round((count * 100) / values.length)
 			return {
+				counts: { detractors, passives, promoters },
 				promoters: share(promoters),
+				passives: share(passives),
 				detractors: share(detractors),
-				score: share(promoters - detractors),
+				score: share(promoters) - share(detractors),
 			}
 		})
 
@@ -939,6 +980,8 @@ export default defineComponent({
 			formatCount,
 			formatPercent,
 			formatPromoterShares,
+			formatScore,
+			promoterGroups: ['detractors', 'passives', 'promoters'] as const,
 			oneDecimal,
 			t,
 		}
@@ -1156,6 +1199,10 @@ export default defineComponent({
 
 	@container (max-width: 631px) {
 		grid-template-columns: repeat(3, 1fr);
+
+		> div.question-summary__figures-promoter {
+			grid-column: 1 / -1;
+		}
 	}
 
 	@container (max-width: 375px) {
@@ -1193,10 +1240,57 @@ export default defineComponent({
 		font-weight: bold;
 	}
 
+	> .question-summary__figures-promoter {
+		grid-column: span 3;
+	}
+
 	dd.question-summary__figures-detail {
 		color: var(--color-text-maxcontrast);
-		font-size: 0.9em;
+		font-size: var(--default-font-size);
 		font-weight: normal;
+	}
+
+	dd.question-summary__figures-split {
+		border-radius: var(--border-radius-pill);
+		display: flex;
+		gap: 2px;
+		height: calc(var(--default-grid-baseline) * 2);
+		margin-block: var(--default-grid-baseline);
+		overflow: hidden;
+
+		> span {
+			flex-basis: 0;
+		}
+	}
+
+	.question-summary__figures-split--detractors {
+		background-color: var(--color-element-error);
+	}
+
+	.question-summary__figures-split--passives {
+		background-color: var(--color-element-warning);
+	}
+
+	.question-summary__figures-split--promoters {
+		background-color: var(--color-element-success);
+	}
+
+	@media (forced-colors: active) {
+		dd.question-summary__figures-split {
+			border: 1px solid CanvasText;
+		}
+
+		.question-summary__figures-split--detractors {
+			background-color: CanvasText;
+		}
+
+		.question-summary__figures-split--passives {
+			background-color: GrayText;
+		}
+
+		.question-summary__figures-split--promoters {
+			background-color: Highlight;
+		}
 	}
 }
 </style>
