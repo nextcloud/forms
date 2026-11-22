@@ -289,6 +289,7 @@ export default defineComponent({
 
 		const onChange = (option: string): void => {
 			emit('update:values', [option])
+			question.errorMessage.value = null
 		}
 
 		const onOptionsLowestChange = (value: number): void => {
