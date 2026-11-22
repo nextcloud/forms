@@ -36,6 +36,10 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 			'Description of question number 1',
 		)
 
+		const answer = questions[0].section.locator('.question__content input')
+		await expect(answer).not.toHaveAttribute('aria-labelledby')
+		await expect(answer).not.toHaveAttribute('aria-describedby')
+
 		await topBar.toggleView(FormsView.View)
 
 		const question = page.getByRole('listitem', { name: /Question number 1/ })
@@ -110,6 +114,10 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		await questions[0].fillTitle('My long question')
 		await questions[0].fillDescription('Please elaborate')
 
+		const answer = questions[0].section.locator('.question__content textarea')
+		await expect(answer).not.toHaveAttribute('aria-labelledby')
+		await expect(answer).not.toHaveAttribute('aria-describedby')
+
 		await topBar.toggleView(FormsView.View)
 
 		const question = page.getByRole('listitem', { name: /Question number 1/ })
@@ -169,6 +177,12 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		const questions = await form.getQuestions()
 		await questions[0].fillTitle('My date question')
 		await questions[0].fillDescription('Pick a date')
+
+		const answer = questions[0].section.locator(
+			'.question__content[role="group"]',
+		)
+		await expect(answer).not.toHaveAttribute('aria-labelledby')
+		await expect(answer).not.toHaveAttribute('aria-describedby')
 
 		await topBar.toggleView(FormsView.View)
 
@@ -241,6 +255,10 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		await questions[0].fillTitle('My file question')
 		await questions[0].fillDescription('Upload your file')
 
+		const answer = questions[0].section.locator('.question__input-wrapper')
+		await expect(answer).not.toHaveAttribute('aria-labelledby')
+		await expect(answer).not.toHaveAttribute('aria-describedby')
+
 		await topBar.toggleView(FormsView.View)
 
 		const question = page.getByRole('listitem', { name: /Question number 1/ })
@@ -289,6 +307,12 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		const questions = await form.getQuestions()
 		await questions[0].fillTitle('My color question')
 		await questions[0].fillDescription('Pick a color')
+
+		const answer = questions[0].section.locator(
+			'.question__content[role="group"]',
+		)
+		await expect(answer).not.toHaveAttribute('aria-labelledby')
+		await expect(answer).not.toHaveAttribute('aria-describedby')
 
 		await topBar.toggleView(FormsView.View)
 
