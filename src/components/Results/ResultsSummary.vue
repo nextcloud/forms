@@ -19,7 +19,7 @@
 			</div>
 			<div>
 				<dt>{{ t('forms', 'Average') }}</dt>
-				<dd>{{ formatCount(numericStats.mean) }}</dd>
+				<dd>{{ oneDecimal.format(numericStats.mean) }}</dd>
 			</div>
 			<div>
 				<dt>{{ t('forms', 'Median') }}</dt>
@@ -860,7 +860,7 @@ export default defineComponent({
 
 			return {
 				count: values.length,
-				mean: Math.round((sum * 100) / values.length) / 100,
+				mean: sum / values.length,
 				median,
 				min: values[0],
 				max: values[values.length - 1],
@@ -883,6 +883,7 @@ export default defineComponent({
 			answers,
 			formatCount,
 			formatPercent,
+			oneDecimal,
 			t,
 		}
 	},
