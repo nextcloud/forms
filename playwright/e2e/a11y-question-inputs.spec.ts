@@ -18,6 +18,23 @@ test.beforeEach(async ({ page }) => {
 	await page.waitForURL(/apps\/forms\/$/)
 })
 
+test('The sub menu of a question type names its back entry', async ({
+	appNavigation,
+	form,
+	page,
+}) => {
+	await appNavigation.clickNewForm()
+	await form.fillTitle('Test form')
+
+	await form.newQuestionButton.click()
+	await page
+		.getByRole('menuitem', { name: QuestionType.Grid, exact: true })
+		.click()
+	await expect(page.getByRole('menuitem').first()).toHaveAccessibleName(
+		'Grid, back to all question types',
+	)
+})
+
 test.describe('Accessibility: aria attributes on question inputs', () => {
 	test('Short answer with description has aria-labelledby and aria-describedby', async ({
 		appNavigation,
