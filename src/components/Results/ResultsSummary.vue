@@ -12,7 +12,6 @@
 			{{ questionTypeLabel }}
 		</p>
 
-		<!-- Summary figures for scale questions, shown above the per-value bars -->
 		<dl v-if="numericStats" class="question-summary__figures">
 			<div>
 				<dt>{{ t('forms', 'Answers') }}</dt>
