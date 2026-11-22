@@ -51,7 +51,7 @@
 					:modelValue="ratingIcon.id"
 					:name="`ratingIcon_${id}`"
 					:value="icon.id"
-					@change="onRatingIconChange(icon.id)">
+					@update:modelValue="onRatingIconChange(icon.id)">
 					{{ icon.label }}
 				</NcActionRadio>
 			</template>
