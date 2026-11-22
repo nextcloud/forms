@@ -212,6 +212,12 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 				exact: true,
 			}),
 		).toBeVisible()
+		await expect(
+			questions[0].section.locator('fieldset.question-linear-scale__options'),
+		).not.toHaveAttribute('aria-labelledby')
+		await expect(
+			questions[0].section.getByRole('radio').first(),
+		).not.toHaveAttribute('aria-describedby')
 
 		await topBar.toggleView(FormsView.View)
 
