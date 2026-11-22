@@ -87,6 +87,35 @@ test.describe('Question editing lifecycle', () => {
 		await expect(questions[0].titleInput).toHaveValue('Second question')
 	})
 
+	test('Saves the value of a setting chosen last in quick succession', async ({
+		form,
+		page,
+	}) => {
+		await form.addQuestion(QuestionType.LinearScale)
+		const question = (await form.getQuestions())[0]
+		await question.openActionsMenu()
+		const highest = page.getByRole('combobox', { name: 'Highest value' })
+		const saved = page.waitForResponse(
+			(response) =>
+				response.request().method() === 'PATCH'
+				&& response.request().postDataJSON()?.keyValuePairs?.extraSettings
+					!== undefined,
+		)
+
+		await highest.click()
+		await page.getByRole('option', { name: '7', exact: true }).click()
+		await highest.click()
+		await page.getByRole('option', { name: '5', exact: true }).click()
+		expect((await saved).ok()).toBeTruthy()
+
+		await page.reload()
+		await expect(
+			page
+				.getByRole('listitem', { name: /Question number \d+/i })
+				.getByRole('radio'),
+		).toHaveCount(5)
+	})
+
 	test('Clone a question', async ({ form }) => {
 		await form.addQuestion(QuestionType.Checkboxes)
 
