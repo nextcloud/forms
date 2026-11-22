@@ -35,6 +35,7 @@
 
 		<template v-else>
 			<NcActionButton
+				:aria-label="backLabel(activeQuestionType)"
 				:disabled="isLoadingQuestions"
 				class="question-menu__question"
 				@click="activeQuestionType = null">
@@ -152,11 +153,27 @@ export default defineComponent({
 			openLocal.value = false
 		}
 
+		/**
+		 * Accessible name of the entry that leaves the sub types of a question type
+		 *
+		 * @param type the question type whose sub types are shown
+		 */
+		const backLabel = (type: string): string => {
+			// TRANSLATORS Name of the entry that leaves the sub types of a question type, e.g. "Grid, back to all question types"
+			return t(
+				'forms',
+				'{type}, back to all question types',
+				{ type: props.answerTypesFilter[type].label },
+				{ escape: false, sanitize: false },
+			)
+		}
+
 		return {
 			activeQuestionType,
 			openLocal,
 			onPrimaryClick,
 			onSubtypeClick,
+			backLabel,
 			t,
 			IconChevronLeft,
 			IconPlus,
