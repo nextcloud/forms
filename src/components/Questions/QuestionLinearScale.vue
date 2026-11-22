@@ -60,6 +60,7 @@
 		<fieldset
 			v-if="isRating"
 			class="question-rating"
+			:style="{ '--rating-color': ratingIcon.color }"
 			:aria-label="readOnly ? undefined : text || t('forms', 'Rating')"
 			:aria-labelledby="readOnly ? titleId : undefined"
 			:aria-describedby="readOnly && description ? descriptionId : undefined"
@@ -86,7 +87,8 @@
 						option <= ratingValue
 							? ratingIcon.filled
 							: ratingIcon.outline
-					" />
+					"
+					:size="34" />
 			</label>
 		</fieldset>
 		<div
@@ -228,6 +230,7 @@ interface RatingIcon {
 	label: string
 	outline: string
 	filled: string
+	color: string
 }
 
 const RATING_ICONS: RatingIcon[] = [
@@ -236,18 +239,21 @@ const RATING_ICONS: RatingIcon[] = [
 		label: t('forms', 'Stars'),
 		outline: IconStar,
 		filled: IconStarFilled,
+		color: 'var(--color-element-warning)',
 	},
 	{
 		id: 'heart',
 		label: t('forms', 'Hearts'),
 		outline: IconHeart,
 		filled: IconHeartFilled,
+		color: 'var(--color-element-error)',
 	},
 	{
 		id: 'thumb',
 		label: t('forms', 'Thumbs up'),
 		outline: IconThumb,
 		filled: IconThumbFilled,
+		color: 'var(--color-element-info)',
 	},
 ]
 
@@ -534,7 +540,7 @@ export default defineComponent({
 	border: none;
 	display: flex;
 	flex-wrap: wrap;
-	gap: 2px;
+	gap: calc(4 * var(--default-grid-baseline));
 	margin: 0;
 	padding: 0;
 
@@ -558,7 +564,7 @@ export default defineComponent({
 		}
 
 		&--on {
-			color: var(--color-favorite, var(--color-warning));
+			color: var(--rating-color);
 		}
 
 		@media (prefers-reduced-motion: reduce) {
