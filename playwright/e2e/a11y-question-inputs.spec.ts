@@ -236,6 +236,8 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 			"From Don't agree & leave to Strongly agree",
 		)
 		const radios = fieldset.getByRole('radio')
+		await expect(radios.first()).toHaveAccessibleName('1')
+		await expect(radios.first()).not.toHaveAttribute('aria-labelledby')
 		await expect(radios.first()).toHaveAccessibleDescription(
 			"Don't agree & leave",
 		)
