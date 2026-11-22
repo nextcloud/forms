@@ -820,15 +820,15 @@ export default defineComponent({
 		})
 
 		/**
-		 * The numeric answers given to a linear scale question in ascending order, taken from
-		 * the answer counts of the bars; empty for other question types.
+		 * The numeric answers given to a linear scale question within its scale in ascending order,
+		 * taken from the answer counts of the bars; empty for other question types.
 		 */
 		const numericValues = computed<number[]>(() => {
 			if (props.question.type !== 'linearscale') {
 				return []
 			}
 			return questionOptions.value
-				.filter((option) => option.id !== -2)
+				.filter((option) => option.id >= 0)
 				.map((option) => ({
 					value: parseFloat(option.text),
 					count: option.count,
