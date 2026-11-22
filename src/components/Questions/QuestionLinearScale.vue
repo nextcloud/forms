@@ -79,10 +79,15 @@
 				">
 				<legend class="hidden-visually">
 					{{
-						t('forms', 'From {firstOption} to {lastOption}', {
-							firstOption: optionsLabelLowest,
-							lastOption: optionsLabelHighest,
-						})
+						t(
+							'forms',
+							'From {firstOption} to {lastOption}',
+							{
+								firstOption: optionsLabelLowest,
+								lastOption: optionsLabelHighest,
+							},
+							{ escape: false, sanitize: false },
+						)
 					}}
 				</legend>
 				<div

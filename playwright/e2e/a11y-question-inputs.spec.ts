@@ -8,6 +8,7 @@ import { test as formTest } from '../support/fixtures/form.ts'
 import { test as appNavigationTest } from '../support/fixtures/navigation.ts'
 import { test as randomUserTest } from '../support/fixtures/random-user.ts'
 import { test as topBarTest } from '../support/fixtures/topBar.ts'
+import { waitForApiResponse } from '../support/helpers.ts'
 import { GridSubtype, QuestionType } from '../support/sections/QuestionType.ts'
 import { FormsView } from '../support/sections/TopBarSection.ts'
 
@@ -212,6 +213,11 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 				exact: true,
 			}),
 		).toBeVisible()
+		const savedLabel = waitForApiResponse(page, 'PATCH')
+		await questions[0].section
+			.getByRole('textbox', { name: 'Label for lowest value', exact: true })
+			.fill("Don't agree & leave")
+		await savedLabel
 		await expect(
 			questions[0].section.locator('fieldset.question-linear-scale__options'),
 		).not.toHaveAttribute('aria-labelledby')
@@ -226,8 +232,13 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 
 		await expect(fieldset).toHaveAttribute('aria-labelledby', 'q1_title')
 		await expect(fieldset).toHaveAttribute('aria-describedby', 'q1_desc')
+		await expect(fieldset.locator('legend')).toHaveText(
+			"From Don't agree & leave to Strongly agree",
+		)
 		const radios = fieldset.getByRole('radio')
-		await expect(radios.first()).toHaveAccessibleDescription('Strongly disagree')
+		await expect(radios.first()).toHaveAccessibleDescription(
+			"Don't agree & leave",
+		)
 		await expect(radios.last()).toHaveAccessibleDescription('Strongly agree')
 
 		await expect(
