@@ -86,8 +86,8 @@
 		<div
 			class="question__content"
 			role="group"
-			:aria-labelledby="titleId"
-			:aria-describedby="description ? descriptionId : undefined">
+			:aria-labelledby="readOnly ? titleId : undefined"
+			:aria-describedby="readOnly && description ? descriptionId : undefined">
 			<NcDateTimePicker
 				:modelValue="time"
 				:disabled="!readOnly"
