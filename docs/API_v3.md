@@ -379,7 +379,7 @@ Returns the questions and options of the given form (without submissions).
   | _subtype_ | String | yes | _Optional_ The cell type of a `grid` question, stored as `extraSettings.questionType`: `checkbox`, `number` or `radio`. Any other value is rejected. |
   | _text_ | String | yes | _Optional_ The text of the new question. |
   | _position_ | Integer | yes | _(optional)_ 1-based position to insert the new question. When omitted the question is appended at the end. |
-- Restrictions: A `grid` question needs its cell type as _subtype_.
+- Restrictions: A `grid` question needs its cell type as _subtype_. A _subtype_ for a question type without sub types is rejected with **400 Bad Request**.
 - Response: The new question object.
 
 ```
