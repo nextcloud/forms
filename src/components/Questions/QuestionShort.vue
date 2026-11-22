@@ -14,8 +14,10 @@
 		<div class="question__content">
 			<input
 				ref="input"
-				:aria-labelledby="titleId"
-				:aria-describedby="description ? descriptionId : undefined"
+				:aria-labelledby="readOnly ? titleId : undefined"
+				:aria-describedby="
+					readOnly && description ? descriptionId : undefined
+				"
 				:aria-errormessage="hasError ? errorId : undefined"
 				:aria-invalid="hasError ? 'true' : undefined"
 				:placeholder="submissionInputPlaceholder"
