@@ -559,13 +559,13 @@ export default defineComponent({
 	}
 
 	&__input {
-		height: 1px;
-		inset-block-start: 0;
-		inset-inline-start: 0;
+		height: 100%;
+		inset: 0;
+		margin: 0;
 		opacity: 0 !important;
 		pointer-events: none;
 		position: absolute;
-		width: 1px;
+		width: 100%;
 	}
 
 	&:disabled &__option {
