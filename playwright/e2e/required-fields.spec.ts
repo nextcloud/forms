@@ -9,6 +9,7 @@ import { test as appNavigationTest } from '../support/fixtures/navigation.ts'
 import { test as randomUserTest } from '../support/fixtures/random-user.ts'
 import { test as submitTest } from '../support/fixtures/submit.ts'
 import { test as topBarTest } from '../support/fixtures/topBar.ts'
+import { api } from '../support/helpers.ts'
 import { QuestionType } from '../support/sections/QuestionType.ts'
 import { FormsView } from '../support/sections/TopBarSection.ts'
 
@@ -82,4 +83,29 @@ test.describe('Required field validation', () => {
 		await submitView.submit()
 		await expect(submitView.successMessage).toBeVisible()
 	})
+})
+
+test('A required linear scale clears its error once a value is picked', async ({
+	page,
+	submitView,
+}) => {
+	const form = await api(page.request, 'POST', '/forms')
+	const scale = await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'linearscale',
+		text: 'Rate the event',
+	})
+	await api(page.request, 'PATCH', `/forms/${form.id}/questions/${scale.id}`, {
+		keyValuePairs: { isRequired: true },
+	})
+	await page.goto(`apps/forms/${form.hash}/submit`)
+
+	await submitView.submitButton.click()
+	const question = submitView.getQuestion('Rate the event')
+	await expect(question.getByText('You must answer this question')).toBeVisible()
+
+	await submitView.checkRadio('Rate the event', '3')
+	await expect(question.getByText('You must answer this question')).toBeHidden()
+	await expect(question.getByRole('radio').first()).not.toHaveAttribute(
+		'aria-invalid',
+	)
 })
