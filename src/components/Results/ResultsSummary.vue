@@ -272,7 +272,9 @@ export default defineComponent({
 					descriptionParts.push(`${optionsHighest}: ${labelHighest}`)
 				}
 
-				return `${label} (${descriptionParts.join(', ')})`
+				return descriptionParts.length > 0
+					? `${label} (${descriptionParts.join(', ')})`
+					: label
 			}
 
 			return label
