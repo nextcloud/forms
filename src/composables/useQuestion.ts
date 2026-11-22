@@ -212,17 +212,20 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 	const saveExtraSettings = debounce(function () {
 		const newExtraSettings = { ...props.extraSettings, ...pendingExtraSettings }
 		pendingExtraSettings = {}
-		options.emit('update:extraSettings', newExtraSettings)
 		saveQuestionProperty('extraSettings', newExtraSettings)
 	}, INPUT_DEBOUNCE_MS)
 
 	/**
-	 * Save changed extra settings; changes within the debounce time are saved together
+	 * Show changed extra settings at once and save them; changes within the debounce time are saved together
 	 *
 	 * @param newSettings the changed extra settings
 	 */
 	const onExtraSettingsChange = (newSettings: Record<string, unknown>): void => {
 		pendingExtraSettings = { ...pendingExtraSettings, ...newSettings }
+		options.emit('update:extraSettings', {
+			...props.extraSettings,
+			...pendingExtraSettings,
+		})
 		saveExtraSettings()
 	}
 
