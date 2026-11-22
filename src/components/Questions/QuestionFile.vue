@@ -113,8 +113,10 @@
 					<div
 						class="question__input-wrapper"
 						role="group"
-						:aria-labelledby="titleId"
-						:aria-describedby="description ? descriptionId : undefined"
+						:aria-labelledby="readOnly ? titleId : undefined"
+						:aria-describedby="
+							readOnly && description ? descriptionId : undefined
+						"
 						:aria-errormessage="hasError ? errorId : undefined"
 						:aria-invalid="hasError ? 'true' : undefined">
 						<label>
