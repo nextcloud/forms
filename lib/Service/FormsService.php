@@ -994,6 +994,11 @@ class FormsService {
 				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
 				return false;
 			}
+		} elseif ($questionType === Constants::ANSWER_TYPE_GRID) {
+			if (isset($extraSettings['questionType'])
+				&& !in_array($extraSettings['questionType'], Constants::EXTRA_SETTINGS_GRID_QUESTION_TYPE, true)) {
+				return false;
+			}
 		}
 		return true;
 	}
