@@ -28,7 +28,7 @@
 			</p>
 			<ol>
 				<li v-for="option in rankingStats" :key="option.id">
-					<label>
+					<label :for="`option-${question.id}-${option.id}`">
 						<span class="question-summary__statistic-score">
 							{{ formatCount(option.bordaTotal) }}
 						</span>
@@ -47,7 +47,11 @@
 							{{ option.text }}
 						</span>
 					</label>
-					<meter min="0" :max="maxBordaScore" :value="option.bordaTotal" />
+					<meter
+						:id="`option-${question.id}-${option.id}`"
+						min="0"
+						:max="maxBordaScore"
+						:value="option.bordaTotal" />
 				</li>
 			</ol>
 		</div>

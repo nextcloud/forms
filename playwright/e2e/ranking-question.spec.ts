@@ -7,8 +7,10 @@ import { expect, mergeTests } from '@playwright/test'
 import { test as formTest } from '../support/fixtures/form.ts'
 import { test as appNavigationTest } from '../support/fixtures/navigation.ts'
 import { test as randomUserTest } from '../support/fixtures/random-user.ts'
+import { test as resultsTest } from '../support/fixtures/results.ts'
 import { test as submitTest } from '../support/fixtures/submit.ts'
 import { test as topBarTest } from '../support/fixtures/topBar.ts'
+import { api } from '../support/helpers.ts'
 import { QuestionType } from '../support/sections/QuestionType.ts'
 import { FormsView } from '../support/sections/TopBarSection.ts'
 
@@ -18,6 +20,7 @@ const test = mergeTests(
 	formTest,
 	topBarTest,
 	submitTest,
+	resultsTest,
 )
 
 test.describe('Ranking question', () => {
@@ -176,4 +179,32 @@ test.describe('Ranking question', () => {
 		await submitView.submit()
 		await expect(submitView.successMessage).toBeVisible()
 	})
+})
+
+test('The results name each ranking bar by its option', async ({
+	page,
+	resultsView,
+}) => {
+	const form = await api(page.request, 'POST', '/forms')
+	const ranking = await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'ranking',
+		text: 'Rank snacks',
+	})
+	const options = await api(
+		page.request,
+		'POST',
+		`/forms/${form.id}/questions/${ranking.id}/options`,
+		{ optionTexts: ['Pretzels', 'Popcorn'] },
+	)
+	await api(page.request, 'POST', `/forms/${form.id}/submissions`, {
+		answers: {
+			[ranking.id]: options.map((option: { id: number }) => String(option.id)),
+		},
+	})
+	await page.goto(`apps/forms/${form.hash}/results`)
+	await page.waitForURL(/\/results\/summary$/)
+
+	const summary = resultsView.getSummaryForQuestion('Rank snacks')
+	await expect(summary.getByRole('meter', { name: /Pretzels/ })).toHaveCount(1)
+	await expect(summary.getByRole('meter', { name: /Popcorn/ })).toHaveCount(1)
 })
