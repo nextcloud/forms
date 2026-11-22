@@ -74,7 +74,7 @@
 					class="question-rating__input"
 					type="radio"
 					:name="`${id}-answer`"
-					:aria-label="ratingOptionLabel(option)"
+					:aria-label="option.toString()"
 					:aria-errormessage="hasError ? errorId : undefined"
 					:aria-invalid="hasError ? 'true' : undefined"
 					:value="option.toString()"
@@ -442,19 +442,6 @@ export default defineComponent({
 			question.errorMessage.value = null
 		}
 
-		/**
-		 * Accessible name of one option of a rating, e.g. "3 of 5"
-		 *
-		 * @param option the value of the option
-		 */
-		const ratingOptionLabel = (option: number): string => {
-			// TRANSLATORS Accessible name of one option of a rating, e.g. "3 of 5"
-			return t('forms', '{value} of {max}', {
-				value: option,
-				max: optionsHighest.value,
-			})
-		}
-
 		const onRatingIconChange = (icon: RatingIcon['id']): void => {
 			question.onExtraSettingsChange({
 				ratingIcon: icon === RATING_ICONS[0].id ? null : icon,
@@ -519,7 +506,6 @@ export default defineComponent({
 			ratingIcon,
 			ratingIcons: RATING_ICONS,
 			ratingValue,
-			ratingOptionLabel,
 			onRatingIconChange,
 			validate,
 			onChange,
