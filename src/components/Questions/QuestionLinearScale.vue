@@ -92,11 +92,7 @@
 					<label :for="`linear-scale-${id}-${option}`">{{ option }}</label>
 					<NcCheckboxRadioSwitch
 						:id="`linear-scale-${id}-${option}`"
-						:aria-describedby="
-							index === 0 && readOnly && optionsLabelLowest !== ''
-								? labelId
-								: undefined
-						"
+						:aria-describedby="optionLabelId(index)"
 						:aria-errormessage="hasError ? errorId : undefined"
 						:aria-invalid="hasError ? 'true' : undefined"
 						:disabled="!readOnly"
@@ -129,6 +125,7 @@
 			</template>
 			<div
 				v-else-if="optionsLabelHighest !== ''"
+				:id="labelHighestId"
 				class="question-linear-scale__label question-linear-scale__label-highest">
 				{{ optionsLabelHighest }}
 			</div>
@@ -250,6 +247,34 @@ export default defineComponent({
 		 * ID for the label for the lowest option
 		 */
 		const labelId = computed(() => 'q' + props.index + '__label_lowest')
+
+		/**
+		 * ID for the label for the highest option
+		 */
+		const labelHighestId = computed(() => 'q' + props.index + '__label_highest')
+
+		/**
+		 * ID of the shown label that describes an option: the lowest label for the first option,
+		 * the highest label for the last one
+		 *
+		 * @param index the position of the option
+		 */
+		const optionLabelId = (index: number): string | undefined => {
+			if (!props.readOnly) {
+				return undefined
+			}
+			if (index === 0 && optionsLabelLowest.value !== '') {
+				return labelId.value
+			}
+			if (
+				index === scaleOptions.value.length - 1
+				&& optionsLabelHighest.value !== ''
+			) {
+				return labelHighestId.value
+			}
+			return undefined
+		}
+
 		const isUnique = computed(() => props.answerType.unique === true)
 
 		/**
@@ -345,6 +370,8 @@ export default defineComponent({
 			isUnique,
 			questionValues,
 			labelId,
+			labelHighestId,
+			optionLabelId,
 			optionsLowest,
 			optionsHighest,
 			optionsLabelLowest,

@@ -226,6 +226,9 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 
 		await expect(fieldset).toHaveAttribute('aria-labelledby', 'q1_title')
 		await expect(fieldset).toHaveAttribute('aria-describedby', 'q1_desc')
+		const radios = fieldset.getByRole('radio')
+		await expect(radios.first()).toHaveAccessibleDescription('Strongly disagree')
+		await expect(radios.last()).toHaveAccessibleDescription('Strongly agree')
 
 		await expect(
 			page.getByRole('heading', { name: 'Rate your experience' }),
