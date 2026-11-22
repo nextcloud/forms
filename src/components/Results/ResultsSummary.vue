@@ -38,17 +38,9 @@
 				<dd>{{ formatCount(promoterBreakdown.score) }}</dd>
 				<dd class="question-summary__figures-detail">
 					{{
-						t(
-							'forms',
-							'{promoters} promoters, {detractors} detractors',
-							{
-								promoters: formatPercent(
-									promoterBreakdown.promoters,
-								),
-								detractors: formatPercent(
-									promoterBreakdown.detractors,
-								),
-							},
+						formatPromoterShares(
+							promoterBreakdown.promoters,
+							promoterBreakdown.detractors,
 						)
 					}}
 				</dd>
@@ -309,6 +301,20 @@ const percent = new Intl.NumberFormat(locale, { style: 'percent' })
  */
 function formatPercent(percentage: number): string {
 	return percent.format(percentage / 100)
+}
+
+/**
+ * The shares of promoters and detractors as text, e.g. "50% promoters, 25% detractors"
+ *
+ * @param promoters the share of promoters in percent
+ * @param detractors the share of detractors in percent
+ */
+function formatPromoterShares(promoters: number, detractors: number): string {
+	// TRANSLATORS {promoters} and {detractors} are percentages, e.g. "50% promoters, 25% detractors"
+	return t('forms', '{promoters} promoters, {detractors} detractors', {
+		promoters: formatPercent(promoters),
+		detractors: formatPercent(detractors),
+	})
 }
 
 export default defineComponent({
@@ -932,6 +938,7 @@ export default defineComponent({
 			answers,
 			formatCount,
 			formatPercent,
+			formatPromoterShares,
 			oneDecimal,
 			t,
 		}
