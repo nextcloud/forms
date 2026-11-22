@@ -299,7 +299,7 @@ test('An edited submission leaves out values the questions no longer offer', asy
 	])
 })
 
-test('Enter in the last answer moves on to the submit button', async ({
+test('Enter moves on past a radio group and from the last answer to the submit button', async ({
 	page,
 	submitView,
 }) => {
@@ -326,8 +326,16 @@ test('Enter in the last answer moves on to the submit button', async ({
 	})
 	await page.goto(`apps/forms/${form.hash}/submit`)
 
+	await submitView.checkRadio('Favourite color', 'Red')
+	await submitView
+		.getQuestion('Favourite color')
+		.getByRole('radio', { name: 'Red' })
+		.press('Enter')
+	const name = submitView.getQuestion('Your name').getByRole('textbox')
+	await expect(name).toBeFocused()
+
 	await submitView.fillText('Your name', 'Alice')
-	await submitView.getQuestion('Your name').getByRole('textbox').press('Enter')
+	await name.press('Enter')
 	await expect(submitView.submitButton).toBeFocused()
 })
 
