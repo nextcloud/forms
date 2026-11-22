@@ -97,6 +97,7 @@
 					<label :for="`linear-scale-${id}-${option}`">{{ option }}</label>
 					<NcCheckboxRadioSwitch
 						:id="`linear-scale-${id}-${option}`"
+						:aria-label="option.toString()"
 						:aria-describedby="optionLabelId(index)"
 						:aria-errormessage="hasError ? errorId : undefined"
 						:aria-invalid="hasError ? 'true' : undefined"
