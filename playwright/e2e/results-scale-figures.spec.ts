@@ -80,8 +80,8 @@ test('Scale figures and the promoter score are shown above the bars', async ({
 	await expect(figure('Answers')).toHaveText('4')
 	await expect(figure('Average')).toHaveText('7.3')
 	await expect(figure('Median')).toHaveText('8')
-	await expect(figure('Minimum')).toHaveText('3')
-	await expect(figure('Maximum')).toHaveText('10')
+	await expect(figure('Minimum')).toHaveCount(0)
+	await expect(figure('Maximum')).toHaveCount(0)
 	const promoterLabel = summary.locator('dt', { hasText: 'Promoter score' })
 	await expect(promoterLabel).toBeVisible()
 	await expect(promoterLabel.locator('.hidden-visually')).toHaveText(
@@ -156,7 +156,7 @@ test('The scale figures leave out answers outside the scale', async ({
 	const figure = (label: string) => summary.locator(`dt:text-is("${label}") + dd`)
 	await expect(figure('Answers')).toHaveText('2')
 	await expect(figure('Average')).toHaveText('3.0')
-	await expect(figure('Maximum')).toHaveText('4')
+	await expect(figure('Median')).toHaveText('3')
 	await expect(summary.getByText('1 (33%): 9')).toBeVisible()
 })
 

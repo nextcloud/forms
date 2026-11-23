@@ -25,14 +25,6 @@
 				<dt>{{ t('forms', 'Median') }}</dt>
 				<dd>{{ formatCount(numericStats.median) }}</dd>
 			</div>
-			<div>
-				<dt>{{ t('forms', 'Minimum') }}</dt>
-				<dd>{{ formatCount(numericStats.min) }}</dd>
-			</div>
-			<div>
-				<dt>{{ t('forms', 'Maximum') }}</dt>
-				<dd>{{ formatCount(numericStats.max) }}</dd>
-			</div>
 			<div v-if="promoterBreakdown" class="question-summary__figures-promoter">
 				<dt>
 					{{ t('forms', 'Promoter score') }}
@@ -903,7 +895,7 @@ export default defineComponent({
 		})
 
 		/**
-		 * Answer count, average, median, minimum and maximum of a linear scale question;
+		 * Answer count, average and median of a linear scale question;
 		 * null without answers and for a rating.
 		 */
 		const numericStats = computed(() => {
@@ -927,8 +919,6 @@ export default defineComponent({
 				count: values.length,
 				mean: sum / values.length,
 				median,
-				min: values[0],
-				max: values[values.length - 1],
 			}
 		})
 
@@ -1192,23 +1182,15 @@ export default defineComponent({
 .question-summary__figures {
 	display: grid;
 	gap: calc(var(--default-grid-baseline) * 2);
-	grid-template-columns: repeat(5, 1fr);
+	grid-template-columns: repeat(3, 1fr);
 	margin-block: calc(var(--default-grid-baseline) * 3)
 		calc(var(--default-grid-baseline) * 4);
 	padding: 0;
 
-	@container (max-width: 631px) {
-		grid-template-columns: repeat(3, 1fr);
-
-		> div.question-summary__figures-promoter {
-			grid-column: 1 / -1;
-		}
-	}
-
 	@container (max-width: 375px) {
 		grid-template-columns: repeat(2, 1fr);
 
-		> div:nth-child(5) {
+		> div:nth-child(3) {
 			grid-column: span 2;
 		}
 	}
@@ -1240,8 +1222,8 @@ export default defineComponent({
 		font-weight: bold;
 	}
 
-	> .question-summary__figures-promoter {
-		grid-column: span 3;
+	> div.question-summary__figures-promoter {
+		grid-column: 1 / -1;
 	}
 
 	dd.question-summary__figures-detail {
