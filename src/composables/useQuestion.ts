@@ -57,6 +57,10 @@ export const QUESTION_PROPS = {
 		type: Number,
 		required: true,
 	},
+	headingLevel: {
+		type: Number,
+		default: 3,
+	},
 	name: {
 		type: String,
 		default: '',
@@ -160,6 +164,7 @@ interface QuestionPropsLike {
 	id: number
 	formId: number | null
 	index: number
+	headingLevel: number
 	text: string
 	description: string
 	isRequired: boolean
@@ -177,6 +182,7 @@ interface QuestionPropsLike {
 
 interface QuestionForwardedProps {
 	index: number
+	headingLevel: number
 	text: string
 	description: string
 	isRequired: boolean
@@ -243,6 +249,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 
 	const questionProps = computed<QuestionForwardedProps>(() => ({
 		index: props.index,
+		headingLevel: props.headingLevel,
 		text: props.text,
 		description: props.description,
 		isRequired: props.isRequired,

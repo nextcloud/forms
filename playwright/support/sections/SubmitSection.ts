@@ -22,7 +22,7 @@ export class SubmitSection {
 	/**
 	 * Get a question's list item by its title text.
 	 * Questions render as <li aria-label="Question number N">,
-	 * and each contains an <h3> with the title text.
+	 * and each contains a heading with the title text.
 	 *
 	 * @param name the title of the question
 	 */

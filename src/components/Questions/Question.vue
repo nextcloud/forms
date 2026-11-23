@@ -63,13 +63,14 @@
 					:maxlength="maxStringLengths.questionText"
 					required
 					@input="onTitleChange" />
-				<h3
+				<component
+					:is="`h${headingLevel}`"
 					v-else
 					:id="titleId"
 					class="question__header__title__text"
 					dir="auto">
 					{{ computedText }}
-				</h3>
+				</component>
 				<div
 					v-if="!readOnly && !questionValid"
 					:title="warningInvalid"
@@ -256,6 +257,11 @@ export default defineComponent({
 		index: {
 			type: Number,
 			required: true,
+		},
+
+		headingLevel: {
+			type: Number,
+			default: 3,
 		},
 
 		text: {
@@ -707,28 +713,11 @@ export default defineComponent({
 
 	&--section {
 		margin-block-end: 16px;
-		position: sticky;
-		top: 0;
-		z-index: 2;
 
 		h3 {
 			font-size: 24px !important;
 			border-block-end: 1px solid var(--color-border);
 		}
 	}
-
-	// Limit the description to two lines while the section is stuck to the top
-	&--section-stuck .question__header__description {
-		// two lines at 1.5em line-height plus the output padding
-		max-height: calc(2 * 1.5em + 12px);
-		overflow: hidden;
-	}
-}
-
-// In views with a sticky top bar, sections must stick below it
-.app-content:not(.app-content--public) .question--section {
-	top: calc(
-		var(--default-clickable-area) + 2 * var(--app-navigation-padding, 0px)
-	);
 }
 </style>

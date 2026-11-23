@@ -166,6 +166,9 @@
 							readOnly
 							:answerType="answerTypes[question.type]"
 							:index="shownQuestions.indexOf(question) + 1"
+							:headingLevel="
+								questionIdsInSection.has(question.id) ? 4 : 3
+							"
 							:maxStringLengths="maxStringLengths"
 							:values="answers[question.id]"
 							@update:values="
@@ -390,16 +393,6 @@ interface QuestionComponentRef {
 	validate: () => Promise<boolean>
 }
 
-interface IndexedQuestion {
-	question: SubmitQuestion
-	displayIndex: number
-}
-
-interface QuestionGroup {
-	section: IndexedQuestion | null
-	questions: IndexedQuestion[]
-}
-
 interface DialogButton {
 	label: string
 	icon: string
@@ -513,42 +506,6 @@ export default defineComponent({
 			}) as SubmitQuestion[]
 		})
 
-		/**
-		 * Group questions by sections.
-		 * Each section contains its questions and the section itself.
-		 * This is needed for position:sticky to work when there are several
-		 * sections and allows to display groups on separate pages later on.
-		 */
-		const groupedQuestions = computed<QuestionGroup[]>(() => {
-			const groups: QuestionGroup[] = []
-			let currentGroup: QuestionGroup = { section: null, questions: [] }
-			let questionIndex = 1
-
-			for (const question of validQuestions.value) {
-				if (question.type === 'section') {
-					if (currentGroup.section || currentGroup.questions.length > 0) {
-						groups.push(currentGroup)
-					}
-					currentGroup = {
-						section: { question, displayIndex: questionIndex },
-						questions: [],
-					}
-				} else {
-					currentGroup.questions.push({
-						question,
-						displayIndex: questionIndex,
-					})
-				}
-				questionIndex++
-			}
-
-			if (currentGroup.section || currentGroup.questions.length > 0) {
-				groups.push(currentGroup)
-			}
-
-			return groups
-		})
-
 		const validQuestionsIds = computed<Set<number>>(() => {
 			return new Set(validQuestions.value.map((question) => question.id))
 		})
@@ -575,6 +532,20 @@ export default defineComponent({
 		const shownQuestions = computed<SubmitQuestion[]>(() => {
 			return validQuestions.value.filter((question) =>
 				visibleQuestionIds.value.has(question.id),
+			)
+		})
+
+		const questionIdsInSection = computed<Set<number>>(() => {
+			const firstSection = shownQuestions.value.findIndex(
+				(question) => question.type === 'section',
+			)
+			return new Set(
+				firstSection === -1
+					? []
+					: shownQuestions.value
+							.slice(firstSection)
+							.filter((question) => question.type !== 'section')
+							.map((question) => question.id),
 			)
 		})
 
@@ -1706,13 +1677,13 @@ export default defineComponent({
 			getAnswerError,
 			jumpAnnouncement,
 			shownQuestions,
+			questionIdsInSection,
 			confirmClearFormButtons,
 			confirmEmptyModalButtons,
 			confirmLeaveFormButtons,
 			expirationMessage,
 			openingMessage,
 			formElement,
-			groupedQuestions,
 			hasAnswers,
 			infoMessage,
 			isArchived,
