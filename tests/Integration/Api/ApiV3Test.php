@@ -1103,6 +1103,22 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertEquals($expected, $data);
 	}
 
+	public function testCreateNewOptionRejectsQuestionWithoutOptions(): void {
+		$formId = $this->testForms[0]['id'];
+		$questionId = $this->testForms[0]['questions'][0]['id'];
+		$resp = $this->http->request('POST', "api/v3/forms/{$formId}/questions/{$questionId}/options", [
+			'json' => [
+				'optionTexts' => ['Coffee', 'Tea'],
+			],
+			'http_errors' => false,
+		]);
+
+		$this->assertEquals(400, $resp->getStatusCode());
+
+		$question = $this->OcsResponse2Data($this->http->request('GET', "api/v3/forms/{$formId}/questions/{$questionId}"));
+		$this->assertSame([], $question['options']);
+	}
+
 	public static function dataUpdateOptionProperties() {
 		$fullFormExpected = self::dataGetFullForm()['getFullForm']['expected'];
 		$fullFormExpected['questions'][1]['options'][0]['text'] = 'New option Text.';
