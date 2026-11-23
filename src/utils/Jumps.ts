@@ -11,7 +11,11 @@ import type {
 } from '../types/Entities.d.ts'
 
 import { QUESTION_EXTRASETTINGS_OTHER_PREFIX } from '../models/Constants.ts'
-import { getSectionIndexes, isAllowedTarget } from './Sections.ts'
+import {
+	getSectionIndexes,
+	isAllowedTarget,
+	QUESTION_TYPE_SECTION,
+} from './Sections.ts'
 
 export const JUMP_TARGET_SUBMIT = 'submit'
 
@@ -179,6 +183,7 @@ function awaitsAnswer(
 /**
  * The questions on the path of the respondent: from the first question, each question leads to the target of its answer in `goTo`, else to its `next` target, else to the following question, until the end of the form.
  * A target that is not a later question of the form counts as the following question.
+ * Leaving a section towards the following question or the end of the form goes to the `next` target of the section instead, if it has one.
  * The path ends at a question that has no answer yet and a jump per answer past the following question.
  * Mirrors `SubmissionService::getVisibleQuestions()`.
  *
@@ -193,12 +198,25 @@ export function getVisibleQuestions<T extends FormsQuestion>(
 		questions.map((question, position) => [question.id, position]),
 	)
 	const visibleQuestions: T[] = []
+	let sectionNext: unknown = null
 
 	let position = 0
 	while (position < questions.length) {
 		const question = questions[position]
 		visibleQuestions.push(question)
+		const toPosition = (target: unknown): number | undefined => {
+			const targetPosition =
+				typeof target === 'number' ? positions.get(target) : undefined
+			return targetPosition !== undefined && targetPosition > position
+				? targetPosition
+				: undefined
+		}
 
+		if (question.type === QUESTION_TYPE_SECTION) {
+			const next = question.extraSettings?.next
+			sectionNext =
+				typeof next === 'number' || typeof next === 'string' ? next : null
+		}
 		const answer = answers[question.id]
 		if (awaitsAnswer(question, answer, position, positions, questions.length)) {
 			break
@@ -207,12 +225,19 @@ export function getVisibleQuestions<T extends FormsQuestion>(
 		if (target === JUMP_TARGET_SUBMIT) {
 			break
 		}
-		const targetPosition =
-			typeof target === 'number' ? positions.get(target) : undefined
-		position =
-			targetPosition !== undefined && targetPosition > position
-				? targetPosition
-				: position + 1
+		let targetPosition = toPosition(target)
+		if (
+			targetPosition === undefined
+			&& sectionNext !== null
+			&& (position + 1 === questions.length
+				|| questions[position + 1].type === QUESTION_TYPE_SECTION)
+		) {
+			if (sectionNext === JUMP_TARGET_SUBMIT) {
+				break
+			}
+			targetPosition = toPosition(sectionNext)
+		}
+		position = targetPosition ?? position + 1
 	}
 
 	return visibleQuestions
@@ -228,6 +253,8 @@ export interface JumpIssues {
 	unreachable: Set<number>
 	/** Ids of the reachable questions that a jump of an earlier question can skip */
 	skippable: Set<number>
+	/** Ids of the questions with jumps out of their section, where other questions of the section have such jumps as well */
+	leavingSection: Set<number>
 }
 
 /**
@@ -281,11 +308,13 @@ export function canDecideByAnswer(question: FormsQuestion): boolean {
  * @param questions the questions of the form in their order
  * @param position the position of the question
  * @param positions the positions by question id
+ * @param following the position that leaving the question without a jump leads to
  */
 function getTargetPositions(
 	questions: FormsQuestion[],
 	position: number,
 	positions: Map<number, number>,
+	following: number,
 ): { targets: Set<number>; brokenJumps: string[] } {
 	const question = questions[position]
 	const extraSettings = question.extraSettings ?? {}
@@ -307,7 +336,7 @@ function getTargetPositions(
 		if (target !== null && target !== undefined) {
 			brokenJumps.push(`${question.id}:${jump}`)
 		}
-		return position + 1
+		return following
 	}
 
 	const possibleAnswers = getPossibleAnswers(question)
@@ -358,16 +387,44 @@ export function getJumpIssues(questions: FormsQuestion[]): JumpIssues {
 		brokenJumps: new Set(),
 		unreachable: new Set(),
 		skippable: new Set(),
+		leavingSection: new Set(),
 	}
 
+	const sections = getSectionIndexes(questions)
 	const reached = new Set(questions.length > 0 ? [0] : [])
 	let farthestTarget = 0
+	let sectionNext: number | undefined
 	for (let position = 0; position < questions.length; position++) {
 		const question = questions[position]
+		if (question.type === QUESTION_TYPE_SECTION) {
+			const next = question.extraSettings?.next
+			const nextPosition =
+				typeof next === 'number' ? positions.get(next) : undefined
+			sectionNext =
+				next === JUMP_TARGET_SUBMIT
+					? questions.length
+					: nextPosition !== undefined
+						  && isAllowedTarget(
+								questions,
+								sections,
+								position,
+								nextPosition,
+						  )
+						? nextPosition
+						: undefined
+			if (next !== undefined && next !== null && sectionNext === undefined) {
+				issues.broken.add(question.id)
+				issues.brokenJumps.add(`${question.id}:next`)
+			}
+		}
+		const leavesSection =
+			position + 1 === questions.length
+			|| questions[position + 1].type === QUESTION_TYPE_SECTION
 		const { targets, brokenJumps } = getTargetPositions(
 			questions,
 			position,
 			positions,
+			leavesSection && sectionNext !== undefined ? sectionNext : position + 1,
 		)
 		if (brokenJumps.length > 0) {
 			issues.broken.add(question.id)
@@ -383,6 +440,36 @@ export function getJumpIssues(questions: FormsQuestion[]): JumpIssues {
 		for (const target of targets) {
 			reached.add(target)
 			farthestTarget = Math.max(farthestTarget, target)
+		}
+	}
+
+	const leaving = new Map<number, number[]>()
+	questions.forEach((question, position) => {
+		const extraSettings = question.extraSettings ?? {}
+		const leaves = [
+			...getJumps(extraSettings).map((jump) => jump.target),
+			QUESTION_TYPES_WITH_NEXT.includes(question.type)
+				? extraSettings.next
+				: undefined,
+		].some((target) => {
+			const targetPosition =
+				typeof target === 'number' ? positions.get(target) : undefined
+			return (
+				target === JUMP_TARGET_SUBMIT
+				|| (targetPosition !== undefined
+					&& sections[targetPosition] !== sections[position])
+			)
+		})
+		if (leaves && sections[position] > 0) {
+			leaving.set(sections[position], [
+				...(leaving.get(sections[position]) ?? []),
+				question.id,
+			])
+		}
+	})
+	for (const ids of leaving.values()) {
+		if (ids.length > 1) {
+			ids.forEach((id) => issues.leavingSection.add(id))
 		}
 	}
 

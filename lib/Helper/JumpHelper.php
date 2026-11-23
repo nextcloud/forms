@@ -167,7 +167,7 @@ final class JumpHelper {
 	}
 
 	/**
-	 * Remove the jumps that go to the question itself, to an earlier question or into the middle of another section, keeping the jumps to the end of the form, to later questions of the same section, to later sections and to questions that are not in the list
+	 * Remove the jumps that go to the question itself, to an earlier question or into the middle of another section, and the jumps of a section to anything but a later section, keeping the jumps to the end of the form, to later questions of the same section, to later sections and to questions that are not in the list
 	 *
 	 * @param list<Question> $questions the questions of the form in their order
 	 * @return list<Question> the questions whose jumps were removed, with their new extra settings set
@@ -187,7 +187,8 @@ final class JumpHelper {
 		foreach ($questions as $position => $question) {
 			$isDisallowed = static fn (mixed $target): bool => is_int($target) && isset($positions[$target])
 				&& ($positions[$target] <= $position
-					|| ($questions[$positions[$target]]->getType() !== Constants::ANSWER_TYPE_SECTION && $sections[$positions[$target]] !== $sections[$position]));
+					|| ($questions[$positions[$target]]->getType() !== Constants::ANSWER_TYPE_SECTION
+						&& ($question->getType() === Constants::ANSWER_TYPE_SECTION || $sections[$positions[$target]] !== $sections[$position])));
 			$extraSettings = $question->getExtraSettings();
 			$newSettings = $extraSettings;
 

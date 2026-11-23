@@ -474,6 +474,115 @@ test.describe('Sections', () => {
 		expect(stored.extraSettings.goTo).toEqual([])
 	})
 
+	test('After a section, respondents go to the section it names', async ({
+		page,
+		submitView,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		for (const [type, text] of [
+			['section', 'Part one'],
+			['short', 'First'],
+			['section', 'Part two'],
+			['short', 'Second'],
+			['section', 'Part three'],
+			['short', 'Third'],
+		]) {
+			await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+				type,
+				text,
+			})
+		}
+		await page.goto(`apps/forms/${form.hash}/edit`)
+
+		const select = page
+			.getByRole('listitem', { name: 'Section number 1' })
+			.getByRole('combobox', { name: 'After section 1 go to' })
+		await select.click()
+		await expect(page.getByRole('option')).toHaveText([
+			'Next section',
+			'Section 2: Part two',
+			'Section 3: Part three',
+			'End of the form',
+		])
+		const saved = page.waitForResponse(
+			(response) =>
+				response.request().method() === 'PATCH'
+				&& response.url().includes(`/forms/${form.id}/questions/`),
+		)
+		await page.getByRole('option', { name: 'Section 3: Part three' }).click()
+		expect((await saved).ok()).toBeTruthy()
+		await expect(
+			page
+				.getByRole('listitem', { name: 'Section number 3' })
+				.getByRole('combobox', { name: 'After section 3 go to' }),
+		).toBeVisible()
+
+		await page.goto(`apps/forms/${form.hash}/submit`)
+		await submitView.fillText('First', 'one')
+		await submitView.nextButton.click()
+		await expect(submitView.getQuestion('Part three')).toBeVisible()
+		await expect(submitView.nextButton).toHaveCount(0)
+		await submitView.fillText('Third', 'three')
+		const response = await submitView.submit()
+		expect(Object.keys(response.request().postDataJSON().answers)).toHaveLength(
+			2,
+		)
+		await expect(submitView.successMessage).toBeVisible()
+	})
+
+	test('A section that goes to a deleted section is named as a section and shows where respondents go', async ({
+		page,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		const ids: number[] = []
+		for (const [type, text] of [
+			['section', 'Part one'],
+			['short', 'First'],
+			['section', 'Part two'],
+			['short', 'Second'],
+			['section', 'Part three'],
+		]) {
+			ids.push(
+				(
+					await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+						type,
+						text,
+					})
+				).id,
+			)
+		}
+		await api(page.request, 'PATCH', `/forms/${form.id}/questions/${ids[0]}`, {
+			keyValuePairs: { extraSettings: { next: ids[4] } },
+		})
+		await api(page.request, 'PATCH', `/forms/${form.id}/questions/${ids[2]}`, {
+			keyValuePairs: { extraSettings: { next: 'submit' } },
+		})
+		await page.goto(`apps/forms/${form.hash}/edit`)
+
+		await page
+			.getByRole('listitem', { name: 'Section number 3' })
+			.getByRole('button', { name: 'Actions', exact: true })
+			.click()
+		await page
+			.getByRole('menuitem', { name: /^Delete (question|section)$/ })
+			.click()
+		await expect(
+			page
+				.getByRole('status')
+				.getByText(
+					'Section 1 went to a section that was deleted, so respondents now go to the next section instead.',
+				),
+		).toBeVisible()
+		const label = (number: number) =>
+			page
+				.getByRole('listitem', { name: `Section number ${number}` })
+				.locator('.jump-target-select__label')
+		await expect(label(1)).toHaveText(
+			'Next section (the chosen section was deleted or moved up)',
+		)
+		await expect(label(2)).toHaveText('End of the form')
+	})
+
 	test('Each page checks its required questions, an empty section is an info page', async ({
 		page,
 		submitView,
@@ -783,5 +892,59 @@ test.describe('Sections', () => {
 			'First',
 			'Second',
 		])
+	})
+
+	test('An empty section sends respondents on to its target without a page of its own', async ({
+		page,
+		submitView,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		const ids: Record<string, number> = {}
+		for (const [type, text] of [
+			['section', 'Start'],
+			['short', 'First'],
+			['section', 'Jump'],
+			['section', 'Skipped'],
+			['short', 'Second'],
+			['section', 'End'],
+			['short', 'Third'],
+			['section', 'Finish'],
+			['section', 'Not reached'],
+			['short', 'Never'],
+		]) {
+			ids[text] = (
+				await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+					type,
+					text: ['Jump', 'Finish'].includes(text) ? '' : text,
+				})
+			).id
+		}
+		for (const [section, next] of [
+			['Jump', ids.End],
+			['End', ids.Finish],
+			['Finish', 'submit'],
+		] as const) {
+			await api(
+				page.request,
+				'PATCH',
+				`/forms/${form.id}/questions/${ids[section]}`,
+				{ keyValuePairs: { extraSettings: { next } } },
+			)
+		}
+		await page.goto(`apps/forms/${form.hash}/submit`)
+
+		await submitView.fillText('First', 'one')
+		await submitView.nextButton.click()
+		await expect(submitView.getQuestion('End')).toBeVisible()
+		await expect(submitView.getQuestion('Skipped')).toBeHidden()
+		await expect(submitView.nextButton).toHaveCount(0)
+		await submitView.fillText('Third', 'three')
+		const response = await submitView.submit()
+		expect(
+			Object.keys(response.request().postDataJSON().answers)
+				.map(Number)
+				.sort((a, b) => a - b),
+		).toEqual([ids.First, ids.Third])
+		await expect(submitView.successMessage).toBeVisible()
 	})
 })

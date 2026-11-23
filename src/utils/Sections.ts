@@ -107,7 +107,7 @@ export function getSectionIndexes(questions: Array<{ type: string }>): number[] 
 }
 
 /**
- * Whether a question may jump to a target: a later question of its own section, or a later section
+ * Whether a question may jump to a target: a later question of its own section, or a later section; a section only to a later section
  *
  * @param questions the questions and sections in their order
  * @param sections the section of each question by position, see `getSectionIndexes()`
@@ -123,7 +123,8 @@ export function isAllowedTarget(
 	return (
 		targetPosition > position
 		&& (questions[targetPosition].type === QUESTION_TYPE_SECTION
-			|| sections[targetPosition] === sections[position])
+			|| (questions[position].type !== QUESTION_TYPE_SECTION
+				&& sections[targetPosition] === sections[position]))
 	)
 }
 

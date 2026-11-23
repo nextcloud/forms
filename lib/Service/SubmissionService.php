@@ -859,6 +859,7 @@ class SubmissionService {
 	 * The questions on the path of the respondent: from the first question, each question leads to the target of its
 	 * answer in `goTo`, else to its `next` target, else to the following question, until the end of the form.
 	 * A target that is not a later question of the form counts as the following question.
+	 * Leaving a section towards the following question or the end of the form goes to the `next` target of the section instead, if it has one.
 	 * The path ends at a question that has no answer yet and a jump per answer past the following question.
 	 *
 	 * @param array $questions the questions of the form in their order
@@ -869,12 +870,18 @@ class SubmissionService {
 		$questions = array_values($questions);
 		$positions = array_flip(array_column($questions, 'id'));
 		$visibleQuestions = [];
+		$sectionNext = null;
 
 		$position = 0;
 		while ($position < count($questions)) {
 			$question = $questions[$position];
 			$visibleQuestions[] = $question;
+			$toPosition = static fn (mixed $target): ?int => is_int($target) && isset($positions[$target]) && $positions[$target] > $position ? $positions[$target] : null;
 
+			if (($question['type'] ?? null) === Constants::ANSWER_TYPE_SECTION) {
+				$next = $question['extraSettings']['next'] ?? null;
+				$sectionNext = is_int($next) || is_string($next) ? $next : null;
+			}
 			$answer = $answers[$question['id']] ?? [];
 			if (self::awaitsAnswer($question, $answer, $position, $positions, count($questions))) {
 				break;
@@ -883,8 +890,15 @@ class SubmissionService {
 			if ($target === Constants::JUMP_TARGET_SUBMIT) {
 				break;
 			}
-			$targetPosition = is_int($target) && isset($positions[$target]) ? $positions[$target] : null;
-			$position = $targetPosition !== null && $targetPosition > $position ? $targetPosition : $position + 1;
+			$targetPosition = $toPosition($target);
+			if ($targetPosition === null && $sectionNext !== null
+				&& ($position + 1 === count($questions) || ($questions[$position + 1]['type'] ?? null) === Constants::ANSWER_TYPE_SECTION)) {
+				if ($sectionNext === Constants::JUMP_TARGET_SUBMIT) {
+					break;
+				}
+				$targetPosition = $toPosition($sectionNext);
+			}
+			$position = $targetPosition ?? $position + 1;
 		}
 
 		return $visibleQuestions;
@@ -947,7 +961,7 @@ class SubmissionService {
 	}
 
 	/**
-	 * The jump target of a question for its answer: the target of the `goTo` entry matching the first value of the answer, else `next` on question types with `next`
+	 * The jump target of a question for its answer: the target of the `goTo` entry matching the first value of the answer, else `next` on question types with `next` other than sections
 	 *
 	 * @param array $question the question
 	 * @param mixed $answer the values of the answer to the question
@@ -968,7 +982,8 @@ class SubmissionService {
 			}
 		}
 
-		$next = isset(FormsService::getAllowedExtraSettings((string)($question['type'] ?? ''))['next']) ? ($extraSettings['next'] ?? null) : null;
+		$type = (string)($question['type'] ?? '');
+		$next = $type !== Constants::ANSWER_TYPE_SECTION && isset(FormsService::getAllowedExtraSettings($type)['next']) ? ($extraSettings['next'] ?? null) : null;
 		return is_int($next) || is_string($next) ? $next : null;
 	}
 

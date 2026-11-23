@@ -282,7 +282,7 @@ Optional extra settings for some [Question Types](#question-types)
 | `questionType`          | `linearscale`                                  | String           | `rating`, `promoter`                        | Sub type, fixed at creation; `rating` is a 1 to N scale drawn as icons, `promoter` is a 0 to 10 scale whose results show the promoter score; absent for a plain scale |
 | `ratingIcon`            | `linearscale` with `questionType` `rating`     | string           | `'star', 'heart', 'thumb'`                  | Set the icon of the rating, default: `'star'`                               |
 | `goTo`                  | `dropdown, linearscale, multiple_unique`       | Array            | see [Jumps](#jumps)                         | Where to go next for an answer                                              |
-| `next`                  | `color, date, file, grid, long, multiple, ranking, short, time` | Integer / string | question id, `'submit'` | Where to go after the question, see [Jumps](#jumps) |
+| `next`                  | `color, date, file, grid, long, multiple, ranking, section, short, time` | Integer / string | question id, `'submit'` | Where to go after the question or, on a section, after the section, see [Jumps](#jumps) |
 
 ### Jumps
 
@@ -299,6 +299,7 @@ An answer can lead to a later question or to the end of the form, as in Microsof
 - Only the deprecated `datetime` accepts neither `goTo` nor `next` (400).
 - A jump of the answer "Other" is for `multiple_unique` questions, as dropdowns have no answer "Other", and only matches while `allowOtherAnswer` is on.
 - `next` also applies when the question is left unanswered.
+- `next` on a section is where respondents go after the section, as "After this section go to" in Microsoft Forms: the id of a later section or `"submit"`; other targets are removed like other disallowed jumps. It applies when the path leaves the section towards the following section or the end of the form, so a jump of an answer out of the section wins over it, while a jump within the section still ends at it.
 
 The respondent's path starts at the first question and follows these targets. It ends at a question that has no answer yet and a jump per answer past the following question, a jump of the answer "Other" only while `allowOtherAnswer` is on, and the questions after it appear once it is answered, as in Microsoft Forms. If such a question is optional and left empty, the form can be submitted without the questions after it. The first value of an answer decides, and answers to questions the submit view does not show, such as questions without a title, do not count. A target that is not a later question of the form, for example after the target was deleted, counts as the following question, and a jump of an option that no longer exists never matches. Questions off the path are skipped: answers to them are ignored, and their required flag does not apply. Editing a submission replaces all its stored answers, so answers to questions that are skipped now are removed.
 

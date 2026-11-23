@@ -71,6 +71,18 @@ export default defineComponent({
 			type: String,
 			default: null,
 		},
+
+		/**
+		 * Label of a target that is not offered any more, by default going to the next question
+		 */
+		fallbackLabel: {
+			type: String,
+			default: () =>
+				t(
+					'forms',
+					'Next question (the chosen question was deleted or moved up)',
+				),
+		},
 	},
 
 	emits: ['update:modelValue'],
@@ -80,10 +92,7 @@ export default defineComponent({
 			return (
 				this.options.find((option) => option.id === this.modelValue) ?? {
 					id: this.modelValue,
-					label: t(
-						'forms',
-						'Next question (the chosen question was deleted or moved up)',
-					),
+					label: this.fallbackLabel,
 				}
 			)
 		},

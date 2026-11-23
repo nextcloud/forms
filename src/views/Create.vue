@@ -684,10 +684,10 @@ export default defineComponent({
 		}
 
 		/**
-		 * The numbers of the questions, as a list
+		 * The numbers of questions or of sections, as a list; questions and sections are numbered apart
 		 *
 		 * @param questions the questions of the form in their order
-		 * @param ids the ids of the questions
+		 * @param ids the ids of the questions or of the sections
 		 */
 		const numbersOf = (questions: FormsQuestion[], ids: number[]): string => {
 			const numbers = getNumbers(questions)
@@ -700,6 +700,21 @@ export default defineComponent({
 				getLanguage(),
 			)
 		}
+
+		/**
+		 * The ids of the sections among some ids
+		 *
+		 * @param questions the questions of the form in their order
+		 * @param ids the ids of questions and sections
+		 */
+		const sectionIdsOf = (questions: FormsQuestion[], ids: number[]): number[] =>
+			questions
+				.filter(
+					(question) =>
+						question.type === QUESTION_TYPE_SECTION
+						&& ids.includes(question.id),
+				)
+				.map((question) => question.id)
 
 		/**
 		 * Show a warning when a change breaks jumps, makes questions unreachable or lets jumps skip more questions
@@ -721,9 +736,9 @@ export default defineComponent({
 					.map((question) => question.id),
 			)
 
-			const broken = getNewlyBrokenQuestions(before, after).filter((id) =>
-				questionIds.has(id),
-			)
+			const newlyBroken = getNewlyBrokenQuestions(before, after)
+			const broken = newlyBroken.filter((id) => questionIds.has(id))
+			const brokenSections = newlyBroken.filter((id) => !questionIds.has(id))
 			const unreachable = [...after.unreachable].filter(
 				(id) => !before.unreachable.has(id) && questionIds.has(id),
 			)
@@ -740,6 +755,14 @@ export default defineComponent({
 					&& !newIds.has(question.id),
 			)
 			const messages = [
+				brokenSections.length > 0
+					&& n(
+						'forms',
+						'Section {sections} went to a section that was deleted, so respondents now go to the next section instead.',
+						'Sections {sections} went to sections that were deleted, so respondents now go to the next section instead.',
+						brokenSections.length,
+						{ sections: numbersOf(newQuestions, brokenSections) },
+					),
 				broken.length > 0
 					&& (deletedSection
 						? n(
@@ -898,18 +921,41 @@ export default defineComponent({
 						severity: 'warning',
 					})
 				}
+				const sectionIds = sectionIdsOf(questions, ids)
+				const questionIds = ids.filter((id) => !sectionIds.includes(id))
+				const sectionsText =
+					sectionIds.length === 0
+						? ''
+						: questionIds.length === 0
+							? n(
+									'forms',
+									'After this move, section {sections} would go to an earlier section.',
+									'After this move, sections {sections} would go to earlier sections.',
+									sectionIds.length,
+									{ sections: numbersOf(questions, sectionIds) },
+								)
+							: n(
+									'forms',
+									'Section {sections} would go to an earlier section as well.',
+									'Sections {sections} would go to earlier sections as well.',
+									sectionIds.length,
+									{ sections: numbersOf(questions, sectionIds) },
+								)
+				const questionsText =
+					questionIds.length === 0
+						? ''
+						: n(
+								'forms',
+								'After this move, question {questions} would jump to an earlier question.',
+								'After this move, questions {questions} would jump to earlier questions.',
+								questionIds.length,
+								{ questions: numbersOf(questions, questionIds) },
+							)
 				return await showConfirmation({
 					name: t('forms', 'Jumps cannot go back'),
-					text: [
-						n(
-							'forms',
-							'After this move, question {questions} would jump to an earlier question.',
-							'After this move, questions {questions} would jump to earlier questions.',
-							ids.length,
-							{ questions: numbersOf(questions, ids) },
-						),
-						moveBackText(moved),
-					].join(' '),
+					text: [questionsText, sectionsText, moveBackText(moved)]
+						.filter(Boolean)
+						.join(' '),
 					labelConfirm: t('forms', 'Remove jumps'),
 					labelReject: t('forms', 'Move back'),
 					severity: 'warning',

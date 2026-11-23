@@ -118,6 +118,30 @@ class JumpHelperTest extends TestCase {
 		$this->assertSame([], $questions[3]->getExtraSettings());
 	}
 
+	public function testRemoveDisallowedJumpsOfASectionToAQuestion(): void {
+		$questions = array_map(static function (array $data): Question {
+			$question = new Question();
+			$question->setId($data[0]);
+			$question->setType($data[1]);
+			$question->setExtraSettings($data[2]);
+			return $question;
+		}, [
+			[1, Constants::ANSWER_TYPE_SECTION, ['next' => 2]],
+			[2, Constants::ANSWER_TYPE_SHORT, []],
+			[3, Constants::ANSWER_TYPE_SECTION, ['next' => 5]],
+			[4, Constants::ANSWER_TYPE_SHORT, []],
+			[5, Constants::ANSWER_TYPE_SECTION, ['next' => 'submit']],
+			[6, Constants::ANSWER_TYPE_SHORT, []],
+		]);
+
+		$changed = JumpHelper::removeDisallowedJumps($questions);
+
+		$this->assertSame([$questions[0]], $changed);
+		$this->assertSame([], $questions[0]->getExtraSettings());
+		$this->assertSame(['next' => 5], $questions[2]->getExtraSettings());
+		$this->assertSame(['next' => 'submit'], $questions[4]->getExtraSettings());
+	}
+
 	public function testMapJumpsOfCopies(): void {
 		$questions = array_map(static function (array $data): Question {
 			$question = new Question();
