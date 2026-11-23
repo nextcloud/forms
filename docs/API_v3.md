@@ -547,7 +547,8 @@ Contains only manipulative question-endpoints. To retrieve options, request the 
   | Parameter | Type | Optional | Description |
   |-----------|---------|----------|-------------|
   | _optionTexts_ | Array | | Array of strings containing the new options |
-  | _optionType_ | [Option Types](DataStructure.md#Option-Types) | yes | The option-type to assign to the new options (e.g. `row`). |
+  | _optionType_ | [Option Types](DataStructure.md#Option-Types) | yes | The option-type to assign to the new options (e.g. `row`). Defaults to `choice`. |
+- Restrictions: Options can only be added to `dropdown`, `multiple`, `multiple_unique` and `ranking` questions, with option type `choice`, and to `grid` questions, with option type `row` or `column`. Any other question type or option type is rejected with **400 Bad Request**.
 - Response: The new array of option objects
 
 ```
