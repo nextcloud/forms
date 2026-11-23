@@ -37,6 +37,7 @@ use OCA\Forms\Controller\ApiController;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
 use OCA\Forms\Db\FormMapper;
+use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
@@ -1416,6 +1417,59 @@ class ApiControllerTest extends TestCase {
 
 		$this->expectException(OCSNotFoundException::class);
 		$this->apiController->$method(...$arguments);
+	}
+
+	public static function dataNewOptionOptionType(): array {
+		return [
+			'short text' => [Constants::ANSWER_TYPE_SHORT, 'choice', false],
+			'long text' => [Constants::ANSWER_TYPE_LONG, 'choice', false],
+			'date' => [Constants::ANSWER_TYPE_DATE, 'choice', false],
+			'file' => [Constants::ANSWER_TYPE_FILE, 'choice', false],
+			'linear scale' => [Constants::ANSWER_TYPE_LINEARSCALE, 'choice', false],
+			'dropdown with a row' => [Constants::ANSWER_TYPE_DROPDOWN, 'row', false],
+			'grid with a choice' => [Constants::ANSWER_TYPE_GRID, 'choice', false],
+			'grid without option type' => [Constants::ANSWER_TYPE_GRID, null, false],
+			'dropdown' => [Constants::ANSWER_TYPE_DROPDOWN, 'choice', true],
+			'dropdown without option type' => [Constants::ANSWER_TYPE_DROPDOWN, null, true],
+			'checkboxes' => [Constants::ANSWER_TYPE_MULTIPLE, 'choice', true],
+			'radio buttons' => [Constants::ANSWER_TYPE_MULTIPLEUNIQUE, 'choice', true],
+			'ranking' => [Constants::ANSWER_TYPE_RANKING, 'choice', true],
+			'grid row' => [Constants::ANSWER_TYPE_GRID, 'row', true],
+			'grid column' => [Constants::ANSWER_TYPE_GRID, 'column', true],
+		];
+	}
+
+	/**
+	 * @dataProvider dataNewOptionOptionType
+	 */
+	public function testNewOptionOptionType(string $questionType, ?string $optionType, bool $allowed): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setOrder(1);
+		$question->setType($questionType);
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->questionMapper->method('findById')->with(7)->willReturn($question);
+		$this->optionMapper->method('findByQuestion')->willReturn([]);
+
+		if (!$allowed) {
+			$this->optionMapper->expects($this->never())->method('insert');
+			$this->expectException(OCSBadRequestException::class);
+		} else {
+			$this->optionMapper->expects($this->once())
+				->method('insert')
+				->with($this->callback(fn (Option $option): bool => $option->getOptionType() === ($optionType ?? Constants::OPTION_TYPE_CHOICE)))
+				->willReturnArgument(0);
+		}
+
+		$response = $this->apiController->newOption(1, 7, ['Coffee'], $optionType);
+		$this->assertSame(Http::STATUS_CREATED, $response->getStatus());
 	}
 
 	public function testUpdateQuestionRejectsTypeChange(): void {

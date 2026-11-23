@@ -971,6 +971,8 @@ class ApiController extends OCSController {
 	 * @param string|null $optionType the new option type (e.g. 'row'), defaults to 'choice'
 	 * @return DataResponse<Http::STATUS_CREATED, list<FormsOption>, array{}> Returns a DataResponse containing the added options
 	 * @throws OCSBadRequestException This question is not part ot the given form
+	 * @throws OCSBadRequestException This question type takes no options
+	 * @throws OCSBadRequestException Invalid option type for this question
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException Current user has no permission to edit
 	 * @throws OCSNotFoundException Could not find form
@@ -1014,6 +1016,18 @@ class ApiController extends OCSController {
 
 		if ($question->getOrder() === 0) {
 			throw new OCSNotFoundException('Could not find question');
+		}
+
+		$allowedOptionTypes = Constants::OPTION_TYPES_PER_ANSWER_TYPE[$question->getType()] ?? [];
+		if ($allowedOptionTypes === []) {
+			$this->logger->debug('This question type takes no options');
+			throw new OCSBadRequestException('This question type takes no options');
+		}
+
+		$optionType ??= Constants::OPTION_TYPE_CHOICE;
+		if (!in_array($optionType, $allowedOptionTypes, true)) {
+			$this->logger->debug('Invalid option type for this question');
+			throw new OCSBadRequestException('Invalid option type for this question');
 		}
 
 		// Retrieve all options sorted by 'order'. Takes the order of the last array-element and adds one.
