@@ -118,6 +118,10 @@ class Constants {
 	public const ANSWER_GRID_TYPE_NUMBER = 'number';
 	public const ANSWER_GRID_TYPE_RADIO = 'radio';
 
+	// Option types
+	public const OPTION_TYPE_ROW = 'row';
+	public const OPTION_TYPE_COLUMN = 'column';
+
 	// All AnswerTypes
 	public const ANSWER_TYPES = [
 		self::ANSWER_TYPE_COLOR,
