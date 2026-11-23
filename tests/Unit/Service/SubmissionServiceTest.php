@@ -1702,7 +1702,7 @@ file2.txt"
 						99 => 'yes',
 					],
 				],
-				'Answer "99" for question "When can you meet?" is not a valid option.',
+				'One of the slots for question "When can you meet?" was removed. Refresh the page before submitting your answer.',
 			],
 			'valid-datepoll-yes-within-person-limit' => [
 				[

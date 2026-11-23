@@ -17,8 +17,8 @@
 			:placeholder="placeholder"
 			class="question__input"
 			:class="{ 'question__input--shifted': !isDropdown }"
-			:maxlength="maxOptionLength"
-			type="text"
+			:maxlength="inputKind === 'datetime' ? undefined : maxOptionLength"
+			:type="inputKind === 'datetime' ? 'datetime-local' : 'text'"
 			dir="auto"
 			@input="debounceOnInput"
 			@keydown.delete="deleteEntry"
@@ -84,6 +84,7 @@ import type { PropType } from 'vue'
 import type { FormsOption } from '../../types/Entities.d.ts'
 
 import IconPlus from '@material-symbols/svg-400/outlined/add.svg?raw'
+import IconCalendar from '@material-symbols/svg-400/outlined/calendar_today.svg?raw'
 import IconCheckboxBlankOutline from '@material-symbols/svg-400/outlined/check_box_outline_blank.svg?raw'
 import IconDelete from '@material-symbols/svg-400/outlined/delete.svg?raw'
 import IconDragIndicator from '@material-symbols/svg-400/outlined/drag_indicator.svg?raw'
@@ -148,6 +149,11 @@ export default defineComponent({
 			default: false,
 		},
 
+		inputKind: {
+			type: String as PropType<'text' | 'datetime'>,
+			default: 'text',
+		},
+
 		maxIndex: {
 			type: Number,
 			required: true,
@@ -182,7 +188,32 @@ export default defineComponent({
 		const buttonOptionUp = ref<{ $el?: HTMLElement } | null>(null)
 		const isIMEComposing = ref(false)
 		const answer = computed(() => props.answer)
-		const localText = ref(answer.value.text ?? '')
+
+		/**
+		 * Datepoll slots are stored as "2026-11-17 10:00" and edited as a datetime-local value.
+		 *
+		 * @param value The stored or typed slot value
+		 */
+		const toStoredValue = (value: string): string => {
+			if (props.inputKind !== 'datetime') {
+				return value
+			}
+			const match = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})/.exec(value)
+			return match ? `${match[1]} ${match[2]}` : ''
+		}
+
+		/**
+		 * @param value The stored slot value
+		 */
+		const toInputValue = (value: string): string => {
+			if (props.inputKind !== 'datetime') {
+				return value
+			}
+			const match = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/.exec(value)
+			return match ? `${match[1]}T${match[2]}` : ''
+		}
+
+		const localText = ref(toInputValue(answer.value.text ?? ''))
 
 		const getInputTarget = (
 			event: Event | { target: EventTarget | null },
@@ -192,13 +223,16 @@ export default defineComponent({
 
 		const canCreateLocalAnswer = computed(() => {
 			if (answer.value.local) {
-				return !!localText.value.trim()
+				return !!toStoredValue(localText.value).trim()
 			}
 			return !!answer.value.text?.trim()
 		})
 
 		const ariaLabel = computed(() => {
 			if (answer.value.local) {
+				if (props.inputKind === 'datetime') {
+					return t('forms', 'Add a date and time')
+				}
 				if (props.optionType === OptionType.Column) {
 					return t('forms', 'Add a new column')
 				}
@@ -207,6 +241,10 @@ export default defineComponent({
 				}
 
 				return t('forms', 'Add a new answer option')
+			}
+
+			if (props.inputKind === 'datetime') {
+				return t('forms', 'Slot {index}', { index: props.index + 1 })
 			}
 
 			if (props.optionType === OptionType.Column) {
@@ -232,6 +270,9 @@ export default defineComponent({
 
 		const placeholder = computed(() => {
 			if (answer.value.local) {
+				if (props.inputKind === 'datetime') {
+					return t('forms', 'Add a date and time')
+				}
 				if (props.optionType === OptionType.Column) {
 					return t('forms', 'Add a new column')
 				}
@@ -241,6 +282,10 @@ export default defineComponent({
 				}
 
 				return t('forms', 'Add a new answer option')
+			}
+
+			if (props.inputKind === 'datetime') {
+				return t('forms', 'Slot {index}', { index: props.index + 1 })
 			}
 
 			if (props.optionType === OptionType.Column) {
@@ -258,7 +303,11 @@ export default defineComponent({
 
 		const pseudoIcon = computed(() => {
 			if (answer.value.local) {
-				return IconPlus
+				return props.inputKind === 'datetime' ? IconCalendar : IconPlus
+			}
+
+			if (props.inputKind === 'datetime') {
+				return IconCalendar
 			}
 
 			if (props.optionType === OptionType.Column) {
@@ -280,7 +329,7 @@ export default defineComponent({
 		watch(
 			() => props.answer,
 			(newVal: FormsOption) => {
-				localText.value = newVal?.text ?? ''
+				localText.value = toInputValue(newVal?.text ?? '')
 			},
 			{ deep: true },
 		)
@@ -319,20 +368,23 @@ export default defineComponent({
 				return
 			}
 
-			if (!event.isComposing && !isIMEComposing.value && target.value !== '') {
+			const stored = toStoredValue(target.value)
+			if (!event.isComposing && !isIMEComposing.value && stored !== '') {
 				// clone answer
 				const answerCopy = { ...answer.value }
 				if (!input.value) {
 					return
 				}
-				answerCopy.text = input.value.value
+				answerCopy.text = stored
 
 				await updateAnswer(answerCopy)
 
-				// Forward changes, but use current answer.text to avoid erasing
+				// Forward changes, but use the stored slot text to avoid erasing
 				// any in-between changes while updating the answer
-				answerCopy.text = input.value.value
-				emit('update:answer', props.index, answerCopy)
+				answerCopy.text = toStoredValue(input.value.value)
+				if (props.inputKind !== 'datetime' || answerCopy.text !== '') {
+					emit('update:answer', props.index, answerCopy)
+				}
 			}
 		}
 
@@ -361,7 +413,7 @@ export default defineComponent({
 				return
 			}
 
-			const value = localText.value ?? ''
+			const value = toStoredValue(localText.value ?? '')
 			if (!value.trim()) {
 				return
 			}
@@ -380,7 +432,7 @@ export default defineComponent({
 				if (!input.value) {
 					return
 				}
-				newAnswer.text = input.value.value
+				newAnswer.text = value
 				localText.value = ''
 				emit('createAnswer', props.index, newAnswer)
 			} finally {

@@ -256,6 +256,7 @@ import { generateOcsUrl } from '@nextcloud/router'
 import {
 	computed,
 	inject,
+	nextTick,
 	onBeforeMount,
 	onMounted,
 	onUnmounted,
@@ -294,7 +295,8 @@ import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 const formsAppName = 'forms'
 
-type AnswerValue = string[] | GridQuestionValues
+type DatePollVotes = Record<string, 'yes' | 'no' | 'maybe'>
+type AnswerValue = string[] | GridQuestionValues | DatePollVotes
 type AnswersMap = Record<number, AnswerValue>
 
 interface StoredAnswerState {
@@ -326,6 +328,7 @@ interface LoadedSubmissionResponse {
 
 interface QuestionComponentRef {
 	validate: () => Promise<boolean>
+	applySubmissionError?: (message: string) => boolean
 }
 
 interface DialogButton {
@@ -867,6 +870,34 @@ export default defineComponent({
 								`option ${text} could not be mapped to an option for question ${questionId}`,
 							)
 						}
+					} else if (question.type === 'datepoll') {
+						try {
+							const parsed = JSON.parse(text) as Record<string, string>
+							const optionIds = new Set(
+								(question.options ?? []).map((option) =>
+									String(option.id),
+								),
+							)
+							const allowed = question.extraSettings?.allowMaybe
+								? ['yes', 'no', 'maybe']
+								: ['yes', 'no']
+							const restored: DatePollVotes = {}
+							for (const [slotId, vote] of Object.entries(parsed)) {
+								if (
+									optionIds.has(String(slotId))
+									&& allowed.includes(vote)
+								) {
+									restored[String(slotId)] = vote as
+										'yes' | 'no' | 'maybe'
+								}
+							}
+							loaded[questionId] = restored
+						} catch (error) {
+							logger.debug(
+								`Could not parse datepoll answer ${text} for question ${questionId}`,
+								{ error },
+							)
+						}
 					} else if (question.type === 'file') {
 						// File answers cannot be restored when editing a submission —
 						// the uploaded file has already been moved to permanent storage
@@ -1042,6 +1073,7 @@ export default defineComponent({
 		async function onConfirmedSubmit(): Promise<void> {
 			showConfirmEmptyModal.value = false
 			loading.value = true
+			let submissionError: string | null = null
 
 			try {
 				if (submissionId.value) {
@@ -1073,21 +1105,15 @@ export default defineComponent({
 				deleteFormFieldFromLocalStorage()
 				emitEvent('forms:last-updated:set', props.form.id)
 			} catch (error) {
-				const errorMessage = (
-					error as {
-						response?: {
-							data?: { ocs?: { meta?: { message?: string } } }
-						}
-					}
-				).response?.data?.ocs?.meta?.message
+				submissionError = submissionErrorMessage(error)
 				logger.error('Error while submitting the form', { error })
-				if (errorMessage) {
+				if (submissionError) {
 					showError(
 						t(
 							'forms',
 							'There was an error submitting the form: {message}',
 							{
-								message: errorMessage,
+								message: submissionError,
 							},
 						),
 					)
@@ -1098,6 +1124,42 @@ export default defineComponent({
 				loading.value = false
 				if (!props.publicView) {
 					await viewForm.fetchFullForm(props.form.id)
+				}
+				await showSubmissionError(submissionError)
+			}
+		}
+
+		/**
+		 * The message Nextcloud returned for a failed submission.
+		 *
+		 * @param error The failed request
+		 */
+		function submissionErrorMessage(error: unknown): string | null {
+			const data = (
+				error as {
+					response?: { data?: { ocs?: { meta?: { message?: string } } } }
+				}
+			).response?.data
+			const message = data?.ocs?.meta?.message
+			return message ? message : null
+		}
+
+		/**
+		 * Show a failed submission on the first question it names, after the form has rendered again.
+		 *
+		 * @param message The message returned by the server
+		 */
+		async function showSubmissionError(message: string | null): Promise<void> {
+			if (!message) {
+				return
+			}
+			await nextTick()
+			const rawQuestionRefs = Array.isArray(questionRefs.value)
+				? questionRefs.value
+				: [questionRefs.value].filter(Boolean)
+			for (const question of rawQuestionRefs as QuestionComponentRef[]) {
+				if (question.applySubmissionError?.(message)) {
+					return
 				}
 			}
 		}

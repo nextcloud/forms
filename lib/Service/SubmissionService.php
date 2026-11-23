@@ -845,7 +845,7 @@ class SubmissionService {
 		foreach ($votes as $optionId => $vote) {
 			$normalizedId = $this->normalizeNumericOptionId($optionId);
 			if ($normalizedId === null || !in_array($normalizedId, $optionIds, true)) {
-				throw new \InvalidArgumentException(sprintf('Answer "%s" for question "%s" is not a valid option.', is_scalar($optionId) ? (string)$optionId : gettype($optionId), $question['text']));
+				throw new \InvalidArgumentException(sprintf('One of the slots for question "%s" was removed. Refresh the page before submitting your answer.', $question['text']));
 			}
 
 			if (!is_string($vote) || !in_array($vote, Constants::DATEPOLL_VOTES, true)) {

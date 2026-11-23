@@ -8,6 +8,7 @@ import type { FormsOption, FormsQuestion } from '../types/Entities.d.ts'
 
 import IconNumeric from '@material-symbols/svg-400/outlined/123.svg?raw'
 import IconArrowDownDropCircleOutline from '@material-symbols/svg-400/outlined/arrow_drop_down_circle.svg?raw'
+import IconCalendarClock from '@material-symbols/svg-400/outlined/calendar_clock.svg?raw'
 import IconCalendar from '@material-symbols/svg-400/outlined/calendar_today.svg?raw'
 import IconCheckboxOutline from '@material-symbols/svg-400/outlined/check_box.svg?raw'
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
@@ -23,6 +24,7 @@ import { t } from '@nextcloud/l10n'
 import { markRaw } from 'vue'
 import QuestionColor from '../components/Questions/QuestionColor.vue'
 import QuestionDate from '../components/Questions/QuestionDate.vue'
+import QuestionDatePoll from '../components/Questions/QuestionDatePoll.vue'
 import QuestionDropdown from '../components/Questions/QuestionDropdown.vue'
 import QuestionFile from '../components/Questions/QuestionFile.vue'
 import QuestionGrid from '../components/Questions/QuestionGrid.vue'
@@ -277,6 +279,23 @@ const answerTypes: Record<string, AnswerTypeConfig> = {
 		createPlaceholder: t('forms', 'People can pick a color'),
 		submitPlaceholder: t('forms', 'Pick a color'),
 		warningInvalid: t('forms', 'This question needs a title!'),
+	},
+
+	datepoll: {
+		component: markRaw(QuestionDatePoll),
+		icon: IconCalendarClock,
+		label: t('forms', 'Date poll'),
+		predefined: true,
+		validate: (question: FormsQuestion) => {
+			return (question.options?.length ?? 0) > 0
+		},
+
+		titlePlaceholder: t('forms', 'Date poll question title'),
+		createPlaceholder: t('forms', 'Add a date and time'),
+		warningInvalid: t(
+			'forms',
+			'This question needs a title and at least one slot!',
+		),
 	},
 
 	ranking: {
