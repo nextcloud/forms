@@ -804,6 +804,49 @@ test.describe('Sections', () => {
 		).toHaveValue('Part one')
 	})
 
+	test('The results summary shows sections as headings between the questions', async ({
+		page,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		const ids: number[] = []
+		for (const [type, text] of [
+			['section', ''],
+			['short', 'Intro'],
+			['section', 'Part one'],
+			['short', 'First'],
+			['section', ''],
+			['short', 'Second'],
+		]) {
+			ids.push(
+				(
+					await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+						type,
+						text,
+					})
+				).id,
+			)
+		}
+		await api(page.request, 'PATCH', `/forms/${form.id}/questions/${ids[2]}`, {
+			keyValuePairs: { description: 'Questions about the first part' },
+		})
+		await api(page.request, 'POST', `/forms/${form.id}/submissions`, {
+			answers: { [ids[1]]: ['hello'], [ids[3]]: ['world'] },
+		})
+		await page.goto(`apps/forms/${form.hash}/results`)
+
+		const main = page.getByRole('main')
+		await expect(main.getByRole('heading', { level: 3 })).toHaveText([
+			'Intro',
+			'Part one',
+			'Second',
+		])
+		await expect(main.getByRole('heading', { level: 4 })).toHaveText(['First'])
+		const section = page.locator('.results-section')
+		await expect(section).toHaveCount(1)
+		await expect(section).toContainText('Questions about the first part')
+		await expect(section).not.toContainText('Section')
+	})
+
 	test('Each page checks its required questions, an empty section is an info page', async ({
 		page,
 		submitView,

@@ -228,11 +228,24 @@
 
 		<!-- Summary view for visualization -->
 		<section v-else-if="isSummaryView">
-			<ResultsSummary
-				v-for="question in questions"
-				:key="question.id"
-				:question="question"
-				:submissions="submissions" />
+			<template v-for="question in summaryItems" :key="question.id">
+				<div
+					v-if="
+						question.type === QUESTION_TYPE_SECTION
+						&& !isEmptySection(question)
+					"
+					class="results-section">
+					<h3 v-if="hasTitle(question)" dir="auto">{{ question.text }}</h3>
+					<p v-if="question.description" dir="auto">
+						{{ question.description }}
+					</p>
+				</div>
+				<ResultsSummary
+					v-else-if="question.type !== QUESTION_TYPE_SECTION"
+					:question="question"
+					:headingLevel="questionIdsInSection.has(question.id) ? 4 : 3"
+					:submissions="submissions" />
+			</template>
 		</section>
 
 		<!-- Responses view for individual responses -->
@@ -320,6 +333,12 @@ import { FormState, INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import { PERMISSION_TYPES } from '../models/Permissions.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
+import {
+	getQuestionIdsInSections,
+	hasTitle,
+	isEmptySection,
+	QUESTION_TYPE_SECTION,
+} from '../utils/Sections.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 type SupportedFileFormat = 'ods' | 'csv' | 'xlsx'
@@ -430,6 +449,24 @@ export default defineComponent({
 		const viewForm = useViewForm({ form: () => props.form, emit })
 
 		const questions = ref<FormsQuestion[]>([])
+
+		const summaryItems = computed<FormsQuestion[]>(() => {
+			const byId = new Map(
+				questions.value.map((question) => [question.id, question]),
+			)
+			const items = (props.form.questions ?? []).flatMap((question) =>
+				question.type === QUESTION_TYPE_SECTION
+					? [question]
+					: (byId.get(question.id) ?? []),
+			)
+			return items.length - questions.value.length
+				=== items.filter(({ type }) => type === QUESTION_TYPE_SECTION).length
+				? items
+				: questions.value
+		})
+		const questionIdsInSection = computed(() =>
+			getQuestionIdsInSections(summaryItems.value),
+		)
 		const submissions = ref<FormsSubmission[]>([])
 		const filteredSubmissionsCount = ref(0)
 		const isDownloadActionOpened = ref(false)
@@ -1071,6 +1108,11 @@ export default defineComponent({
 		return {
 			...viewForm,
 			isMobile,
+			QUESTION_TYPE_SECTION,
+			hasTitle,
+			isEmptySection,
+			summaryItems,
+			questionIdsInSection,
 			t,
 			responseViews,
 			questions,
@@ -1167,6 +1209,23 @@ export default defineComponent({
 
 		p {
 			padding-inline-start: 14px;
+		}
+	}
+
+	.results-section {
+		padding-inline: var(--default-clickable-area) 16px;
+		margin-block: 32px 8px;
+
+		h3 {
+			font-size: 24px;
+			font-weight: bold;
+			padding-block-end: 8px;
+			border-block-end: 1px solid var(--color-border);
+		}
+
+		p {
+			color: var(--color-text-maxcontrast);
+			margin-block-start: 8px;
 		}
 	}
 

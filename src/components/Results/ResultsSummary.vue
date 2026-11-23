@@ -5,9 +5,9 @@
 
 <template>
 	<div class="section question-summary">
-		<h3 dir="auto">
+		<component :is="`h${headingLevel}`" dir="auto">
 			{{ question.text }}
-		</h3>
+		</component>
 		<p class="question-summary__detail">
 			{{ questionTypeLabel }}
 		</p>
@@ -364,6 +364,11 @@ export default defineComponent({
 		question: {
 			type: Object as PropType<FormsQuestion>,
 			required: true,
+		},
+
+		headingLevel: {
+			type: Number,
+			default: 3,
 		},
 	},
 
@@ -1009,7 +1014,8 @@ export default defineComponent({
 	container-type: inline-size;
 	padding-inline: var(--default-clickable-area) 16px;
 
-	h3 {
+	h3,
+	h4 {
 		font-weight: bold;
 	}
 
