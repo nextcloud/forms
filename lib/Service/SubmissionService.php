@@ -291,6 +291,8 @@ class SubmissionService {
 		$gridColumnsPerQuestionId = [];
 		/** @var array<int, list<int>> $rankingOptionsPerQuestionId */
 		$rankingOptionsPerQuestionId = [];
+		/** @var array<int, int> $exportColumnCountPerQuestionId */
+		$exportColumnCountPerQuestionId = [];
 
 		$optionPerOptionId = [];
 		foreach ($questions as $question) {
@@ -319,12 +321,16 @@ class SubmissionService {
 						}
 					}
 				}
+
+				$exportColumnCountPerQuestionId[$question->getId()] = count($gridRowsPerQuestionId[$question->getId()] ?? [])
+					* ($gridCellType === Constants::ANSWER_GRID_TYPE_NUMBER ? count($gridColumnsPerQuestionId[$question->getId()] ?? []) : 1);
 			} elseif ($question->getType() === Constants::ANSWER_TYPE_RANKING) {
 				$options = $optionsByQuestion[$question->getId()] ?? [];
 				foreach ($options as $option) {
 					$optionPerOptionId[$option->getId()] = $option;
 					$rankingOptionsPerQuestionId[$question->getId()][] = $option->getId();
 				}
+				$exportColumnCountPerQuestionId[$question->getId()] = count($rankingOptionsPerQuestionId[$question->getId()] ?? []);
 				foreach ($rankingOptionsPerQuestionId[$question->getId()] as $optionId) {
 					$header[] = ['id' => 'question-id-' . $question->getId() . '-' . $optionId, 'title' => $question->getText() . ' (' . $optionPerOptionId[$optionId]->getText() . ')'];
 				}
@@ -382,7 +388,8 @@ class SubmissionService {
 						$columns = [];
 						foreach ($gridRowsPerQuestionId[$questionId] as $row) {
 							if (empty($answerText[$row])) {
-								$columns[] = '';
+								$emptyCells = $gridCellType === Constants::ANSWER_GRID_TYPE_NUMBER ? count($gridColumnsPerQuestionId[$questionId] ?? []) : 1;
+								array_push($columns, ...array_fill(0, $emptyCells, ''));
 								continue;
 							}
 
@@ -393,7 +400,7 @@ class SubmissionService {
 							} elseif ($gridCellType === Constants::ANSWER_GRID_TYPE_NUMBER) {
 								// For number grids, we need to create a header for each cell in the grid
 								foreach ($gridColumnsPerQuestionId[$questionId] as $column) {
-									if (empty($answerText[$row][$column])) {
+									if (!isset($answerText[$row][$column]) || $answerText[$row][$column] === '') {
 										$columns[] = '';
 										continue;
 									}
@@ -423,7 +430,11 @@ class SubmissionService {
 				}, []);
 
 			foreach ($questions as $question) {
-				$row[] = $this->answerExportValue($question, $answers[$question->getId()] ?? null);
+				$answer = $answers[$question->getId()] ?? null;
+				if ($answer === null && isset($exportColumnCountPerQuestionId[$question->getId()])) {
+					$answer = ['columns' => array_fill(0, $exportColumnCountPerQuestionId[$question->getId()], '')];
+				}
+				$row[] = $this->answerExportValue($question, $answer);
 			}
 
 			$data[] = $row;

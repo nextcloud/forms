@@ -452,6 +452,128 @@ class SubmissionServiceTest extends TestCase {
 				"1","user1","User 1","1973-11-29T22:33:09+01:00","Option 55","Option 56"
 				'
 			],
+			'grid-number-empty-row' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Question 1', 'extraSettings' => ['questionType' => 'number'], 'options' => [
+						['id' => 2, 'text' => 'A1', 'optionType' => 'row'],
+						['id' => 3, 'text' => 'A2', 'optionType' => 'row'],
+						['id' => 4, 'text' => 'A3', 'optionType' => 'row'],
+						['id' => 55, 'text' => 'N0', 'optionType' => 'column'],
+						['id' => 56, 'text' => 'N1', 'optionType' => 'column'],
+						['id' => 57, 'text' => 'N2', 'optionType' => 'column'],
+					]],
+					['id' => 9, 'type' => 'short', 'text' => 'Question 2'],
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 1, 'text' => '{"2":{"55":2,"57":1},"4":{"56":4}}'],
+							['questionId' => 9, 'text' => 'after'],
+						]
+					],
+				],
+				// Expected CSV-Result
+				'
+				"Submission ID","User ID","User display name","Timestamp","Question 1 (A1 - N0)","Question 1 (A1 - N1)","Question 1 (A1 - N2)","Question 1 (A2 - N0)","Question 1 (A2 - N1)","Question 1 (A2 - N2)","Question 1 (A3 - N0)","Question 1 (A3 - N1)","Question 1 (A3 - N2)","Question 2"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1-2-55","question-id-1-2-56","question-id-1-2-57","question-id-1-3-55","question-id-1-3-56","question-id-1-3-57","question-id-1-4-55","question-id-1-4-56","question-id-1-4-57","question-id-9"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","2","","1","","","","","4","","after"
+				'
+			],
+			'grid-number-zero' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Question 1', 'extraSettings' => ['questionType' => 'number'], 'options' => [
+						['id' => 2, 'text' => 'A1', 'optionType' => 'row'],
+						['id' => 3, 'text' => 'A2', 'optionType' => 'row'],
+						['id' => 4, 'text' => 'A3', 'optionType' => 'row'],
+						['id' => 55, 'text' => 'N0', 'optionType' => 'column'],
+						['id' => 56, 'text' => 'N1', 'optionType' => 'column'],
+						['id' => 57, 'text' => 'N2', 'optionType' => 'column'],
+					]],
+					['id' => 9, 'type' => 'short', 'text' => 'Question 2'],
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 1, 'text' => '{"2":{"56":0},"3":{"55":5},"4":{"57":7}}'],
+							['questionId' => 9, 'text' => 'after'],
+						]
+					],
+				],
+				// Expected CSV-Result
+				'
+				"Submission ID","User ID","User display name","Timestamp","Question 1 (A1 - N0)","Question 1 (A1 - N1)","Question 1 (A1 - N2)","Question 1 (A2 - N0)","Question 1 (A2 - N1)","Question 1 (A2 - N2)","Question 1 (A3 - N0)","Question 1 (A3 - N1)","Question 1 (A3 - N2)","Question 2"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1-2-55","question-id-1-2-56","question-id-1-2-57","question-id-1-3-55","question-id-1-3-56","question-id-1-3-57","question-id-1-4-55","question-id-1-4-56","question-id-1-4-57","question-id-9"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","","0","","5","","","","","7","after"
+				'
+			],
+			'grid-unanswered' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Question 1', 'extraSettings' => ['questionType' => 'radio'], 'options' => [
+						['id' => 2, 'text' => 'R1', 'optionType' => 'row'],
+						['id' => 3, 'text' => 'R2', 'optionType' => 'row'],
+						['id' => 4, 'text' => 'R3', 'optionType' => 'row'],
+						['id' => 55, 'text' => 'C1', 'optionType' => 'column'],
+						['id' => 56, 'text' => 'C2', 'optionType' => 'column'],
+					]],
+					['id' => 9, 'type' => 'short', 'text' => 'Question 2'],
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 9, 'text' => 'after'],
+						]
+					],
+				],
+				// Expected CSV-Result
+				'
+				"Submission ID","User ID","User display name","Timestamp","Question 1 (R1)","Question 1 (R2)","Question 1 (R3)","Question 2"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1-2","question-id-1-3","question-id-1-4","question-id-9"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","","","","after"
+				'
+			],
+			'ranking-unanswered-before-another-question' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'ranking', 'text' => 'Question 1', 'options' => [
+						['id' => 2, 'text' => 'First'],
+						['id' => 3, 'text' => 'Second'],
+						['id' => 4, 'text' => 'Third'],
+					]],
+					['id' => 9, 'type' => 'short', 'text' => 'Question 2'],
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 9, 'text' => 'after'],
+						]
+					],
+				],
+				// Expected CSV-Result
+				'
+				"Submission ID","User ID","User display name","Timestamp","Question 1 (First)","Question 1 (Second)","Question 1 (Third)","Question 2"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1-2","question-id-1-3","question-id-1-4","question-id-9"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","","","","after"
+				'
+			],
 			'file-multi-answers' => [
 				// Questions
 				[
