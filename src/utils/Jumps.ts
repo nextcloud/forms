@@ -11,6 +11,7 @@ import type {
 } from '../types/Entities.d.ts'
 
 import { QUESTION_EXTRASETTINGS_OTHER_PREFIX } from '../models/Constants.ts'
+import { getSectionIndexes, isAllowedTarget } from './Sections.ts'
 
 export const JUMP_TARGET_SUBMIT = 'submit'
 
@@ -428,33 +429,41 @@ export function getJumps(
 }
 
 /**
- * The questions without their jumps to the question itself or to an earlier question, as the server removes them when it saves an order.
+ * The questions without their jumps to the question itself, to an earlier question or into the middle of another section, as the server removes them when it saves an order.
  * Questions without such jumps stay the same objects.
- * Mirrors `JumpHelper::removeBackwardJumps()`.
+ * Mirrors `JumpHelper::removeDisallowedJumps()`.
  *
  * @param questions the questions of the form in their order
  */
-export function withoutBackwardJumps<T extends FormsQuestion>(questions: T[]): T[] {
+export function withoutDisallowedJumps<T extends FormsQuestion>(
+	questions: T[],
+): T[] {
 	const positions = new Map(
 		questions.map((question, position) => [question.id, position]),
 	)
+	const sections = getSectionIndexes(questions)
 	return questions.map((question, position) => {
-		const isBackward = (target: unknown): boolean =>
-			typeof target === 'number'
-			&& (positions.get(target) ?? Number.POSITIVE_INFINITY) <= position
+		const isDisallowed = (target: unknown): boolean => {
+			const targetPosition =
+				typeof target === 'number' ? positions.get(target) : undefined
+			return (
+				targetPosition !== undefined
+				&& !isAllowedTarget(questions, sections, position, targetPosition)
+			)
+		}
 		const { next, goTo, ...extraSettings }: FormsQuestionExtraSettings =
 			question.extraSettings ?? {}
 		const keptGoTo = Array.isArray(goTo)
 			? goTo.filter(
 					(jump: unknown) =>
-						!isBackward(
+						!isDisallowed(
 							typeof jump === 'object' && jump !== null
 								? (jump as { target?: unknown }).target
 								: undefined,
 						),
 				)
 			: goTo
-		if (!isBackward(next) && keptGoTo?.length === goTo?.length) {
+		if (!isDisallowed(next) && keptGoTo?.length === goTo?.length) {
 			return question
 		}
 		return {
@@ -462,10 +471,24 @@ export function withoutBackwardJumps<T extends FormsQuestion>(questions: T[]): T
 			extraSettings: {
 				...extraSettings,
 				...(goTo === undefined ? {} : { goTo: keptGoTo }),
-				...(next === undefined || isBackward(next) ? {} : { next }),
+				...(next === undefined || isDisallowed(next) ? {} : { next }),
 			},
 		}
 	})
+}
+
+/**
+ * The ids of the questions with jumps to the question itself, to an earlier question or into the middle of another section
+ *
+ * @param questions the questions of the form in their order
+ */
+export function getQuestionsWithDisallowedJumps(
+	questions: FormsQuestion[],
+): number[] {
+	const allowed = withoutDisallowedJumps(questions)
+	return questions
+		.filter((question, position) => allowed[position] !== question)
+		.map((question) => question.id)
 }
 
 /**

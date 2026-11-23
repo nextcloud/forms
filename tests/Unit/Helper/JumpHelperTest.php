@@ -60,7 +60,7 @@ class JumpHelperTest extends TestCase {
 		);
 	}
 
-	public function testRemoveBackwardJumps(): void {
+	public function testRemoveDisallowedJumps(): void {
 		$questions = array_map(static function (array $data): Question {
 			$question = new Question();
 			$question->setId($data[0]);
@@ -73,13 +73,49 @@ class JumpHelperTest extends TestCase {
 			[4, ['goTo' => []]],
 		]);
 
-		$changed = JumpHelper::removeBackwardJumps($questions);
+		$changed = JumpHelper::removeDisallowedJumps($questions);
 
 		$this->assertSame([$questions[0], $questions[1], $questions[2]], $changed);
 		$this->assertSame(['next' => 3, 'goTo' => [['optionId' => 12, 'target' => 'submit']]], $questions[0]->getExtraSettings());
 		$this->assertSame(['shuffleOptions' => true, 'goTo' => [['optionId' => 22, 'target' => 99]]], $questions[1]->getExtraSettings());
 		$this->assertSame([], $questions[2]->getExtraSettings());
 		$this->assertSame(['goTo' => []], $questions[3]->getExtraSettings());
+	}
+
+	public function testRemoveDisallowedJumpsIntoTheMiddleOfAnotherSection(): void {
+		$questions = array_map(static function (array $data): Question {
+			$question = new Question();
+			$question->setId($data[0]);
+			$question->setType($data[1]);
+			$question->setExtraSettings($data[2]);
+			return $question;
+		}, [
+			[1, Constants::ANSWER_TYPE_MULTIPLEUNIQUE, ['goTo' => [
+				['optionId' => 11, 'target' => 2],
+				['optionId' => 12, 'target' => 3],
+				['optionId' => 13, 'target' => 4],
+				['optionId' => 14, 'target' => 6],
+				['optionId' => 15, 'target' => 5],
+				['optionId' => 16, 'target' => 'submit'],
+			]]],
+			[2, Constants::ANSWER_TYPE_SHORT, ['next' => 5]],
+			[3, Constants::ANSWER_TYPE_SECTION, []],
+			[4, Constants::ANSWER_TYPE_SHORT, ['next' => 6]],
+			[5, Constants::ANSWER_TYPE_SECTION, []],
+			[6, Constants::ANSWER_TYPE_SHORT, []],
+		]);
+
+		$changed = JumpHelper::removeDisallowedJumps($questions);
+
+		$this->assertSame([$questions[0], $questions[3]], $changed);
+		$this->assertSame(['goTo' => [
+			['optionId' => 11, 'target' => 2],
+			['optionId' => 12, 'target' => 3],
+			['optionId' => 15, 'target' => 5],
+			['optionId' => 16, 'target' => 'submit'],
+		]], $questions[0]->getExtraSettings());
+		$this->assertSame(['next' => 5], $questions[1]->getExtraSettings());
+		$this->assertSame([], $questions[3]->getExtraSettings());
 	}
 
 	public function testMapJumpsOfCopies(): void {

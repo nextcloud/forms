@@ -95,6 +95,56 @@ export function getQuestionIdsInSections(
 }
 
 /**
+ * The section of each question by position: 0 before the first section, then 1, 2, … from each section on, the section itself included
+ *
+ * @param questions the questions and sections in their order
+ */
+export function getSectionIndexes(questions: Array<{ type: string }>): number[] {
+	let section = 0
+	return questions.map((question) =>
+		question.type === QUESTION_TYPE_SECTION ? ++section : section,
+	)
+}
+
+/**
+ * Whether a question may jump to a target: a later question of its own section, or a later section
+ *
+ * @param questions the questions and sections in their order
+ * @param sections the section of each question by position, see `getSectionIndexes()`
+ * @param position the position of the question
+ * @param targetPosition the position of the target
+ */
+export function isAllowedTarget(
+	questions: Array<{ type: string }>,
+	sections: number[],
+	position: number,
+	targetPosition: number,
+): boolean {
+	return (
+		targetPosition > position
+		&& (questions[targetPosition].type === QUESTION_TYPE_SECTION
+			|| sections[targetPosition] === sections[position])
+	)
+}
+
+/**
+ * The pages of the questions on a path: a page starts at each section, questions before the first section form the first page
+ *
+ * @param questions the questions and sections on the path, in their order
+ */
+export function getPages<T extends { type: string }>(questions: T[]): T[][] {
+	const pages: T[][] = []
+	for (const question of questions) {
+		if (question.type === QUESTION_TYPE_SECTION || pages.length === 0) {
+			pages.push([question])
+		} else {
+			pages[pages.length - 1].push(question)
+		}
+	}
+	return pages
+}
+
+/**
  * The number of questions before the first section, 0 for a form without sections
  *
  * @param questions the questions and sections in their order
@@ -130,21 +180,4 @@ export function withNextSectionMovedUp<T extends { type: string }>(
 		...questions.slice(position, first),
 		...questions.slice(first + 1),
 	]
-}
-
-/**
- * The pages of the questions on a path: a page starts at each section, questions before the first section form the first page
- *
- * @param questions the questions and sections on the path, in their order
- */
-export function getPages<T extends { type: string }>(questions: T[]): T[][] {
-	const pages: T[][] = []
-	for (const question of questions) {
-		if (question.type === QUESTION_TYPE_SECTION || pages.length === 0) {
-			pages.push([question])
-		} else {
-			pages[pages.length - 1].push(question)
-		}
-	}
-	return pages
 }

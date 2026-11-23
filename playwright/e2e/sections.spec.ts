@@ -75,7 +75,9 @@ test.describe('Sections', () => {
 		).toHaveCount(0)
 	})
 
-	test('A jump lists a later section by its own number', async ({ page }) => {
+	test('A jump lists the later sections, not the questions inside them', async ({
+		page,
+	}) => {
 		const { form } = await createSectionForm(page.request)
 		await page.goto(`apps/forms/${form.hash}/edit`)
 
@@ -90,8 +92,6 @@ test.describe('Sections', () => {
 		await expect(page.getByRole('option')).toHaveText([
 			'Next question',
 			'Section 2: About the pet',
-			'Question 2: Which pet?',
-			'Question 3: Comments',
 			'End of the form',
 		])
 	})
@@ -105,7 +105,7 @@ test.describe('Sections', () => {
 		await api(page.request, 'PATCH', `/forms/${form.id}/questions/${pet.id}`, {
 			keyValuePairs: {
 				extraSettings: {
-					goTo: [{ optionId: options[1].id, target: comments.id }],
+					goTo: [{ optionId: options[1].id, target: 'submit' }],
 				},
 			},
 		})
@@ -129,14 +129,13 @@ test.describe('Sections', () => {
 				.getByRole('radio', { name: 'Yes' }),
 		).toBeChecked()
 		await submitView.checkRadio('Do you have a pet?', 'No')
-		await expect(submitView.getQuestion('Comments')).toBeVisible()
 		await expect(submitView.nextButton).toHaveCount(0)
-		await submitView.fillText('Comments', 'None')
 
 		const response = await submitView.submit()
 		const { answers } = response.request().postDataJSON()
 		expect(answers).not.toHaveProperty(String(section.id))
 		expect(answers).not.toHaveProperty(String(which.id))
+		expect(answers).not.toHaveProperty(String(comments.id))
 		await expect(submitView.successMessage).toBeVisible()
 	})
 
@@ -240,6 +239,239 @@ test.describe('Sections', () => {
 			'Which pet?',
 			'Comments',
 		])
+	})
+
+	test('The server removes jumps into the middle of another section', async ({
+		page,
+	}) => {
+		const headers = { 'OCS-APIRequest': 'true', Accept: 'application/json' }
+		const { form, pet, options, which } = await createSectionForm(page.request)
+		const update = await page.request.patch(
+			`../ocs/v2.php/apps/forms/api/v3/forms/${form.id}/questions/${pet.id}`,
+			{
+				headers,
+				data: {
+					keyValuePairs: {
+						extraSettings: {
+							goTo: [
+								{ optionId: options[0].id, target: which.id },
+								{ optionId: options[1].id, target: 'submit' },
+							],
+						},
+					},
+				},
+			},
+		)
+		expect(update.headers()['x-forms-adjusted']).toBe(
+			`removed-jumps=(${pet.id})`,
+		)
+		const saved = await api(page.request, 'GET', `/forms/${form.id}`)
+		expect(saved.questions[1].extraSettings).toEqual({
+			goTo: [{ optionId: options[1].id, target: 'submit' }],
+		})
+	})
+
+	test('Inserting a section removes the jumps into its middle', async ({
+		page,
+	}) => {
+		const headers = { 'OCS-APIRequest': 'true', Accept: 'application/json' }
+		const form = await api(page.request, 'POST', '/forms')
+		await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'section',
+			text: 'Start',
+		})
+		const question = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'multiple_unique',
+				text: 'Continue?',
+			},
+		)
+		const options = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions/${question.id}/options`,
+			{ optionTexts: ['Yes', 'No'] },
+		)
+		await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'short',
+			text: 'Why?',
+		})
+		const last = await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'short',
+			text: 'Anything else?',
+		})
+		await api(
+			page.request,
+			'PATCH',
+			`/forms/${form.id}/questions/${question.id}`,
+			{
+				keyValuePairs: {
+					extraSettings: {
+						goTo: [{ optionId: options[0].id, target: last.id }],
+					},
+				},
+			},
+		)
+
+		const insert = await page.request.post(
+			`../ocs/v2.php/apps/forms/api/v3/forms/${form.id}/questions`,
+			{ headers, data: { type: 'section', text: 'More', position: 4 } },
+		)
+		expect(insert.headers()['x-forms-adjusted']).toBe(
+			`removed-jumps=(${question.id})`,
+		)
+		const saved = await api(page.request, 'GET', `/forms/${form.id}`)
+		expect(saved.questions[1].extraSettings).toEqual({ goTo: [] })
+	})
+
+	test('Cloning a section into the middle of a section removes the jumps into its middle', async ({
+		page,
+	}) => {
+		const headers = { 'OCS-APIRequest': 'true', Accept: 'application/json' }
+		const form = await api(page.request, 'POST', '/forms')
+		await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'section',
+			text: 'Start',
+		})
+		const question = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'multiple_unique',
+				text: 'Continue?',
+			},
+		)
+		const options = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions/${question.id}/options`,
+			{ optionTexts: ['Yes', 'No'] },
+		)
+		await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'short',
+			text: 'Why?',
+		})
+		const last = await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'short',
+			text: 'Anything else?',
+		})
+		const section = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'section',
+				text: 'More',
+			},
+		)
+		await api(
+			page.request,
+			'PATCH',
+			`/forms/${form.id}/questions/${question.id}`,
+			{
+				keyValuePairs: {
+					extraSettings: {
+						goTo: [{ optionId: options[0].id, target: last.id }],
+					},
+				},
+			},
+		)
+
+		const clone = await page.request.post(
+			`../ocs/v2.php/apps/forms/api/v3/forms/${form.id}/questions`,
+			{ headers, data: { fromId: section.id, position: 4 } },
+		)
+		expect(clone.headers()['x-forms-adjusted']).toBe(
+			`removed-jumps=(${question.id})`,
+		)
+		const saved = await api(page.request, 'GET', `/forms/${form.id}`)
+		expect(saved.questions[1].extraSettings).toEqual({ goTo: [] })
+	})
+
+	test('Moving a question asks before it turns a jump into a jump into another section', async ({
+		page,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'section',
+			text: 'Part one',
+		})
+		const question = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'multiple_unique',
+				text: 'Continue?',
+			},
+		)
+		const options = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions/${question.id}/options`,
+			{ optionTexts: ['Yes', 'No'] },
+		)
+		const target = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'short',
+				text: 'Anything else?',
+			},
+		)
+		for (const [type, text] of [
+			['section', 'Part two'],
+			['short', 'Last'],
+		]) {
+			await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+				type,
+				text,
+			})
+		}
+		await api(
+			page.request,
+			'PATCH',
+			`/forms/${form.id}/questions/${question.id}`,
+			{
+				keyValuePairs: {
+					extraSettings: {
+						goTo: [{ optionId: options[0].id, target: target.id }],
+					},
+				},
+			},
+		)
+		await page.goto(`apps/forms/${form.hash}/edit`)
+
+		await page
+			.getByRole('listitem', { name: 'Question number 2' })
+			.getByRole('button', { name: 'Move question down' })
+			.focus()
+		await page.keyboard.press('Enter')
+		const dialog = page.getByRole('dialog', {
+			name: 'Jumps go to the start of a section',
+		})
+		await expect(dialog).toContainText(
+			'After this move, question 1 would jump into the middle of another section. Move the question "Anything else?" back, or remove these jumps?',
+		)
+		const order = page.waitForResponse(
+			(response) =>
+				response.request().method() === 'PATCH'
+				&& response.url().endsWith(`/forms/${form.id}/questions`),
+		)
+		await dialog.getByRole('button', { name: 'Remove jumps' }).click()
+		await order
+
+		const stored = await api(
+			page.request,
+			'GET',
+			`/forms/${form.id}/questions/${question.id}`,
+		)
+		expect(stored.extraSettings.goTo).toEqual([])
 	})
 
 	test('Each page checks its required questions, an empty section is an info page', async ({

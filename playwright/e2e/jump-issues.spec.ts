@@ -11,7 +11,7 @@ import {
 	formatList,
 	getJumpIssues,
 	getNewlyBrokenQuestions,
-	withoutBackwardJumps,
+	withoutDisallowedJumps,
 	withoutRemovedJumps,
 } from '../../src/utils/Jumps.ts'
 
@@ -258,7 +258,7 @@ test('jumps: only a question the submit view shows with answers to choose from c
 
 test('jumps: a new order loses only the jumps to the question itself or to an earlier question', () => {
 	const unchanged = short(3, { next: 'submit' })
-	const reordered = withoutBackwardJumps([
+	const reordered = withoutDisallowedJumps([
 		short(2),
 		radio(1, {
 			goTo: [
@@ -278,6 +278,45 @@ test('jumps: a new order loses only the jumps to the question itself or to an ea
 		{ next: 99 },
 	])
 	expect(reordered[3]).toBe(unchanged)
+})
+
+test('jumps: in a form with sections, a jump into the middle of another section is removed', () => {
+	const section = (id: number): FormsQuestion => ({
+		...short(id),
+		type: 'section',
+	})
+	const allowed = withoutDisallowedJumps([
+		radio(1, {
+			goTo: [
+				{ optionId: 11, target: 2 },
+				{ optionId: 12, target: 3 },
+				{ optionId: 13, target: 4 },
+				{ optionId: 14, target: 6 },
+				{ optionId: 15, target: 5 },
+				{ optionId: 16, target: 'submit' },
+			],
+		}),
+		short(2, { next: 5 }),
+		section(3),
+		short(4, { next: 6 }),
+		section(5),
+		short(6),
+	])
+	expect(allowed.map((question) => question.extraSettings)).toEqual([
+		{
+			goTo: [
+				{ optionId: 11, target: 2 },
+				{ optionId: 12, target: 3 },
+				{ optionId: 15, target: 5 },
+				{ optionId: 16, target: 'submit' },
+			],
+		},
+		{ next: 5 },
+		{},
+		{},
+		{},
+		{},
+	])
 })
 
 test('jumps: only the jumps a reorder removed are removed from newer extra settings', () => {
