@@ -13,7 +13,6 @@ use OCA\Forms\Constants;
 use OCA\Forms\Db\Answer;
 use OCA\Forms\Db\AnswerMapper;
 use OCA\Forms\Db\Form;
-use OCA\Forms\Db\Option;
 use OCA\Forms\Db\OptionMapper;
 use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
@@ -293,10 +292,10 @@ class SubmissionService {
 
 				foreach ($options as $option) {
 					$optionPerOptionId[$option->getId()] = $option;
-					if ($option->getOptionType() === Option::OPTION_TYPE_ROW) {
+					if ($option->getOptionType() === Constants::OPTION_TYPE_ROW) {
 						$gridRowsPerQuestionId[$question->getId()][] = $option->getId();
 					}
-					if ($option->getOptionType() === Option::OPTION_TYPE_COLUMN) {
+					if ($option->getOptionType() === Constants::OPTION_TYPE_COLUMN) {
 						$gridColumnsPerQuestionId[$question->getId()][] = $option->getId();
 					}
 				}
@@ -598,7 +597,7 @@ class SubmissionService {
 		$optionTypes = array_map(static fn (mixed $option): mixed => is_array($option) ? ($option['optionType'] ?? null) : null, $question['options'] ?? []);
 		return match ($question['type'] ?? null) {
 			Constants::ANSWER_TYPE_MULTIPLE, Constants::ANSWER_TYPE_MULTIPLEUNIQUE, Constants::ANSWER_TYPE_DROPDOWN, Constants::ANSWER_TYPE_RANKING => $optionTypes !== [],
-			Constants::ANSWER_TYPE_GRID => in_array(Option::OPTION_TYPE_ROW, $optionTypes, true) && in_array(Option::OPTION_TYPE_COLUMN, $optionTypes, true),
+			Constants::ANSWER_TYPE_GRID => in_array(Constants::OPTION_TYPE_ROW, $optionTypes, true) && in_array(Constants::OPTION_TYPE_COLUMN, $optionTypes, true),
 			default => true,
 		};
 	}
@@ -874,8 +873,8 @@ class SubmissionService {
 	}
 
 	private function validateGridQuestion(array $question, array $answers): void {
-		$rowIds = $this->normalizeOptionIds($question['options'] ?? [], Option::OPTION_TYPE_ROW);
-		$columnIds = $this->normalizeOptionIds($question['options'] ?? [], Option::OPTION_TYPE_COLUMN);
+		$rowIds = $this->normalizeOptionIds($question['options'] ?? [], Constants::OPTION_TYPE_ROW);
+		$columnIds = $this->normalizeOptionIds($question['options'] ?? [], Constants::OPTION_TYPE_COLUMN);
 		$gridType = $question['extraSettings']['questionType'] ?? null;
 
 		foreach ($answers as $rowId => $rowAnswer) {
