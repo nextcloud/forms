@@ -52,6 +52,30 @@
 			</ol>
 		</div>
 
+		<!-- Date poll: yes, no, and maybe for each slot -->
+		<ol
+			v-else-if="question.type === 'datepoll'"
+			class="question-summary__statistic">
+			<li v-for="slot in datePollStats" :key="slot.optionId">
+				<label :for="`datepoll-${question.id}-${slot.optionId}`">
+					<span
+						:class="{
+							'question-summary__statistic-text--best': slot.best,
+						}">
+						{{ slot.label }}
+					</span>
+					<span class="question-summary__statistic-percentage">
+						— {{ datePollSummary(slot) }}
+					</span>
+				</label>
+				<meter
+					:id="`datepoll-${question.id}-${slot.optionId}`"
+					min="0"
+					:max="datePollMax"
+					:value="slot.yes" />
+			</li>
+		</ol>
+
 		<!-- Answers with countable results for visualization -->
 		<ol
 			v-else-if="answerTypes[question.type].predefined"
@@ -159,6 +183,7 @@
 import type { PropType } from 'vue'
 import type {
 	BordaRankStats,
+	DatePollCount,
 	FormsAnswer,
 	FormsQuestion,
 	FormsSubmission,
@@ -173,6 +198,7 @@ import { computed, defineComponent } from 'vue'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import answerTypes from '../../models/AnswerTypes.ts'
 import { GridCellType, OptionType } from '../../models/Constants.ts'
+import { countDatePollVotes, formatDatePollSlot } from '../../utils/DatePoll.ts'
 
 export default defineComponent({
 	name: 'ResultsSummary',
@@ -420,6 +446,53 @@ export default defineComponent({
 			return result
 		})
 
+		interface DatePollSlotStats extends DatePollCount {
+			label: string
+			best: boolean
+		}
+
+		const datePollStats = computed<DatePollSlotStats[]>(() => {
+			const counts = countDatePollVotes(
+				props.question.id,
+				props.question.options ?? [],
+				props.submissions,
+			)
+			const maxYes = Math.max(0, ...counts.map((count) => count.yes))
+
+			return counts.map((count) => ({
+				...count,
+				label: formatDatePollSlot(count.text),
+				best: maxYes > 0 && count.yes === maxYes,
+			}))
+		})
+
+		const datePollMax = computed(() => Math.max(props.submissions.length, 1))
+
+		const datePollShowMaybe = computed(
+			() =>
+				!!props.question.extraSettings?.allowMaybe
+				|| datePollStats.value.some((slot) => slot.maybe > 0),
+		)
+
+		/**
+		 * Yes, no, and maybe counts shown in front of a slot.
+		 *
+		 * @param slot The counted votes for one slot
+		 */
+		const datePollSummary = (slot: DatePollSlotStats): string => {
+			if (datePollShowMaybe.value) {
+				return t('forms', '{yes} Yes, {no} No, {maybe} Maybe', {
+					yes: slot.yes,
+					no: slot.no,
+					maybe: slot.maybe,
+				})
+			}
+			return t('forms', '{yes} Yes, {no} No', {
+				yes: slot.yes,
+				no: slot.no,
+			})
+		}
+
 		const maxBordaScore = computed(
 			() => (props.question.options ?? []).length * props.submissions.length,
 		)
@@ -619,6 +692,9 @@ export default defineComponent({
 			questionTypeLabel,
 			questionOptions,
 			rankingStats,
+			datePollStats,
+			datePollMax,
+			datePollSummary,
 			maxBordaScore,
 			gridColumns,
 			gridRows,

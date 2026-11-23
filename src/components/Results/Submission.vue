@@ -68,6 +68,11 @@ import NcActions from '@nextcloud/vue/components/NcActions'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Answer from './Answer.vue'
 import { OptionType } from '../../models/Constants.ts'
+import {
+	datePollVoteLabel,
+	formatDatePollSlot,
+	parseDatePollVotes,
+} from '../../utils/DatePoll.ts'
 
 interface AnsweredQuestion {
 	id: number
@@ -325,6 +330,24 @@ export default defineComponent({
 							return option
 								? `${index + 1}. ${option.text}`
 								: `${index + 1}. ?`
+						})
+						.join('\n')
+
+					answeredQuestionsArray.push({
+						id: question.id,
+						text: question.text,
+						type: question.type,
+						squashedAnswers,
+					})
+				} else if (question.type === 'datepoll') {
+					const votes = parseDatePollVotes(answers[0]?.text)
+					const squashedAnswers = (question.options ?? [])
+						.map((option) => {
+							const vote = votes[String(option.id)]
+							const label = vote
+								? datePollVoteLabel(vote)
+								: t('forms', 'No vote')
+							return `${formatDatePollSlot(option.text)}: ${label}`
 						})
 						.join('\n')
 

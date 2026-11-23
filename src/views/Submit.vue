@@ -236,6 +236,7 @@
 
 <script lang="ts">
 import type {
+	DatePollVote,
 	FormsOption,
 	FormsQuestion,
 	GridQuestionValues,
@@ -289,13 +290,14 @@ import {
 	QUESTION_EXTRASETTINGS_OTHER_PREFIX,
 } from '../models/Constants.ts'
 import { PERMISSION_TYPES } from '../models/Permissions.ts'
+import { parseDatePollVotes } from '../utils/DatePoll.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 const formsAppName = 'forms'
 
-type DatePollVotes = Record<string, 'yes' | 'no' | 'maybe'>
+type DatePollVotes = Record<string, DatePollVote>
 type AnswerValue = string[] | GridQuestionValues | DatePollVotes
 type AnswersMap = Record<number, AnswerValue>
 
@@ -871,33 +873,8 @@ export default defineComponent({
 							)
 						}
 					} else if (question.type === 'datepoll') {
-						try {
-							const parsed = JSON.parse(text) as Record<string, string>
-							const optionIds = new Set(
-								(question.options ?? []).map((option) =>
-									String(option.id),
-								),
-							)
-							const allowed = question.extraSettings?.allowMaybe
-								? ['yes', 'no', 'maybe']
-								: ['yes', 'no']
-							const restored: DatePollVotes = {}
-							for (const [slotId, vote] of Object.entries(parsed)) {
-								if (
-									optionIds.has(String(slotId))
-									&& allowed.includes(vote)
-								) {
-									restored[String(slotId)] = vote as
-										'yes' | 'no' | 'maybe'
-								}
-							}
-							loaded[questionId] = restored
-						} catch (error) {
-							logger.debug(
-								`Could not parse datepoll answer ${text} for question ${questionId}`,
-								{ error },
-							)
-						}
+						// QuestionDatePoll drops votes for removed slots or a disabled maybe
+						loaded[questionId] = parseDatePollVotes(text)
 					} else if (question.type === 'file') {
 						// File answers cannot be restored when editing a submission —
 						// the uploaded file has already been moved to permanent storage

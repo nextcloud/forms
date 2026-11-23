@@ -39,6 +39,16 @@ export interface FormsSubmission {
 	userDisplayName: string
 }
 
+export type DatePollVote = 'yes' | 'no' | 'maybe'
+
+export interface DatePollCount {
+	optionId: number
+	text: string
+	yes: number
+	no: number
+	maybe: number
+}
+
 export interface FormsQuestionExtraSettings {
 	allowOtherAnswer?: boolean
 	shuffleOptions?: boolean

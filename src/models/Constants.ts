@@ -43,3 +43,8 @@ export enum GridCellType {
 	Number = 'number',
 	Radio = 'radio',
 }
+
+/**
+ * The votes a date poll slot can get. Keep in sync with Constants.php
+ */
+export const DATEPOLL_VOTES = ['yes', 'no', 'maybe'] as const

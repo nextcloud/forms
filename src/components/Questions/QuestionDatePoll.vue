@@ -65,33 +65,20 @@
 				:key="slot.id"
 				class="datepoll-slot"
 				role="radiogroup"
-				:aria-label="formatSlot(slot.text)">
-				<span class="datepoll-slot__text">{{ formatSlot(slot.text) }}</span>
+				:aria-label="formatDatePollSlot(slot.text)">
+				<span class="datepoll-slot__text">{{
+					formatDatePollSlot(slot.text)
+				}}</span>
 				<div class="datepoll-slot__votes">
 					<NcCheckboxRadioSwitch
+						v-for="vote in allowedVotes"
+						:key="vote"
 						type="radio"
 						:name="`datepoll-${id}-${slot.id}`"
-						value="yes"
+						:value="vote"
 						:modelValue="votes[String(slot.id)]"
-						@update:modelValue="onVote(slot.id, 'yes')">
-						{{ t('forms', 'Yes') }}
-					</NcCheckboxRadioSwitch>
-					<NcCheckboxRadioSwitch
-						type="radio"
-						:name="`datepoll-${id}-${slot.id}`"
-						value="no"
-						:modelValue="votes[String(slot.id)]"
-						@update:modelValue="onVote(slot.id, 'no')">
-						{{ t('forms', 'No') }}
-					</NcCheckboxRadioSwitch>
-					<NcCheckboxRadioSwitch
-						v-if="extraSettings.allowMaybe"
-						type="radio"
-						:name="`datepoll-${id}-${slot.id}`"
-						value="maybe"
-						:modelValue="votes[String(slot.id)]"
-						@update:modelValue="onVote(slot.id, 'maybe')">
-						{{ t('forms', 'Maybe') }}
+						@update:modelValue="onVote(slot.id, vote)">
+						{{ datePollVoteLabel(vote) }}
 					</NcCheckboxRadioSwitch>
 				</div>
 			</div>
@@ -143,7 +130,7 @@
 </template>
 
 <script lang="ts">
-import type { FormsOption } from '../../types/Entities.d.ts'
+import type { DatePollVote, FormsOption } from '../../types/Entities.d.ts'
 
 import { n, t } from '@nextcloud/l10n'
 import { computed, defineComponent, nextTick, ref, watch } from 'vue'
@@ -162,7 +149,8 @@ import {
 	QUESTION_MULTIPLE_EMITS,
 	useQuestionMultiple,
 } from '../../composables/useQuestionMultiple.ts'
-import { OptionType } from '../../models/Constants.ts'
+import { DATEPOLL_VOTES, OptionType } from '../../models/Constants.ts'
+import { datePollVoteLabel, formatDatePollSlot } from '../../utils/DatePoll.ts'
 
 type DatePollExtraSettings = {
 	allowMaybe?: boolean
@@ -225,24 +213,24 @@ export default defineComponent({
 			return choices.value.filter((slot) => !slot.local)
 		})
 
-		const allowedVotes = computed(() => {
-			return extraSettings.value.allowMaybe
-				? ['yes', 'no', 'maybe']
-				: ['yes', 'no']
+		const allowedVotes = computed<DatePollVote[]>(() => {
+			return DATEPOLL_VOTES.filter(
+				(vote) => vote !== 'maybe' || !!extraSettings.value.allowMaybe,
+			)
 		})
 
-		const storedVotes = computed<Record<string, string>>(() => {
+		const storedVotes = computed<Record<string, DatePollVote>>(() => {
 			const value = props.values
 			if (!value || Array.isArray(value)) {
 				return {}
 			}
-			return value as Record<string, string>
+			return value as Record<string, DatePollVote>
 		})
 
 		/**
 		 * Votes for slots that still exist, with only the votes the question allows.
 		 */
-		const votes = computed<Record<string, string>>(() => {
+		const votes = computed<Record<string, DatePollVote>>(() => {
 			const slotIds = new Set(savedSlots.value.map((slot) => String(slot.id)))
 			return Object.fromEntries(
 				Object.entries(storedVotes.value).filter(
@@ -267,31 +255,11 @@ export default defineComponent({
 			{ immediate: true },
 		)
 
-		const yesCount = (nextVotes: Record<string, string>): number => {
+		const yesCount = (nextVotes: Record<string, DatePollVote>): number => {
 			return Object.values(nextVotes).filter((vote) => vote === 'yes').length
 		}
 
-		/**
-		 * Show a stored slot in the local date and time format.
-		 *
-		 * @param text The stored slot, for example 2026-11-17 10:00
-		 */
-		const formatSlot = (text: string): string => {
-			const match = /^(\d{4}-\d{2}-\d{2}) (\d{2}:\d{2})$/.exec(text)
-			if (!match) {
-				return text
-			}
-			const date = new Date(`${match[1]}T${match[2]}`)
-			if (Number.isNaN(date.getTime())) {
-				return text
-			}
-			return new Intl.DateTimeFormat(undefined, {
-				dateStyle: 'medium',
-				timeStyle: 'short',
-			}).format(date)
-		}
-
-		const onVote = (slotId: number, vote: 'yes' | 'no' | 'maybe'): void => {
+		const onVote = (slotId: number, vote: DatePollVote): void => {
 			const nextVotes = {
 				...votes.value,
 				[String(slotId)]: vote,
@@ -405,7 +373,9 @@ export default defineComponent({
 			onYesLimit,
 			OptionType,
 			applySubmissionError,
-			formatSlot,
+			allowedVotes,
+			datePollVoteLabel,
+			formatDatePollSlot,
 			onVote,
 			savedSlots,
 			shiftDragHandle,
