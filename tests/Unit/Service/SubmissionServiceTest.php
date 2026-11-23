@@ -1763,4 +1763,84 @@ file2.txt"
 
 		$this->submissionService->validateSubmission($questions, $answers, 'alice', 7);
 	}
+
+	public function testDatePollSlotRejectsYesWhenFull(): void {
+		$this->answerMapper->method('findByQuestion')->with(1)->willReturn($this->datePollYesAnswers(10, 3));
+
+		$this->expectException(\InvalidArgumentException::class);
+		$this->expectExceptionMessage('Slot "2026-11-17 10:00" already has 3 yes.');
+
+		$this->submissionService->validateSubmission($this->datePollQuestion(3), [
+			'1' => [10 => 'yes'],
+		], 'admin', 1);
+	}
+
+	public function testDatePollSlotAllowsYesOnAnotherSlot(): void {
+		$this->answerMapper->method('findByQuestion')->with(1)->willReturn($this->datePollYesAnswers(10, 3));
+
+		$this->submissionService->validateSubmission($this->datePollQuestion(3), [
+			'1' => [11 => 'yes'],
+		], 'admin', 1);
+		$this->assertTrue(true);
+	}
+
+	public function testDatePollSlotIgnoresNoAndMaybe(): void {
+		$no = new Answer();
+		$no->setSubmissionId(2);
+		$no->setText(json_encode([10 => 'no']));
+		$maybe = new Answer();
+		$maybe->setSubmissionId(3);
+		$maybe->setText(json_encode([10 => 'maybe']));
+		$this->answerMapper->method('findByQuestion')->with(1)->willReturn([$no, $maybe]);
+
+		$this->submissionService->validateSubmission($this->datePollQuestion(1), [
+			'1' => [10 => 'yes'],
+		], 'admin', 1);
+		$this->assertTrue(true);
+	}
+
+	public function testDatePollSlotKeepsTheEditedYes(): void {
+		$ownYes = new Answer();
+		$ownYes->setSubmissionId(9);
+		$ownYes->setText(json_encode([10 => 'yes']));
+		$this->answerMapper->method('findByQuestion')->with(1)->willReturn([$ownYes]);
+
+		$this->submissionService->validateSubmission($this->datePollQuestion(1), [
+			'1' => [10 => 'yes'],
+		], 'admin', 1, 9);
+		$this->assertTrue(true);
+	}
+
+	private function datePollQuestion(int $slotLimit): array {
+		return [[
+			'id' => 1,
+			'type' => 'datepoll',
+			'text' => 'When can you meet?',
+			'isRequired' => false,
+			'extraSettings' => [
+				'allowMaybe' => true,
+				'yesLimitPerPerson' => 1,
+				'yesLimitPerSlot' => $slotLimit,
+			],
+			'options' => [
+				['id' => 10, 'text' => '2026-11-17 10:00'],
+				['id' => 11, 'text' => '2026-11-17 14:00'],
+			],
+		]];
+	}
+
+	/**
+	 * @return list<Answer>
+	 */
+	private function datePollYesAnswers(int $optionId, int $count): array {
+		$answers = [];
+		for ($submissionId = 1; $submissionId <= $count; $submissionId++) {
+			$answer = new Answer();
+			$answer->setSubmissionId($submissionId);
+			$answer->setText(json_encode([$optionId => 'yes']));
+			$answers[] = $answer;
+		}
+
+		return $answers;
+	}
 };

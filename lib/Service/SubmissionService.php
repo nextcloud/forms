@@ -620,9 +620,10 @@ class SubmissionService {
 	 * @param array $answers Array of the submitted answers
 	 * @param string $formOwnerId Owner of the form
 	 * @param int $formId Id of the form being submitted
+	 * @param ?int $submissionId Submission being edited, so its saved votes are not counted again
 	 * @throw \InvalidArgumentException if validation failed
 	 */
-	public function validateSubmission(array $questions, array $answers, string $formOwnerId, int $formId): void {
+	public function validateSubmission(array $questions, array $answers, string $formOwnerId, int $formId, ?int $submissionId = null): void {
 		// Check by questions
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
@@ -696,7 +697,7 @@ class SubmissionService {
 			}
 
 			if ($question['type'] === Constants::ANSWER_TYPE_DATEPOLL) {
-				$this->validateDatePoll($question, $answers[$questionId]);
+				$this->validateDatePoll($question, $answers[$questionId], $submissionId);
 			}
 
 			// Check if all answers are within the possible options
@@ -805,8 +806,9 @@ class SubmissionService {
 	 *
 	 * @param array $question the question with its options and settings
 	 * @param array<int|string, mixed> $votes slot id => vote
+	 * @param ?int $submissionId Submission being edited, so its saved votes are not counted again
 	 */
-	private function validateDatePoll(array $question, array $votes): void {
+	private function validateDatePoll(array $question, array $votes, ?int $submissionId = null): void {
 		if ($votes === []) {
 			return;
 		}
@@ -843,6 +845,66 @@ class SubmissionService {
 		if (is_int($yesLimit) && $yesCount > $yesLimit) {
 			throw new \InvalidArgumentException(sprintf('Question "%s" allows at most %d yes.', $question['text'], $yesLimit));
 		}
+
+		$slotLimit = $question['extraSettings']['yesLimitPerSlot'] ?? null;
+		if (!is_int($slotLimit)) {
+			return;
+		}
+
+		foreach ($votes as $optionId => $vote) {
+			if ($vote !== Constants::DATEPOLL_VOTE_YES) {
+				continue;
+			}
+
+			$normalizedId = $this->normalizeNumericOptionId($optionId);
+			if ($normalizedId === null) {
+				continue;
+			}
+
+			$storedYes = $this->countStoredDatePollYes((int)$question['id'], $normalizedId, $submissionId);
+			if ($storedYes >= $slotLimit) {
+				throw new \InvalidArgumentException(sprintf('Slot "%s" already has %d yes.', $this->datePollSlotText($question, $normalizedId), $slotLimit));
+			}
+		}
+	}
+
+	/**
+	 * Count yes votes already stored for one datepoll slot.
+	 */
+	private function countStoredDatePollYes(int $questionId, int $optionId, ?int $submissionId): int {
+		$count = 0;
+
+		foreach ($this->answerMapper->findByQuestion($questionId) as $answer) {
+			if ($submissionId !== null && $answer->getSubmissionId() === $submissionId) {
+				continue;
+			}
+
+			$storedVotes = json_decode((string)$answer->getText(), true);
+			if (!is_array($storedVotes)) {
+				continue;
+			}
+
+			foreach ($storedVotes as $storedOptionId => $storedVote) {
+				if ($this->normalizeNumericOptionId($storedOptionId) === $optionId && $storedVote === Constants::DATEPOLL_VOTE_YES) {
+					$count++;
+				}
+			}
+		}
+
+		return $count;
+	}
+
+	private function datePollSlotText(array $question, int $optionId): string {
+		foreach ($question['options'] ?? [] as $option) {
+			if ($this->normalizeNumericOptionId($option['id'] ?? null) === $optionId) {
+				$text = trim((string)($option['text'] ?? ''));
+				if ($text !== '') {
+					return $text;
+				}
+			}
+		}
+
+		return (string)$optionId;
 	}
 
 	/**

@@ -1588,8 +1588,8 @@ class ApiController extends OCSController {
 
 		$questions = $this->formsService->getQuestions($formId);
 		try {
-			// Is the submission valid
-			$this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId(), $formId);
+			// Is the submission valid. Exclude this submission so its current yes votes are not counted twice.
+			$this->submissionService->validateSubmission($questions, $answers, $form->getOwnerId(), $formId, $submissionId);
 		} catch (\InvalidArgumentException $e) {
 			throw new OCSBadRequestException($e->getMessage());
 		}

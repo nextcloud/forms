@@ -43,6 +43,21 @@ class AnswerMapper extends QBMapper {
 	}
 
 	/**
+	 * @return Answer[]
+	 */
+	public function findByQuestion(int $questionId): array {
+		$qb = $this->db->getQueryBuilder();
+
+		$qb->select('*')
+			->from($this->getTableName())
+			->where(
+				$qb->expr()->eq('question_id', $qb->createNamedParameter($questionId, IQueryBuilder::PARAM_INT))
+			);
+
+		return $this->findEntities($qb);
+	}
+
+	/**
 	 * @param list<int> $submissionIds
 	 * @return Answer[]
 	 */
