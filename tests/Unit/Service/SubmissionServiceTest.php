@@ -1829,6 +1829,27 @@ file2.txt"
 		]];
 	}
 
+	public function testDatePollCounts(): void {
+		$counts = $this->submissionService->datePollCounts([
+			'id' => 2,
+			'options' => [
+				['id' => 1, 'text' => '2026-11-17 10:00'],
+				['id' => 2, 'text' => '2026-11-17 14:00'],
+				['id' => 3, 'text' => '2026-11-18 09:00'],
+			],
+		], [
+			['answers' => [['questionId' => 2, 'text' => '{"1":"yes","2":"maybe"}']]],
+			['answers' => [['questionId' => 2, 'text' => '{"1":"no","2":"yes"}']]],
+			['answers' => [['questionId' => 9, 'text' => '{"1":"yes"}']]],
+		]);
+
+		$this->assertSame([
+			['optionId' => 1, 'text' => '2026-11-17 10:00', 'yes' => 1, 'no' => 1, 'maybe' => 0],
+			['optionId' => 2, 'text' => '2026-11-17 14:00', 'yes' => 1, 'no' => 0, 'maybe' => 1],
+			['optionId' => 3, 'text' => '2026-11-18 09:00', 'yes' => 0, 'no' => 0, 'maybe' => 0],
+		], $counts);
+	}
+
 	/**
 	 * @return list<Answer>
 	 */

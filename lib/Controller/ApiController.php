@@ -1359,6 +1359,13 @@ class ApiController extends OCSController {
 			return $submission;
 		}, $submissions);
 
+		foreach ($questions as $questionId => $question) {
+			if (($question['type'] ?? '') !== Constants::ANSWER_TYPE_DATEPOLL) {
+				continue;
+			}
+			$questions[$questionId]['datepollCounts'] = $this->submissionService->datePollCounts($question, $submissions);
+		}
+
 		$questions = array_map(static function (array $question) {
 			if (empty($question['extraSettings'])) {
 				$question['extraSettings'] = new \stdClass();

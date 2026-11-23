@@ -62,6 +62,7 @@ namespace OCA\Forms;
  *   extraSettings: FormsQuestionExtraSettings|\stdClass,
  *   options: list<FormsOption>,
  *   accept: list<string>,
+ *   datepollCounts?: list<array{optionId: int, text: string, yes: int, no: int, maybe: int}>,
  * }
  *
  * @psalm-type FormsAnswer = array{

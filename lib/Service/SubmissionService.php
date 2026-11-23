@@ -908,6 +908,62 @@ class SubmissionService {
 	}
 
 	/**
+	 * Count votes for each slot of a datepoll question.
+	 *
+	 * @param array $question the question with its options
+	 * @param list<array{answers?: list<array{questionId?: int, text?: string}>}> $submissions
+	 * @return list<array{optionId: int, text: string, yes: int, no: int, maybe: int}>
+	 */
+	public function datePollCounts(array $question, array $submissions): array {
+		$counts = [];
+		foreach ($question['options'] ?? [] as $option) {
+			$optionId = $this->normalizeNumericOptionId($option['id'] ?? null);
+			if ($optionId === null) {
+				continue;
+			}
+			$counts[$optionId] = [
+				'optionId' => $optionId,
+				'text' => (string)($option['text'] ?? ''),
+				'yes' => 0,
+				'no' => 0,
+				'maybe' => 0,
+			];
+		}
+
+		$questionId = (int)$question['id'];
+		foreach ($submissions as $submission) {
+			$votes = $this->datePollVotes($submission['answers'] ?? [], $questionId);
+			foreach ($votes as $optionId => $vote) {
+				$normalizedId = $this->normalizeNumericOptionId($optionId);
+				if ($normalizedId === null || !isset($counts[$normalizedId]) || !in_array($vote, Constants::DATEPOLL_VOTES, true)) {
+					continue;
+				}
+				$counts[$normalizedId][$vote]++;
+			}
+		}
+
+		return array_values($counts);
+	}
+
+	/**
+	 * The one datepoll vote map stored for this question, or an empty list.
+	 *
+	 * @param list<array{questionId?: int, text?: string}> $answers
+	 * @return array<int|string, string>
+	 */
+	private function datePollVotes(array $answers, int $questionId): array {
+		foreach ($answers as $answer) {
+			if ((int)($answer['questionId'] ?? 0) !== $questionId) {
+				continue;
+			}
+			$votes = json_decode((string)($answer['text'] ?? ''), true);
+			return is_array($votes) ? $votes : [];
+		}
+
+		return [];
+	}
+
+	/**
 	 * Validate correct date/time formats
 	 * @param array $answers Array with date from answer
 	 * @param string $format String with the format to validate
