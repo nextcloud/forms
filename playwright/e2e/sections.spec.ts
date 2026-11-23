@@ -96,7 +96,7 @@ test.describe('Sections', () => {
 		])
 	})
 
-	test('A respondent sees the section and submits the questions around it', async ({
+	test('A respondent goes through the sections page by page', async ({
 		page,
 		submitView,
 	}) => {
@@ -111,14 +111,26 @@ test.describe('Sections', () => {
 		})
 		await page.goto(`apps/forms/${form.hash}/submit`)
 
+		await expect(submitView.submitButton).toBeVisible()
 		await submitView.checkRadio('Do you have a pet?', 'Yes')
+		await expect(submitView.getQuestion('About the pet')).toBeHidden()
+		await submitView.nextButton.click()
+		await expect(submitView.getQuestion('Do you have a pet?')).toBeHidden()
 		await expect(submitView.getQuestion('About the pet')).toBeVisible()
 		await expect(
 			page.getByRole('listitem', { name: 'Question number 2' }),
 		).toContainText('Which pet?')
 		await submitView.fillText('Which pet?', 'Rex')
+
+		await submitView.backButton.click()
+		await expect(
+			submitView
+				.getQuestion('Do you have a pet?')
+				.getByRole('radio', { name: 'Yes' }),
+		).toBeChecked()
 		await submitView.checkRadio('Do you have a pet?', 'No')
-		await expect(submitView.getQuestion('About the pet')).toBeHidden()
+		await expect(submitView.getQuestion('Comments')).toBeVisible()
+		await expect(submitView.nextButton).toHaveCount(0)
 		await submitView.fillText('Comments', 'None')
 
 		const response = await submitView.submit()
@@ -151,6 +163,7 @@ test.describe('Sections', () => {
 
 	test('A respondent sees no heading for a section without title', async ({
 		page,
+		submitView,
 	}) => {
 		const form = await api(page.request, 'POST', '/forms')
 		for (const [type, text, description] of [
@@ -181,17 +194,195 @@ test.describe('Sections', () => {
 		await page.goto(`apps/forms/${form.hash}/submit`)
 
 		const questions = page.locator('form')
-		await expect(questions.getByRole('heading', { level: 3 })).toHaveText([
-			'Intro',
-			'Part one',
-			'Second',
-			'Third',
-		])
-		await expect(questions.getByRole('heading', { level: 4 })).toHaveText([
-			'First',
-		])
+		const level3 = questions.getByRole('heading', { level: 3 })
+		const level4 = questions.getByRole('heading', { level: 4 })
+		await expect(level3).toHaveText(['Intro'])
+		await submitView.nextButton.click()
+		await expect(level3).toHaveText(['Part one'])
+		await expect(level4).toHaveText(['First'])
+
+		await submitView.nextButton.click()
 		await expect(questions).toContainText('Only a note')
-		await expect(questions.locator(':scope > ul > li')).toHaveCount(6)
+		await expect(level3).toHaveText(['Second'])
+		await expect(level3).toBeFocused()
+		await expect(level4).toHaveCount(0)
+
+		await submitView.nextButton.click()
+		await expect(level3).toHaveText(['Third'])
+		await expect(level3).toBeFocused()
+		await expect(questions.locator(':scope > ul > li')).toHaveCount(1)
+	})
+
+	test('Every page starts with the form title, questions of a section are headed below it', async ({
+		page,
+		submitView,
+	}) => {
+		const { form } = await createSectionForm(page.request)
+		await page.goto(`apps/forms/${form.hash}/submit`)
+
+		const main = page.getByRole('main')
+		await expect(main.getByRole('heading', { level: 2 })).toHaveText(
+			'Section form',
+		)
+		await expect(main.getByRole('heading', { level: 3 })).toHaveText([
+			'Do you have a pet?',
+		])
+		await expect(main.getByRole('heading', { level: 4 })).toHaveCount(0)
+
+		await submitView.nextButton.click()
+		await expect(main.getByRole('heading', { level: 2 })).toHaveText(
+			'Section form',
+		)
+		const section = main.getByRole('heading', { level: 3 })
+		await expect(section).toHaveText(['About the pet'])
+		await expect(section).toBeFocused()
+		await expect(main.getByRole('heading', { level: 4 })).toHaveText([
+			'Which pet?',
+			'Comments',
+		])
+	})
+
+	test('Each page checks its required questions, an empty section is an info page', async ({
+		page,
+		submitView,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'section',
+			text: '',
+		})
+		const name = await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'short',
+			text: 'Your name',
+		})
+		const info = await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'section',
+			text: 'Before you continue',
+		})
+		await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'section',
+			text: 'Details',
+		})
+		const city = await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+			type: 'short',
+			text: 'City',
+		})
+		for (const question of [name, city]) {
+			await api(
+				page.request,
+				'PATCH',
+				`/forms/${form.id}/questions/${question.id}`,
+				{ keyValuePairs: { isRequired: true } },
+			)
+		}
+		await api(page.request, 'PATCH', `/forms/${form.id}/questions/${info.id}`, {
+			keyValuePairs: { description: 'The next page asks for details.' },
+		})
+		await page.goto(`apps/forms/${form.hash}/submit`)
+
+		await expect(submitView.backButton).toHaveCount(0)
+		await submitView.nextButton.click()
+		await expect(submitView.getQuestion('Your name')).toBeVisible()
+		await expect(submitView.getQuestion('City')).toBeHidden()
+		await submitView.fillText('Your name', 'Alex')
+		await submitView.nextButton.click()
+
+		await expect(submitView.getQuestion('Before you continue')).toBeVisible()
+		await expect(page.getByText('The next page asks for details.')).toBeVisible()
+		await expect(submitView.getQuestion('Your name')).toBeHidden()
+		await submitView.nextButton.click()
+
+		await expect(submitView.getQuestion('City')).toBeVisible()
+		await expect(submitView.nextButton).toHaveCount(0)
+		await submitView.backButton.click()
+		await submitView.backButton.click()
+		await expect(
+			submitView.getQuestion('Your name').getByRole('textbox'),
+		).toHaveValue('Alex')
+		await submitView.nextButton.click()
+		await submitView.nextButton.click()
+		await submitView.fillText('City', 'Berlin')
+
+		const response = await submitView.submit()
+		const { answers } = response.request().postDataJSON()
+		expect(answers).toEqual({
+			[name.id]: ['Alex'],
+			[city.id]: ['Berlin'],
+		})
+		await expect(submitView.successMessage).toBeVisible()
+	})
+
+	test('Respondents skip a section with no title, no description and no questions', async ({
+		page,
+		submitView,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		for (const [type, text] of [
+			['section', ''],
+			['short', 'Your name'],
+			['section', ''],
+			['section', 'Details'],
+			['short', 'City'],
+			['section', ''],
+		]) {
+			await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+				type,
+				text,
+			})
+		}
+		await page.goto(`apps/forms/${form.hash}/submit`)
+
+		await expect(submitView.getQuestion('Your name')).toBeVisible()
+		await submitView.nextButton.click()
+		await expect(submitView.getQuestion('Details')).toBeVisible()
+		await expect(submitView.getQuestion('City')).toBeVisible()
+		await expect(submitView.nextButton).toHaveCount(0)
+		await expect(submitView.submitButton).toBeVisible()
+		await submitView.backButton.click()
+		await expect(submitView.getQuestion('Your name')).toBeVisible()
+	})
+
+	test('A last section with a title but no questions is a page with the submit button', async ({
+		page,
+		submitView,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		for (const [type, text] of [
+			['section', ''],
+			['short', 'Your name'],
+		]) {
+			await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+				type,
+				text,
+			})
+		}
+		const closing = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'section',
+				text: 'Thank you',
+			},
+		)
+		await api(
+			page.request,
+			'PATCH',
+			`/forms/${form.id}/questions/${closing.id}`,
+			{
+				keyValuePairs: { description: 'We will get back to you.' },
+			},
+		)
+		await page.goto(`apps/forms/${form.hash}/submit`)
+
+		await expect(submitView.getQuestion('Your name')).toBeVisible()
+		await expect(submitView.submitButton).toHaveCount(0)
+		await submitView.nextButton.click()
+		await expect(submitView.getQuestion('Thank you')).toBeVisible()
+		await expect(page.getByText('We will get back to you.')).toBeVisible()
+		await expect(submitView.getQuestion('Your name')).toBeHidden()
+		await expect(submitView.nextButton).toHaveCount(0)
+		await expect(submitView.submitButton).toBeVisible()
 	})
 
 	test('Adding a section below questions puts them into a section "Untitled section"', async ({
