@@ -429,6 +429,32 @@ class SubmissionServiceTest extends TestCase {
 				"1","user1","User 1","1973-11-29T22:33:09+01:00","Q1A1","Q2A1"
 				'
 			],
+			'section-without-column' => [
+				// Questions
+				[
+					['id' => 1, 'text' => 'Question 1'],
+					['id' => 2, 'type' => 'section', 'text' => 'Section 1'],
+					['id' => 3, 'text' => 'Question 2'],
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 1, 'text' => 'Q1A1'],
+							['questionId' => 3, 'text' => 'Q2A1']
+						]
+					],
+				],
+				// Expected CSV-Result
+				'
+				"Submission ID","User ID","User display name","Timestamp","Question 1","Question 2"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1","question-id-3"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","Q1A1","Q2A1"
+				'
+			],
 			'checkbox-multi-answers' => [
 				// Questions
 				[

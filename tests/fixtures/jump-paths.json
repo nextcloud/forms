@@ -387,5 +387,49 @@
 		],
 		"answers": { "1": ["11"], "2": ["21"] },
 		"visible": [1, 3]
+	},
+	{
+		"name": "a section is part of the path like a question without an answer",
+		"questions": [
+			{ "id": 1, "type": "short", "extraSettings": {} },
+			{ "id": 2, "type": "section", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} }
+		],
+		"answers": {},
+		"visible": [1, 2, 3]
+	},
+	{
+		"name": "an option jumps over a section",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 4 }] } },
+			{ "id": 2, "type": "section", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} },
+			{ "id": 4, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["11"] },
+		"visible": [1, 4]
+	},
+	{
+		"name": "an option jumps to a later section",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 4 }] } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "section", "extraSettings": {} },
+			{ "id": 4, "type": "section", "extraSettings": {} },
+			{ "id": 5, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "1": ["11"] },
+		"visible": [1, 4, 5]
+	},
+	{
+		"name": "a section after an unanswered question with jumps is not shown yet",
+		"questions": [
+			{ "id": 1, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 11, "target": 4 }] } },
+			{ "id": 2, "type": "section", "extraSettings": {} },
+			{ "id": 3, "type": "short", "extraSettings": {} },
+			{ "id": 4, "type": "short", "extraSettings": {} }
+		],
+		"answers": {},
+		"visible": [1]
 	}
 ]
