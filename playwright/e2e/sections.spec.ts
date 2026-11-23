@@ -583,6 +583,62 @@ test.describe('Sections', () => {
 		await expect(label(2)).toHaveText('End of the form')
 	})
 
+	test('Deleting a section asks whether to keep its questions', async ({
+		page,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		for (const [type, text] of [
+			['section', 'Part one'],
+			['short', 'First'],
+			['section', 'Part two'],
+			['short', 'Second'],
+			['short', 'Third'],
+			['section', 'Empty part'],
+		]) {
+			await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+				type,
+				text,
+			})
+		}
+		await page.goto(`apps/forms/${form.hash}/edit`)
+		const deleteSection = async (number: number) => {
+			await page
+				.getByRole('listitem', { name: `Section number ${number}` })
+				.getByRole('button', { name: 'Actions', exact: true })
+				.click()
+			await page.getByRole('menuitem', { name: 'Delete section' }).click()
+		}
+
+		await deleteSection(3)
+		await expect(
+			page.getByRole('listitem', { name: 'Section number 3' }),
+		).toHaveCount(0)
+
+		await deleteSection(2)
+		const dialog = page.getByRole('dialog', { name: 'Delete section' })
+		await expect(dialog).toContainText(
+			'Delete only the section, so its 2 questions join the part before it',
+		)
+		await dialog.getByRole('button', { name: 'Keep questions' }).click()
+		await expect(
+			page.getByRole('listitem', { name: 'Section number 2' }),
+		).toHaveCount(0)
+		await expect(
+			page.getByRole('listitem', { name: 'Question number 3' }),
+		).toBeVisible()
+
+		await deleteSection(1)
+		await expect(dialog).toContainText(
+			'Delete only the section, so its 3 questions stay in a form without sections',
+		)
+		await dialog.getByRole('button', { name: 'Delete questions' }).click()
+		await expect(
+			page.getByRole('listitem', { name: /^(Question|Section) number/ }),
+		).toHaveCount(0)
+		const { questions } = await api(page.request, 'GET', `/forms/${form.id}`)
+		expect(questions).toEqual([])
+	})
+
 	test('Each page checks its required questions, an empty section is an info page', async ({
 		page,
 		submitView,
@@ -874,7 +930,12 @@ test.describe('Sections', () => {
 
 		const start = page.getByRole('listitem', { name: 'Section number 1' })
 		await start.getByRole('button', { name: 'Actions', exact: true }).click()
-		await page.getByRole('menuitem', { name: 'Delete question' }).click()
+		await page.getByRole('menuitem', { name: 'Delete section' }).click()
+		const dialog = page.getByRole('dialog', { name: 'Delete section' })
+		await expect(dialog).toContainText(
+			'Delete only the section, so its question joins the next section',
+		)
+		await dialog.getByRole('button', { name: 'Keep questions' }).click()
 
 		await expect(
 			page.getByRole('textbox', { name: 'Title of section number 1' }),
