@@ -162,7 +162,7 @@
 							"
 							:canMoveUp="!isChangingQuestions && index > 0"
 							:answerType="answerTypes[question.type]"
-							:index="index + 1"
+							:index="questionNumbers.get(question.id)"
 							:maxStringLengths="maxStringLengths"
 							@update:text="updateQuestionText(index, $event)"
 							@update:description="
@@ -196,11 +196,27 @@
 									]">
 									<AddQuestionMenu
 										:aria-label="
-											t(
-												'forms',
-												'Insert question after question {index}',
-												{ index: index + 1 },
-											)
+											question.type === QUESTION_TYPE_SECTION
+												? t(
+														'forms',
+														'Insert question after section {index}',
+														{
+															index:
+																questionNumbers.get(
+																	question.id,
+																) ?? '',
+														},
+													)
+												: t(
+														'forms',
+														'Insert question after question {index}',
+														{
+															index:
+																questionNumbers.get(
+																	question.id,
+																) ?? '',
+														},
+													)
 										"
 										variant="tertiary"
 										:position="index"
@@ -287,6 +303,7 @@ import {
 } from '../utils/Jumps.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
+import { getNumbers, QUESTION_TYPE_SECTION } from '../utils/Sections.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 const formsAppName = 'forms'
@@ -336,6 +353,7 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const formQuestions = computed(() => props.form.questions)
+		const questionNumbers = computed(() => getNumbers(formQuestions.value))
 		provide(FORM_QUESTIONS_KEY, formQuestions)
 		provide(
 			FORM_JUMP_ISSUES_KEY,
@@ -458,7 +476,9 @@ export default defineComponent({
 		const isRequiredUsed = computed<boolean>(() =>
 			props.form.questions.reduce(
 				(isUsed: boolean, question: FormsQuestion) =>
-					isUsed || Boolean(question.isRequired),
+					isUsed
+					|| (Boolean(question.isRequired)
+						&& question.type !== QUESTION_TYPE_SECTION),
 				false,
 			),
 		)
@@ -560,13 +580,17 @@ export default defineComponent({
 		 * @param questions the questions of the form in their order
 		 * @param ids the ids of the questions
 		 */
-		const numbersOf = (questions: FormsQuestion[], ids: number[]): string =>
-			formatList(
-				questions.flatMap((question, position) =>
-					ids.includes(question.id) ? [String(position + 1)] : [],
+		const numbersOf = (questions: FormsQuestion[], ids: number[]): string => {
+			const numbers = getNumbers(questions)
+			return formatList(
+				questions.flatMap((question) =>
+					ids.includes(question.id)
+						? [String(numbers.get(question.id))]
+						: [],
 				),
 				getLanguage(),
 			)
+		}
 
 		/**
 		 * Show a warning when a change breaks jumps, makes questions unreachable or lets jumps skip more questions
@@ -582,28 +606,47 @@ export default defineComponent({
 		): void => {
 			const before = getJumpIssues(oldQuestions)
 			const after = getJumpIssues(newQuestions)
+			const questionIds = new Set(
+				newQuestions
+					.filter((question) => question.type !== QUESTION_TYPE_SECTION)
+					.map((question) => question.id),
+			)
 
-			const broken = getNewlyBrokenQuestions(before, after)
+			const broken = getNewlyBrokenQuestions(before, after).filter((id) =>
+				questionIds.has(id),
+			)
 			const unreachable = [...after.unreachable].filter(
-				(id) => !before.unreachable.has(id),
+				(id) => !before.unreachable.has(id) && questionIds.has(id),
 			)
 			const skipped = reportSkippable
-				? [...after.skippable].filter((id) => !before.skippable.has(id))
+				? [...after.skippable].filter(
+						(id) => !before.skippable.has(id) && questionIds.has(id),
+					)
 				: []
 
+			const newIds = new Set(newQuestions.map((question) => question.id))
+			const deletedSection = oldQuestions.some(
+				(question) =>
+					question.type === QUESTION_TYPE_SECTION
+					&& !newIds.has(question.id),
+			)
 			const messages = [
-				broken.length === 1
-					&& t(
-						'forms',
-						'Question {questions} jumped to the deleted question, so respondents now go to the next question instead.',
-						{ questions: numbersOf(newQuestions, broken) },
-					),
-				broken.length > 1
-					&& t(
-						'forms',
-						'Questions {questions} jumped to the deleted question, so respondents now go to the next question instead.',
-						{ questions: numbersOf(newQuestions, broken) },
-					),
+				broken.length > 0
+					&& (deletedSection
+						? n(
+								'forms',
+								'Question {questions} jumped to the deleted section, so respondents now go to the next question instead.',
+								'Questions {questions} jumped to the deleted section, so respondents now go to the next question instead.',
+								broken.length,
+								{ questions: numbersOf(newQuestions, broken) },
+							)
+						: n(
+								'forms',
+								'Question {questions} jumped to the deleted question, so respondents now go to the next question instead.',
+								'Questions {questions} jumped to the deleted question, so respondents now go to the next question instead.',
+								broken.length,
+								{ questions: numbersOf(newQuestions, broken) },
+							)),
 				unreachable.length === 1
 					&& t(
 						'forms',
@@ -1202,6 +1245,8 @@ export default defineComponent({
 			deleteQuestion,
 			insertQuestion,
 			cloneQuestion,
+			questionNumbers,
+			QUESTION_TYPE_SECTION,
 			onUpdateQuestions,
 			onQuestionOrderChange,
 			IconLock,

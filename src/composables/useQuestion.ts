@@ -17,6 +17,7 @@ import { computed, nextTick, onDeactivated, ref, toRaw, watch } from 'vue'
 import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
+import { getIdPrefix } from '../utils/Sections.ts'
 import { useJumps } from './useJumps.ts'
 
 export const QUESTION_EMITS = [
@@ -262,13 +263,11 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		jumps,
 	}))
 
-	const titleId = computed(() => {
-		return 'q' + props.index + '_title'
-	})
+	const idPrefix = computed(() => getIdPrefix(String(props.type), props.index))
 
-	const descriptionId = computed(() => {
-		return 'q' + props.index + '_desc'
-	})
+	const titleId = computed(() => idPrefix.value + '_title')
+
+	const descriptionId = computed(() => idPrefix.value + '_desc')
 
 	const hasError = computed(() => {
 		return !!errorMessage.value
@@ -278,13 +277,9 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		return !!options.infoMessage?.value
 	})
 
-	const errorId = computed(() => {
-		return `q${props.index}_error`
-	})
+	const errorId = computed(() => `${idPrefix.value}_error`)
 
-	const infoId = computed(() => {
-		return `q${props.index}_info`
-	})
+	const infoId = computed(() => `${idPrefix.value}_info`)
 
 	const onTitleChange = debounce(function (text: string) {
 		options.emit('update:text', text)

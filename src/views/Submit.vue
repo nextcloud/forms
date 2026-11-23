@@ -155,7 +155,10 @@
 					<KeepAlive v-for="question in validQuestions" :key="question.id">
 						<component
 							:is="answerTypes[question.type].component"
-							v-if="visibleQuestionIds.has(question.id)"
+							v-if="
+								visibleQuestionIds.has(question.id)
+								&& !isEmptySection(question)
+							"
 							ref="questionRefs"
 							v-bind="question"
 							:isRequired="
@@ -165,7 +168,7 @@
 							:answerError="getAnswerError(question)"
 							readOnly
 							:answerType="answerTypes[question.type]"
-							:index="shownQuestions.indexOf(question) + 1"
+							:index="shownNumbers.get(question.id)"
 							:headingLevel="
 								questionIdsInSection.has(question.id) ? 4 : 3
 							"
@@ -334,6 +337,12 @@ import { PERMISSION_TYPES } from '../models/Permissions.ts'
 import { formatList, getJumps, getVisibleQuestions } from '../utils/Jumps.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
+import {
+	getNumbers,
+	getQuestionIdsInSections,
+	isEmptySection,
+	QUESTION_TYPE_SECTION,
+} from '../utils/Sections.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 const formsAppName = 'forms'
@@ -492,8 +501,11 @@ export default defineComponent({
 
 		const validQuestions = computed<SubmitQuestion[]>(() => {
 			return (props.form.questions ?? []).filter((question: FormsQuestion) => {
-				// All questions must have a valid title
-				if (question.text?.trim() === '') {
+				// All questions must have a valid title, sections may go without
+				if (
+					question.type !== QUESTION_TYPE_SECTION
+					&& question.text?.trim() === ''
+				) {
 					return false
 				}
 
@@ -535,19 +547,11 @@ export default defineComponent({
 			)
 		})
 
-		const questionIdsInSection = computed<Set<number>>(() => {
-			const firstSection = shownQuestions.value.findIndex(
-				(question) => question.type === 'section',
-			)
-			return new Set(
-				firstSection === -1
-					? []
-					: shownQuestions.value
-							.slice(firstSection)
-							.filter((question) => question.type !== 'section')
-							.map((question) => question.id),
-			)
-		})
+		const questionIdsInSection = computed(() =>
+			getQuestionIdsInSections(shownQuestions.value),
+		)
+
+		const shownNumbers = computed(() => getNumbers(shownQuestions.value))
 
 		const submittedAnswers = computed<AnswersMap>(() => {
 			return Object.fromEntries(
@@ -561,7 +565,7 @@ export default defineComponent({
 		let shownBeforeAnnouncement: SubmitQuestion[] | null = null
 
 		/**
-		 * The status of the questions added to or skipped from the path, empty without changes
+		 * The status of the questions added to or skipped from the path, empty without changes; sections do not count
 		 *
 		 * @param oldQuestions the questions shown before
 		 * @param newQuestions the questions shown now
@@ -572,9 +576,15 @@ export default defineComponent({
 		): string {
 			const oldIds = new Set(oldQuestions.map((question) => question.id))
 			const newIds = new Set(newQuestions.map((question) => question.id))
-			const added = newQuestions.filter((question) => !oldIds.has(question.id))
+			const added = newQuestions.filter(
+				(question) =>
+					!oldIds.has(question.id)
+					&& question.type !== QUESTION_TYPE_SECTION,
+			)
 			const removed = oldQuestions.filter(
-				(question) => !newIds.has(question.id),
+				(question) =>
+					!newIds.has(question.id)
+					&& question.type !== QUESTION_TYPE_SECTION,
 			)
 			return formatList(
 				[
@@ -638,8 +648,10 @@ export default defineComponent({
 				shownQuestions.value.some((question) =>
 					answersToChooseAgain.value.has(question.id),
 				)
-				|| props.form.questions.some((question: FormsQuestion) =>
-					Boolean(question.isRequired),
+				|| props.form.questions.some(
+					(question: FormsQuestion) =>
+						Boolean(question.isRequired)
+						&& question.type !== QUESTION_TYPE_SECTION,
 				)
 			)
 		})
@@ -1678,6 +1690,8 @@ export default defineComponent({
 			jumpAnnouncement,
 			shownQuestions,
 			questionIdsInSection,
+			isEmptySection,
+			shownNumbers,
 			confirmClearFormButtons,
 			confirmEmptyModalButtons,
 			confirmLeaveFormButtons,

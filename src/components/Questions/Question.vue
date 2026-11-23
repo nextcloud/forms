@@ -10,7 +10,14 @@
 			'question--editable': !readOnly,
 			'question--section': readOnly && isSection,
 		}"
-		:aria-label="t('forms', 'Question number {index}', { index })">
+		:aria-label="
+			isSection
+				? readOnly
+					? undefined
+					: t('forms', 'Section number {index}', { index })
+				: t('forms', 'Question number {index}', { index })
+		"
+		:aria-labelledby="isSection && readOnly && titled ? titleId : undefined">
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div
@@ -51,9 +58,13 @@
 					v-if="!readOnly"
 					:placeholder="titlePlaceholder"
 					:aria-label="
-						t('forms', 'Title of question number {index}', {
-							index,
-						})
+						isSection
+							? t('forms', 'Title of section number {index}', {
+									index,
+								})
+							: t('forms', 'Title of question number {index}', {
+									index,
+								})
 					"
 					:value="text"
 					class="question__header__title__text question__header__title__text__input"
@@ -65,7 +76,7 @@
 					@input="onTitleChange" />
 				<component
 					:is="`h${headingLevel}`"
-					v-else
+					v-else-if="titled"
 					:id="titleId"
 					class="question__header__title__text"
 					dir="auto">
@@ -85,7 +96,7 @@
 					forceMenu
 					placement="bottom-end"
 					class="question__header__title__menu">
-					<template v-if="isRequired" #icon>
+					<template v-if="isRequired && !isSection" #icon>
 						<IconOverlay>
 							<template #overlay>
 								<NcIconSvgWrapper :svg="IconAsterisk" inline />
@@ -123,7 +134,10 @@
 						</template>
 						{{ t('forms', 'Technical name') }}
 					</NcActionInput>
-					<NcActionButton closeAfterClick @click="onClone">
+					<NcActionButton
+						v-if="!isSection"
+						closeAfterClick
+						@click="onClone">
 						<template #icon>
 							<NcIconSvgWrapper :svg="IconContentCopy" />
 						</template>
@@ -146,9 +160,13 @@
 					dir="auto"
 					:value="description"
 					:aria-label="
-						t('forms', 'Description of question number {index}', {
-							index,
-						})
+						isSection
+							? t('forms', 'Description of section number {index}', {
+									index,
+								})
+							: t('forms', 'Description of question number {index}', {
+									index,
+								})
 					"
 					:placeholder="
 						t(
@@ -236,6 +254,11 @@ import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconOverlay from '../Icons/IconOverlay.vue'
 import JumpTargetSelect from './JumpTargetSelect.vue'
+import {
+	getIdPrefix,
+	hasTitle,
+	QUESTION_TYPE_SECTION,
+} from '../../utils/Sections.ts'
 
 export default defineComponent({
 	// eslint-disable-next-line vue/multi-word-component-names
@@ -369,7 +392,8 @@ export default defineComponent({
 		const buttonUp = ref<{ $el?: HTMLElement } | undefined>(undefined)
 		const buttonDown = ref<{ $el?: HTMLElement } | undefined>(undefined)
 
-		const isSection = computed(() => props.type === 'section')
+		const isSection = computed(() => props.type === QUESTION_TYPE_SECTION)
+		const titled = computed(() => !isSection.value || hasTitle(props))
 
 		/**
 		 * Extend text with asterisk if question is required
@@ -394,14 +418,15 @@ export default defineComponent({
 		 * @return true if question valid
 		 */
 		const questionValid = computed(() => !!props.text && props.contentValid)
-		const actionsId = computed(() => 'q' + props.index + '_actions')
-		const titleId = computed(() => 'q' + props.index + '_title')
-		const descriptionId = computed(() => 'q' + props.index + '_desc')
+		const idPrefix = computed(() => getIdPrefix(props.type, props.index))
+		const actionsId = computed(() => idPrefix.value + '_actions')
+		const titleId = computed(() => idPrefix.value + '_title')
+		const descriptionId = computed(() => idPrefix.value + '_desc')
 		const hasDescription = computed(() => props.description !== '')
 		const hasError = computed(() => !!props.errorMessage)
 		const hasInfo = computed(() => !!props.infoMessage)
-		const errorId = computed(() => `q${props.index}_error`)
-		const infoId = computed(() => `q${props.index}_info`)
+		const errorId = computed(() => `${idPrefix.value}_error`)
+		const infoId = computed(() => `${idPrefix.value}_info`)
 
 		const resizeDescription = (): void => {
 			// next tick ensures that the textarea is attached to DOM
@@ -531,6 +556,7 @@ export default defineComponent({
 			descriptionId,
 			hasDescription,
 			isSection,
+			titled,
 			hasError,
 			hasInfo,
 			errorId,
