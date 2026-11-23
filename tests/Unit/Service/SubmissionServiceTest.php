@@ -1990,6 +1990,18 @@ file2.txt"
 				// Expected Result
 				'Section "My section" cannot have answers.',
 			],
+			'invalid-section-with-empty-answers' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'section', 'text' => 'My section', 'isRequired' => false]
+				],
+				// Answers – values that look empty are answers as well
+				[
+					'1' => ['', '0']
+				],
+				// Expected Result
+				'Section "My section" cannot have answers.',
+			],
 			'valid-section-without-answer' => [
 				// Questions
 				[

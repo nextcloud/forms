@@ -696,7 +696,7 @@ class SubmissionService {
 
 			// Sections are structural elements and cannot have answers
 			if ($question['type'] === Constants::ANSWER_TYPE_SECTION) {
-				if ($questionAnswered && array_filter($answers[$questionId])) {
+				if ($questionAnswered) {
 					throw new \InvalidArgumentException(sprintf('Section "%s" cannot have answers.', $question['text']));
 				}
 				continue;

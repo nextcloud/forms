@@ -740,7 +740,7 @@ Get all Submissions to a Form
   | _query_ | String | Phrase for full text search |
   | _limit_ | Integer | How many items to get |
   | _offset_ | Integer | How many items to skip for a pagination |
-- Response: An Array of all submissions, sorted as newest first, as well as an array of the corresponding questions.
+- Response: An Array of all submissions, sorted as newest first, as well as an array of the corresponding questions, without sections.
   Answers to deleted questions are left out, and the search does not match them.
 
 ```
@@ -845,7 +845,7 @@ Returns all submissions to the form in form of a csv-file.
   |--------------|---------|-------------|
   | _formId_ | Integer | Id of the form to get the submissions for |
   | _fileFormat_ | String | `csv|ods|xlsx` |
-- Response: A Data Download Response containing the headers `Content-Disposition: attachment; filename="Form 1 (responses).csv"` and `Content-Type: text/csv;charset=UTF-8`. The actual data contains all submissions to the referred form, without answers to deleted questions, formatted as comma separated and escaped csv. For file format `ods` or `xlsx` the Download Response contains an Open Document Spreadsheet or an Office Open XML Spreadsheet file.
+- Response: A Data Download Response containing the headers `Content-Disposition: attachment; filename="Form 1 (responses).csv"` and `Content-Type: text/csv;charset=UTF-8`. The actual data contains all submissions to the referred form, without answers to deleted questions, formatted as comma separated and escaped csv. For file format `ods` or `xlsx` the Download Response contains an Open Document Spreadsheet or an Office Open XML Spreadsheet file. There is one column per question; sections have no column.
 
 ```
 "User display name","Timestamp","Question 1","Question 2"
@@ -981,6 +981,7 @@ Store Submission to Database
     - For File-Uploads, the array contains objects with `uploadedFileId` and `uploadToken` (both from the [Upload a file] endpoint for the same `questionId`).
     - Answers to questions that the [jumps](DataStructure.md#jumps) of the answers skip are ignored, and a skipped required question needs no answer. The path ends at a question that has no answer and a jump per answer past the following question, so the questions after an optional one left empty need no answer either.
     - An answer "Other" is `system-other-answer:` followed by its text. The text must not be empty where the question has a jump for the answer "Other", as the answer decides the path there.
+    - A `section` takes no answer: a non-empty array of values for a section on the respondent's path, even `[""]`, is rejected with **400 Bad Request** "Section "…" cannot have answers." An answer that is not an array of values gets the usual "Invalid answer for question "…".", and answers to sections the jumps skip are ignored like those to skipped questions.
 
 ```
   {
