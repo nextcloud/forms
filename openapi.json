@@ -2792,7 +2792,7 @@
                         }
                     },
                     "400": {
-                        "description": "This question is not part ot the given form",
+                        "description": "Invalid option type for this question",
                         "content": {
                             "application/json": {
                                 "schema": {

@@ -275,7 +275,7 @@ Supported option types and their intended usage.
 
 | Type-ID  | Description                                                                                |
 | -------- | ------------------------------------------------------------------------------------------ |
-| `choice` | Standard selectable option used by `dropdown`, `multiple` and `multiple_unique` questions. |
+| `choice` | Standard selectable option used by `dropdown`, `multiple`, `multiple_unique` and `ranking` questions. |
 | `row`    | Represents a row header when rendering options in a grid-style question.                   |
 | `column` | Represents a column header when rendering options in a grid-style question.                |
 

@@ -110,8 +110,20 @@ class Constants {
 	public const ANSWER_GRID_TYPE_RADIO = 'radio';
 
 	// Option types
+	public const OPTION_TYPE_CHOICE = 'choice';
 	public const OPTION_TYPE_ROW = 'row';
 	public const OPTION_TYPE_COLUMN = 'column';
+
+	/**
+	 * The option types each question type takes; question types not listed take no options
+	 */
+	public const OPTION_TYPES_PER_ANSWER_TYPE = [
+		self::ANSWER_TYPE_DROPDOWN => [self::OPTION_TYPE_CHOICE],
+		self::ANSWER_TYPE_MULTIPLE => [self::OPTION_TYPE_CHOICE],
+		self::ANSWER_TYPE_MULTIPLEUNIQUE => [self::OPTION_TYPE_CHOICE],
+		self::ANSWER_TYPE_RANKING => [self::OPTION_TYPE_CHOICE],
+		self::ANSWER_TYPE_GRID => [self::OPTION_TYPE_ROW, self::OPTION_TYPE_COLUMN],
+	];
 
 	// All AnswerTypes
 	public const ANSWER_TYPES = [
