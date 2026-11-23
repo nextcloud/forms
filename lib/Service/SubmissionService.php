@@ -292,6 +292,8 @@ class SubmissionService {
 		$gridColumnsPerQuestionId = [];
 		/** @var array<int, list<int>> $rankingOptionsPerQuestionId */
 		$rankingOptionsPerQuestionId = [];
+		/** @var array<int, list<int>> $datePollOptionsPerQuestionId */
+		$datePollOptionsPerQuestionId = [];
 
 		$optionPerOptionId = [];
 		foreach ($questions as $question) {
@@ -329,6 +331,16 @@ class SubmissionService {
 				foreach ($rankingOptionsPerQuestionId[$question->getId()] as $optionId) {
 					$header[] = ['id' => 'question-id-' . $question->getId() . '-' . $optionId, 'title' => $question->getText() . ' (' . $optionPerOptionId[$optionId]->getText() . ')'];
 				}
+			} elseif ($question->getType() === Constants::ANSWER_TYPE_DATEPOLL) {
+				$options = $optionsByQuestion[$question->getId()] ?? [];
+				$datePollOptionsPerQuestionId[$question->getId()] = [];
+				foreach ($options as $option) {
+					$optionPerOptionId[$option->getId()] = $option;
+					$datePollOptionsPerQuestionId[$question->getId()][] = $option->getId();
+				}
+				foreach ($datePollOptionsPerQuestionId[$question->getId()] as $optionId) {
+					$header[] = ['id' => 'question-id-' . $question->getId() . '-' . $optionId, 'title' => $question->getText() . ' (' . $optionPerOptionId[$optionId]->getText() . ')'];
+				}
 			} else {
 				$header[] = ['id' => 'question-id-' . $question->getId(), 'title' => $question->getText()];
 			}
@@ -364,7 +376,7 @@ class SubmissionService {
 
 			// Answers, make sure we keep the question order
 			$answers = array_reduce($answersBySubmission[$submission->getId()] ?? [],
-				function (array $carry, Answer $answer) use ($questionPerQuestionId, $gridRowsPerQuestionId, $gridColumnsPerQuestionId, $rankingOptionsPerQuestionId, $optionPerOptionId) {
+				function (array $carry, Answer $answer) use ($questionPerQuestionId, $gridRowsPerQuestionId, $gridColumnsPerQuestionId, $rankingOptionsPerQuestionId, $datePollOptionsPerQuestionId, $optionPerOptionId) {
 					$questionId = $answer->getQuestionId();
 					$questionType = isset($questionPerQuestionId[$questionId]) ? $questionPerQuestionId[$questionId]->getType() : null;
 
@@ -410,6 +422,14 @@ class SubmissionService {
 						foreach ($rankingOptionsPerQuestionId[$questionId] as $optionId) {
 							$position = array_search($optionId, $rankedIds);
 							$columns[] = $position !== false ? $position + 1 : '';
+						}
+						$carry[$questionId] = ['columns' => $columns];
+					} elseif ($questionType === Constants::ANSWER_TYPE_DATEPOLL) {
+						$votes = json_decode($answer->getText(), true);
+						$columns = [];
+						foreach ($datePollOptionsPerQuestionId[$questionId] ?? [] as $optionId) {
+							$vote = is_array($votes) ? ($votes[$optionId] ?? '') : '';
+							$columns[] = in_array($vote, Constants::DATEPOLL_VOTES, true) ? $vote : '';
 						}
 						$carry[$questionId] = ['columns' => $columns];
 					} else {

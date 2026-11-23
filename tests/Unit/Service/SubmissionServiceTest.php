@@ -588,6 +588,60 @@ file2.txt"
 				"1","user1","User 1","1973-11-29T22:33:09+01:00","2","1","3"
 				'
 			],
+			'datepoll-submission' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'datepoll', 'text' => 'When', 'options' => [
+						['id' => 10, 'text' => '2026-11-17 10:00'],
+						['id' => 11, 'text' => '2026-11-17 14:00'],
+					]],
+					['id' => 2, 'type' => 'short', 'text' => 'Name'],
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 1, 'text' => '{"11":"maybe","10":"yes","99":"no"}'],
+							['questionId' => 2, 'text' => 'Ada'],
+						]
+					],
+				],
+				// Expected CSV-Result: one column per slot, in slot order. Unknown slots are dropped.
+				'
+				"Submission ID","User ID","User display name","Timestamp","When (2026-11-17 10:00)","When (2026-11-17 14:00)","Name"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1-10","question-id-1-11","question-id-2"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","yes","maybe","Ada"
+				'
+			],
+			'datepoll-unanswered' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'datepoll', 'text' => 'When', 'options' => [
+						['id' => 10, 'text' => '2026-11-17 10:00'],
+						['id' => 11, 'text' => '2026-11-17 14:00'],
+					]]
+				],
+				// Submission with no datepoll answer
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 1, 'text' => '{"10":"later"}'],
+						],
+					],
+				],
+				// A vote that is not yes, no, or maybe stays empty
+				'
+				"Submission ID","User ID","User display name","Timestamp","When (2026-11-17 10:00)","When (2026-11-17 14:00)"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1-10","question-id-1-11"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","",""
+				'
+			],
 			'ranking-unanswered' => [
 				// Questions
 				[
