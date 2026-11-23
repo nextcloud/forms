@@ -10,6 +10,7 @@ import { test as randomUserTest } from '../support/fixtures/random-user.ts'
 import { test as resultsTest } from '../support/fixtures/results.ts'
 import { test as submitTest } from '../support/fixtures/submit.ts'
 import { test as topBarTest } from '../support/fixtures/topBar.ts'
+import { api } from '../support/helpers.ts'
 import { QuestionType } from '../support/sections/QuestionType.ts'
 import { FormsView } from '../support/sections/TopBarSection.ts'
 
@@ -113,3 +114,29 @@ test.describe('Results view', () => {
 	})
 })
 
+test('A linear scale without labels is named without parentheses', async ({
+	page,
+	resultsView,
+}) => {
+	const form = await api(page.request, 'POST', '/forms')
+	const scale = await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'linearscale',
+		text: 'Rate the event',
+	})
+	await api(page.request, 'PATCH', `/forms/${form.id}/questions/${scale.id}`, {
+		keyValuePairs: {
+			extraSettings: { optionsLabelLowest: '', optionsLabelHighest: '' },
+		},
+	})
+	await api(page.request, 'POST', `/forms/${form.id}/submissions`, {
+		answers: { [scale.id]: ['3'] },
+	})
+	await page.goto(`apps/forms/${form.hash}/results`)
+	await page.waitForURL(/\/results\/summary$/)
+
+	await expect(
+		resultsView
+			.getSummaryForQuestion('Rate the event')
+			.getByText('Linear scale', { exact: true }),
+	).toBeVisible()
+})
