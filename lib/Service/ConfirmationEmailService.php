@@ -115,7 +115,6 @@ class ConfirmationEmailService {
 		}
 
 		if ($question->getFormId() !== $form->getId()
-			|| $question->getOrder() === 0
 			|| !$question->isEmailType()) {
 			throw new \InvalidArgumentException('Invalid confirmationEmailQuestionId');
 		}
