@@ -376,7 +376,7 @@ Returns the questions and options of the given form (without submissions).
   | Parameter | Type | Optional | Description |
   |-----------|---------|----------|-------------|
   | _type_ | [QuestionType](DataStructure.md#question-types) | | The question-type of the new question |
-  | _subtype_ | String | yes | _Optional_ The cell type of a `grid` question, stored as `extraSettings.questionType`: `checkbox`, `number` or `radio`. Any other value is rejected. |
+  | _subtype_ | String | yes | _Optional_ The sub type, stored as `extraSettings.questionType`: the cell type for `grid` (`checkbox`, `number` or `radio`), `rating` for `linearscale` (a 1 to N scale drawn as icons). Any other value is rejected. |
   | _text_ | String | yes | _Optional_ The text of the new question. |
   | _position_ | Integer | yes | _(optional)_ 1-based position to insert the new question. When omitted the question is appended at the end. |
 - Restrictions: A `grid` question needs its cell type as _subtype_. A _subtype_ for a question type without sub types is rejected with **400 Bad Request**.

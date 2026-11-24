@@ -43,3 +43,7 @@ export enum GridCellType {
 	Number = 'number',
 	Radio = 'radio',
 }
+
+export enum LinearScaleType {
+	Rating = 'rating',
+}

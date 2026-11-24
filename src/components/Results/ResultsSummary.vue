@@ -12,6 +12,48 @@
 			{{ questionTypeLabel }}
 		</p>
 
+		<div
+			v-if="ratingSummary"
+			class="question-summary__rating"
+			:style="{ '--rating-color': ratingSummary.icon.color }">
+			<p v-if="averageRating" class="question-summary__rating-average">
+				<span class="question-summary__rating-icons" aria-hidden="true">
+					<span class="question-summary__rating-icons-row">
+						<NcIconSvgWrapper
+							v-for="level in ratingSummary.highest"
+							:key="level"
+							:svg="ratingSummary.icon.outline"
+							:size="ratingSummary.iconSize"
+							inline />
+					</span>
+					<span
+						class="question-summary__rating-icons-row question-summary__rating-icons-row--filled"
+						:style="{ width: ratingSummary.fill }">
+						<NcIconSvgWrapper
+							v-for="level in ratingSummary.highest"
+							:key="level"
+							:svg="ratingSummary.icon.filled"
+							:size="ratingSummary.iconSize"
+							inline />
+					</span>
+				</span>
+				<span class="question-summary__rating-score" aria-hidden="true">
+					{{ ratingSummary.score }}
+				</span>
+				<span class="hidden-visually">{{ averageRating }}</span>
+			</p>
+			<p
+				class="question-summary__rating-count"
+				:aria-hidden="averageRating ? 'true' : undefined">
+				{{ ratingSummary.countText }}
+			</p>
+			<p
+				v-if="ratingSummary.outsideText"
+				class="question-summary__rating-count">
+				{{ ratingSummary.outsideText }}
+			</p>
+		</div>
+
 		<!-- Ranking questions: Borda count with average rank -->
 		<div v-if="question.type === 'ranking'" class="question-summary__statistic">
 			<p class="question-summary__ranking-description">
@@ -175,6 +217,7 @@
 
 <script lang="ts">
 import type { PropType } from 'vue'
+import type { RatingIcon } from '../../models/RatingIcons.ts'
 import type {
 	BordaRankStats,
 	FormsAnswer,
@@ -185,12 +228,23 @@ import type {
 } from '../../types/Entities.d.ts'
 
 import IconFile from '@material-symbols/svg-400/outlined/draft.svg?raw'
-import { getCanonicalLocale, t } from '@nextcloud/l10n'
+import { getCanonicalLocale, isRTL, n, t } from '@nextcloud/l10n'
 import { generateUrl } from '@nextcloud/router'
 import { computed, defineComponent } from 'vue'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import answerTypes from '../../models/AnswerTypes.ts'
-import { GridCellType, OptionType } from '../../models/Constants.ts'
+import { GridCellType, LinearScaleType, OptionType } from '../../models/Constants.ts'
+import { getRatingIcon } from '../../models/RatingIcons.ts'
+
+const RATING_ICON_SIZE = 28
+/**
+ * Per rating icon, where to cut it, as a share of its width, so that it looks a quarter, half and three quarters filled
+ */
+const RATING_ICON_QUARTERS: Record<RatingIcon['id'], [number, number, number]> = {
+	star: [0.39, 0.5, 0.63],
+	heart: [0.35, 0.5, 0.65],
+	thumb: [0.43, 0.57, 0.73],
+}
 
 const locale = getCanonicalLocale()
 const formatCount = new Intl.NumberFormat(locale).format
@@ -250,6 +304,14 @@ export default defineComponent({
 				) {
 					return `${label} (${t('forms', 'Radio')})`
 				}
+			}
+
+			if (
+				props.question.type === 'linearscale'
+				&& props.question.extraSettings?.questionType
+					=== LinearScaleType.Rating
+			) {
+				return `${label} (${t('forms', 'Rating')})`
 			}
 
 			if (props.question.type === 'linearscale') {
@@ -593,6 +655,80 @@ export default defineComponent({
 			return matrix
 		})
 
+		const ratingSummary = computed(() => {
+			if (
+				props.question.type !== 'linearscale'
+				|| props.question.extraSettings?.questionType
+					!== LinearScaleType.Rating
+			) {
+				return null
+			}
+			const highest = props.question.extraSettings?.optionsHighest ?? 5
+			const rated = questionOptions.value.filter((option) => option.id >= 0)
+			const count = rated.reduce((total, option) => total + option.count, 0)
+			const sum = rated.reduce(
+				(total, option) => total + Number(option.text) * option.count,
+				0,
+			)
+			const average = count === 0 ? 0 : sum / count
+			const outside = questionOptions.value
+				.filter((option) => option.id < -2)
+				.reduce((total, option) => total + option.count, 0)
+			const icon = getRatingIcon(props.question.extraSettings?.ratingIcon)
+			const quarters = Math.round(average * 4)
+			const rest = quarters % 4
+			const cuts = RATING_ICON_QUARTERS[icon.id]
+			const partial = rest
+				? isRTL()
+					? 1 - cuts[3 - rest]
+					: cuts[rest - 1]
+				: 0
+			return {
+				icon,
+				iconSize: RATING_ICON_SIZE,
+				highest,
+				count,
+				average,
+				fill: `${(Math.floor(quarters / 4) + partial) * RATING_ICON_SIZE}px`,
+				// TRANSLATORS The average rating out of the highest rating, e.g. "3.8 of 5"
+				score: t('forms', '{average} of {highest}', {
+					average: oneDecimal.format(average),
+					highest: formatCount(highest),
+				}),
+				countText: n('forms', '{count} rating', '{count} ratings', count, {
+					count: formatCount(count),
+				}),
+				outsideText:
+					outside === 0
+						? ''
+						: n(
+								'forms',
+								'{count} rating outside the scale is not counted',
+								'{count} ratings outside the scale are not counted',
+								outside,
+								{ count: formatCount(outside) },
+							),
+			}
+		})
+
+		const averageRating = computed<string | null>(() => {
+			const summary = ratingSummary.value
+			if (!summary || summary.count === 0) {
+				return null
+			}
+			return n(
+				'forms',
+				'Average rating {average} of {highest}, from {count} rating',
+				'Average rating {average} of {highest}, from {count} ratings',
+				summary.count,
+				{
+					average: oneDecimal.format(summary.average),
+					highest: formatCount(summary.highest),
+					count: formatCount(summary.count),
+				},
+			)
+		})
+
 		// For text answers like short answer and long text
 		const answers = computed<(FormsAnswer & { url?: string })[]>(() => {
 			const answersModels: (FormsAnswer & { url?: string })[] = []
@@ -655,6 +791,8 @@ export default defineComponent({
 			IconFile,
 			answerTypes,
 			questionTypeLabel,
+			averageRating,
+			ratingSummary,
 			questionOptions,
 			rankingStats,
 			maxBordaScore,
@@ -681,6 +819,50 @@ export default defineComponent({
 	&__detail {
 		color: var(--color-text-lighter);
 		margin-block-start: -8px;
+	}
+
+	&__rating {
+		margin-block-start: calc(var(--default-grid-baseline) * 2);
+
+		&-average {
+			align-items: center;
+			display: flex;
+			flex-wrap: wrap;
+			gap: calc(var(--default-grid-baseline) * 3);
+		}
+
+		&-icons {
+			color: var(--rating-color);
+			display: inline-flex;
+			position: relative;
+		}
+
+		&-icons-row {
+			color: var(--color-border-maxcontrast);
+			display: flex;
+			flex-shrink: 0;
+
+			&--filled {
+				color: var(--rating-color);
+				inset-block-start: 0;
+				inset-inline-start: 0;
+				overflow: hidden;
+				position: absolute;
+			}
+
+			:deep(.icon-vue) {
+				flex-shrink: 0;
+			}
+		}
+
+		&-score {
+			font-size: 1.5em;
+			font-weight: bold;
+		}
+
+		&-count {
+			color: var(--color-text-maxcontrast);
+		}
 	}
 
 	&__text,

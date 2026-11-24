@@ -13,6 +13,7 @@
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionInput
+				v-if="!isRating"
 				:modelValue="optionsLowest"
 				type="multiselect"
 				:clearable="false"
@@ -30,8 +31,8 @@
 				:modelValue="optionsHighest"
 				type="multiselect"
 				:clearable="false"
-				:label="t('forms', 'Highest value')"
-				:aria-label-combobox="t('forms', 'Highest value')"
+				:label="highestLabel"
+				:aria-label-combobox="highestLabel"
 				labelOutside
 				:options="[2, 3, 4, 5, 6, 7, 8, 9, 10]"
 				required
@@ -40,9 +41,59 @@
 					<NcIconSvgWrapper :svg="IconPencil" />
 				</template>
 			</NcActionInput>
+			<NcActionInput
+				v-if="isRating"
+				:modelValue="ratingIcon.id"
+				type="multiselect"
+				:clearable="false"
+				:label="ratingIconLabel"
+				:aria-label-combobox="ratingIconLabel"
+				labelOutside
+				:options="ratingIcons"
+				:reduce="ratingIconId"
+				@update:modelValue="onRatingIconChange">
+				<template #icon>
+					<NcIconSvgWrapper :svg="ratingIcon.outline" />
+				</template>
+			</NcActionInput>
 		</template>
 
+		<fieldset
+			v-if="isRating"
+			class="question-rating"
+			:style="{ '--rating-color': ratingIcon.color }"
+			:aria-label="readOnly ? undefined : text || t('forms', 'Rating')"
+			:aria-labelledby="readOnly ? titleId : undefined"
+			:aria-describedby="readOnly && description ? descriptionId : undefined"
+			:disabled="!readOnly">
+			<label
+				v-for="option in scaleOptions"
+				:key="option"
+				class="question-rating__option"
+				:class="{ 'question-rating__option--on': option <= ratingValue }">
+				<input
+					class="question-rating__input"
+					type="radio"
+					:name="`${id}-answer`"
+					:aria-label="option.toString()"
+					:aria-errormessage="hasError ? errorId : undefined"
+					:aria-invalid="hasError ? 'true' : undefined"
+					:value="option.toString()"
+					:checked="option === ratingValue"
+					:required="isRequired"
+					@change="onChange(option.toString())"
+					@invalid.prevent="validate" />
+				<NcIconSvgWrapper
+					:svg="
+						option <= ratingValue
+							? ratingIcon.filled
+							: ratingIcon.outline
+					"
+					:size="34" />
+			</label>
+		</fieldset>
 		<div
+			v-else
 			class="question__content question-linear-scale"
 			:class="{
 				question__content__edit: !readOnly,
@@ -143,6 +194,8 @@
 </template>
 
 <script lang="ts">
+import type { RatingIcon } from '../../models/RatingIcons.ts'
+
 import IconPencil from '@material-symbols/svg-400/outlined/edit.svg?raw'
 import { t } from '@nextcloud/l10n'
 import { computed, defineComponent, nextTick, onMounted, ref } from 'vue'
@@ -156,12 +209,16 @@ import {
 	QUESTION_PROPS,
 	useQuestion,
 } from '../../composables/useQuestion.ts'
+import { LinearScaleType } from '../../models/Constants.ts'
+import { getRatingIcon, RATING_ICONS } from '../../models/RatingIcons.ts'
 
 type LinearScaleExtraSettings = {
 	optionsLowest?: number | null
 	optionsHighest?: number | null
 	optionsLabelLowest?: string | null
 	optionsLabelHighest?: string | null
+	questionType?: string
+	ratingIcon?: string | null
 }
 
 export default defineComponent({
@@ -189,6 +246,23 @@ export default defineComponent({
 				(props.extraSettings as LinearScaleExtraSettings | undefined) ?? {}
 			)
 		})
+		const isRating = computed<boolean>(
+			() => extraSettings.value.questionType === LinearScaleType.Rating,
+		)
+		const ratingIcon = computed<RatingIcon>(() =>
+			getRatingIcon(extraSettings.value.ratingIcon),
+		)
+		const ratingValue = computed<number>(
+			() => parseInt(values.value?.[0] ?? '') || 0,
+		)
+		// TRANSLATORS Label of the choice between stars, hearts and thumbs up as the icons of a rating
+		const ratingIconLabel = t('forms', 'Icon')
+		const highestLabel = computed<string>(() =>
+			isRating.value
+				? // TRANSLATORS Label of the choice of how many icons a rating offers, the highest rating that can be given
+					t('forms', 'Highest rating')
+				: t('forms', 'Highest value'),
+		)
 		const lowest = ref<{ $refs: { input: HTMLTextAreaElement } } | null>(null)
 		const highest = ref<{ $refs: { input: HTMLTextAreaElement } } | null>(null)
 
@@ -305,7 +379,7 @@ export default defineComponent({
 		}
 
 		onMounted(() => {
-			if (!props.readOnly) {
+			if (!props.readOnly && !isRating.value) {
 				resizeLabel('lowest')
 				resizeLabel('highest')
 			}
@@ -327,6 +401,19 @@ export default defineComponent({
 		const onChange = (option: string): void => {
 			emit('update:values', [option])
 			question.errorMessage.value = null
+		}
+
+		/**
+		 * The id of a rating icon, the value the icon dropdown stands for
+		 *
+		 * @param icon the rating icon
+		 */
+		const ratingIconId = (icon: RatingIcon): RatingIcon['id'] => icon.id
+
+		const onRatingIconChange = (icon: RatingIcon['id']): void => {
+			question.onExtraSettingsChange({
+				ratingIcon: icon === RATING_ICONS[0].id ? null : icon,
+			})
 		}
 
 		const onOptionsLowestChange = (value: number): void => {
@@ -382,6 +469,14 @@ export default defineComponent({
 			optionsHighest,
 			optionsLabelLowest,
 			optionsLabelHighest,
+			isRating,
+			highestLabel,
+			ratingIcon,
+			ratingIconLabel,
+			ratingIconId,
+			ratingIcons: RATING_ICONS,
+			ratingValue,
+			onRatingIconChange,
 			validate,
 			onChange,
 			onOptionsLowestChange,
@@ -396,6 +491,64 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.question-rating {
+	align-items: center;
+	border: none;
+	display: flex;
+	flex-wrap: wrap;
+	gap: calc(4 * var(--default-grid-baseline));
+	margin: 0;
+	padding: 0;
+
+	&__option {
+		align-items: center;
+		border-radius: var(--border-radius);
+		color: var(--color-text-maxcontrast);
+		cursor: pointer;
+		display: inline-flex;
+		justify-content: center;
+		min-height: var(--default-clickable-area);
+		min-width: var(--default-clickable-area);
+		position: relative;
+		transition:
+			color 0.1s ease-in-out,
+			transform 0.1s ease-in-out;
+
+		&:has(:focus-visible) {
+			outline: 2px solid var(--color-primary-element);
+			outline-offset: -2px;
+		}
+
+		&--on {
+			color: var(--rating-color);
+		}
+
+		@media (prefers-reduced-motion: reduce) {
+			transition: none;
+		}
+	}
+
+	&__input {
+		height: 100%;
+		inset: 0;
+		margin: 0;
+		opacity: 0 !important;
+		pointer-events: none;
+		position: absolute;
+		width: 100%;
+	}
+
+	&:disabled &__option {
+		cursor: default;
+	}
+
+	@media (hover: hover) and (prefers-reduced-motion: no-preference) {
+		&:not(:disabled) &__option:hover {
+			transform: scale(1.1);
+		}
+	}
+}
+
 .question__content {
 	display: flex;
 

@@ -1051,6 +1051,25 @@ class FormsService {
 				|| isset($extraSettings['optionsHighest']) && ($extraSettings['optionsHighest'] < 2 || $extraSettings['optionsHighest'] > 10)) {
 				return false;
 			}
+
+			$subtype = $extraSettings['questionType'] ?? null;
+			if ($subtype !== null && !in_array($subtype, Constants::EXTRA_SETTINGS_LINEARSCALE_QUESTION_TYPE, true)) {
+				return false;
+			}
+
+			if ($subtype === Constants::ANSWER_LINEARSCALE_TYPE_RATING && ($extraSettings['optionsLowest'] ?? 1) !== 1) {
+				return false;
+			}
+
+			if (isset($extraSettings['ratingIcon'])
+				&& ($subtype !== Constants::ANSWER_LINEARSCALE_TYPE_RATING || !in_array($extraSettings['ratingIcon'], Constants::RATING_ICONS, true))) {
+				return false;
+			}
+
+			if ($subtype === Constants::ANSWER_LINEARSCALE_TYPE_RATING
+				&& (isset($extraSettings['optionsLabelLowest']) || isset($extraSettings['optionsLabelHighest']))) {
+				return false;
+			}
 		} elseif ($questionType === Constants::ANSWER_TYPE_GRID) {
 			if (isset($extraSettings['questionType'])
 				&& !in_array($extraSettings['questionType'], Constants::EXTRA_SETTINGS_GRID_QUESTION_TYPE, true)) {
