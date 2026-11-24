@@ -5,6 +5,36 @@
 
 # Changelog
 
+## v5.4.4 - 2026-11-24
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.3...v5.4.4)
+
+### Fixed
+
+- [stable5.4] fix: unify checks for deleted questions and don't load submissions to deleted questions by @backportbot[bot] in [\#4018](https://github.com/nextcloud/forms/pull/4018)
+- [stable5.4] fix(a11y): keep a single main landmark in embedded forms by @backportbot[bot] in [\#4016](https://github.com/nextcloud/forms/pull/4016)
+- [stable5.4] fix(a11y): use correct color for invalid question indicator by @backportbot[bot] in [\#4015](https://github.com/nextcloud/forms/pull/4015)
+- [stable5.4] fix(export): keep cells under their headers for empty grid and ranking answers by @backportbot[bot] in [\#4004](https://github.com/nextcloud/forms/pull/4004)
+- [stable5.4] fix(api): add options only to questions that take them by @backportbot[bot] in [\#4003](https://github.com/nextcloud/forms/pull/4003)
+- [stable5.4] fix(results): show no empty parentheses for a scale without labels by @backportbot[bot] in [\#4002](https://github.com/nextcloud/forms/pull/4002)
+- [stable5.4] docs(api): say that a question type without sub types rejects one by @backportbot[bot] in [\#3999](https://github.com/nextcloud/forms/pull/3999)
+- [stable5.4] fix(a11y): keep result bars visible in forced colors and name ranking bars by @backportbot[bot] in [\#3996](https://github.com/nextcloud/forms/pull/3996)
+- [stable5.4] fix(a11y): editor references and the sub menu back entry by @backportbot[bot] in [\#3995](https://github.com/nextcloud/forms/pull/3995)
+- [stable5.4] fix(a11y): screen reader fixes for the linear scale question by @backportbot[bot] in [\#3994](https://github.com/nextcloud/forms/pull/3994)
+- [stable5.4] fix(submit): move on past a radio group on Enter by @backportbot[bot] in [\#3993](https://github.com/nextcloud/forms/pull/3993)
+- [stable5.4] fix(api): reject a missing or unknown grid cell type and check the sub type lock first by @backportbot[bot] in [\#3992](https://github.com/nextcloud/forms/pull/3992)
+- [stable5.4] fix(results): draw the bar track dark in Chromium dark mode by @backportbot[bot] in [\#3986](https://github.com/nextcloud/forms/pull/3986)
+- [stable5.4] fix(editor): show a changed extra setting immediately by @backportbot[bot] in [\#3983](https://github.com/nextcloud/forms/pull/3983)
+- [stable5.4] fix(submit): only submit the form by button or Ctrl/Cmd+Enter by @backportbot[bot] in [\#3979](https://github.com/nextcloud/forms/pull/3979)
+- [stable5.4] fix(api): keep the sub type of a question fixed after creation by @backportbot[bot] in [\#3976](https://github.com/nextcloud/forms/pull/3976)
+- [stable5.4] fix(results): format the summary numbers for the user's locale by @backportbot[bot] in [\#3973](https://github.com/nextcloud/forms/pull/3973)
+- [stable5.4] fix(submit): move on to the submit button after the last answer by @backportbot[bot] in [\#3971](https://github.com/nextcloud/forms/pull/3971)
+- [stable5.4] fix(api): leave out unset extra settings when reading them by @backportbot[bot] in [\#3969](https://github.com/nextcloud/forms/pull/3969)
+- [stable5.4] fix(api): list every question type in the API description by @backportbot[bot] in [\#3968](https://github.com/nextcloud/forms/pull/3968)
+- [stable5.4] fix(edit): align the linear scale labels with the other inputs by @backportbot[bot] in [\#3948](https://github.com/nextcloud/forms/pull/3948)
+- [stable5.4] fix(edit): keep focus on the used move button when reordering options by @backportbot[bot] in [\#3946](https://github.com/nextcloud/forms/pull/3946)
+- [stable5.4] fix(submit): tell respondents when they submit too often by @backportbot[bot] in [\#3945](https://github.com/nextcloud/forms/pull/3945)
+
 ## v5.4.3 - 2026-11-19
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.2...v5.4.3)
