@@ -81,13 +81,17 @@ class SubmissionService {
 	 * Get all the answers of a given submission
 	 *
 	 * @param int $submissionId the submission id
+	 * @param array<int, true> $activeQuestionIds ids of the active questions as keys, to filter answers
 	 * @return list<FormsAnswer>
 	 */
-	private function getAnswers(int $submissionId): array {
+	private function getAnswers(int $submissionId, array $activeQuestionIds): array {
 		$answerList = [];
 		try {
 			$answerEntities = $this->answerMapper->findBySubmission($submissionId);
 			foreach ($answerEntities as $answerEntity) {
+				if (!isset($activeQuestionIds[$answerEntity->getQuestionId()])) {
+					continue;
+				}
 				$answerList[] = $answerEntity->read();
 			}
 		} catch (DoesNotExistException) {
@@ -95,6 +99,16 @@ class SubmissionService {
 		} finally {
 			return $answerList;
 		}
+	}
+
+	/**
+	 * Get the ids of the given questions as keys
+	 *
+	 * @param list<Question> $questions questions that are not deleted
+	 * @return array<int, true> the question ids as keys
+	 */
+	private function getActiveQuestionIds(array $questions): array {
+		return array_fill_keys(array_map(static fn (Question $question) => $question->getId(), $questions), true);
 	}
 
 	/**
@@ -124,12 +138,17 @@ class SubmissionService {
 				$answersBySubmission[$answer->getSubmissionId()][] = $answer;
 			}
 
+			$activeQuestionIds = $this->getActiveQuestionIds($this->questionMapper->findByForm($formId));
+
 			foreach ($submissionEntities as $submissionEntity) {
 				$submission = $submissionEntity->read();
-				$submission['answers'] = array_map(
-					static fn (Answer $answer) => $answer->read(),
-					$answersBySubmission[$submission['id']] ?? []
-				);
+				$answers = [];
+				foreach ($answersBySubmission[$submission['id']] ?? [] as $answer) {
+					if (isset($activeQuestionIds[$answer->getQuestionId()])) {
+						$answers[] = $answer->read();
+					}
+				}
+				$submission['answers'] = $answers;
 				$submissionList[] = $submission;
 			}
 		} catch (DoesNotExistException) {
@@ -155,7 +174,8 @@ class SubmissionService {
 		try {
 			$submissionEntity = $this->submissionMapper->findById($submissionId);
 			$submission = $submissionEntity->read();
-			$submission['answers'] = $this->getAnswers($submission['id']);
+			$activeQuestionIds = $this->getActiveQuestionIds($this->questionMapper->findByForm($submission['formId']));
+			$submission['answers'] = $this->getAnswers($submission['id'], $activeQuestionIds);
 			return $submission;
 		} catch (DoesNotExistException) {
 			return null;
@@ -249,6 +269,9 @@ class SubmissionService {
 		$submissionEntities = array_reverse($submissionEntities);
 
 		$questions = $this->questionMapper->findByForm($form->getId());
+
+		$activeQuestionIds = $this->getActiveQuestionIds($questions);
+
 		$defaultTimeZone = $this->config->getSystemValueString('default_timezone', 'UTC');
 
 		if (!$this->currentUser) {
@@ -261,6 +284,9 @@ class SubmissionService {
 		$submissionIds = array_map(static fn (Submission $submission) => $submission->getId(), $submissionEntities);
 		$answersBySubmission = [];
 		foreach ($this->answerMapper->findBySubmissions($submissionIds) as $answer) {
+			if (!isset($activeQuestionIds[$answer->getQuestionId()])) {
+				continue;
+			}
 			$answersBySubmission[$answer->getSubmissionId()][] = $answer;
 		}
 
@@ -271,9 +297,8 @@ class SubmissionService {
 		}
 
 		// Fetch all options of the form's questions at once, grouped by question
-		$questionIds = array_map(static fn (Question $question) => $question->getId(), $questions);
 		$optionsByQuestion = [];
-		foreach ($this->optionMapper->findByQuestions($questionIds) as $option) {
+		foreach ($this->optionMapper->findByQuestions(array_keys($activeQuestionIds)) as $option) {
 			$optionsByQuestion[$option->getQuestionId()][] = $option;
 		}
 

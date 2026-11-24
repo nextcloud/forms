@@ -25,12 +25,14 @@ class SubmissionMapper extends QBMapper {
 	 * SubmissionMapper constructor.
 	 * @param IDBConnection $db
 	 * @param AnswerMapper $answerMapper
+	 * @param QuestionMapper $questionMapper
 	 * @param FilePathHelper $filePathHelper
 	 * @param LoggerInterface $logger
 	 */
 	public function __construct(
 		IDBConnection $db,
 		private readonly AnswerMapper $answerMapper,
+		private readonly QuestionMapper $questionMapper,
 		private readonly FilePathHelper $filePathHelper,
 		private readonly LoggerInterface $logger,
 	) {
@@ -69,23 +71,42 @@ class SubmissionMapper extends QBMapper {
 			->setFirstResult($offset)
 			->setMaxResults($limit);
 
-		// If a query is provided, join the answers table and filter by the query text
 		if (!is_null($searchString) && $searchString !== '') {
-			$qb->join(
-				'submissions',
-				$this->answerMapper->getTableName(),
-				'answers',
-				$qb->expr()->eq('submissions.id', 'answers.submission_id')
-			)
-				->andWhere(
-					$qb->expr()->orX(
-						$qb->expr()->iLike('submissions.user_id', $qb->createNamedParameter('%' . $searchString . '%')),
-						$qb->expr()->iLike('answers.text', $qb->createNamedParameter('%' . $searchString . '%')),
-					),
-				);
+			$this->filterBySearch($qb, $searchString);
 		}
 
 		return $this->findEntities($qb);
+	}
+
+	/**
+	 * Restricts the submissions to those whose user id or an answer to a question that is not deleted contains the search string
+	 *
+	 * @param IQueryBuilder $qb query on the submissions table with the alias `submissions`
+	 * @param string $searchString the search string
+	 */
+	private function filterBySearch(IQueryBuilder $qb, string $searchString): void {
+		$pattern = $qb->createNamedParameter('%' . $searchString . '%');
+		$qb->join(
+			'submissions',
+			$this->answerMapper->getTableName(),
+			'answers',
+			$qb->expr()->eq('submissions.id', 'answers.submission_id')
+		)
+			->join(
+				'answers',
+				$this->questionMapper->getTableName(),
+				'questions',
+				$qb->expr()->eq('answers.question_id', 'questions.id')
+			)
+			->andWhere(
+				$qb->expr()->orX(
+					$qb->expr()->iLike('submissions.user_id', $pattern),
+					$qb->expr()->andX(
+						$qb->expr()->iLike('answers.text', $pattern),
+						$qb->expr()->neq('questions.order', $qb->createNamedParameter(0, IQueryBuilder::PARAM_INT)),
+					),
+				),
+			);
 	}
 
 	/**
@@ -194,18 +215,7 @@ class SubmissionMapper extends QBMapper {
 		}
 
 		if (!is_null($searchString) && $searchString !== '') {
-			$query->join(
-				'submissions',
-				$this->answerMapper->getTableName(),
-				'answers',
-				$qb->expr()->eq('submissions.id', 'answers.submission_id')
-			)
-				->andWhere(
-					$qb->expr()->orX(
-						$qb->expr()->iLike('submissions.user_id', $qb->createNamedParameter('%' . $searchString . '%')),
-						$qb->expr()->iLike('answers.text', $qb->createNamedParameter('%' . $searchString . '%')),
-					),
-				);
+			$this->filterBySearch($query, $searchString);
 		}
 
 		if ($limit !== -1) {

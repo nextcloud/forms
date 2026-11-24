@@ -510,7 +510,7 @@ class ApiController extends OCSController {
 		}
 
 		$question = $this->formsService->getQuestion($questionId);
-		if ($question === null || $question['order'] === 0) {
+		if ($question === null) {
 			throw new OCSNotFoundException('Question doesn\'t exist');
 		}
 
@@ -633,9 +633,6 @@ class ApiController extends OCSController {
 				if ($sourceQuestion->getFormId() !== $formId) {
 					throw new OCSBadRequestException('Question doesn\'t belong to given form');
 				}
-				if ($sourceQuestion->getOrder() === 0) {
-					throw new OCSNotFoundException('Could not find question');
-				}
 				$sourceOptions = $this->optionMapper->findByQuestion($fromId);
 			} catch (IMapperException) {
 				$this->logger->debug('Could not find question');
@@ -735,10 +732,6 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Question doesn\'t belong to given Form');
 		}
 
-		if ($question->getOrder() === 0) {
-			throw new OCSNotFoundException('Could not find question');
-		}
-
 		// Don't allow empty array
 		if (count($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update.');
@@ -825,10 +818,6 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('Question doesn\'t belong to given Form');
 		}
 
-		if ($question->getOrder() === 0) {
-			throw new OCSNotFoundException('Could not find question');
-		}
-
 		// Store Order of deleted Question
 		$deletedOrder = $question->getOrder();
 
@@ -872,7 +861,6 @@ class ApiController extends OCSController {
 	 * @throws OCSBadRequestException The given array contains duplicates
 	 * @throws OCSBadRequestException The length of the given array does not match the number of stored questions
 	 * @throws OCSBadRequestException Question doesn't belong to given Form
-	 * @throws OCSBadRequestException One question has already been marked as deleted
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSNotFoundException Could not find form
@@ -933,16 +921,8 @@ class ApiController extends OCSController {
 				throw new OCSBadRequestException('Question doesn\'t belong to given Form');
 			}
 
-			// Abort if a question is already marked as deleted (order==0)
-			$oldOrder = $questions[$arrayKey]->getOrder();
-			if ($oldOrder === 0) {
-				$this->logger->debug('This question has already been marked as deleted: Id: {questionId}', [
-					'questionId' => $questions[$arrayKey]->getId()
-				]);
-				throw new OCSBadRequestException('One question has already been marked as deleted');
-			}
-
 			// Only set order, if it changed.
+			$oldOrder = $questions[$arrayKey]->getOrder();
 			if ($oldOrder !== $arrayKey + 1) {
 				// Set Order. ArrayKey counts from zero, order counts from 1.
 				$questions[$arrayKey]->setOrder($arrayKey + 1);
@@ -1015,10 +995,6 @@ class ApiController extends OCSController {
 				'questionId' => $questionId
 			]);
 			throw new OCSBadRequestException('This question is not part ot the given form');
-		}
-
-		if ($question->getOrder() === 0) {
-			throw new OCSNotFoundException('Could not find question');
 		}
 
 		$allowedOptionTypes = Constants::OPTION_TYPES_PER_ANSWER_TYPE[$question->getType()] ?? [];
@@ -1117,10 +1093,6 @@ class ApiController extends OCSController {
 			throw new OCSBadRequestException('The given option id doesn\'t match the question or form.');
 		}
 
-		if ($question->getOrder() === 0) {
-			throw new OCSNotFoundException('Could not find question');
-		}
-
 		// Don't allow empty array
 		if (count($keyValuePairs) === 0) {
 			$this->logger->info('Empty keyValuePairs, will not update');
@@ -1182,16 +1154,12 @@ class ApiController extends OCSController {
 			$question = $this->questionMapper->findById($questionId);
 		} catch (IMapperException) {
 			$this->logger->debug('Could not find option or question');
-			throw new OCSBadRequestException('Could not find option or question');
+			throw new OCSNotFoundException('Could not find option or question');
 		}
 
 		if ($option->getQuestionId() !== $questionId || $question->getFormId() !== $formId) {
 			$this->logger->debug('The given option id doesn\'t match the question or form.');
 			throw new OCSBadRequestException('The given option id doesn\'t match the question or form.');
-		}
-
-		if ($question->getOrder() === 0) {
-			throw new OCSNotFoundException('Could not find question');
 		}
 
 		$this->optionMapper->delete($option);
@@ -1250,10 +1218,6 @@ class ApiController extends OCSController {
 		if ($question->getFormId() !== $formId) {
 			$this->logger->debug('The given question id doesn\'t match the form.');
 			throw new OCSBadRequestException('The given question id doesn\'t match the form.');
-		}
-
-		if ($question->getOrder() === 0) {
-			throw new OCSNotFoundException('Could not find question');
 		}
 
 		// Check if array contains duplicates
@@ -1790,6 +1754,7 @@ class ApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, list<FormsUploadedFile>, array{}>
 	 * @throws OCSBadRequestException No files provided
 	 * @throws OCSBadRequestException Question doesn't belong to the given form
+	 * @throws OCSBadRequestException Wrong question type
 	 * @throws OCSBadRequestException Invalid file provided
 	 * @throws OCSBadRequestException Failed to upload the file
 	 * @throws OCSBadRequestException File size exceeds the maximum allowed size
@@ -1842,6 +1807,11 @@ class ApiController extends OCSController {
 		if ($formId !== $question->getFormId()) {
 			$this->logger->debug('Question doesn\'t belong to the given form');
 			throw new OCSBadRequestException('Question doesn\'t belong to the given form');
+		}
+
+		if ($question->getType() !== Constants::ANSWER_TYPE_FILE) {
+			$this->logger->debug('Question {questionId} is no file question', ['questionId' => $questionId]);
+			throw new OCSBadRequestException('Wrong question type');
 		}
 
 		$path = $this->formsService->getTemporaryUploadedFilePath($form, $question);
