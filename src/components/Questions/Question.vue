@@ -552,7 +552,7 @@ export default defineComponent({
 			&__warning {
 				margin-block: auto;
 				margin-inline: 8px;
-				color: var(--color-error);
+				color: var(--color-element-error);
 			}
 
 			&__menu {
