@@ -1974,7 +1974,7 @@
                         }
                     },
                     "400": {
-                        "description": "One question has already been marked as deleted",
+                        "description": "Question doesn't belong to given Form",
                         "content": {
                             "application/json": {
                                 "schema": {

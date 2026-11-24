@@ -135,6 +135,16 @@ class SubmissionServiceTest extends TestCase {
 		$submission_2->setUserId('someOtherUser');
 		$submission_2->setTimestamp(1234);
 
+		$question_1 = new Question();
+		$question_1->setId(422);
+		$question_1->setFormId(5);
+		$question_1->setOrder(1);
+
+		$question_2 = new Question();
+		$question_2->setId(423);
+		$question_2->setFormId(5);
+		$question_2->setOrder(2);
+
 		$this->submissionMapper->expects($this->any())
 			->method('findByForm')
 			->willReturnCallback(function ($formId, $userId = null) use ($submission_1, $submission_2) {
@@ -151,6 +161,11 @@ class SubmissionServiceTest extends TestCase {
 				[42, [$answer_1, $answer_2]],
 				[43, []]
 			]);
+
+		$this->questionMapper->expects($this->any())
+			->method('findByForm')
+			->with(5)
+			->willReturn([$question_1, $question_2]);
 
 		$expected = [
 			[
@@ -207,6 +222,16 @@ class SubmissionServiceTest extends TestCase {
 		$answer_2->setQuestionId(423);
 		$answer_2->setText('Just some more Text');
 
+		$question_1 = new Question();
+		$question_1->setId(422);
+		$question_1->setFormId(5);
+		$question_1->setOrder(1);
+
+		$question_2 = new Question();
+		$question_2->setId(423);
+		$question_2->setFormId(5);
+		$question_2->setOrder(2);
+
 		$this->submissionMapper->expects($this->once())
 			->method('findById')
 			->with(42)
@@ -217,6 +242,11 @@ class SubmissionServiceTest extends TestCase {
 			->willReturnMap([
 				[42, [$answer_1, $answer_2]]
 			]);
+
+		$this->questionMapper->expects($this->any())
+			->method('findByForm')
+			->with(5)
+			->willReturn([$question_1, $question_2]);
 
 		$expected = [
 			'id' => 42,
