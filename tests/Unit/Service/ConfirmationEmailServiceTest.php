@@ -423,13 +423,7 @@ class ConfirmationEmailServiceTest extends TestCase {
 		$form = new Form();
 		$form->setId(1);
 
-		$question = new Question();
-		$question->setFormId(1);
-		$question->setOrder(0);
-		$question->setType(Constants::ANSWER_TYPE_SHORT);
-		$question->setExtraSettings(['validationType' => 'email']);
-
-		$this->questionMapper->method('findById')->willReturn($question);
+		$this->questionMapper->method('findById')->willThrowException(new DoesNotExistException('Question not found'));
 		$this->expectException(\InvalidArgumentException::class);
 		$this->service->validateRecipientQuestionId($form, 7);
 	}
