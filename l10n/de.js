@@ -79,6 +79,7 @@ OC.L10N.register(
     "Allow showing form to all logged in accounts on sidebar" : "Anzeige des Formulars in der Seitenleiste für alle angemeldeten Konten zulassen",
     "Comments" : "Kommentare",
     "Allow comments" : "Kommentare erlauben",
+    "{type}, back to all question types" : "{type}, zurück zu allen Fragetypen",
     "Grid" : "Raster",
     "Form closed" : "Formular geschlossen",
     "Opens {relativeDate}" : "Öffnet sich {relativeDate}",
