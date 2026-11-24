@@ -881,23 +881,48 @@ export default defineComponent({
 		})
 
 		/**
-		 * The numeric answers given to a linear scale question within its scale in ascending order,
-		 * taken from the answer counts of the bars; empty for other question types.
+		 * The answers to a linear scale question within its scale as each answered value with its
+		 * answer count, in ascending order of the values, taken from the bars; empty for other question types.
 		 */
-		const numericValues = computed<number[]>(() => {
+		const scaleCounts = computed<Array<{ value: number; count: number }>>(() => {
 			if (props.question.type !== 'linearscale') {
 				return []
 			}
 			return questionOptions.value
-				.filter((option) => option.id >= 0)
+				.filter((option) => option.id >= 0 && option.count > 0)
 				.map((option) => ({
 					value: parseFloat(option.text),
 					count: option.count,
 				}))
 				.filter(({ value }) => !isNaN(value))
 				.sort((a, b) => a.value - b.value)
-				.flatMap(({ value, count }) => Array<number>(count).fill(value))
 		})
+
+		/**
+		 * The number of answers within the scale whose value passes a test
+		 *
+		 * @param test the test for a value, every value without one
+		 */
+		const countAnswers = (test: (value: number) => boolean = () => true) =>
+			scaleCounts.value
+				.filter(({ value }) => test(value))
+				.reduce((total, { count }) => total + count, 0)
+
+		/**
+		 * The value at a position among all answers within the scale in ascending order
+		 *
+		 * @param position the position, from 0
+		 */
+		const valueAt = (position: number): number => {
+			let seen = 0
+			for (const { value, count } of scaleCounts.value) {
+				seen += count
+				if (position < seen) {
+					return value
+				}
+			}
+			return NaN
+		}
 
 		/**
 		 * Answer count, average and median of a linear scale question;
@@ -907,21 +932,22 @@ export default defineComponent({
 			if (isRating.value) {
 				return null
 			}
-			const values = numericValues.value
-			if (values.length === 0) {
+			const count = countAnswers()
+			if (count === 0) {
 				return null
 			}
-			const middle = Math.floor(values.length / 2)
-			const median =
-				values.length % 2
-					? values[middle]
-					: (values[middle - 1] + values[middle]) / 2
-			const sum = values.reduce((a, b) => a + b, 0)
+			const sum = scaleCounts.value.reduce(
+				(total, { value, count }) => total + value * count,
+				0,
+			)
 
 			return {
-				count: values.length,
-				mean: sum / values.length,
-				median,
+				count,
+				mean: sum / count,
+				median:
+					(valueAt(Math.floor((count - 1) / 2))
+						+ valueAt(Math.floor(count / 2)))
+					/ 2,
 			}
 		})
 
@@ -934,15 +960,14 @@ export default defineComponent({
 			if (!isPromoter.value) {
 				return null
 			}
-			const values = numericValues.value
-			if (values.length === 0) {
+			const total = countAnswers()
+			if (total === 0) {
 				return null
 			}
-			const promoters = values.filter((value) => value >= 9).length
-			const detractors = values.filter((value) => value <= 6).length
-			const passives = values.length - promoters - detractors
-			const share = (count: number) =>
-				Math.round((count * 100) / values.length)
+			const promoters = countAnswers((value) => value >= 9)
+			const detractors = countAnswers((value) => value <= 6)
+			const passives = total - promoters - detractors
+			const share = (count: number) => Math.round((count * 100) / total)
 			return {
 				counts: { detractors, passives, promoters },
 				promoters: share(promoters),

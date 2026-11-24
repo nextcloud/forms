@@ -126,13 +126,14 @@ test('A plain 0 to 10 scale shows no promoter score', async ({
 		page.request,
 		null,
 		{ optionsLowest: 0, optionsHighest: 10 },
-		['10', '3'],
+		['10', '3', '4'],
 	)
 	await page.goto(`apps/forms/${form.hash}/results`)
 	await page.waitForURL(/\/results\/summary$/)
 
 	const summary = resultsView.getSummaryForQuestion('Recommend')
-	await expect(summary.locator('dt:text-is("Average") + dd')).toHaveText('6.5')
+	await expect(summary.locator('dt:text-is("Average") + dd')).toHaveText('5.7')
+	await expect(summary.locator('dt:text-is("Median") + dd')).toHaveText('4')
 	await expect(summary.getByText(/Promoter score/)).toHaveCount(0)
 })
 
