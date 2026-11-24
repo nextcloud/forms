@@ -368,6 +368,19 @@ export default defineComponent({
 	},
 
 	setup(props) {
+		const isRating = computed(
+			() =>
+				props.question.type === 'linearscale'
+				&& props.question.extraSettings?.questionType
+					=== LinearScaleType.Rating,
+		)
+		const isPromoter = computed(
+			() =>
+				props.question.type === 'linearscale'
+				&& props.question.extraSettings?.questionType
+					=== LinearScaleType.Promoter,
+		)
+
 		const questionTypeLabel = computed(() => {
 			const label = answerTypes[props.question.type]?.label ?? ''
 
@@ -391,11 +404,7 @@ export default defineComponent({
 				}
 			}
 
-			if (
-				props.question.type === 'linearscale'
-				&& props.question.extraSettings?.questionType
-					=== LinearScaleType.Rating
-			) {
+			if (isRating.value) {
 				return `${label} (${t('forms', 'Rating')})`
 			}
 
@@ -744,11 +753,7 @@ export default defineComponent({
 		})
 
 		const ratingSummary = computed(() => {
-			if (
-				props.question.type !== 'linearscale'
-				|| props.question.extraSettings?.questionType
-					!== LinearScaleType.Rating
-			) {
+			if (!isRating.value) {
 				return null
 			}
 			const highest = props.question.extraSettings?.optionsHighest ?? 5
@@ -899,9 +904,7 @@ export default defineComponent({
 		 * null without answers and for a rating.
 		 */
 		const numericStats = computed(() => {
-			if (
-				props.question.extraSettings?.questionType === LinearScaleType.Rating
-			) {
+			if (isRating.value) {
 				return null
 			}
 			const values = numericValues.value
@@ -928,10 +931,7 @@ export default defineComponent({
 		 * split. Null unless the question has the promoter sub type and answers.
 		 */
 		const promoterBreakdown = computed(() => {
-			if (
-				props.question.extraSettings?.questionType
-				!== LinearScaleType.Promoter
-			) {
+			if (!isPromoter.value) {
 				return null
 			}
 			const values = numericValues.value
