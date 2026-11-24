@@ -5,6 +5,36 @@
 
 # Changelog
 
+## v5.4.4 - 2026-11-24
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.3...v5.4.4)
+
+### Fixed
+
+- fix: unify checks for deleted questions and don't load submissions to deleted questions by @Chartman123 in [\#4017](https://github.com/nextcloud/forms/pull/4017)
+- fix(a11y): use correct color for invalid question indicator by @Chartman123 in [\#4014](https://github.com/nextcloud/forms/pull/4014)
+- fix(a11y): keep a single main landmark in embedded forms by @AndyScherzinger in [\#4013](https://github.com/nextcloud/forms/pull/4013)
+- fix(export): keep cells under their headers for empty grid and ranking answers by @AndyScherzinger in [\#4001](https://github.com/nextcloud/forms/pull/4001)
+- fix(api): add options only to questions that take them by @AndyScherzinger in [\#4000](https://github.com/nextcloud/forms/pull/4000)
+- docs(api): say that a question type without sub types rejects one by @AndyScherzinger in [\#3998](https://github.com/nextcloud/forms/pull/3998)
+- fix(results): show no empty parentheses for a scale without labels by @AndyScherzinger in [\#3997](https://github.com/nextcloud/forms/pull/3997)
+- fix(a11y): keep result bars visible in forced colors and name ranking bars by @AndyScherzinger in [\#3991](https://github.com/nextcloud/forms/pull/3991)
+- fix(a11y): editor references and the sub menu back entry by @AndyScherzinger in [\#3990](https://github.com/nextcloud/forms/pull/3990)
+- fix(a11y): screen reader fixes for the linear scale question by @AndyScherzinger in [\#3989](https://github.com/nextcloud/forms/pull/3989)
+- fix(submit): move on past a radio group on Enter by @AndyScherzinger in [\#3988](https://github.com/nextcloud/forms/pull/3988)
+- fix(api): reject a missing or unknown grid cell type and check the sub type lock first by @AndyScherzinger in [\#3987](https://github.com/nextcloud/forms/pull/3987)
+- fix(results): draw the bar track dark in Chromium dark mode by @AndyScherzinger in [\#3985](https://github.com/nextcloud/forms/pull/3985)
+- fix(editor): show a changed extra setting immediately by @AndyScherzinger in [\#3982](https://github.com/nextcloud/forms/pull/3982)
+- fix(api): keep the sub type of a question fixed after creation by @AndyScherzinger in [\#3975](https://github.com/nextcloud/forms/pull/3975)
+- fix(results): format the summary numbers for the user's locale by @AndyScherzinger in [\#3972](https://github.com/nextcloud/forms/pull/3972)
+- fix(submit): move on to the submit button after the last answer by @AndyScherzinger in [\#3952](https://github.com/nextcloud/forms/pull/3952)
+- fix(submit): only submit the form by button or Ctrl/Cmd+Enter by @AndyScherzinger in [\#3951](https://github.com/nextcloud/forms/pull/3951)
+- fix(api): list every question type in the API description by @AndyScherzinger in [\#3950](https://github.com/nextcloud/forms/pull/3950)
+- fix(api): leave out unset extra settings when reading them by @AndyScherzinger in [\#3949](https://github.com/nextcloud/forms/pull/3949)
+- fix(edit): align the linear scale labels with the other inputs by @AndyScherzinger in [\#3947](https://github.com/nextcloud/forms/pull/3947)
+- fix(submit): tell respondents when they submit too often by @AndyScherzinger in [\#3944](https://github.com/nextcloud/forms/pull/3944)
+- fix(edit): keep focus on the used move button when reordering options by @bhardwajhimanshu2515 in [\#3937](https://github.com/nextcloud/forms/pull/3937)
+
 ## v5.4.3 - 2026-11-20
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.2...v5.4.3)
