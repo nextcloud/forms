@@ -459,6 +459,7 @@ Reorders all Questions of a single form
   | _newOrder_ | Array | Array of **all** Question-IDs, ordered in the desired order |
 - Restrictions: The Array **must** contain all Question-IDs corresponding to the specified form and **must not** contain any duplicates.
 - Response: Array of questionIDs and their corresponding order.
+  An id of a deleted question gets a **Not Found** response.
 
 ```
 "data": {
@@ -568,6 +569,7 @@ Update a single or all properties of an option-object
   | _questionId_ | Integer | ID of the question, the new option will belong to |
   | _optionId_ | Integer | ID of the option to delete |
 - Response: **Status-Code OK**, as well as the id of the deleted option.
+  An option or question that does not exist, and a deleted question, get a **Not Found** response.
 
 ```
 "data": 7
@@ -672,6 +674,7 @@ Get all Submissions to a Form
   | _limit_ | Integer | How many items to get |
   | _offset_ | Integer | How many items to skip for a pagination |
 - Response: An Array of all submissions, sorted as newest first, as well as an array of the corresponding questions.
+  Answers to deleted questions are left out, and the search does not match them.
 
 ```
 "data": {
@@ -775,7 +778,7 @@ Returns all submissions to the form in form of a csv-file.
   |--------------|---------|-------------|
   | _formId_ | Integer | Id of the form to get the submissions for |
   | _fileFormat_ | String | `csv|ods|xlsx` |
-- Response: A Data Download Response containing the headers `Content-Disposition: attachment; filename="Form 1 (responses).csv"` and `Content-Type: text/csv;charset=UTF-8`. The actual data contains all submissions to the referred form, formatted as comma separated and escaped csv. For file format `ods` or `xlsx` the Download Response contains an Open Document Spreadsheet or an Office Open XML Spreadsheet file.
+- Response: A Data Download Response containing the headers `Content-Disposition: attachment; filename="Form 1 (responses).csv"` and `Content-Type: text/csv;charset=UTF-8`. The actual data contains all submissions to the referred form, without answers to deleted questions, formatted as comma separated and escaped csv. For file format `ods` or `xlsx` the Download Response contains an Open Document Spreadsheet or an Office Open XML Spreadsheet file.
 
 ```
 "User display name","Timestamp","Question 1","Question 2"
@@ -836,6 +839,7 @@ Upload a file to an answer before form submission
   |--------------|----------------|-------------|
   | _files_ | Array of files | Files to upload |
 - Response: **Status-Code OK**, as well as the id of the uploaded file and it's name.
+  An upload for a question that is not a file question gets a **Bad Request** response, and a deleted question gets a **Not Found** response.
 
 ```
 "data": {"uploadedFileId": integer, "fileName": "string"}
