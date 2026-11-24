@@ -129,6 +129,39 @@ export function isAllowedTarget(
 }
 
 /**
+ * The questions with the sections in a new order, each section followed by its questions; questions before the first section stay first, sections missing from the order keep their place after the others
+ *
+ * @param questions the questions and sections in their order
+ * @param sectionIds the ids of the sections in their new order
+ */
+export function reorderSections<T extends { id: number; type: string }>(
+	questions: T[],
+	sectionIds: number[],
+): T[] {
+	const first = questions.findIndex(
+		(question) => question.type === QUESTION_TYPE_SECTION,
+	)
+	if (first === -1) {
+		return questions
+	}
+	const blocks: T[][] = []
+	for (const question of questions.slice(first)) {
+		if (question.type === QUESTION_TYPE_SECTION) {
+			blocks.push([])
+		}
+		blocks[blocks.length - 1].push(question)
+	}
+	const rank = (block: T[]): number => {
+		const position = sectionIds.indexOf(block[0].id)
+		return position === -1 ? sectionIds.length : position
+	}
+	return [
+		...questions.slice(0, first),
+		...blocks.sort((a, b) => rank(a) - rank(b)).flat(),
+	]
+}
+
+/**
  * The pages of the questions on a path: a page starts at each section, questions before the first section form the first page
  *
  * @param questions the questions and sections on the path, in their order

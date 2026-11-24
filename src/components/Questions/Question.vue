@@ -21,7 +21,7 @@
 		<!-- Drag handle -->
 		<!-- TODO: implement arrow key mapping to reorder question -->
 		<div
-			v-if="!readOnly"
+			v-if="!readOnly && !isSection"
 			class="question__drag-handle"
 			:class="{
 				'question__drag-handle--shiftup': shiftDragHandle,
@@ -144,6 +144,15 @@
 							}}
 						</NcActionCheckbox>
 						<slot name="actions" />
+						<NcActionButton
+							v-if="isSection && (canMoveUp || canMoveDown)"
+							closeAfterClick
+							@click="$emit('moveSection')">
+							<template #icon>
+								<NcIconSvgWrapper :svg="IconSwapVert" />
+							</template>
+							{{ t('forms', 'Move section') }}
+						</NcActionButton>
 						<NcActionInput
 							v-if="!isSection"
 							:label="t('forms', 'Technical name of the question')"
@@ -263,6 +272,7 @@ import IconAlertCircleOutline from '@material-symbols/svg-400/outlined/error.svg
 import IconArrowDown from '@material-symbols/svg-400/outlined/keyboard_arrow_down.svg?raw'
 import IconArrowUp from '@material-symbols/svg-400/outlined/keyboard_arrow_up.svg?raw'
 import IconDotsHorizontal from '@material-symbols/svg-400/outlined/more_horiz.svg?raw'
+import IconSwapVert from '@material-symbols/svg-400/outlined/swap_vert.svg?raw'
 import { t } from '@nextcloud/l10n'
 import {
 	computed,
@@ -409,6 +419,7 @@ export default defineComponent({
 		'update:isRequired',
 		'moveDown',
 		'moveUp',
+		'moveSection',
 		'delete',
 		'clone',
 	],
@@ -588,6 +599,7 @@ export default defineComponent({
 			IconArrowDown,
 			IconArrowUp,
 			IconContentCopy,
+			IconSwapVert,
 			IconDelete,
 			IconDotsHorizontal,
 			IconDragIndicator,

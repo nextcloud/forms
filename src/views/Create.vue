@@ -176,12 +176,8 @@
 							:ref="registerQuestionRef(question)"
 							:class="sectionFrames[index]"
 							v-bind="form.questions[index]"
-							:canMoveDown="
-								!isChangingQuestions && canSwapWithNext(index)
-							"
-							:canMoveUp="
-								!isChangingQuestions && canSwapWithNext(index - 1)
-							"
+							:canMoveDown="!isChangingQuestions && canMoveDown(index)"
+							:canMoveUp="!isChangingQuestions && canMoveUp(index)"
 							:answerType="answerTypes[question.type]"
 							:index="questionNumbers.get(question.id)"
 							:maxStringLengths="maxStringLengths"
@@ -200,7 +196,8 @@
 							@clone="cloneQuestion(question, index)"
 							@delete="onDelete(question.id)"
 							@moveDown="onMoveDown(index)"
-							@moveUp="onMoveUp(index)">
+							@moveUp="onMoveUp(index)"
+							@moveSection="reorderSectionsFrom = question.id">
 							<template
 								v-if="index < form.questions.length - 1"
 								#insert>
@@ -270,6 +267,11 @@
 						primary
 						@addQuestion="addQuestion" />
 				</div>
+				<ReorderSectionsDialog
+					:open="reorderSectionsFrom !== null"
+					:sections="sections"
+					@update:open="closeReorderSections"
+					@save="onReorderSections" />
 			</section>
 		</template>
 	</NcAppContent>
@@ -310,6 +312,7 @@ import Question from '../components/Questions/Question.vue'
 import QuestionLong from '../components/Questions/QuestionLong.vue'
 import QuestionMultiple from '../components/Questions/QuestionMultiple.vue'
 import QuestionShort from '../components/Questions/QuestionShort.vue'
+import ReorderSectionsDialog from '../components/ReorderSectionsDialog.vue'
 import TopBar from '../components/TopBar.vue'
 import { FORM_JUMP_ISSUES_KEY, FORM_QUESTIONS_KEY } from '../composables/useJumps.ts'
 import { queueQuestionRequest } from '../composables/useQuestion.ts'
@@ -330,6 +333,7 @@ import {
 	countQuestionsOutsideSections,
 	getNumbers,
 	QUESTION_TYPE_SECTION,
+	reorderSections,
 	STUCK_SECTION_KEY,
 	withNextSectionMovedUp,
 } from '../utils/Sections.ts'
@@ -350,6 +354,7 @@ export default defineComponent({
 		Draggable,
 		NcIconSvgWrapper,
 		AddQuestionMenu,
+		ReorderSectionsDialog,
 		NcAppContent,
 		NcEmptyContent,
 		NcLoadingIcon,
@@ -469,6 +474,7 @@ export default defineComponent({
 		const questionMenuOpened = ref<boolean>(false)
 		const activeQuestionType = ref<string | null>(null)
 		const questionRefsMap = ref<Record<number, QuestionRefInstance>>({})
+		const reorderSectionsFrom = ref<number | null>(null)
 		// when set to a number, the next created question will be inserted at this index
 		const insertMenuOpenedIndex = ref<number | null>(null)
 		// controls per-question insert menu visibility
@@ -866,26 +872,45 @@ export default defineComponent({
 		}
 
 		/**
-		 * The closing question of a move confirmation, naming the moved question or section
+		 * The closing question of a move confirmation, naming the moved question, section or sections
 		 *
-		 * @param moved the moved question or section
+		 * @param moved the moved question, section or sections
 		 */
-		const moveBackText = (moved: FormsQuestion | undefined): string =>
-			moved?.type === QUESTION_TYPE_SECTION
+		const moveBackText = (moved: FormsQuestion[]): string => {
+			const options = { escape: false, sanitize: false }
+			if (moved.length > 1) {
+				return t(
+					'forms',
+					'Move the sections {sections} back, or remove these jumps?',
+					{
+						sections: formatList(
+							moved.map(
+								({ text }) =>
+									`"${text || t('forms', 'Untitled section')}"`,
+							),
+							getLanguage(),
+						),
+					},
+					undefined,
+					options,
+				)
+			}
+			return moved[0]?.type === QUESTION_TYPE_SECTION
 				? t(
 						'forms',
 						'Move the section "{title}" back, or remove these jumps?',
-						{ title: moved.text || t('forms', 'Untitled section') },
+						{ title: moved[0].text || t('forms', 'Untitled section') },
 						undefined,
-						{ escape: false, sanitize: false },
+						options,
 					)
 				: t(
 						'forms',
 						'Move the question "{title}" back, or remove these jumps?',
-						{ title: moved?.text || t('forms', 'Untitled question') },
+						{ title: moved[0]?.text || t('forms', 'Untitled question') },
 						undefined,
-						{ escape: false, sanitize: false },
+						options,
 					)
+		}
 
 		/**
 		 * Ask whether to remove the jumps that a new order of the questions would turn into jumps to an earlier question or into the middle of another section, or to move the moved question back
@@ -893,14 +918,14 @@ export default defineComponent({
 		 * @param questions the questions in the new order
 		 * @param ids the ids of the questions with jumps to an earlier question
 		 * @param intoSectionIds the ids of the other questions with jumps into the middle of another section
-		 * @param moved the moved question or section
+		 * @param moved the moved question, section or sections
 		 * @return whether to remove the jumps
 		 */
 		const confirmRemovingBackwardJumps = async (
 			questions: FormsQuestion[],
 			ids: number[],
 			intoSectionIds: number[],
-			moved: FormsQuestion | undefined,
+			moved: FormsQuestion[],
 		): Promise<boolean> => {
 			try {
 				if (ids.length === 0) {
@@ -969,11 +994,11 @@ export default defineComponent({
 		 * Reorder questions on dragEnd
 		 *
 		 * @param questions the freshly reordered questions (avoids reading the not-yet-updated `form` prop)
-		 * @param moved the question the user moved
+		 * @param moved the question, section or sections the user moved
 		 */
 		const onQuestionOrderChange = async (
 			questions: FormsQuestion[],
-			moved?: FormsQuestion,
+			moved: FormsQuestion[] = [],
 		): Promise<void> => {
 			const formId = props.form.id
 			const oldQuestions = props.form.questions
@@ -1101,7 +1126,7 @@ export default defineComponent({
 				questions[index - 1],
 			]
 			emit('update:form', { ...props.form, questions })
-			onQuestionOrderChange(questions, moved)
+			onQuestionOrderChange(questions, [moved])
 		}
 
 		/**
@@ -1118,6 +1143,77 @@ export default defineComponent({
 					|| questions[index].type !== QUESTION_TYPE_SECTION
 					|| questions[index + 1].type === QUESTION_TYPE_SECTION)
 			)
+		}
+
+		/**
+		 * Whether the question at a position can move up without leaving the first section; a section, whether another section is before it
+		 *
+		 * @param index the position of the question
+		 */
+		const canMoveUp = (index: number): boolean =>
+			props.form.questions[index]?.type === QUESTION_TYPE_SECTION
+				? props.form.questions
+						.slice(0, index)
+						.some((question) => question.type === QUESTION_TYPE_SECTION)
+				: canSwapWithNext(index - 1)
+
+		/**
+		 * Whether the question at a position can move down; a section, whether another section is after it
+		 *
+		 * @param index the position of the question
+		 */
+		const canMoveDown = (index: number): boolean =>
+			props.form.questions[index]?.type === QUESTION_TYPE_SECTION
+				? props.form.questions
+						.slice(index + 1)
+						.some((question) => question.type === QUESTION_TYPE_SECTION)
+				: canSwapWithNext(index)
+
+		const sections = computed(() =>
+			props.form.questions.filter(
+				(question) => question.type === QUESTION_TYPE_SECTION,
+			),
+		)
+
+		/**
+		 * Focus the title of a question or section
+		 *
+		 * @param id the id of the question or section
+		 */
+		const focusQuestion = (id: number | null): void => {
+			nextTick(() => {
+				if (id !== null) {
+					questionRefsMap.value[id]?.focus?.()
+				}
+			})
+		}
+
+		/**
+		 * Close the reorder sections dialog and focus the section it was opened from
+		 */
+		const closeReorderSections = (): void => {
+			focusQuestion(reorderSectionsFrom.value)
+			reorderSectionsFrom.value = null
+		}
+
+		/**
+		 * Move the sections with their questions into a new order, then focus the section the dialog was opened from
+		 *
+		 * @param sectionIds the ids of the sections in their new order
+		 * @param movedIds the ids of the sections the user moved
+		 */
+		const onReorderSections = async (
+			sectionIds: number[],
+			movedIds: number[],
+		): Promise<void> => {
+			const id = reorderSectionsFrom.value
+			const questions = reorderSections(props.form.questions, sectionIds)
+			emit('update:form', { ...props.form, questions })
+			await onQuestionOrderChange(
+				questions,
+				sections.value.filter((section) => movedIds.includes(section.id)),
+			)
+			focusQuestion(id)
 		}
 
 		const onMoveUp = (index: number): void => {
@@ -1520,7 +1616,7 @@ export default defineComponent({
 			emit('update:form', { ...props.form, questions })
 			onQuestionOrderChange(
 				questions,
-				questions.find(({ id }) => id === draggedId),
+				questions.filter(({ id }) => id === draggedId),
 			)
 		}
 
@@ -1602,7 +1698,6 @@ export default defineComponent({
 			updateQuestionName,
 			updateQuestionExtraSettings,
 			updateQuestionOptions,
-			canSwapWithNext,
 			onMoveUp,
 			onMoveDown,
 			onTitleInput,
@@ -1610,6 +1705,12 @@ export default defineComponent({
 			resizeTitle,
 			resizeDescription,
 			addQuestion,
+			canMoveDown,
+			canMoveUp,
+			closeReorderSections,
+			onReorderSections,
+			reorderSectionsFrom,
+			sections,
 			onDelete,
 			insertQuestion,
 			cloneQuestion,
