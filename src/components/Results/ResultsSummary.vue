@@ -12,6 +12,49 @@
 			{{ questionTypeLabel }}
 		</p>
 
+		<dl v-if="numericStats" class="question-summary__figures">
+			<div>
+				<dt>{{ t('forms', 'Answers') }}</dt>
+				<dd>{{ formatCount(numericStats.count) }}</dd>
+			</div>
+			<div>
+				<dt>{{ t('forms', 'Average') }}</dt>
+				<dd>{{ oneDecimal.format(numericStats.mean) }}</dd>
+			</div>
+			<div>
+				<dt>{{ t('forms', 'Median') }}</dt>
+				<dd>{{ formatCount(numericStats.median) }}</dd>
+			</div>
+			<div v-if="promoterBreakdown" class="question-summary__figures-promoter">
+				<dt>
+					{{ t('forms', 'Promoter score') }}
+					<span class="hidden-visually">
+						{{ t('forms', '(promoters − detractors)') }}
+					</span>
+				</dt>
+				<dd>
+					<bdi>{{ formatScore(promoterBreakdown.score) }}</bdi>
+				</dd>
+				<dd class="question-summary__figures-split" aria-hidden="true">
+					<span
+						v-for="group in promoterGroups"
+						v-show="promoterBreakdown.counts[group] > 0"
+						:key="group"
+						:class="`question-summary__figures-split--${group}`"
+						:style="{ flexGrow: promoterBreakdown.counts[group] }" />
+				</dd>
+				<dd class="question-summary__figures-detail">
+					{{
+						formatPromoterShares(
+							promoterBreakdown.detractors,
+							promoterBreakdown.passives,
+							promoterBreakdown.promoters,
+						)
+					}}
+				</dd>
+			</div>
+		</dl>
+
 		<div
 			v-if="ratingSummary"
 			class="question-summary__rating"
@@ -233,7 +276,12 @@ import { generateUrl } from '@nextcloud/router'
 import { computed, defineComponent } from 'vue'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import answerTypes from '../../models/AnswerTypes.ts'
-import { GridCellType, LinearScaleType, OptionType } from '../../models/Constants.ts'
+import {
+	getLinearScaleDefaultLabels,
+	GridCellType,
+	LinearScaleType,
+	OptionType,
+} from '../../models/Constants.ts'
 import { getRatingIcon } from '../../models/RatingIcons.ts'
 
 const RATING_ICON_SIZE = 28
@@ -253,6 +301,7 @@ const oneDecimal = new Intl.NumberFormat(locale, {
 	maximumFractionDigits: 1,
 })
 const percent = new Intl.NumberFormat(locale, { style: 'percent' })
+const signedCount = new Intl.NumberFormat(locale, { signDisplay: 'exceptZero' })
 
 /**
  * Format a percentage from 0 to 100 for the user's locale
@@ -261,6 +310,42 @@ const percent = new Intl.NumberFormat(locale, { style: 'percent' })
  */
 function formatPercent(percentage: number): string {
 	return percent.format(percentage / 100)
+}
+
+/**
+ * The shares of detractors, passives and promoters as text, e.g. "25% detractors · 25% passives · 50% promoters"
+ *
+ * @param detractors the share of detractors in percent
+ * @param passives the share of passives in percent
+ * @param promoters the share of promoters in percent
+ */
+function formatPromoterShares(
+	detractors: number,
+	passives: number,
+	promoters: number,
+): string {
+	// TRANSLATORS {detractors}, {passives} and {promoters} are percentages, e.g. "25% detractors · 25% passives · 50% promoters"
+	return t(
+		'forms',
+		'{detractors} detractors · {passives} passives · {promoters} promoters',
+		{
+			detractors: formatPercent(detractors),
+			passives: formatPercent(passives),
+			promoters: formatPercent(promoters),
+		},
+	)
+}
+
+/**
+ * The promoter score with its sign, e.g. "+11", "0" or "−25"
+ *
+ * @param score the promoter score
+ */
+function formatScore(score: number): string {
+	return signedCount
+		.formatToParts(score)
+		.map((part) => (part.type === 'minusSign' ? '−' : part.value))
+		.join('')
 }
 
 export default defineComponent({
@@ -283,6 +368,19 @@ export default defineComponent({
 	},
 
 	setup(props) {
+		const isRating = computed(
+			() =>
+				props.question.type === 'linearscale'
+				&& props.question.extraSettings?.questionType
+					=== LinearScaleType.Rating,
+		)
+		const isPromoter = computed(
+			() =>
+				props.question.type === 'linearscale'
+				&& props.question.extraSettings?.questionType
+					=== LinearScaleType.Promoter,
+		)
+
 		const questionTypeLabel = computed(() => {
 			const label = answerTypes[props.question.type]?.label ?? ''
 
@@ -306,21 +404,20 @@ export default defineComponent({
 				}
 			}
 
-			if (
-				props.question.type === 'linearscale'
-				&& props.question.extraSettings?.questionType
-					=== LinearScaleType.Rating
-			) {
+			if (isRating.value) {
 				return `${label} (${t('forms', 'Rating')})`
 			}
 
 			if (props.question.type === 'linearscale') {
+				const defaultLabels = getLinearScaleDefaultLabels(
+					props.question.extraSettings?.questionType,
+				)
 				const labelLowest =
 					props.question.extraSettings?.optionsLabelLowest
-					?? t('forms', 'Strongly disagree')
+					?? defaultLabels.lowest
 				const labelHighest =
 					props.question.extraSettings?.optionsLabelHighest
-					?? t('forms', 'Strongly agree')
+					?? defaultLabels.highest
 				const optionsLowest =
 					props.question.extraSettings?.optionsLowest?.toString() ?? '1'
 				const optionsHighest =
@@ -656,11 +753,7 @@ export default defineComponent({
 		})
 
 		const ratingSummary = computed(() => {
-			if (
-				props.question.type !== 'linearscale'
-				|| props.question.extraSettings?.questionType
-					!== LinearScaleType.Rating
-			) {
+			if (!isRating.value) {
 				return null
 			}
 			const highest = props.question.extraSettings?.optionsHighest ?? 5
@@ -787,9 +880,108 @@ export default defineComponent({
 			return answersModels
 		})
 
+		/**
+		 * The answers to a linear scale question within its scale as each answered value with its
+		 * answer count, in ascending order of the values, taken from the bars; empty for other question types.
+		 */
+		const scaleCounts = computed<Array<{ value: number; count: number }>>(() => {
+			if (props.question.type !== 'linearscale') {
+				return []
+			}
+			return questionOptions.value
+				.filter((option) => option.id >= 0 && option.count > 0)
+				.map((option) => ({
+					value: parseFloat(option.text),
+					count: option.count,
+				}))
+				.filter(({ value }) => !isNaN(value))
+				.sort((a, b) => a.value - b.value)
+		})
+
+		/**
+		 * The number of answers within the scale whose value passes a test
+		 *
+		 * @param test the test for a value, every value without one
+		 */
+		const countAnswers = (test: (value: number) => boolean = () => true) =>
+			scaleCounts.value
+				.filter(({ value }) => test(value))
+				.reduce((total, { count }) => total + count, 0)
+
+		/**
+		 * The value at a position among all answers within the scale in ascending order
+		 *
+		 * @param position the position, from 0
+		 */
+		const valueAt = (position: number): number => {
+			let seen = 0
+			for (const { value, count } of scaleCounts.value) {
+				seen += count
+				if (position < seen) {
+					return value
+				}
+			}
+			return NaN
+		}
+
+		/**
+		 * Answer count, average and median of a linear scale question;
+		 * null without answers and for a rating.
+		 */
+		const numericStats = computed(() => {
+			if (isRating.value) {
+				return null
+			}
+			const count = countAnswers()
+			if (count === 0) {
+				return null
+			}
+			const sum = scaleCounts.value.reduce(
+				(total, { value, count }) => total + value * count,
+				0,
+			)
+
+			return {
+				count,
+				mean: sum / count,
+				median:
+					(valueAt(Math.floor((count - 1) / 2))
+						+ valueAt(Math.floor(count / 2)))
+					/ 2,
+			}
+		})
+
+		/**
+		 * Answers per group, detractor, passive and promoter shares in percent and the promoter
+		 * score, the difference of the promoter and detractor shares, using the 9-10 / 7-8 / 0-6
+		 * split. Null unless the question has the promoter sub type and answers.
+		 */
+		const promoterBreakdown = computed(() => {
+			if (!isPromoter.value) {
+				return null
+			}
+			const total = countAnswers()
+			if (total === 0) {
+				return null
+			}
+			const promoters = countAnswers((value) => value >= 9)
+			const detractors = countAnswers((value) => value <= 6)
+			const passives = total - promoters - detractors
+			const share = (count: number) => Math.round((count * 100) / total)
+			return {
+				counts: { detractors, passives, promoters },
+				promoters: share(promoters),
+				passives: share(passives),
+				detractors: share(detractors),
+				score: share(promoters) - share(detractors),
+			}
+		})
+
 		return {
 			IconFile,
 			answerTypes,
+			numericStats,
+			promoterBreakdown,
 			questionTypeLabel,
 			averageRating,
 			ratingSummary,
@@ -802,6 +994,10 @@ export default defineComponent({
 			answers,
 			formatCount,
 			formatPercent,
+			formatPromoterShares,
+			formatScore,
+			promoterGroups: ['detractors', 'passives', 'promoters'] as const,
+			oneDecimal,
 			t,
 		}
 	},
@@ -810,6 +1006,7 @@ export default defineComponent({
 
 <style lang="scss" scoped>
 .question-summary {
+	container-type: inline-size;
 	padding-inline: var(--default-clickable-area) 16px;
 
 	h3 {
@@ -1003,6 +1200,103 @@ export default defineComponent({
 			text-align: start;
 			position: sticky;
 			inset-inline-start: 0;
+		}
+	}
+}
+
+.question-summary__figures {
+	display: grid;
+	gap: calc(var(--default-grid-baseline) * 2);
+	grid-template-columns: repeat(3, 1fr);
+	margin-block: calc(var(--default-grid-baseline) * 3)
+		calc(var(--default-grid-baseline) * 4);
+	padding: 0;
+
+	@container (max-width: 375px) {
+		grid-template-columns: repeat(2, 1fr);
+
+		> div:nth-child(3) {
+			grid-column: span 2;
+		}
+	}
+
+	> div {
+		background-color: var(--color-background-hover);
+		border-radius: var(--border-radius-large);
+		padding: calc(var(--default-grid-baseline) * 2)
+			calc(var(--default-grid-baseline) * 3);
+	}
+
+	dt,
+	dd {
+		display: block;
+		width: auto;
+		margin: 0;
+		padding: 0;
+		white-space: normal;
+		text-align: start;
+	}
+
+	dt {
+		color: var(--color-text-maxcontrast);
+		font-size: var(--default-font-size);
+	}
+
+	dd {
+		font-size: 1.5em;
+		font-weight: bold;
+	}
+
+	> div.question-summary__figures-promoter {
+		grid-column: 1 / -1;
+	}
+
+	dd.question-summary__figures-detail {
+		color: var(--color-text-maxcontrast);
+		font-size: var(--default-font-size);
+		font-weight: normal;
+	}
+
+	dd.question-summary__figures-split {
+		border-radius: var(--border-radius-pill);
+		display: flex;
+		gap: 2px;
+		height: calc(var(--default-grid-baseline) * 2);
+		margin-block: var(--default-grid-baseline);
+		overflow: hidden;
+
+		> span {
+			flex-basis: 0;
+		}
+	}
+
+	.question-summary__figures-split--detractors {
+		background-color: var(--color-element-error);
+	}
+
+	.question-summary__figures-split--passives {
+		background-color: var(--color-element-warning);
+	}
+
+	.question-summary__figures-split--promoters {
+		background-color: var(--color-element-success);
+	}
+
+	@media (forced-colors: active) {
+		dd.question-summary__figures-split {
+			border: 1px solid CanvasText;
+		}
+
+		.question-summary__figures-split--detractors {
+			background-color: CanvasText;
+		}
+
+		.question-summary__figures-split--passives {
+			background-color: GrayText;
+		}
+
+		.question-summary__figures-split--promoters {
+			background-color: Highlight;
 		}
 	}
 }

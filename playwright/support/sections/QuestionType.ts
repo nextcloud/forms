@@ -33,4 +33,5 @@ export enum GridSubtype {
 export enum LinearScaleSubtype {
 	Numbers = 'Numbers',
 	Rating = 'Rating',
+	Promoter = 'Promoter score',
 }

@@ -1814,12 +1814,21 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->newQuestion(1, null, null, '', 7);
 	}
 
-	public function testNewQuestionRatingSubtypeStoresSubtype(): void {
+	public static function dataNewQuestionSubtype(): array {
+		return [
+			'rating' => ['rating', ['questionType' => 'rating']],
+			'promoter score with its fixed range' => ['promoter', ['questionType' => 'promoter', 'optionsLowest' => 0, 'optionsHighest' => 10]],
+		];
+	}
+
+	/**
+	 * @dataProvider dataNewQuestionSubtype
+	 */
+	public function testNewQuestionStoresSubtype(string $subtype, array $expectedSettings): void {
 		$form = new Form();
 		$form->setId(1);
 		$form->setOwnerId('currentUser');
 
-		$expectedSettings = ['questionType' => 'rating'];
 		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
 		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
 		$this->formsService->expects($this->once())
@@ -1840,7 +1849,7 @@ class ApiControllerTest extends TestCase {
 			return $stored->read();
 		});
 
-		$response = $this->apiController->newQuestion(1, Constants::ANSWER_TYPE_LINEARSCALE, 'rating');
+		$response = $this->apiController->newQuestion(1, Constants::ANSWER_TYPE_LINEARSCALE, $subtype);
 
 		$this->assertSame($expectedSettings, $stored->getExtraSettings());
 		$this->assertSame($expectedSettings, $response->getData()['extraSettings']);

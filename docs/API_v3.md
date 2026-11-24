@@ -376,7 +376,7 @@ Returns the questions and options of the given form (without submissions).
   | Parameter | Type | Optional | Description |
   |-----------|---------|----------|-------------|
   | _type_ | [QuestionType](DataStructure.md#question-types) | | The question-type of the new question |
-  | _subtype_ | String | yes | _Optional_ The sub type, stored as `extraSettings.questionType`: the cell type for `grid` (`checkbox`, `number` or `radio`), `rating` for `linearscale` (a 1 to N scale drawn as icons). Any other value is rejected. |
+  | _subtype_ | String | yes | _Optional_ The sub type, stored as `extraSettings.questionType`: the cell type for `grid` (`checkbox`, `number` or `radio`), `rating` (a 1 to N scale drawn as icons) or `promoter` (a fixed 0 to 10 scale) for `linearscale`. Any other value is rejected. |
   | _text_ | String | yes | _Optional_ The text of the new question. |
   | _position_ | Integer | yes | _(optional)_ 1-based position to insert the new question. When omitted the question is appended at the end. |
 - Restrictions: A `grid` question needs its cell type as _subtype_. A _subtype_ for a question type without sub types is rejected with **400 Bad Request**.
@@ -457,6 +457,7 @@ Update a single or multiple properties of a question-object.
 - Restrictions:
     - It is **not allowed** to update one of the following key-value pairs: _id, formId, order, type_.
     - The sub type `extraSettings.questionType` is fixed when the question is created. An `extraSettings` value that adds, removes or changes `questionType` is rejected with **403 Forbidden**, so send the stored `questionType` with every `extraSettings` update.
+    - A promoter score question (`questionType` `promoter`) keeps `optionsLowest` at `0` and `optionsHighest` at `10`; send both with every `extraSettings` update, or it is rejected with **400 Bad Request**.
 - Response: **Status-Code OK**, as well as the id of the updated question.
 
 ```
