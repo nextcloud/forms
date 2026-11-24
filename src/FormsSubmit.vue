@@ -101,6 +101,7 @@ export default defineComponent({
 				return
 			}
 
+			document.getElementById('content')?.removeAttribute('role')
 			subscribe('forms:last-updated:set', onSubmitMessageEvent)
 
 			// Communicate window size to parent window in iframes
