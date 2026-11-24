@@ -1048,6 +1048,54 @@ class ApiV3Test extends IntegrationBase {
 		$this->assertNotContains($fileQuestionId, $questionIds);
 	}
 
+	public static function dataMissingQuestion(): array {
+		return [
+			'deleted question' => [true],
+			'unknown question' => [false],
+		];
+	}
+
+	/**
+	 * @dataProvider dataMissingQuestion
+	 */
+	public function testQuestionEndpointsRejectMissingQuestion(bool $deleted): void {
+		$formId = $this->testForms[0]['id'];
+		$questions = $this->testForms[0]['questions'];
+		$questionId = $deleted ? $questions[1]['id'] : 2147483647;
+		$optionId = $questions[1]['options'][0]['id'];
+		if ($deleted) {
+			$resp = $this->http->request('DELETE', "api/v3/forms/{$formId}/questions/{$questionId}");
+			$this->assertEquals(200, $resp->getStatusCode());
+		}
+		$newOrder = $deleted ? [$questions[0]['id'], $questionId] : [$questions[0]['id'], $questionId, $questions[2]['id']];
+
+		$requests = [
+			'get question' => ['GET', "api/v3/forms/{$formId}/questions/{$questionId}", []],
+			'update question' => ['PATCH', "api/v3/forms/{$formId}/questions/{$questionId}", ['json' => ['keyValuePairs' => ['text' => 'New text']]]],
+			'delete question' => ['DELETE', "api/v3/forms/{$formId}/questions/{$questionId}", []],
+			'clone question' => ['POST', "api/v3/forms/{$formId}/questions", ['json' => ['fromId' => $questionId]]],
+			'reorder questions' => ['PATCH', "api/v3/forms/{$formId}/questions", ['json' => ['newOrder' => $newOrder]]],
+			'new option' => ['POST', "api/v3/forms/{$formId}/questions/{$questionId}/options", ['json' => ['optionTexts' => ['New option']]]],
+			'update option' => ['PATCH', "api/v3/forms/{$formId}/questions/{$questionId}/options/{$optionId}", ['json' => ['keyValuePairs' => ['text' => 'New text']]]],
+			'delete option' => ['DELETE', "api/v3/forms/{$formId}/questions/{$questionId}/options/{$optionId}", []],
+			'reorder options' => ['PATCH', "api/v3/forms/{$formId}/questions/{$questionId}/options", ['json' => ['newOrder' => [$optionId]]]],
+			'upload file' => ['POST', "api/v3/forms/{$formId}/submissions/files/{$questionId}", ['multipart' => [['name' => 'files[]', 'contents' => 'test file content', 'filename' => 'test.txt']]]],
+		];
+		foreach ($requests as $name => [$method, $url, $options]) {
+			$resp = $this->http->request($method, $url, $options + ['http_errors' => false]);
+			$this->assertEquals(404, $resp->getStatusCode(), $name);
+		}
+	}
+
+	public function testUploadFileRejectsNonFileQuestion(): void {
+		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/submissions/files/{$this->testForms[0]['questions'][0]['id']}", [
+			'multipart' => [['name' => 'files[]', 'contents' => 'test file content', 'filename' => 'test.txt']],
+			'http_errors' => false,
+		]);
+
+		$this->assertEquals(400, $resp->getStatusCode());
+	}
+
 	public function testCloneQuestion() {
 		$resp = $this->http->request('POST', "api/v3/forms/{$this->testForms[0]['id']}/questions?fromId=" . $this->testForms[0]['questions'][0]['id']);
 		$data = $this->OcsResponse2Data($resp);
