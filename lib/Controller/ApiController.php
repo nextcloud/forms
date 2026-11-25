@@ -1645,6 +1645,8 @@ class ApiController extends OCSController {
 			'submissionUserId' => $submission->getUserId(),
 		]);
 
+		$this->formMapper->update($form);
+
 		//Create Activity
 		$this->formsService->notifyNewSubmission($form, $submission);
 
