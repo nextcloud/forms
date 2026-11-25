@@ -3,8 +3,14 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
+import type { InjectionKey, Ref } from 'vue'
+
 /** The question type of a section */
 export const QUESTION_TYPE_SECTION = 'section'
+
+/** The number of the section whose bar sticks to the top of the editor, null while none does */
+export const STUCK_SECTION_KEY: InjectionKey<Readonly<Ref<number | null>>> =
+	Symbol('forms:stuck-section')
 
 /**
  * The prefix of the element ids of a question or section: `q` or `s` with its number

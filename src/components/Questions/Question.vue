@@ -51,9 +51,23 @@
 			</NcButton>
 		</div>
 
+		<div v-if="hasSectionBar" class="question__section-bar">
+			<span class="question__section-bar__label">
+				{{
+					t('forms', 'Section {index} of {total}', {
+						index,
+						total: sectionCount,
+					})
+				}}
+			</span>
+			<div :id="sectionBarMenuId" class="question__section-bar__menu" />
+		</div>
+
 		<!-- Header -->
 		<div class="question__header">
-			<div class="question__header__title">
+			<div
+				class="question__header__title"
+				:class="{ 'question__header__title--menu-in-bar': hasSectionBar }">
 				<input
 					v-if="!readOnly"
 					:placeholder="titlePlaceholder"
@@ -89,67 +103,72 @@
 					tabindex="0">
 					<NcIconSvgWrapper :svg="IconAlertCircleOutline" />
 				</div>
-				<NcActions
+				<Teleport
 					v-if="!readOnly"
-					:id="actionsId"
-					v-model:open="isActionsOpen"
-					forceMenu
-					placement="bottom-end"
-					class="question__header__title__menu">
-					<template v-if="isRequired && !isSection" #icon>
-						<IconOverlay>
-							<template #overlay>
-								<NcIconSvgWrapper :svg="IconAsterisk" inline />
+					:to="sectionMenuTarget"
+					:disabled="!hasSectionBar"
+					defer>
+					<NcActions
+						:id="actionsId"
+						v-model:open="isActionsOpen"
+						forceMenu
+						placement="bottom-end"
+						class="question__header__title__menu">
+						<template v-if="isRequired && !isSection" #icon>
+							<IconOverlay>
+								<template #overlay>
+									<NcIconSvgWrapper :svg="IconAsterisk" inline />
+								</template>
+								<NcIconSvgWrapper :svg="IconDotsHorizontal" />
+							</IconOverlay>
+						</template>
+						<NcActionCheckbox
+							v-if="!isSection"
+							:modelValue="isRequired"
+							@update:modelValue="onRequiredChange">
+							<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
+							{{ t('forms', 'Required') }}
+						</NcActionCheckbox>
+						<NcActionCheckbox
+							v-if="jumps && (jumps.canGoTo || jumps.canNext)"
+							:modelValue="jumps.enabled"
+							@update:modelValue="onJumpsEnabledChange">
+							{{
+								jumps.canGoTo
+									? t('forms', 'Go to based on answer')
+									: t('forms', 'Go to after this question')
+							}}
+						</NcActionCheckbox>
+						<slot name="actions" />
+						<NcActionInput
+							v-if="!isSection"
+							:label="t('forms', 'Technical name of the question')"
+							:labelOutside="false"
+							:showTrailingButton="false"
+							:modelValue="name"
+							@update:modelValue="onNameChange">
+							<template #icon>
+								<NcIconSvgWrapper :svg="IconIdentifier" />
 							</template>
-							<NcIconSvgWrapper :svg="IconDotsHorizontal" />
-						</IconOverlay>
-					</template>
-					<NcActionCheckbox
-						v-if="!isSection"
-						:modelValue="isRequired"
-						@update:modelValue="onRequiredChange">
-						<!-- TRANSLATORS Making this question necessary to be answered when submitting to a form -->
-						{{ t('forms', 'Required') }}
-					</NcActionCheckbox>
-					<NcActionCheckbox
-						v-if="jumps && (jumps.canGoTo || jumps.canNext)"
-						:modelValue="jumps.enabled"
-						@update:modelValue="onJumpsEnabledChange">
-						{{
-							jumps.canGoTo
-								? t('forms', 'Go to based on answer')
-								: t('forms', 'Go to after this question')
-						}}
-					</NcActionCheckbox>
-					<slot name="actions" />
-					<NcActionInput
-						v-if="!isSection"
-						:label="t('forms', 'Technical name of the question')"
-						:labelOutside="false"
-						:showTrailingButton="false"
-						:modelValue="name"
-						@update:modelValue="onNameChange">
-						<template #icon>
-							<NcIconSvgWrapper :svg="IconIdentifier" />
-						</template>
-						{{ t('forms', 'Technical name') }}
-					</NcActionInput>
-					<NcActionButton
-						v-if="!isSection"
-						closeAfterClick
-						@click="onClone">
-						<template #icon>
-							<NcIconSvgWrapper :svg="IconContentCopy" />
-						</template>
-						{{ t('forms', 'Copy question') }}
-					</NcActionButton>
-					<NcActionButton closeAfterClick @click="onDelete">
-						<template #icon>
-							<NcIconSvgWrapper :svg="IconDelete" />
-						</template>
-						{{ t('forms', 'Delete question') }}
-					</NcActionButton>
-				</NcActions>
+							{{ t('forms', 'Technical name') }}
+						</NcActionInput>
+						<NcActionButton
+							v-if="!isSection"
+							closeAfterClick
+							@click="onClone">
+							<template #icon>
+								<NcIconSvgWrapper :svg="IconContentCopy" />
+							</template>
+							{{ t('forms', 'Copy question') }}
+						</NcActionButton>
+						<NcActionButton closeAfterClick @click="onDelete">
+							<template #icon>
+								<NcIconSvgWrapper :svg="IconDelete" />
+							</template>
+							{{ t('forms', 'Delete question') }}
+						</NcActionButton>
+					</NcActions>
+				</Teleport>
 			</div>
 			<div
 				v-if="hasDescription || !readOnly"
@@ -254,10 +273,12 @@ import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import IconOverlay from '../Icons/IconOverlay.vue'
 import JumpTargetSelect from './JumpTargetSelect.vue'
+import { FORM_QUESTIONS_KEY } from '../../composables/useJumps.ts'
 import {
 	getIdPrefix,
 	hasTitle,
 	QUESTION_TYPE_SECTION,
+	STUCK_SECTION_KEY,
 } from '../../utils/Sections.ts'
 
 export default defineComponent({
@@ -393,6 +414,14 @@ export default defineComponent({
 		const buttonDown = ref<{ $el?: HTMLElement } | undefined>(undefined)
 
 		const isSection = computed(() => props.type === QUESTION_TYPE_SECTION)
+		const formQuestions = inject(FORM_QUESTIONS_KEY, null)
+		const hasSectionBar = computed(() => isSection.value && !props.readOnly)
+		const sectionCount = computed(
+			() =>
+				formQuestions?.value.filter(
+					(question) => question.type === QUESTION_TYPE_SECTION,
+				).length ?? 0,
+		)
 		const titled = computed(() => !isSection.value || hasTitle(props))
 
 		/**
@@ -420,6 +449,13 @@ export default defineComponent({
 		const questionValid = computed(() => !!props.text && props.contentValid)
 		const idPrefix = computed(() => getIdPrefix(props.type, props.index))
 		const actionsId = computed(() => idPrefix.value + '_actions')
+		const sectionBarMenuId = computed(() => idPrefix.value + '_bar_menu')
+		const stuckSection = inject(STUCK_SECTION_KEY, null)
+		const sectionMenuTarget = computed(() =>
+			hasSectionBar.value && stuckSection?.value === props.index
+				? '#section-sticky-menu'
+				: '#' + sectionBarMenuId.value,
+		)
 		const titleId = computed(() => idPrefix.value + '_title')
 		const descriptionId = computed(() => idPrefix.value + '_desc')
 		const hasDescription = computed(() => props.description !== '')
@@ -552,6 +588,10 @@ export default defineComponent({
 			computedDescription,
 			questionValid,
 			actionsId,
+			sectionBarMenuId,
+			sectionMenuTarget,
+			hasSectionBar,
+			sectionCount,
 			titleId,
 			descriptionId,
 			hasDescription,
@@ -642,6 +682,29 @@ export default defineComponent({
 		}
 	}
 
+	&__section-bar {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: var(--default-grid-baseline);
+		min-height: var(--default-clickable-area);
+		margin-block: 2px calc(3 * var(--default-grid-baseline));
+		margin-inline: calc(2px - 56px + var(--section-frame-inset-start, 0px))
+			calc(
+				2px +
+					var(
+						--section-frame-inset-end,
+						calc(-2 * var(--default-grid-baseline))
+					)
+			);
+		padding-inline: calc(56px - 2px - var(--section-frame-inset-start, 0px))
+			var(--default-grid-baseline);
+		border-start-start-radius: calc(var(--border-radius-large) - 2px);
+		border-start-end-radius: calc(var(--border-radius-large) - 2px);
+		background-color: var(--color-primary-element-light);
+		color: var(--color-main-text);
+	}
+
 	&__title,
 	&__content {
 		flex: 1 1 100%;
@@ -668,6 +731,10 @@ export default defineComponent({
 		&__title {
 			display: flex;
 			min-height: 44px;
+
+			&--menu-in-bar {
+				padding-inline-end: calc(var(--default-clickable-area) + 12px);
+			}
 
 			&__text {
 				flex: 1 1 100%;
