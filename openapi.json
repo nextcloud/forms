@@ -530,6 +530,14 @@
                     "dateRange": {
                         "type": "boolean"
                     },
+                    "lengthMax": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "lengthMin": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
                     "maxAllowedFilesCount": {
                         "type": "integer",
                         "format": "int64"
@@ -537,6 +545,30 @@
                     "maxFileSize": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "numberMax": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            {
+                                "type": "number",
+                                "format": "double"
+                            }
+                        ]
+                    },
+                    "numberMin": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            {
+                                "type": "number",
+                                "format": "double"
+                            }
+                        ]
                     },
                     "optionsHighest": {
                         "type": "integer",

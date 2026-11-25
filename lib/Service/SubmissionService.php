@@ -769,6 +769,11 @@ class SubmissionService {
 				throw new \InvalidArgumentException(sprintf('Invalid input for question "%s".', $question['text']));
 			}
 
+			if (in_array($question['type'], [Constants::ANSWER_TYPE_SHORT, Constants::ANSWER_TYPE_LONG], true)
+				&& $answers[$questionId][0] !== '') {
+				$this->validateAnswerLimits($question, $answers[$questionId][0]);
+			}
+
 			// Handle ranking questions: answers must be a permutation of all option IDs
 			if ($question['type'] === Constants::ANSWER_TYPE_RANKING) {
 				$optionIds = array_map(intval(...), array_column($question['options'] ?? [], 'id'));
@@ -915,6 +920,29 @@ class SubmissionService {
 				$this->logger->error('Invalid input type for question detected, please report this issue!', ['validationType' => $question['extraSettings']['validationType']]);
 				// The result is just a non-validated text on the results, but not a fully declined submission. So no need to throw but simply return false here.
 				return false;
+		}
+	}
+
+	/**
+	 * Check a text answer against the length limits and the number range of its question
+	 *
+	 * @param array $question the question
+	 * @param string $answer the answer text
+	 * @throws \InvalidArgumentException if the answer is too short, too long or out of range
+	 */
+	private function validateAnswerLimits(array $question, string $answer): void {
+		$lengthMin = $question['extraSettings']['lengthMin'] ?? null;
+		$lengthMax = $question['extraSettings']['lengthMax'] ?? null;
+		$length = mb_strlen($answer);
+		if (($lengthMin !== null && $length < $lengthMin) || ($lengthMax !== null && $length > $lengthMax)) {
+			throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be from %d to %d characters long.', $question['text'], $lengthMin ?? 1, $lengthMax ?? Constants::MAX_STRING_LENGTHS['answerText']));
+		}
+
+		$numberMin = $question['extraSettings']['numberMin'] ?? null;
+		$numberMax = $question['extraSettings']['numberMax'] ?? null;
+		if (($numberMin !== null || $numberMax !== null) && is_numeric($answer)
+			&& (($numberMin !== null && +$answer < $numberMin) || ($numberMax !== null && +$answer > $numberMax))) {
+			throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be a number from %s to %s.', $question['text'], $numberMin ?? '-∞', $numberMax ?? '∞'));
 		}
 	}
 

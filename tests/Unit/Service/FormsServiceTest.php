@@ -1727,6 +1727,66 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'expected' => false
 			],
+			'valid-length-short' => [
+				'extraSettings' => ['lengthMin' => 3, 'lengthMax' => 70],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-length-long' => [
+				'extraSettings' => ['lengthMax' => 4096],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => true
+			],
+			'invalid-length-min-above-max' => [
+				'extraSettings' => ['lengthMin' => 80, 'lengthMax' => 70],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => false
+			],
+			'invalid-length-zero' => [
+				'extraSettings' => ['lengthMin' => 0],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-length-above-stored-length' => [
+				'extraSettings' => ['lengthMax' => 4097],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => false
+			],
+			'invalid-length-not-integer' => [
+				'extraSettings' => ['lengthMax' => 7.5],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => false
+			],
+			'invalid-length-with-validation-type' => [
+				'extraSettings' => ['validationType' => 'email', 'lengthMax' => 70],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'valid-number-range' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => -1.5, 'numberMax' => 10],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-number-min-above-max' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 11, 'numberMax' => 10],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-infinite' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => INF],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-range-without-number-type' => [
+				'extraSettings' => ['numberMin' => 1],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-range-on-long' => [
+				'extraSettings' => ['numberMax' => 1],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => false
+			],
 			'valid-custom-regex' => [
 				'extraSettings' => [
 					'validationType' => 'regex',

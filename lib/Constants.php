@@ -204,8 +204,17 @@ class Constants {
 	];
 
 	public const EXTRA_SETTINGS_SHORT = [
+		'lengthMax' => ['integer'],
+		'lengthMin' => ['integer'],
+		'numberMax' => ['integer', 'double'],
+		'numberMin' => ['integer', 'double'],
 		'validationType' => ['string'],
 		'validationRegex' => ['string'],
+	];
+
+	public const EXTRA_SETTINGS_LONG = [
+		'lengthMax' => ['integer'],
+		'lengthMin' => ['integer'],
 	];
 
 	public const EXTRA_SETTINGS_FILE = [

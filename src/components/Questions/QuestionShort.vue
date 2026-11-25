@@ -10,14 +10,13 @@
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
 		:errorMessage="errorMessage"
+		:infoMessage="hasError ? undefined : (limitHint ?? undefined)"
 		v-on="commonListeners">
 		<div class="question__content">
 			<input
 				ref="input"
 				:aria-labelledby="readOnly ? titleId : undefined"
-				:aria-describedby="
-					readOnly && description ? descriptionId : undefined
-				"
+				:aria-describedby="describedBy"
 				:aria-errormessage="hasError ? errorId : undefined"
 				:aria-invalid="hasError ? 'true' : undefined"
 				:placeholder="submissionInputPlaceholder"
@@ -27,12 +26,18 @@
 				:value="inputValue"
 				class="question__input"
 				dir="auto"
-				:maxlength="maxStringLengths.answerText"
-				minlength="1"
+				:minlength="extraSettings.lengthMin || 1"
+				:min="
+					validationType === 'number' ? extraSettings.numberMin : undefined
+				"
+				:max="
+					validationType === 'number' ? extraSettings.numberMax : undefined
+				"
 				:type="validationObject.inputType"
 				:step="validationObject.inputType === 'number' ? 'any' : undefined"
 				@invalid.prevent="validate"
-				@input="onInput" />
+				@input="onInput"
+				@compositionend="onInput" />
 			<NcActions
 				v-if="!readOnly"
 				:id="validationTypeMenuId"
@@ -72,7 +77,107 @@
 					/^[a-z]{3}$/i
 					<!-- ^ Some example RegExp for the placeholder text -->
 				</NcActionInput>
+				<template v-if="validationType === 'text'">
+					<NcActionSeparator />
+					<NcActionCheckbox
+						:modelValue="!!extraSettings.lengthMin"
+						@update:modelValue="
+							(checked) =>
+								onLimitChange('lengthMin', checked ? 1 : null, true)
+						">
+						{{ t('forms', 'Require a minimum length') }}
+					</NcActionCheckbox>
+					<NcActionInput
+						v-if="extraSettings.lengthMin"
+						type="number"
+						:label="t('forms', 'Minimum characters')"
+						:labelOutside="false"
+						:showTrailingButton="false"
+						:modelValue="extraSettings.lengthMin"
+						v-bind="limitFieldState('lengthMin')"
+						@update:modelValue="
+							(value) => onLimitChange('lengthMin', value, true)
+						" />
+					<NcActionCheckbox
+						:modelValue="!!extraSettings.lengthMax"
+						@update:modelValue="
+							(checked) =>
+								onLimitChange(
+									'lengthMax',
+									checked ? answerLengthMax : null,
+									true,
+								)
+						">
+						{{ t('forms', 'Limit the maximum length') }}
+					</NcActionCheckbox>
+					<NcActionInput
+						v-if="extraSettings.lengthMax"
+						type="number"
+						:label="t('forms', 'Maximum characters')"
+						:labelOutside="false"
+						:showTrailingButton="false"
+						:modelValue="extraSettings.lengthMax"
+						v-bind="limitFieldState('lengthMax')"
+						@update:modelValue="
+							(value) => onLimitChange('lengthMax', value, true)
+						" />
+				</template>
+				<template v-if="validationType === 'number'">
+					<NcActionSeparator />
+					<NcActionCheckbox
+						:modelValue="extraSettings.numberMin !== undefined"
+						@update:modelValue="
+							(checked) =>
+								onLimitChange('numberMin', checked ? 0 : null, false)
+						">
+						{{ t('forms', 'Require a lowest number') }}
+					</NcActionCheckbox>
+					<NcActionInput
+						v-if="extraSettings.numberMin !== undefined"
+						type="number"
+						step="any"
+						:label="t('forms', 'Lowest number')"
+						:labelOutside="false"
+						:showTrailingButton="false"
+						:modelValue="extraSettings.numberMin"
+						v-bind="limitFieldState('numberMin')"
+						@update:modelValue="
+							(value) => onLimitChange('numberMin', value, false)
+						" />
+					<NcActionCheckbox
+						:modelValue="extraSettings.numberMax !== undefined"
+						@update:modelValue="
+							(checked) =>
+								onLimitChange(
+									'numberMax',
+									checked
+										? Math.max(extraSettings.numberMin ?? 0, 100)
+										: null,
+									false,
+								)
+						">
+						{{ t('forms', 'Require a highest number') }}
+					</NcActionCheckbox>
+					<NcActionInput
+						v-if="extraSettings.numberMax !== undefined"
+						type="number"
+						step="any"
+						:label="t('forms', 'Highest number')"
+						:labelOutside="false"
+						:showTrailingButton="false"
+						:modelValue="extraSettings.numberMax"
+						v-bind="limitFieldState('numberMax')"
+						@update:modelValue="
+							(value) => onLimitChange('numberMax', value, false)
+						" />
+				</template>
 			</NcActions>
+			<p
+				v-if="readOnly && hasLengthLimit"
+				class="question__counter"
+				aria-hidden="true">
+				{{ lengthCounter }}
+			</p>
 		</div>
 		<template #insert>
 			<slot name="insert" />
@@ -81,15 +186,20 @@
 </template>
 
 <script lang="ts">
+import type { AnswerLimitSettings } from '../../composables/useAnswerLimits.ts'
+
 import IconRegex from '@material-symbols/svg-400/outlined/regular_expression.svg?raw'
 import { t } from '@nextcloud/l10n'
 import debounce from 'debounce'
 import { computed, defineComponent, ref } from 'vue'
+import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcActions from '@nextcloud/vue/components/NcActions'
+import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Question from './Question.vue'
+import { useAnswerLimits } from '../../composables/useAnswerLimits.ts'
 import {
 	QUESTION_EMITS,
 	QUESTION_PROPS,
@@ -99,7 +209,7 @@ import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
 import validationTypes from '../../models/ValidationTypes.ts'
 import { splitRegex, validateExpression } from '../../utils/RegularExpression.ts'
 
-type QuestionShortExtraSettings = {
+type QuestionShortExtraSettings = AnswerLimitSettings & {
 	validationRegex?: string
 	validationType?: string
 }
@@ -110,8 +220,10 @@ export default defineComponent({
 	components: {
 		NcIconSvgWrapper,
 		NcActions,
+		NcActionCheckbox,
 		NcActionInput,
 		NcActionRadio,
+		NcActionSeparator,
 		Question,
 	},
 
@@ -120,7 +232,6 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const rootElement = ref<{ $el?: HTMLElement } | null>(null)
-		const question = useQuestion(props, { emit, rootElement })
 		const input = ref<HTMLInputElement | null>(null)
 		const regexInput = ref<{
 			$el: {
@@ -138,6 +249,21 @@ export default defineComponent({
 				(props.extraSettings as QuestionShortExtraSettings | undefined) ?? {}
 			)
 		})
+		const answer = computed(() => String(values.value[0] ?? ''))
+		const answerLengthMax = (props.maxStringLengths as Record<string, number>)
+			.answerText
+		const limits = useAnswerLimits(extraSettings, answer, answerLengthMax)
+		const question = useQuestion(props, {
+			emit,
+			infoMessage: limits.limitHint,
+			rootElement,
+		})
+		const onLimitChange = (
+			key: keyof AnswerLimitSettings,
+			input: number | string | null,
+			integer: boolean,
+		): void =>
+			limits.saveLimit(key, input, integer, question.onExtraSettingsChange)
 
 		/**
 		 * Name of the current validation type, fallsback to 'text'
@@ -203,6 +329,13 @@ export default defineComponent({
 				return false
 			}
 
+			const limitError = limits.limitError(value)
+			if (limitError) {
+				field.setCustomValidity(limitError)
+				question.errorMessage.value = limitError
+				return false
+			}
+
 			const isCustomValid =
 				!value
 				|| validationObject.value.validate(
@@ -224,12 +357,16 @@ export default defineComponent({
 			await validate()
 		}, INPUT_DEBOUNCE_MS)
 
-		const onInput = (): void => {
+		const onInput = (event: Event): void => {
 			const field = input.value
 			if (!field) {
 				return
 			}
+			if ((event as InputEvent).isComposing) {
+				return
+			}
 			field.setCustomValidity('')
+			limits.fitLength(field)
 			emit('update:values', [field.value])
 			void debounceValidate()
 		}
@@ -240,9 +377,16 @@ export default defineComponent({
 		 * @param validationType new input type
 		 */
 		const onChangeValidationType = (validationType: string): void => {
+			const noLimits = {
+				lengthMax: undefined,
+				lengthMin: undefined,
+				numberMax: undefined,
+				numberMin: undefined,
+			}
 			if (validationType === 'regex') {
 				// Make sure to also submit a regex (even if empty)
 				question.onExtraSettingsChange({
+					...noLimits,
 					validationType,
 					validationRegex: validationRegex.value,
 				})
@@ -250,6 +394,7 @@ export default defineComponent({
 				// For all other types except regex we close the menu (for regex we keep it open to allow entering a regex)
 				isValidationTypeMenuOpen.value = false
 				question.onExtraSettingsChange({
+					...noLimits,
 					validationType:
 						validationType === 'text' ? undefined : validationType,
 				})
@@ -303,6 +448,10 @@ export default defineComponent({
 
 		return {
 			...question,
+			...limits,
+			answerLengthMax,
+			onLimitChange,
+			extraSettings,
 			rootElement,
 			IconRegex,
 			t,
@@ -327,6 +476,11 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.question__counter {
+	color: var(--color-text-maxcontrast);
+	text-align: end;
+}
+
 .question__input {
 	width: 100%;
 	min-height: var(--default-clickable-area);

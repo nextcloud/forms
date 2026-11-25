@@ -905,6 +905,7 @@ class FormsService {
 			Constants::ANSWER_TYPE_DROPDOWN => Constants::EXTRA_SETTINGS_DROPDOWN,
 			Constants::ANSWER_TYPE_MULTIPLE, Constants::ANSWER_TYPE_MULTIPLEUNIQUE => Constants::EXTRA_SETTINGS_MULTIPLE,
 			Constants::ANSWER_TYPE_SHORT => Constants::EXTRA_SETTINGS_SHORT,
+			Constants::ANSWER_TYPE_LONG => Constants::EXTRA_SETTINGS_LONG,
 			Constants::ANSWER_TYPE_FILE => Constants::EXTRA_SETTINGS_FILE,
 			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
 			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
@@ -925,6 +926,10 @@ class FormsService {
 				// Not allowed type
 				return false;
 			}
+		}
+
+		if (!$this->areAnswerLimitsValid($extraSettings)) {
+			return false;
 		}
 
 		// Validate extraSettings for specific question types
@@ -1082,6 +1087,54 @@ class FormsService {
 				return false;
 			}
 		}
+		return true;
+	}
+
+	/**
+	 * Whether the length and number limits of a text answer are consistent
+	 *
+	 * A length limit is allowed on plain text answers only, a number range only
+	 * on answers validated as number. Lengths are counted in characters from 1
+	 * up to the stored answer length, and a minimum must not exceed its maximum.
+	 *
+	 * @param array $extraSettings the extra settings of the question
+	 * @return bool true if the limits are valid or not set
+	 */
+	private function areAnswerLimitsValid(array $extraSettings): bool {
+		$validationType = $extraSettings['validationType'] ?? null;
+		$lengthMin = $extraSettings['lengthMin'] ?? null;
+		$lengthMax = $extraSettings['lengthMax'] ?? null;
+		$numberMin = $extraSettings['numberMin'] ?? null;
+		$numberMax = $extraSettings['numberMax'] ?? null;
+
+		if ($lengthMin !== null || $lengthMax !== null) {
+			if ($validationType !== null) {
+				return false;
+			}
+			foreach ([$lengthMin, $lengthMax] as $length) {
+				if ($length !== null && ($length < 1 || $length > Constants::MAX_STRING_LENGTHS['answerText'])) {
+					return false;
+				}
+			}
+			if ($lengthMin !== null && $lengthMax !== null && $lengthMin > $lengthMax) {
+				return false;
+			}
+		}
+
+		if ($numberMin !== null || $numberMax !== null) {
+			if ($validationType !== 'number') {
+				return false;
+			}
+			foreach ([$numberMin, $numberMax] as $number) {
+				if ($number !== null && !is_finite((float)$number)) {
+					return false;
+				}
+			}
+			if ($numberMin !== null && $numberMax !== null && $numberMin > $numberMax) {
+				return false;
+			}
+		}
+
 		return true;
 	}
 

@@ -1425,6 +1425,41 @@ file2.txt"
 				// Expected Result
 				'Invalid input for question "q1".',
 			],
+			'short-length-within-limits' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMin' => 2, 'lengthMax' => 4]]],
+				['1' => ['äöü€']],
+				null,
+			],
+			'short-length-too-short' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMin' => 2, 'lengthMax' => 4]]],
+				['1' => ['a']],
+				'The answer for question "q1" must be from 2 to 4 characters long.',
+			],
+			'long-length-too-long' => [
+				[['id' => 1, 'type' => 'long', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMax' => 3]]],
+				['1' => ['abcd']],
+				'The answer for question "q1" must be from 1 to 3 characters long.',
+			],
+			'long-length-empty-optional-answer' => [
+				[['id' => 1, 'type' => 'long', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMin' => 3]]],
+				['1' => ['']],
+				null,
+			],
+			'short-number-within-range' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => -1.5, 'numberMax' => 10]]],
+				['1' => ['-1.5']],
+				null,
+			],
+			'short-number-below-range' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1]]],
+				['1' => ['0.5']],
+				'The answer for question "q1" must be a number from 1 to ∞.',
+			],
+			'short-number-above-range' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10]]],
+				['1' => ['10.01']],
+				'The answer for question "q1" must be a number from 1 to 10.',
+			],
 			'invalid-date-question' => [
 				// Questions
 				[
