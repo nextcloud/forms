@@ -121,6 +121,16 @@
 				<p v-if="infoMessage" class="info-message">
 					{{ infoMessage }}
 				</p>
+				<NcNoteCard v-if="form.submissionCount" type="warning">
+					{{
+						n(
+							'forms',
+							'This form already has %n response. Changing the options, rows or columns of a question, or the range of a linear scale, does not change it: answers that are no longer offered stay in the results.',
+							'This form already has %n responses. Changing the options, rows or columns of a question, or the range of a linear scale, does not change them: answers that are no longer offered stay in the results.',
+							form.submissionCount,
+						)
+					}}
+				</NcNoteCard>
 			</header>
 
 			<section>
@@ -233,7 +243,7 @@ import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
 import { emit as emitEvent } from '@nextcloud/event-bus'
 import { loadState } from '@nextcloud/initial-state'
-import { t } from '@nextcloud/l10n'
+import { n, t } from '@nextcloud/l10n'
 import moment from '@nextcloud/moment'
 import { generateOcsUrl } from '@nextcloud/router'
 import { useIsMobile } from '@nextcloud/vue'
@@ -856,6 +866,7 @@ export default defineComponent({
 			onQuestionOrderChange,
 			IconLock,
 			isMobile: useIsMobile(),
+			n,
 			t,
 		}
 	},

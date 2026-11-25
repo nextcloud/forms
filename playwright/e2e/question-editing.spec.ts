@@ -7,6 +7,7 @@ import { expect, mergeTests } from '@playwright/test'
 import { test as formTest } from '../support/fixtures/form.ts'
 import { test as appNavigationTest } from '../support/fixtures/navigation.ts'
 import { test as randomUserTest } from '../support/fixtures/random-user.ts'
+import { api } from '../support/helpers.ts'
 import {
 	LinearScaleSubtype,
 	QuestionType,
@@ -143,4 +144,25 @@ test.describe('Question editing lifecycle', () => {
 		await expect(clone.titleInput).toHaveValue('Favorite colors')
 		await expect(clone.answerInputs).toHaveCount(2)
 	})
+})
+
+test('The editor warns about changing questions once the form has responses', async ({
+	page,
+}) => {
+	const form = await api(page.request, 'POST', '/forms')
+	const question = await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'short',
+		text: 'Name',
+	})
+	const warning = page.getByText('This form already has 1 response.')
+
+	await page.goto(`apps/forms/${form.hash}/edit`)
+	await expect(page.getByRole('textbox', { name: 'Form title' })).toBeVisible()
+	await expect(warning).toHaveCount(0)
+
+	await api(page.request, 'POST', `/forms/${form.id}/submissions`, {
+		answers: { [question.id]: ['Jane'] },
+	})
+	await page.reload()
+	await expect(warning).toBeVisible()
 })
