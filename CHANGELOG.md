@@ -5,6 +5,16 @@
 
 # Changelog
 
+## v5.2.11 - 2026-11-25
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.2.10...v5.2.11)
+
+### Fixed
+
+- [stable5.2] fix: unify checks for deleted questions and don't load submissions to deleted questions by @AndyScherzinger in [\#4026](https://github.com/nextcloud/forms/pull/4026)
+- [stable5.2] fix(submission): use the same answer checks for validating and storing by @AndyScherzinger in [\#4025](https://github.com/nextcloud/forms/pull/4025)
+- [stable5.2] fix(submission): only accept a list of values as an answer by @AndyScherzinger in [\#4024](https://github.com/nextcloud/forms/pull/4024)
+
 ## v5.2.10 - 2026-08-19
 
 [[Full Changelog]](https://github.com/nextcloud/forms/compare/v5.2.9...v5.2.10)
