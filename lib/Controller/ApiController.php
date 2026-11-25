@@ -1589,6 +1589,8 @@ class ApiController extends OCSController {
 			$this->storeAnswersForQuestion($form, $submission->getId(), $question, $answerArray);
 		}
 
+		$this->formMapper->update($form);
+
 		//Create Activity
 		$this->formsService->notifyNewSubmission($form, $submission);
 
