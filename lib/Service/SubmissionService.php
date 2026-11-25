@@ -399,7 +399,11 @@ class SubmissionService {
 		// Check by questions
 		foreach ($questions as $question) {
 			$questionId = $question['id'];
-			$questionAnswered = array_key_exists($questionId, $answers);
+			$questionAnswered = array_key_exists($questionId, $answers) && $answers[$questionId] !== [];
+
+			if ($questionAnswered && !self::isListOfValues($question['type'], $answers[$questionId])) {
+				throw new \InvalidArgumentException(sprintf('Invalid answer for question "%s".', $question['text']));
+			}
 
 			// Check if all required questions have an answer
 			if ($question['isRequired']
@@ -600,5 +604,23 @@ class SubmissionService {
 				// The result is just a non-validated text on the results, but not a fully declined submission. So no need to throw but simply return false here.
 				return false;
 		}
+	}
+
+	/**
+	 * Whether the answer is a list of values: texts or numbers, or uploaded files for file questions
+	 *
+	 * @param string $questionType the question type
+	 * @param mixed $answer the answer
+	 */
+	private static function isListOfValues(string $questionType, mixed $answer): bool {
+		if (!is_array($answer) || !array_is_list($answer)) {
+			return false;
+		}
+		foreach ($answer as $value) {
+			if ($questionType === Constants::ANSWER_TYPE_FILE ? !is_array($value) : !is_scalar($value)) {
+				return false;
+			}
+		}
+		return true;
 	}
 }
