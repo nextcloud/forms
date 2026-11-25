@@ -225,15 +225,40 @@
 			<NcDialog
 				v-model:open="showClearFormDueToChangeDialog"
 				:name="t('forms', 'Clear form')"
-				:message="
-					t(
-						'forms',
-						'The form has changed since your last visit. Do you want to clear all answers?',
-					)
-				"
 				:buttons="confirmClearFormButtons"
 				noClose
-				:closeOnClickOutside="false" />
+				:closeOnClickOutside="false">
+				<p>
+					{{ t('forms', 'The form has changed since your last visit.') }}
+				</p>
+				<p v-if="hasAnswersToDeletedQuestions">
+					{{
+						t(
+							'forms',
+							'Your answers to questions that no longer exist were removed.',
+						)
+					}}
+				</p>
+				<template v-if="questionsWithRemovedAnswers.length > 0">
+					<p>
+						{{
+							t(
+								'forms',
+								'Some of your answers are no longer offered and were removed from these questions:',
+							)
+						}}
+					</p>
+					<ul class="changed-questions">
+						<li
+							v-for="question in questionsWithRemovedAnswers"
+							:key="question.id"
+							dir="auto">
+							{{ question.text }}
+						</li>
+					</ul>
+				</template>
+				<p>{{ t('forms', 'Do you want to clear all answers?') }}</p>
+			</NcDialog>
 		</template>
 	</NcAppContent>
 </template>
@@ -424,6 +449,8 @@ export default defineComponent({
 		const showConfirmLeaveDialog = ref(false)
 		const showClearFormDialog = ref(false)
 		const showClearFormDueToChangeDialog = ref(false)
+		const removedAnswerQuestionIds = ref<number[]>([])
+		const hasAnswersToDeletedQuestions = ref(false)
 		const confirmButtonCallback = ref<(val: boolean) => void>(() => {})
 
 		const validQuestions = computed<SubmitQuestion[]>(() => {
@@ -724,6 +751,62 @@ export default defineComponent({
 		}
 
 		/**
+		 * Number of values in an answer, counting each cell of a grid
+		 *
+		 * @param value the values of the answer
+		 */
+		function countValues(value: AnswerValue): number {
+			if (Array.isArray(value)) {
+				return value.length
+			}
+			return Object.values(value).reduce<number>(
+				(count, rowValue) =>
+					count
+					+ (Array.isArray(rowValue)
+						? rowValue.length
+						: typeof rowValue === 'object' && rowValue !== null
+							? Object.keys(rowValue).length
+							: 1),
+				0,
+			)
+		}
+
+		/**
+		 * Remember a question that lost an earlier answer because it is no longer offered
+		 *
+		 * @param questionId the id of the question
+		 */
+		function noteRemovedAnswer(questionId: number): void {
+			if (!removedAnswerQuestionIds.value.includes(questionId)) {
+				removedAnswerQuestionIds.value.push(questionId)
+			}
+			showClearFormDueToChangeDialog.value = true
+		}
+
+		/**
+		 * The values of an earlier answer the question still offers, remembering the question if any were removed
+		 *
+		 * @param question the question
+		 * @param value the values of the earlier answer
+		 */
+		function withOfferedEarlierValues(
+			question: SubmitQuestion,
+			value: AnswerValue,
+		): AnswerValue {
+			const offered = withOfferedValues(question, value)
+			if (countValues(offered) < countValues(value)) {
+				noteRemovedAnswer(question.id)
+			}
+			return offered
+		}
+
+		const questionsWithRemovedAnswers = computed(() =>
+			validQuestions.value.filter((question) =>
+				removedAnswerQuestionIds.value.includes(question.id),
+			),
+		)
+
+		/**
 		 * Initialize answers from saved state in LocalStorage
 		 */
 		function initFromLocalStorage(): void {
@@ -740,6 +823,7 @@ export default defineComponent({
 				const question = questions.get(parseInt(questionId, 10))
 				// Clean up answers for questions that do not exist anymore
 				if (!question) {
+					hasAnswersToDeletedQuestions.value = true
 					showClearFormDueToChangeDialog.value = true
 					logger.debug('Question does not exist anymore', {
 						questionId,
@@ -752,7 +836,7 @@ export default defineComponent({
 				)
 					? (answer.value as string[]).map(String)
 					: answer.value
-				localAnswers[question.id] = withOfferedValues(question, value)
+				localAnswers[question.id] = withOfferedEarlierValues(question, value)
 			}
 			answers.value = localAnswers
 		}
@@ -857,6 +941,7 @@ export default defineComponent({
 					logger.debug(`questionId: ${questionId}, answerId: ${answer.id}`)
 					// Clean up answers for questions that do not exist anymore
 					if (!validQuestionsIds.value.has(questionId)) {
+						hasAnswersToDeletedQuestions.value = true
 						showClearFormDueToChangeDialog.value = true
 						logger.debug('Question does not exist anymore', {
 							questionId,
@@ -910,7 +995,7 @@ export default defineComponent({
 								QUESTION_EXTRASETTINGS_OTHER_PREFIX + text,
 							)
 						} else {
-							// error handling
+							noteRemovedAnswer(questionId)
 							logger.debug(
 								`option ${text} could not be mapped to an option for question ${questionId}`,
 							)
@@ -930,7 +1015,7 @@ export default defineComponent({
 
 				for (const question of validQuestions.value) {
 					if (loaded[question.id] !== undefined) {
-						loaded[question.id] = withOfferedValues(
+						loaded[question.id] = withOfferedEarlierValues(
 							question,
 							loaded[question.id],
 						)
@@ -1228,6 +1313,8 @@ export default defineComponent({
 			showConfirmLeaveDialog.value = false
 			showClearFormDialog.value = false
 			showClearFormDueToChangeDialog.value = false
+			removedAnswerQuestionIds.value = []
+			hasAnswersToDeletedQuestions.value = false
 			success.value = false
 			submitForm.value = false
 		}
@@ -1342,6 +1429,8 @@ export default defineComponent({
 			...viewForm,
 			answerTypes,
 			answers,
+			questionsWithRemovedAnswers,
+			hasAnswersToDeletedQuestions,
 			confirmClearFormButtons,
 			confirmEmptyModalButtons,
 			confirmLeaveFormButtons,
@@ -1482,5 +1571,11 @@ export default defineComponent({
 			padding-inline-start: 20px;
 		}
 	}
+}
+
+.changed-questions {
+	list-style: disc;
+	padding-inline-start: calc(var(--default-grid-baseline) * 5);
+	margin-block: var(--default-grid-baseline);
 }
 </style>

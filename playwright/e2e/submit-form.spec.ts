@@ -136,6 +136,9 @@ test.describe('Form submission', () => {
 		await deleted
 
 		await topBar.toggleView(FormsView.View)
+		const dialog = page.getByRole('dialog', { name: 'Clear form' })
+		await expect(dialog.getByRole('listitem')).toHaveText(['Favorite fruits'])
+		await dialog.getByRole('button', { name: 'Abort' }).click()
 		const response = await submitView.submit()
 		expect(response.status()).toBe(201)
 		await expect(submitView.successMessage).toBeVisible()
@@ -209,6 +212,7 @@ test('A restored draft leaves out values the questions no longer offer', async (
 					},
 					type: 'QuestionGrid',
 				},
+				999999: { value: ['Friday'], type: 'QuestionShort' },
 			}),
 		],
 	)
@@ -223,6 +227,20 @@ test('A restored draft leaves out values the questions no longer offer', async (
 		`/forms/${form.id}/questions/${grid.id}/options/${rows[1].id}`,
 	)
 	await page.reload()
+
+	const dialog = page.getByRole('dialog', { name: 'Clear form' })
+	await expect(dialog).toContainText(
+		'Your answers to questions that no longer exist were removed.',
+	)
+	await expect(dialog).toContainText(
+		'Some of your answers are no longer offered and were removed from these questions:',
+	)
+	await expect(dialog.getByRole('listitem')).toHaveText([
+		'Rating',
+		'Order',
+		'Skills',
+	])
+	await dialog.getByRole('button', { name: 'Abort' }).click()
 
 	const response = await submitView.submit()
 	expect(response.status()).toBe(201)
@@ -251,6 +269,8 @@ test('A restored draft sends a linear scale answer as its plain number', async (
 		],
 	)
 	await page.reload()
+	await expect(submitView.getQuestion('Rating')).toBeVisible()
+	await expect(page.getByRole('dialog', { name: 'Clear form' })).toHaveCount(0)
 
 	const response = await submitView.submit()
 	expect(response.status()).toBe(201)
@@ -288,6 +308,14 @@ test('An edited submission leaves out values the questions no longer offer', asy
 	)
 	await page.goto(`apps/forms/${form.hash}/submit/${submissions[0].id}`)
 	await expect(submitView.getQuestion('Order')).toBeVisible()
+	const dialog = page.getByRole('dialog', { name: 'Clear form' })
+	await expect(dialog.getByRole('listitem')).toHaveText(['Rating', 'Order'])
+	await expect(
+		dialog.getByText(
+			'Your answers to questions that no longer exist were removed.',
+		),
+	).toHaveCount(0)
+	await dialog.getByRole('button', { name: 'Abort' }).click()
 
 	const response = await submitView.submit()
 	expect(response.status()).toBe(200)
