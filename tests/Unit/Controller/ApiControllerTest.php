@@ -685,7 +685,7 @@ class ApiControllerTest extends TestCase {
 		$form->setId(1);
 		$form->setHash('hash');
 		$form->setOwnerId('currentUser');
-		$question = Question::fromParams(['formId' => 1]);
+		$question = Question::fromParams(['formId' => 1, 'type' => Constants::ANSWER_TYPE_FILE]);
 
 		$this->formsService->expects($this->once())
 			->method('loadFormForSubmission')
@@ -743,6 +743,48 @@ class ApiControllerTest extends TestCase {
 			->with('currentUser')
 			->willReturn($userFolder);
 
+		$this->apiController->uploadFiles(1, 10, '');
+	}
+
+	public static function dataUploadFilesNoFileQuestion(): array {
+		return [
+			'short question' => [Constants::ANSWER_TYPE_SHORT, false, OCSBadRequestException::class],
+			'deleted file question' => [Constants::ANSWER_TYPE_FILE, true, OCSNotFoundException::class],
+		];
+	}
+
+	/**
+	 * @dataProvider dataUploadFilesNoFileQuestion
+	 */
+	public function testUploadFilesNoFileQuestion(string $type, bool $deleted, string $exception): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('currentUser');
+
+		$this->formsService->method('loadFormForSubmission')
+			->with(1)
+			->willReturn($form);
+		$this->formsService->method('canSubmit')
+			->willReturn(true);
+		$lookup = $this->questionMapper->method('findById')->with(10);
+		if ($deleted) {
+			$lookup->willThrowException(new DoesNotExistException('Question is deleted'));
+		} else {
+			$lookup->willReturn(Question::fromParams(['formId' => 1, 'type' => $type]));
+		}
+		$this->request->method('getUploadedFile')
+			->with('files')
+			->willReturn([
+				'size' => [100],
+				'tmp_name' => [tempnam('/tmp', 'test')],
+				'name' => ['file.txt'],
+				'error' => [0],
+			]);
+		$this->storage->expects($this->never())
+			->method('getUserFolder');
+
+		$this->expectException($exception);
 		$this->apiController->uploadFiles(1, 10, '');
 	}
 
@@ -1251,6 +1293,67 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->updateForm(1, ['confirmationEmailQuestionId' => 7]);
 	}
 
+	public function testGetDeletedQuestion(): void {
+		$form = new Form();
+		$form->setId(1);
+		$this->formMapper->method('findById')
+			->with(1)
+			->willReturn($form);
+		$this->formsService->method('hasUserAccess')
+			->with($form)
+			->willReturn(true);
+		$this->formsService->method('getQuestion')
+			->with(2)
+			->willReturn(null);
+
+		$this->expectException(OCSNotFoundException::class);
+		$this->apiController->getQuestion(1, 2);
+	}
+
+	public static function dataChangeDeletedQuestion(): array {
+		return [
+			'update question' => ['updateQuestion', [1, 7, ['text' => 'New text']], OCSNotFoundException::class],
+			'new option' => ['newOption', [1, 7, ['New option']], OCSNotFoundException::class],
+			'update option' => ['updateOption', [1, 7, 3, ['text' => 'New text']], OCSNotFoundException::class],
+			'delete option' => ['deleteOption', [1, 7, 3], OCSNotFoundException::class],
+			'reorder options' => ['reorderOptions', [1, 7, [3]], OCSNotFoundException::class],
+		];
+	}
+
+	/**
+	 * @dataProvider dataChangeDeletedQuestion
+	 */
+	public function testChangeDeletedQuestion(string $method, array $arguments, string $exception): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService
+			->method('getFormIfAllowed')
+			->with(1, Constants::PERMISSION_EDIT)
+			->willReturn($form);
+		$this->formsService
+			->method('isFormArchived')
+			->with($form)
+			->willReturn(false);
+		$this->questionMapper
+			->method('findById')
+			->with(7)
+			->willThrowException(new DoesNotExistException('Question not found'));
+		$this->optionMapper
+			->method('findById')
+			->with(3)
+			->willReturn(\OCA\Forms\Db\Option::fromParams(['id' => 3, 'questionId' => 7]));
+		$this->questionMapper->expects($this->never())->method('update');
+		$this->optionMapper->expects($this->never())->method('insert');
+		$this->optionMapper->expects($this->never())->method('update');
+		$this->optionMapper->expects($this->never())->method('delete');
+		$this->formMapper->expects($this->never())->method('update');
+
+		$this->expectException($exception);
+		$this->apiController->$method(...$arguments);
+	}
+
 	public function testUpdateQuestionClearsConfirmationEmailQuestionIdWhenQuestionStopsBeingEmail(): void {
 		$form = new Form();
 		$form->setId(1);
@@ -1332,6 +1435,35 @@ class ApiControllerTest extends TestCase {
 
 		$this->assertEquals(new DataResponse(7), $this->apiController->deleteQuestion(1, 7));
 		$this->assertNull($form->getConfirmationEmailQuestionId());
+	}
+
+	public function testDeleteQuestionRejectsDeletedQuestion(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->questionMapper->method('findById')->with(7)->willThrowException(new DoesNotExistException('Question not found'));
+		$this->questionMapper->expects($this->never())->method('update');
+		$this->formMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSNotFoundException::class);
+		$this->apiController->deleteQuestion(1, 7);
+	}
+
+	public function testCloneQuestionRejectsDeletedQuestion(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->questionMapper->method('findById')->with(7)->willThrowException(new DoesNotExistException('Question not found'));
+		$this->questionMapper->expects($this->never())->method('insert');
+
+		$this->expectException(OCSNotFoundException::class);
+		$this->apiController->newQuestion(1, null, null, '', 7);
 	}
 
 	public function testCloneFormWithConfirmationEmailQuestionId(): void {

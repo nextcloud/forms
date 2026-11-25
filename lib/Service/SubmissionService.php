@@ -71,13 +71,17 @@ class SubmissionService {
 	 * Get all the answers of a given submission
 	 *
 	 * @param int $submissionId the submission id
+	 * @param array<int, true> $activeQuestionIds ids of the active questions as keys, to filter answers
 	 * @return list<FormsAnswer>
 	 */
-	private function getAnswers(int $submissionId): array {
+	private function getAnswers(int $submissionId, array $activeQuestionIds): array {
 		$answerList = [];
 		try {
 			$answerEntities = $this->answerMapper->findBySubmission($submissionId);
 			foreach ($answerEntities as $answerEntity) {
+				if (!isset($activeQuestionIds[$answerEntity->getQuestionId()])) {
+					continue;
+				}
 				$answerList[] = $answerEntity->read();
 			}
 		} catch (DoesNotExistException) {
@@ -85,6 +89,16 @@ class SubmissionService {
 		} finally {
 			return $answerList;
 		}
+	}
+
+	/**
+	 * Get the ids of the given questions as keys
+	 *
+	 * @param list<Question> $questions questions that are not deleted
+	 * @return array<int, true> the question ids as keys
+	 */
+	private function getActiveQuestionIds(array $questions): array {
+		return array_fill_keys(array_map(static fn (Question $question) => $question->getId(), $questions), true);
 	}
 
 	/**
@@ -108,9 +122,11 @@ class SubmissionService {
 		try {
 			$submissionEntities = $this->submissionMapper->findByForm($formId, $userId, $query, $limit, $offset);
 
+			$activeQuestionIds = $this->getActiveQuestionIds($this->questionMapper->findByForm($formId));
+
 			foreach ($submissionEntities as $submissionEntity) {
 				$submission = $submissionEntity->read();
-				$submission['answers'] = $this->getAnswers($submission['id']);
+				$submission['answers'] = $this->getAnswers($submission['id'], $activeQuestionIds);
 				$submissionList[] = $submission;
 			}
 		} catch (DoesNotExistException) {
@@ -136,7 +152,8 @@ class SubmissionService {
 		try {
 			$submissionEntity = $this->submissionMapper->findById($submissionId);
 			$submission = $submissionEntity->read();
-			$submission['answers'] = $this->getAnswers($submission['id']);
+			$activeQuestionIds = $this->getActiveQuestionIds($this->questionMapper->findByForm($submission['formId']));
+			$submission['answers'] = $this->getAnswers($submission['id'], $activeQuestionIds);
 			return $submission;
 		} catch (DoesNotExistException) {
 			return null;
