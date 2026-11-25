@@ -37,16 +37,12 @@ test.describe('Form settings', () => {
 		await page.getByRole('button', { name: /Share/ }).click()
 		const settingsTab = page.getByRole('tab', { name: /Settings/ })
 		await settingsTab.click()
-		await expect(
-			page.getByRole('checkbox', { name: /Close form/ }),
-		).toBeVisible()
+		await expect(page.getByRole('switch', { name: /Close form/ })).toBeVisible()
 	})
 
 	test('Closing a form blocks submissions', async ({ page, topBar }) => {
 		const saved = waitForApiResponse(page, 'PATCH')
-		await page
-			.getByRole('checkbox', { name: /Close form/ })
-			.click({ force: true })
+		await page.getByRole('switch', { name: /Close form/ }).click({ force: true })
 		await saved
 
 		await topBar.toggleView(FormsView.View)
@@ -67,16 +63,12 @@ test.describe('Form settings', () => {
 	}) => {
 		// Close the form
 		const closed = waitForApiResponse(page, 'PATCH')
-		await page
-			.getByRole('checkbox', { name: /Close form/ })
-			.click({ force: true })
+		await page.getByRole('switch', { name: /Close form/ }).click({ force: true })
 		await closed
 
 		// Reopen the form
 		const reopened = waitForApiResponse(page, 'PATCH')
-		await page
-			.getByRole('checkbox', { name: /Close form/ })
-			.click({ force: true })
+		await page.getByRole('switch', { name: /Close form/ }).click({ force: true })
 		await reopened
 
 		await topBar.toggleView(FormsView.View)
@@ -91,7 +83,7 @@ test.describe('Form settings', () => {
 	}) => {
 		const saved = waitForApiResponse(page, 'PATCH')
 		await page
-			.getByRole('checkbox', { name: /Store responses anonymously/ })
+			.getByRole('switch', { name: /Store responses anonymously/ })
 			.click({ force: true })
 		await saved
 
