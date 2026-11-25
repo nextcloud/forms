@@ -883,6 +883,50 @@ file2.txt"
 				// Expected Result
 				'Answer for non-existent question with ID 2.',
 			],
+			'question-id-in-other-notation' => [
+				[
+					['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'email']]
+				],
+				[
+					'1.0' => ['not an email']
+				],
+				'Answer for non-existent question with ID 1.0.',
+			],
+			'option-id-in-other-notation' => [
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => false, 'options' => [
+						['id' => 3],
+						['id' => 5]
+					]],
+				],
+				[
+					'1' => ['03']
+				],
+				'Answer "03" for question "q1" is not a valid option.',
+			],
+			'option-id-in-other-notation-with-other-answer' => [
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['allowOtherAnswer' => true], 'options' => [
+						['id' => 3],
+						['id' => 5]
+					]],
+				],
+				[
+					'1' => ['05']
+				],
+				'Answer "05" for question "q1" is not a valid option.',
+			],
+			'unknown-option-with-other-answer' => [
+				[
+					['id' => 1, 'type' => 'multiple_unique', 'text' => 'q1', 'isRequired' => true, 'extraSettings' => ['allowOtherAnswer' => true], 'options' => [
+						['id' => 3]
+					]],
+				],
+				[
+					'1' => ['not an option']
+				],
+				'Answer "not an option" for question "q1" is not a valid option.',
+			],
 			'invalid-multiple-too-many-answers' => [
 				// Questions
 				[
@@ -1345,6 +1389,46 @@ file2.txt"
 				],
 				['1' => ['10' => ['21' => '1']]],
 				'Column "21" for question "Number grid" is not a valid option.',
+			],
+			'invalid-number-grid-row-in-other-notation' => [
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Number grid', 'isRequired' => false, 'extraSettings' => ['questionType' => Constants::ANSWER_GRID_TYPE_NUMBER], 'options' => [
+						['id' => 10, 'optionType' => 'row'],
+						['id' => 20, 'optionType' => 'column'],
+					]],
+				],
+				['1' => ['010' => ['20' => '1']]],
+				'Row "010" for question "Number grid" is not a valid option.',
+			],
+			'valid-radio-grid' => [
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Radio grid', 'isRequired' => false, 'extraSettings' => ['questionType' => Constants::ANSWER_GRID_TYPE_RADIO], 'options' => [
+						['id' => 10, 'optionType' => 'row'],
+						['id' => 20, 'optionType' => 'column'],
+					]],
+				],
+				['1' => ['10' => '20']],
+				null,
+			],
+			'invalid-radio-grid-column-in-other-notation' => [
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Radio grid', 'isRequired' => false, 'extraSettings' => ['questionType' => Constants::ANSWER_GRID_TYPE_RADIO], 'options' => [
+						['id' => 10, 'optionType' => 'row'],
+						['id' => 20, 'optionType' => 'column'],
+					]],
+				],
+				['1' => ['10' => '020']],
+				'Column "020" for question "Radio grid" is not a valid option.',
+			],
+			'invalid-checkbox-grid-column-in-other-notation' => [
+				[
+					['id' => 1, 'type' => 'grid', 'text' => 'Checkbox grid', 'isRequired' => false, 'extraSettings' => ['questionType' => Constants::ANSWER_GRID_TYPE_CHECKBOX], 'options' => [
+						['id' => 10, 'optionType' => 'row'],
+						['id' => 20, 'optionType' => 'column'],
+					]],
+				],
+				['1' => ['10' => ['20', '020']]],
+				'Column "020" for question "Checkbox grid" is not a valid option.',
 			],
 			'invalid-ranking-missing-option' => [
 				// Questions
