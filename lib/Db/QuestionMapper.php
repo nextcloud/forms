@@ -72,8 +72,9 @@ class QuestionMapper extends QBMapper {
 	}
 
 	/**
-	 * Find Question by its ID
+	 * Find Question by its ID, unless it is deleted
 	 * @param int|float $questionId The question ID (int but for 32bit systems PHP uses float)
+	 * @throws DoesNotExistException if the question does not exist or is deleted
 	 */
 	public function findById(int|float $questionId): Question {
 		$qb = $this->db->getQueryBuilder();
@@ -82,6 +83,9 @@ class QuestionMapper extends QBMapper {
 			->from($this->getTableName())
 			->where(
 				$qb->expr()->eq('id', $qb->createNamedParameter($questionId, IQueryBuilder::PARAM_INT))
+			)
+			->andWhere(
+				$qb->expr()->neq('order', $qb->createNamedParameter(0, IQueryBuilder::PARAM_INT))
 			);
 
 		return $this->findEntity($qb);

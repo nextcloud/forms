@@ -55,6 +55,17 @@ class SubmissionMapperTest extends IntegrationBase {
 						'accept' => [],
 						'description' => 'Please answer this.',
 						'extraSettings' => []
+					],
+					[
+						'type' => 'short',
+						'text' => 'Deleted Question?',
+						'isRequired' => false,
+						'name' => '',
+						'order' => 0,
+						'options' => [],
+						'accept' => [],
+						'description' => '',
+						'extraSettings' => []
 					]
 				],
 				'shares' => [],
@@ -76,6 +87,10 @@ class SubmissionMapperTest extends IntegrationBase {
 							[
 								'questionIndex' => 0,
 								'text' => 'Answer 2'
+							],
+							[
+								'questionIndex' => 1,
+								'text' => 'Deleted term'
 							]
 						]
 					],
@@ -120,7 +135,8 @@ class SubmissionMapperTest extends IntegrationBase {
 
 		$db = \OCP\Server::get(IDBConnection::class);
 		$answerMapper = \OCP\Server::get(\OCA\Forms\Db\AnswerMapper::class);
-		$this->submissionMapper = new SubmissionMapper($db, $answerMapper);
+		$questionMapper = \OCP\Server::get(\OCA\Forms\Db\QuestionMapper::class);
+		$this->submissionMapper = new SubmissionMapper($db, $answerMapper, $questionMapper);
 	}
 
 	public function testFindByFormBasic(): void {
@@ -145,6 +161,10 @@ class SubmissionMapperTest extends IntegrationBase {
 
 		$this->assertCount(1, $submissions);
 		$this->assertEquals('user2', $submissions[0]->getUserId());
+	}
+
+	public function testFindByFormSearchSkipsAnswersToDeletedQuestions(): void {
+		$this->assertCount(0, $this->submissionMapper->findByForm($this->testForms[0]['id'], null, 'Deleted term'));
 	}
 
 	public function testFindByFormWithLimit(): void {
@@ -175,6 +195,10 @@ class SubmissionMapperTest extends IntegrationBase {
 		$count = $this->submissionMapper->countSubmissions($this->testForms[0]['id'], null, 'Search term');
 
 		$this->assertEquals(1, $count);
+	}
+
+	public function testCountSubmissionsSearchSkipsAnswersToDeletedQuestions(): void {
+		$this->assertEquals(0, $this->submissionMapper->countSubmissions($this->testForms[0]['id'], null, 'Deleted term'));
 	}
 
 	public function testCountSubmissionsEmptyForm(): void {
