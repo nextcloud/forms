@@ -132,8 +132,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["سىز ئەڭ ئاز بولغاندا 1 تاللانمىنى تاللىشىڭىز كېرەك","سىز ئەڭ ئاز بولغاندا %n تاللانمىلارنى تاللىشىڭىز كېرەك"],
     "Columns" : "ستون",
     "Rows" : "قۇر",
+    "Icon" : "سىنبەلگە",
     "Highest value" : "ئەڭ يۇقىرى قىممەت",
     "Lowest value" : "ئەڭ تۆۋەن قىممەت",
+    "Rating" : "باھا",
     "Label for lowest value" : "ئەڭ تۆۋەن قىممەت بەلگىسى",
     "Label (optional)" : "بەلگە (ئىختىيارى)",
     "From {firstOption} to {lastOption}" : "{firstOption} دىن {lastOption} غىچە",
@@ -151,6 +153,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "كىرگۈزۈش تۈرلىرى (ھازىر: {type})",
     "Regular expression for input validation" : "كىرگۈزۈشنى دەلىللەش ئۈچۈن دائىملىق ئىپادىلەش",
     "No response" : "ھېچقانداق جاۋاب يوق",
+    "Answers" : "جاۋاب",
+    "Average" : "ئوتتۇرىچە",
     "Edit this response" : "بۇ جاۋابنى تەھرىرلە",
     "Delete this response" : "بۇ جاۋابنى ئۆچۈرۈڭ",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "ئەگەر بۇ جەدۋەلنىڭ ئاممىۋى ئۇلىنىشى بولسا ياكى نامسىز جاۋابلارنى ساقلىسا ، بۇنى كونترول قىلغىلى بولمايدۇ.",
@@ -270,7 +274,6 @@ OC.L10N.register(
     "Leave form" : "جەدۋەلنى قالدۇرۇڭ",
     "You have unsaved changes! Do you still want to leave?" : "ساقلانمىغان ئۆزگەرتىشلىرىڭىز بار! بۇ يەردىن ئايرىلىشنى خالامسىز؟",
     "Do you want to clear all answers?" : "بارلىق جاۋابلارنى تازىلىماقچىمۇ؟",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "ئالدىنقى قېتىملىق زىيارىتىڭىزدىن باشلاپ بۇ جەدۋەل ئۆزگەردى. بارلىق جاۋابلارنى تازىلىماقچىمۇ؟",
     "Error while saving question" : "سوئالنى ساقلاش جەريانىدا خاتالىق",
     "Error while saving question options" : "سوئال تاللانمىلىرىنى ساقلاشتا خاتالىق",
     "There was an issue deleting this option" : "بۇ تاللاشنى ئۆچۈرۈشتە مەسىلە كۆرۈلدى",
@@ -341,6 +344,7 @@ OC.L10N.register(
     "People can enter a number" : "كىشىلەر بىر ساننى كىرگۈزەلەيدۇ",
     "Enter a number" : "سان كىرگۈزۈڭ",
     "Custom regular expression" : "دائىملىق ئىپادىلەش",
-    "The input does not match the required pattern" : "كىرگۈزۈش تەلەپ قىلىنغان ئەندىزىگە ماس كەلمەيدۇ"
+    "The input does not match the required pattern" : "كىرگۈزۈش تەلەپ قىلىنغان ئەندىزىگە ماس كەلمەيدۇ",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "ئالدىنقى قېتىملىق زىيارىتىڭىزدىن باشلاپ بۇ جەدۋەل ئۆزگەردى. بارلىق جاۋابلارنى تازىلىماقچىمۇ؟"
 },
 "nplurals=2; plural=(n != 1);");

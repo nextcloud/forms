@@ -147,8 +147,10 @@
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Devi scegliere almeno un'opzione","Devi scegliere almeno %n opzioni","Devi scegliere almeno %n opzioni"],
     "Columns" : "Colonne",
     "Rows" : "Righe",
+    "Icon" : "Icona",
     "Highest value" : "Valore più alto",
     "Lowest value" : "Valore più basso",
+    "Rating" : "Valutazione",
     "Label for lowest value" : "Etichetta per il valore più basso",
     "Label (optional)" : "Etichetta (facoltativa)",
     "From {firstOption} to {lastOption}" : "Da {firstOption}a {lastOption}",
@@ -166,6 +168,8 @@
     "Input types (currently: {type})" : "Tipi di input (attualmente: {type})",
     "Regular expression for input validation" : "Espressione regolare per la convalida dell'input",
     "No response" : "Nessuna risposta",
+    "Answers" : "Risposte",
+    "Average" : "Media",
     "Edit this response" : "Modifica questa risposta",
     "Delete this response" : "Elimina questa risposta",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Ciò non può essere controllato se il modulo contiene un collegamento pubblico o memorizza le risposte in forma anonima.",
@@ -315,7 +319,6 @@
     "Leave form" : "Lascia il modulo",
     "You have unsaved changes! Do you still want to leave?" : "Hai delle modifiche non salvate! Vuoi uscire comunque?",
     "Do you want to clear all answers?" : "Vuoi cancellare tutte le risposte?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Il modulo è cambiato dalla tua ultima visita. Vuoi cancellare tutte le risposte?",
     "Error while saving question" : "Errore durante il salvataggio della domanda",
     "Error while saving question options" : "Errore durante il salvataggio delle opzioni della domanda",
     "There was an issue deleting this option" : "Si è verificato un problema durante l'eliminazione di questa opzione",
@@ -388,6 +391,7 @@
     "People can enter a number" : "Le persone possono inserire un numero",
     "Enter a number" : "Inserisci un numero",
     "Custom regular expression" : "Espressione regolare personalizzata",
-    "The input does not match the required pattern" : "L'input non corrisponde al modello richiesto"
+    "The input does not match the required pattern" : "L'input non corrisponde al modello richiesto",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Il modulo è cambiato dalla tua ultima visita. Vuoi cancellare tutte le risposte?"
 },"pluralForm" :"nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;"
 }

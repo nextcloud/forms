@@ -133,8 +133,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Морате да изаберете барем једну опцију","Морате да изаберете барем %n опције","Морате да изаберете барем %n опција"],
     "Columns" : "Колоне",
     "Rows" : "Редови",
+    "Icon" : "Икона",
     "Highest value" : "Највиша вредност",
     "Lowest value" : "Најнижа вредност",
+    "Rating" : "По оцени",
     "Label for lowest value" : "Ознака за најнижу вредност",
     "Label (optional)" : "Ознака (није обавезно)",
     "From {firstOption} to {lastOption}" : "Од {firstOption} до {lastOption}",
@@ -152,6 +154,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Типови уноса (тренутно: {type})",
     "Regular expression for input validation" : "Регуларни израз за проверу исправности уноса",
     "No response" : "Нема одговора",
+    "Answers" : "Одговори",
+    "Average" : "Просечно",
     "Edit this response" : "Уреди овај одговор",
     "Delete this response" : "Обриши овај одговор",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Ово не може да се контролише, ако упитник има јавни лик или анонимно чува одговоре.",
@@ -271,7 +275,6 @@ OC.L10N.register(
     "Leave form" : "Напусти формулар",
     "You have unsaved changes! Do you still want to leave?" : "Имате измене које нисте сачували! Да ли још увек желите да напустите?",
     "Do you want to clear all answers?" : "Да ли желите да обришете све одговоре?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Формулар се изменио након што сте му приступили последњи пут. Желите ли да обришете све одговоре?",
     "Error while saving question" : "Грешка током чувања питања",
     "Error while saving question options" : "Грешка приликом чувања опција питања",
     "There was an issue deleting this option" : "Десила се грешка приликом брисања овог избора",
@@ -341,6 +344,7 @@ OC.L10N.register(
     "People can enter a number" : "Људи могу унети број",
     "Enter a number" : "Унесите број",
     "Custom regular expression" : "Произвољни регуларни израз",
-    "The input does not match the required pattern" : "Унос не задовољава тражени шаблон"
+    "The input does not match the required pattern" : "Унос не задовољава тражени шаблон",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Формулар се изменио након што сте му приступили последњи пут. Желите ли да обришете све одговоре?"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);");

@@ -16,6 +16,7 @@ OC.L10N.register(
     "Columns" : "Kolone",
     "Rows" : "Redovi",
     "Other" : "Ostali",
+    "Average" : "Prosjek",
     "never" : "nikad",
     "Set expiration date" : "Postavite datum isteka",
     "Expiration date" : "Datum isteka",

@@ -111,6 +111,8 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Gutxienez aukera %n hautatu behar duzu","Gutxienez %n aukera hautatu behar dituzu"],
     "Columns" : "Zutabeak",
     "Rows" : "Errenkadak",
+    "Icon" : "Ikonoa",
+    "Rating" : "Balorazioa",
     "Upper options limit must be greater than the lower limit" : "Aukeren goiko muga beheko muga baino handiagoa izan behar da",
     "Lower options limit must be smaller than the upper limit" : "Aukeren beheko muga goiko muga baino txikiagoa izan behar da",
     "Add \"other\"" : "Gehitu \"besteak\"",
@@ -124,6 +126,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Sarrera motak (currently: {type})",
     "Regular expression for input validation" : "Sarrera baliozkotzeko adierazpen erregularra",
     "No response" : "Erantzunik ez",
+    "Answers" : "Erantzunak",
+    "Average" : "Batezbestekoa",
     "Delete this response" : "Ezabatu erantzun hau",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Hau ezin da kontrolatu formularioak esteka publikoa badu edo erantzunak modu anonimoan gordetzen baditu.",
     "Expired on {date}" : "{date} datan iraungia",
@@ -232,7 +236,6 @@ OC.L10N.register(
     "Leave form" : "Utzi galdetegia",
     "You have unsaved changes! Do you still want to leave?" : "Gorde gabeko aldaketak dauzkazu! Atera nahi duzu hala ere?",
     "Do you want to clear all answers?" : "Erantzun guztiak garbitu nahi dituzu?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Galdetegia aldatu egin da zure azken bisitatik. Erantzun guztiak garbitu nahi dituzu?",
     "Error while saving question" : "Errorea galdera gordetzean",
     "Error while saving question options" : "Errore bat gertatu da galdera-aukerak gordetzean",
     "There was an issue deleting this option" : "Arazo bat gertatu da aukera hau ezabatzean",
@@ -288,6 +291,7 @@ OC.L10N.register(
     "People can enter a number" : "Jendeak zenbaki bat sar dezake",
     "Enter a number" : "Sartu zenbaki bat",
     "Custom regular expression" : "Pertsonalizatu adierazpen erregularra",
-    "The input does not match the required pattern" : "Sarrera ez dator bat behar den ereduarekin"
+    "The input does not match the required pattern" : "Sarrera ez dator bat behar den ereduarekin",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Galdetegia aldatu egin da zure azken bisitatik. Erantzun guztiak garbitu nahi dituzu?"
 },
 "nplurals=2; plural=(n != 1);");

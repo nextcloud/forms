@@ -140,8 +140,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Morate odabrati najmanje jednu opciju","Morate odabrati najmanje %n opcije","Morate odabrati najmanje %n opcija"],
     "Columns" : "Stupci",
     "Rows" : "Retci",
+    "Icon" : "Ikona",
     "Highest value" : "Najviša vrijednost",
     "Lowest value" : "Najniža vrijednost",
+    "Rating" : "Ocjena",
     "Label for lowest value" : "Oznaka za najnižu vrijednost",
     "Label (optional)" : "Oznaka (neobavezno)",
     "From {firstOption} to {lastOption}" : "Od {firstOption} do {lastOption}",
@@ -159,6 +161,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Vrste unosa (trenutačno: {type})",
     "Regular expression for input validation" : "Regularni izraz za provjeru valjanosti unosa",
     "No response" : "Nema odgovora",
+    "Answers" : "Odgovori",
+    "Average" : "Prosječno",
     "Edit this response" : "Uredi ovaj odgovor",
     "Delete this response" : "Izbriši ovaj odgovor",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Ovo nije moguće kontrolirati ako obrazac ima javnu poveznicu ili sprema odgovore anonimno.",
@@ -296,7 +300,6 @@ OC.L10N.register(
     "Leave form" : "Napusti obrazac",
     "You have unsaved changes! Do you still want to leave?" : "Postoje nespremljene promjene! Želite li još uvijek izaći?",
     "Do you want to clear all answers?" : "Želite li očistiti sve odgovore?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Obrazac se promijenio od vašeg zadnjeg posjeta. Želite li očistiti sve odgovore?",
     "Error while saving question" : "Pogreška pri spremanju pitanja",
     "Error while saving question options" : "Pogreška pri spremanju opcija pitanja",
     "There was an issue deleting this option" : "Došlo je do problema pri brisanju ove opcije",
@@ -369,6 +372,7 @@ OC.L10N.register(
     "People can enter a number" : "Osobe mogu unijeti broj",
     "Enter a number" : "Unesite broj",
     "Custom regular expression" : "Prilagođeni regularni izraz",
-    "The input does not match the required pattern" : "Unos ne odgovara traženom uzorku"
+    "The input does not match the required pattern" : "Unos ne odgovara traženom uzorku",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Obrazac se promijenio od vašeg zadnjeg posjeta. Želite li očistiti sve odgovore?"
 },
 "nplurals=3; plural=n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2;");

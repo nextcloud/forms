@@ -19,6 +19,7 @@ OC.L10N.register(
     "Columns" : "Ustunlar",
     "Rows" : "Qatorlar",
     "Other" : "Boshqa",
+    "Average" : "O'rtacha",
     "never" : "hech qachon",
     "Set expiration date" : "Set expiration date",
     "Expiration date" : "Tugash muddati",

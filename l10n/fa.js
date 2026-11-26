@@ -149,8 +149,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Ø¨Ø§ÛŒØ³ØªÛŒ Ø¯Ø³Øª Ú©Ù… ÛŒÚ© Ú¯Ø²ÛŒÙ†Ù‡ Ø±Ø§ Ø§Ù†ØªØ®Ø§Ø¨ Ú©Ù†ÛŒØ¯","Ø¨Ø§ÛŒØ³ØªÛŒ Ø¯Ø³Øª Ú©Ù… %n Ú¯Ø²ÛŒÙ†Ù‡ Ø±Ø§ Ø§Ù†ØªØ®Ø§Ø¨ Ú©Ù†ÛŒØ¯"],
     "Columns" : "ستون‌ها",
     "Rows" : "ردیف‌ها",
+    "Icon" : "آیکون",
     "Highest value" : "بیشترین مقدار",
     "Lowest value" : "کمترین مقدار",
+    "Rating" : "رتبه‌بندی",
     "Label for lowest value" : "کمترین مقدار",
     "Label (optional)" : "برچسب (اختیاری)",
     "From {firstOption} to {lastOption}" : "از {firstOption} تا {lastOption}",
@@ -179,6 +181,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "انواع ورودی (در حال حاضر: {type})",
     "Regular expression for input validation" : "عبارت منظم برای اعتبارسنجی ورودی",
     "No response" : "بدون پاسخ",
+    "Answers" : "گزینه‌ها",
+    "Average" : "میانگین",
     "Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred." : "رتبه‌بندی با روش Borda count: هر مقام اول {n} امتیاز، مقام دوم {n1} امتیاز و به همین ترتیب. امتیاز بالاتر به معنای اولویت بیشتر است.",
     "avg. rank {average}" : "میانگین رتبه {average}",
     "Edit this response" : "ویرایش این پاسخ",
@@ -332,7 +336,6 @@ OC.L10N.register(
     "Leave form" : "خروج از فرم",
     "You have unsaved changes! Do you still want to leave?" : "تغییرات ذخیره‌نشده‌ای دارید! آیا همچنان می‌خواهید خارج شوید؟",
     "Do you want to clear all answers?" : "آیا می‌خواهید همه پاسخ‌ها را پاک کنید؟",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "فرم از آخرین بازدید شما تغییر کرده است. آیا می‌خواهید همه پاسخ‌ها را پاک کنید؟",
     "Error while saving question" : "خطا در ذخیره سؤال",
     "Error while saving question options" : "خطا در ذخیره گزینه‌های سؤال",
     "There was an issue deleting this option" : "مشکلی در حذف این گزینه وجود داشت",
@@ -409,6 +412,7 @@ OC.L10N.register(
     "People can enter a number" : "کاربران می‌توانند یک عدد وارد کنند",
     "Enter a number" : "یک عدد وارد کنید",
     "Custom regular expression" : "عبارت منظم سفارشی",
-    "The input does not match the required pattern" : "ورودی با الگوی مورد نیاز مطابقت ندارد"
+    "The input does not match the required pattern" : "ورودی با الگوی مورد نیاز مطابقت ندارد",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "فرم از آخرین بازدید شما تغییر کرده است. آیا می‌خواهید همه پاسخ‌ها را پاک کنید؟"
 },
 "nplurals=2; plural=(n > 1);");

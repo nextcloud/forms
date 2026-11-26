@@ -10,6 +10,7 @@ OC.L10N.register(
     "Required" : "Angen",
     "Delete" : "Dileu",
     "Checkbox" : "Blwch ticio",
+    "Rating" : "Graddio",
     "Other" : "Arall",
     "never" : "byth",
     "Set expiration date" : "Gosod dyddiad dod i ben",

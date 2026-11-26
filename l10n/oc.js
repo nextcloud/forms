@@ -16,6 +16,7 @@ OC.L10N.register(
     "Options" : "Opcions",
     "Delete" : "Suprimir",
     "Text" : "Tèxt",
+    "Answers" : "Responsas",
     "never" : "pas jamai",
     "Set expiration date" : "Especificar una data d'expiracion",
     "Expiration date" : "Data d'expiracion",

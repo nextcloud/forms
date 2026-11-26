@@ -131,8 +131,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Debe escoger al menos una opción","Debe escoger al menos %n opciones","Debe escoger al menos %n opciones"],
     "Columns" : "Columnas",
     "Rows" : "Filas",
+    "Icon" : "Ícono",
     "Highest value" : "Valor más alto",
     "Lowest value" : "Valor más bajo",
+    "Rating" : "Calificación",
     "Label for lowest value" : "Etiqueta para el valor más bajo",
     "Label (optional)" : "Etiqueta (opcional)",
     "From {firstOption} to {lastOption}" : "Desde {firstOption} hasta {lastOption}",
@@ -150,6 +152,7 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Tipos de entrada (actualmente: {type})",
     "Regular expression for input validation" : "Expresión regular para validación de entrada",
     "No response" : "Sin respuesta",
+    "Average" : "Media",
     "Edit this response" : "Editar esta respuesta",
     "Delete this response" : "Eliminar esta respuesta",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Esto no se puede controlar, si el formulario tiene un enlace público o almacena las respuestas anónimamente.",
@@ -265,7 +268,6 @@ OC.L10N.register(
     "Leave form" : "Abandonar formulario",
     "You have unsaved changes! Do you still want to leave?" : "¡Tiene cambios sin guardar! , ¿Está seguro que desea salir?",
     "Do you want to clear all answers?" : "¿Desea limpiar todas las respuestas?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "El formulario ha cambiado desde su última visita. ¿Desea limpiar todas las respuestas?",
     "Error while saving question" : "Error al guardar pregunta",
     "Error while saving question options" : "Error al guardar las opciones de las preguntas",
     "There was an issue deleting this option" : "Ha habido un problema al eliminar esta opción",
@@ -336,6 +338,7 @@ OC.L10N.register(
     "People can enter a number" : "Las personas pueden ingresar un número",
     "Enter a number" : "Ingrese un número",
     "Custom regular expression" : "Expresión regular personalizada",
-    "The input does not match the required pattern" : "El valor ingresado no coincide con el patrón requerido"
+    "The input does not match the required pattern" : "El valor ingresado no coincide con el patrón requerido",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "El formulario ha cambiado desde su última visita. ¿Desea limpiar todas las respuestas?"
 },
 "nplurals=3; plural=n == 1 ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

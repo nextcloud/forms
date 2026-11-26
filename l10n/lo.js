@@ -132,6 +132,7 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["ທ່ານຕ້ອງເລືອກຢ່າງໜ້ອຍ %n ຕົວເລືອກ"],
     "Columns" : "ຖັນ",
     "Rows" : "ແຖວ",
+    "Icon" : "ໄອຄອນ",
     "Highest value" : "ຄ່າສູງສຸດ",
     "Lowest value" : "ຄ່າຕໍ່າສຸດ",
     "Label for lowest value" : "ປ້າຍກຳກັບສຳລັບຄ່າຕໍ່າສຸດ",
@@ -151,6 +152,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "ປະເພດການປ້ອນຂໍ້ມູນ (ປັດຈຸບັນ: {type})",
     "Regular expression for input validation" : "Regular expression ສຳລັບກວດສອບການປ້ອນຂໍ້ມູນ",
     "No response" : "ບໍ່ມີການຕອບກັບ",
+    "Answers" : "Answers",
+    "Average" : "ຄ່າສະເລ່ຍ",
     "Edit this response" : "ແກ້ໄຂຄຳຕອບນີ້",
     "Delete this response" : "ລຶບຄຳຕອບນີ້",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "ບໍ່ສາມາດຄວບຄຸມສິ່ງນີ້ໄດ້, ຫາກແບບຟອມມີລິງສາທາລະນະ ຫຼື ເກັບຄຳຕອບແບບບໍ່ລະບຸຊື່.",
@@ -270,7 +273,6 @@ OC.L10N.register(
     "Leave form" : "ອອກຈາກແບບຟອມ",
     "You have unsaved changes! Do you still want to leave?" : "ທ່ານມີການປ່ຽນແປງທີ່ຍັງບໍ່ໄດ້ບັນທຶກ! ທ່ານຍັງຕ້ອງການອອກຢູ່ບໍ່?",
     "Do you want to clear all answers?" : "ທ່ານຕ້ອງການລຶບລ້າງຄຳຕອບທັງໝົດບໍ່?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "ແບບຟອມມີການປ່ຽນແປງຕັ້ງແຕ່ການເຂົ້າເບິ່ງຄັ້ງຫຼ້າສຸດຂອງທ່ານ. ທ່ານຕ້ອງການລຶບລ້າງຄຳຕອບທັງໝົດບໍ່?",
     "Error while saving question" : "ເກີດຂໍ້ຜິດພາດໃນຂະນະທີ່ບັນທຶກຄຳຖາມ",
     "Error while saving question options" : "ເກີດຂໍ້ຜິດພາດໃນຂະນະທີ່ບັນທຶກຕົວເລືອກຂອງຄຳຖາມ",
     "There was an issue deleting this option" : "ເກີດບັນຫາໃນການລຶບຕົວເລືອກນີ້",
@@ -341,6 +343,7 @@ OC.L10N.register(
     "People can enter a number" : "ຜູ້ຄົນສາມາດປ້ອນຕົວເລກໄດ້",
     "Enter a number" : "ປ້ອນຕົວເລກ",
     "Custom regular expression" : "Regular expression ທີ່ກຳນົດເອງ",
-    "The input does not match the required pattern" : "ຂໍ້ມູນທີ່ປ້ອນບໍ່ກົງກັບຮູບແບບທີ່ກຳນົດ"
+    "The input does not match the required pattern" : "ຂໍ້ມູນທີ່ປ້ອນບໍ່ກົງກັບຮູບແບບທີ່ກຳນົດ",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "ແບບຟອມມີການປ່ຽນແປງຕັ້ງແຕ່ການເຂົ້າເບິ່ງຄັ້ງຫຼ້າສຸດຂອງທ່ານ. ທ່ານຕ້ອງການລຶບລ້າງຄຳຕອບທັງໝົດບໍ່?"
 },
 "nplurals=1; plural=0;");

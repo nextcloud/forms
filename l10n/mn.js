@@ -157,8 +157,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Та хамгийн багадаа нэг сонголт хийх ёстой","Та хамгийн багадаа %n сонголт хийх ёстой"],
     "Columns" : "Баганууд",
     "Rows" : "Мөрүүд",
+    "Icon" : "Тэмдэгт ",
     "Highest value" : "Хамгийн их утга",
     "Lowest value" : "Хамгийн бага утга",
+    "Rating" : "Зэрэглэл",
     "Label for lowest value" : "Хамгийн бага утгын шошго",
     "Label (optional)" : "Шошго (заавал биш)",
     "From {firstOption} to {lastOption}" : "{firstOption}-с {lastOption} хүртэл",
@@ -187,6 +189,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Оролтын төрлүүд (одоогоор: {type})",
     "Regular expression for input validation" : "Оролтын баталгаажуулалтын regular expression",
     "No response" : "Хариулт байхгүй",
+    "Answers" : "Хариултууд",
+    "Average" : "Дундаж",
     "Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred." : "Borda тооллоор эрэмбэлсэн: 1-р байр тус бүр {n} оноо, 2-р байр {n1} оноо гэх мэтчилэн авна. Өндөр оноо нь илүү дээр гэсэн үг.",
     "avg. rank {average}" : "дундаж эрэмбэ {average}",
     "Edit this response" : "Энэ хариултыг засах",
@@ -344,7 +348,6 @@ OC.L10N.register(
     "Leave form" : "Маягтаас гарах",
     "You have unsaved changes! Do you still want to leave?" : "Та хадгалаагүй өөрчлөлттэй байна! Та гарахдаа итгэлтэй байна уу?",
     "Do you want to clear all answers?" : "Та бүх хариултуудыг цэвэрлэхийг хүсэж байна уу?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Маягт таны сүүлийн зочилсноос хойш өөрчлөгдсөн байна. Бүх хариултыг арилгахыг хүсэж байна уу?",
     "Error while saving question" : "Асуулт хадгалахад алдаа гарлаа",
     "Error while saving question options" : "Асуултын сонголтуудыг хадгалахад алдаа гарлаа",
     "There was an issue deleting this option" : "Энэ сонголтыг устгахад асуудал гарлаа",
@@ -421,6 +424,7 @@ OC.L10N.register(
     "People can enter a number" : "Хүмүүс тоо оруулж болно",
     "Enter a number" : "Тоо оруулна уу",
     "Custom regular expression" : "Тусгай regular expression",
-    "The input does not match the required pattern" : "Оруулсан утга шаардлагатай загварт таарахгүй байна"
+    "The input does not match the required pattern" : "Оруулсан утга шаардлагатай загварт таарахгүй байна",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Маягт таны сүүлийн зочилсноос хойш өөрчлөгдсөн байна. Бүх хариултыг арилгахыг хүсэж байна уу?"
 },
 "nplurals=2; plural=(n != 1);");

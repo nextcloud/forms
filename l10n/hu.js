@@ -157,8 +157,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Legalább egy lehetőséget ki kell választania","Legalább %n lehetőséget ki kell választania"],
     "Columns" : "Oszlopok",
     "Rows" : "Sorok",
+    "Icon" : "Ikon",
     "Highest value" : "Legmagasabb érték",
     "Lowest value" : "Legalacsonyabb érték",
+    "Rating" : "Értékelés",
     "Label for lowest value" : "Legalacsonyabb érték címkéje",
     "Label (optional)" : "Címke (nem kötelező)",
     "From {firstOption} to {lastOption}" : "{firstOption} – {lastOption}",
@@ -187,6 +189,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Bemeneti típusok (jelenleg: {type})",
     "Regular expression for input validation" : "Reguláris kifejezés a bemenet ellenőrzésére",
     "No response" : "Nincs válasz",
+    "Answers" : "Válaszok",
+    "Average" : "Átlag",
     "Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred." : "Borda-módszer szerinti rangsor: minden 1. hely {n} pontot, a 2. hely {n1}pontot kap, és így tovább. A magasabb pontszám azt jelenti, hogy az adott jelöltet jobban preferálják.",
     "avg. rank {average}" : "átlagos rangsor {average}",
     "Edit this response" : "Ezen válasz szerkesztése",
@@ -344,7 +348,6 @@ OC.L10N.register(
     "Leave form" : "Űrlap elhagyása",
     "You have unsaved changes! Do you still want to leave?" : "Nem mentett módosításai vannak! Elhagyja az oldalt?",
     "Do you want to clear all answers?" : "Törli az összes választ?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Az űrlap megváltozott a legutóbbi látogatása óta. Törli az összes választ?",
     "Error while saving question" : "Hiba a kérdés mentése során",
     "Error while saving question options" : "Hiba történt a kérdés lehetőségeinek mentése során",
     "There was an issue deleting this option" : "Hiba lépett fel a lehetőség törlése során",
@@ -421,6 +424,7 @@ OC.L10N.register(
     "People can enter a number" : "Szám írható be",
     "Enter a number" : "Adjon meg egy számot",
     "Custom regular expression" : "Egyéni reguláris kifejezés",
-    "The input does not match the required pattern" : "A bemenet nem felel meg a kért mintának"
+    "The input does not match the required pattern" : "A bemenet nem felel meg a kért mintának",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Az űrlap megváltozott a legutóbbi látogatása óta. Törli az összes választ?"
 },
 "nplurals=2; plural=(n != 1);");
