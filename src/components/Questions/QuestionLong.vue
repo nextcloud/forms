@@ -94,6 +94,7 @@ import type {
 } from '../../composables/useAnswerLimits.ts'
 
 import { t } from '@nextcloud/l10n'
+import debounce from 'debounce'
 import { computed, defineComponent, nextTick, ref, watch } from 'vue'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
@@ -104,6 +105,7 @@ import {
 	QUESTION_PROPS,
 	useQuestion,
 } from '../../composables/useQuestion.ts'
+import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
 
 export default defineComponent({
 	name: 'QuestionLong',
@@ -197,6 +199,10 @@ export default defineComponent({
 			return true
 		}
 
+		const debounceValidate = debounce(async () => {
+			await validate()
+		}, INPUT_DEBOUNCE_MS)
+
 		const onInput = (event: Event): void => {
 			const field = textarea.value
 			if (!field) {
@@ -207,6 +213,7 @@ export default defineComponent({
 			}
 			limits.fitLength(field)
 			emit('update:values', [field.value])
+			void debounceValidate()
 		}
 
 		return {
