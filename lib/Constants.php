@@ -187,7 +187,8 @@ class Constants {
 		'phone',
 		'email',
 		'regex',
-		'number'
+		'number',
+		'url',
 	];
 
 	// This are allowed extra settings
@@ -206,8 +207,11 @@ class Constants {
 	public const EXTRA_SETTINGS_SHORT = [
 		'lengthMax' => ['integer'],
 		'lengthMin' => ['integer'],
+		'numberExclude' => ['boolean'],
 		'numberMax' => ['integer', 'double'],
 		'numberMin' => ['integer', 'double'],
+		'textContains' => ['string'],
+		'textNotContains' => ['string'],
 		'validationType' => ['string'],
 		'validationRegex' => ['string'],
 	];

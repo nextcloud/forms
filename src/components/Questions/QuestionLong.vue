@@ -88,7 +88,10 @@
 </template>
 
 <script lang="ts">
-import type { AnswerLimitSettings } from '../../composables/useAnswerLimits.ts'
+import type {
+	AnswerLimitKey,
+	AnswerLimitSettings,
+} from '../../composables/useAnswerLimits.ts'
 
 import { t } from '@nextcloud/l10n'
 import { computed, defineComponent, nextTick, ref, watch } from 'vue'
@@ -135,7 +138,7 @@ export default defineComponent({
 			rootElement,
 		})
 		const onLimitChange = (
-			key: keyof AnswerLimitSettings,
+			key: AnswerLimitKey,
 			input: number | string | null,
 			integer: boolean,
 		): void =>

@@ -27,12 +27,8 @@
 				class="question__input"
 				dir="auto"
 				:minlength="extraSettings.lengthMin || 1"
-				:min="
-					validationType === 'number' ? extraSettings.numberMin : undefined
-				"
-				:max="
-					validationType === 'number' ? extraSettings.numberMax : undefined
-				"
+				:min="hasNumberRange ? extraSettings.numberMin : undefined"
+				:max="hasNumberRange ? extraSettings.numberMax : undefined"
 				:type="validationObject.inputType"
 				:step="validationObject.inputType === 'number' ? 'any' : undefined"
 				@invalid.prevent="validate"
@@ -53,17 +49,21 @@
 				<template #icon>
 					<NcIconSvgWrapper :svg="validationObject.icon" />
 				</template>
-				<NcActionRadio
-					v-for="(
-						validationTypeObject, validationTypeName
-					) in validationTypes"
-					:key="validationTypeName"
-					:modelValue="validationType"
-					:name="`${id}_validationMenu`"
-					:value="validationTypeName"
-					@update:modelValue="onChangeValidationType(validationTypeName)">
-					{{ validationTypeObject.label }}
-				</NcActionRadio>
+				<template v-if="!isNumberRuleMenuOpen">
+					<NcActionRadio
+						v-for="(
+							validationTypeObject, validationTypeName
+						) in validationTypes"
+						:key="validationTypeName"
+						:modelValue="validationType"
+						:name="`${id}_validationMenu`"
+						:value="validationTypeName"
+						@update:modelValue="
+							onChangeValidationType(validationTypeName)
+						">
+						{{ validationTypeObject.label }}
+					</NcActionRadio>
+				</template>
 				<NcActionInput
 					v-if="validationType === 'regex'"
 					ref="regexInput"
@@ -121,55 +121,94 @@
 						@update:modelValue="
 							(value) => onLimitChange('lengthMax', value, true)
 						" />
-				</template>
-				<template v-if="validationType === 'number'">
-					<NcActionSeparator />
-					<NcActionCheckbox
-						:modelValue="extraSettings.numberMin !== undefined"
-						@update:modelValue="
-							(checked) =>
-								onLimitChange('numberMin', checked ? 0 : null, false)
-						">
-						{{ t('forms', 'Require a lowest number') }}
-					</NcActionCheckbox>
 					<NcActionInput
-						v-if="extraSettings.numberMin !== undefined"
+						:label="t('forms', 'Must contain')"
+						:labelOutside="false"
+						:showTrailingButton="false"
+						:maxlength="answerLengthMax"
+						:modelValue="extraSettings.textContains ?? ''"
+						@update:modelValue="
+							(value) => onChangeTextRule('textContains', value)
+						" />
+					<NcActionInput
+						:label="t('forms', 'Must not contain')"
+						:labelOutside="false"
+						:showTrailingButton="false"
+						:maxlength="answerLengthMax"
+						:modelValue="extraSettings.textNotContains ?? ''"
+						@update:modelValue="
+							(value) => onChangeTextRule('textNotContains', value)
+						" />
+				</template>
+				<template
+					v-if="validationType === 'number' && !isNumberRuleMenuOpen">
+					<NcActionSeparator />
+					<NcActionButton
+						key="number-rule"
+						isMenu
+						:name="t('forms', 'Number rule')"
+						@click="isNumberRuleMenuOpen = true">
+						{{ numberRules[currentNumberRule] }}
+					</NcActionButton>
+				</template>
+				<template v-if="validationType === 'number' && isNumberRuleMenuOpen">
+					<NcActionButton
+						key="number-rule-back"
+						:aria-label="t('forms', 'Number rule, back to input types')"
+						@click="isNumberRuleMenuOpen = false">
+						<template #icon>
+							<NcIconSvgWrapper :svg="IconChevronLeft" />
+						</template>
+						{{ t('forms', 'Number rule') }}
+					</NcActionButton>
+					<NcActionSeparator />
+					<NcActionRadio
+						v-for="(label, rule) in numberRules"
+						:key="rule"
+						:modelValue="currentNumberRule"
+						:name="`${id}_numberRule`"
+						:value="rule"
+						@update:modelValue="onChangeNumberRule(rule)">
+						{{ label }}
+					</NcActionRadio>
+					<NcActionInput
+						v-if="
+							currentNumberRule === 'equal'
+							|| currentNumberRule === 'notEqual'
+						"
 						type="number"
 						step="any"
-						:label="t('forms', 'Lowest number')"
+						:label="t('forms', 'Number')"
 						:labelOutside="false"
 						:showTrailingButton="false"
 						:modelValue="extraSettings.numberMin"
-						v-bind="limitFieldState('numberMin')"
-						@update:modelValue="
-							(value) => onLimitChange('numberMin', value, false)
-						" />
-					<NcActionCheckbox
-						:modelValue="extraSettings.numberMax !== undefined"
-						@update:modelValue="
-							(checked) =>
-								onLimitChange(
-									'numberMax',
-									checked
-										? Math.max(extraSettings.numberMin ?? 0, 100)
-										: null,
-									false,
-								)
-						">
-						{{ t('forms', 'Require a highest number') }}
-					</NcActionCheckbox>
-					<NcActionInput
-						v-if="extraSettings.numberMax !== undefined"
-						type="number"
-						step="any"
-						:label="t('forms', 'Highest number')"
-						:labelOutside="false"
-						:showTrailingButton="false"
-						:modelValue="extraSettings.numberMax"
-						v-bind="limitFieldState('numberMax')"
-						@update:modelValue="
-							(value) => onLimitChange('numberMax', value, false)
-						" />
+						@update:modelValue="onChangeNumberValue" />
+					<template v-else>
+						<NcActionInput
+							v-if="extraSettings.numberMin !== undefined"
+							type="number"
+							step="any"
+							:label="t('forms', 'Lowest number')"
+							:labelOutside="false"
+							:showTrailingButton="false"
+							:modelValue="extraSettings.numberMin"
+							v-bind="limitFieldState('numberMin')"
+							@update:modelValue="
+								(value) => onLimitChange('numberMin', value, false)
+							" />
+						<NcActionInput
+							v-if="extraSettings.numberMax !== undefined"
+							type="number"
+							step="any"
+							:label="t('forms', 'Highest number')"
+							:labelOutside="false"
+							:showTrailingButton="false"
+							:modelValue="extraSettings.numberMax"
+							v-bind="limitFieldState('numberMax')"
+							@update:modelValue="
+								(value) => onLimitChange('numberMax', value, false)
+							" />
+					</template>
 				</template>
 			</NcActions>
 			<p
@@ -186,12 +225,18 @@
 </template>
 
 <script lang="ts">
-import type { AnswerLimitSettings } from '../../composables/useAnswerLimits.ts'
+import type {
+	AnswerLimitKey,
+	AnswerLimitSettings,
+	NumberRule,
+} from '../../composables/useAnswerLimits.ts'
 
+import IconChevronLeft from '@material-symbols/svg-400/outlined/chevron_left.svg?raw'
 import IconRegex from '@material-symbols/svg-400/outlined/regular_expression.svg?raw'
 import { t } from '@nextcloud/l10n'
 import debounce from 'debounce'
-import { computed, defineComponent, ref } from 'vue'
+import { computed, defineComponent, ref, watch } from 'vue'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
@@ -199,7 +244,11 @@ import NcActions from '@nextcloud/vue/components/NcActions'
 import NcActionSeparator from '@nextcloud/vue/components/NcActionSeparator'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
 import Question from './Question.vue'
-import { useAnswerLimits } from '../../composables/useAnswerLimits.ts'
+import {
+	numberRule,
+	numberRuleSettings,
+	useAnswerLimits,
+} from '../../composables/useAnswerLimits.ts'
 import {
 	QUESTION_EMITS,
 	QUESTION_PROPS,
@@ -220,6 +269,7 @@ export default defineComponent({
 	components: {
 		NcIconSvgWrapper,
 		NcActions,
+		NcActionButton,
 		NcActionCheckbox,
 		NcActionInput,
 		NcActionRadio,
@@ -239,6 +289,12 @@ export default defineComponent({
 			}
 		} | null>(null)
 		const isValidationTypeMenuOpen = ref(false)
+		const isNumberRuleMenuOpen = ref(false)
+		watch(isValidationTypeMenuOpen, (open) => {
+			if (!open) {
+				isNumberRuleMenuOpen.value = false
+			}
+		})
 		const values = computed(() => {
 			return props.values as Array<
 				string | number | readonly string[] | null | undefined
@@ -259,7 +315,7 @@ export default defineComponent({
 			rootElement,
 		})
 		const onLimitChange = (
-			key: keyof AnswerLimitSettings,
+			key: AnswerLimitKey,
 			input: number | string | null,
 			integer: boolean,
 		): void =>
@@ -380,8 +436,11 @@ export default defineComponent({
 			const noLimits = {
 				lengthMax: undefined,
 				lengthMin: undefined,
+				numberExclude: undefined,
 				numberMax: undefined,
 				numberMin: undefined,
+				textContains: undefined,
+				textNotContains: undefined,
 			}
 			if (validationType === 'regex') {
 				// Make sure to also submit a regex (even if empty)
@@ -399,6 +458,65 @@ export default defineComponent({
 						validationType === 'text' ? undefined : validationType,
 				})
 			}
+		}
+
+		const numberRules: Record<NumberRule, string> = {
+			any: t('forms', 'Any number'),
+			between: t('forms', 'Between'),
+			notBetween: t('forms', 'Not between'),
+			atLeast: t('forms', 'At least'),
+			atMost: t('forms', 'At most'),
+			equal: t('forms', 'Equal to'),
+			notEqual: t('forms', 'Not equal to'),
+		}
+
+		const currentNumberRule = computed(() => numberRule(extraSettings.value))
+
+		const hasNumberRange = computed(
+			() =>
+				validationType.value === 'number'
+				&& !extraSettings.value.numberExclude,
+		)
+
+		/**
+		 * Change the number rule, keeping the current numbers where possible
+		 *
+		 * @param rule the new number rule
+		 */
+		const onChangeNumberRule = (rule: NumberRule): void => {
+			question.onExtraSettingsChange(
+				numberRuleSettings(rule, extraSettings.value),
+			)
+		}
+
+		/**
+		 * Save the number of an equal or not equal rule
+		 *
+		 * @param value the new number
+		 */
+		const onChangeNumberValue = (value: number | string | null): void => {
+			const number = Number.parseFloat(String(value ?? ''))
+			if (!isNaN(number)) {
+				question.onExtraSettingsChange({
+					numberMin: number,
+					numberMax: number,
+				})
+			}
+		}
+
+		/**
+		 * Save a text the answer must or must not contain, an empty text removes the rule
+		 *
+		 * @param key the rule to change
+		 * @param value the new text
+		 */
+		const onChangeTextRule = (
+			key: 'textContains' | 'textNotContains',
+			value: number | string | null,
+		): void => {
+			question.onExtraSettingsChange({
+				[key]: String(value ?? '') || undefined,
+			})
 		}
 
 		/**
@@ -453,8 +571,10 @@ export default defineComponent({
 			onLimitChange,
 			extraSettings,
 			rootElement,
+			IconChevronLeft,
 			IconRegex,
 			t,
+			isNumberRuleMenuOpen,
 			validationTypes,
 			isValidationTypeMenuOpen,
 			submissionInputPlaceholder,
@@ -468,6 +588,12 @@ export default defineComponent({
 			validate,
 			onInput,
 			onChangeValidationType,
+			currentNumberRule,
+			hasNumberRange,
+			numberRules,
+			onChangeNumberRule,
+			onChangeNumberValue,
+			onChangeTextRule,
 			onInputRegex,
 			onSubmitRegex,
 		}

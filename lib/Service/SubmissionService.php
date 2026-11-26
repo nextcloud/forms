@@ -902,6 +902,11 @@ class SubmissionService {
 				return $this->emailValidator->isValid($data);
 			case 'number':
 				return is_numeric($data);
+			case 'url':
+				$url = parse_url($data);
+				return is_array($url)
+					&& in_array(strtolower($url['scheme'] ?? ''), ['http', 'https'], true)
+					&& preg_match('/^\S+$/u', $url['host'] ?? '') === 1;
 			case 'phone':
 				// some special characters are used (depending on the locale)
 				$sanitized = str_replace([' ', '(', ')', '.', '/', '-', 'x'], '', $data);
@@ -924,11 +929,12 @@ class SubmissionService {
 	}
 
 	/**
-	 * Check a text answer against the length limits and the number range of its question
+	 * Check a text answer against the length limits, the number rule and the
+	 * required or forbidden text of its question
 	 *
 	 * @param array $question the question
 	 * @param string $answer the answer text
-	 * @throws \InvalidArgumentException if the answer is too short, too long or out of range
+	 * @throws \InvalidArgumentException if the answer breaks one of the rules
 	 */
 	private function validateAnswerLimits(array $question, string $answer): void {
 		$lengthMin = $question['extraSettings']['lengthMin'] ?? null;
@@ -940,9 +946,28 @@ class SubmissionService {
 
 		$numberMin = $question['extraSettings']['numberMin'] ?? null;
 		$numberMax = $question['extraSettings']['numberMax'] ?? null;
-		if (($numberMin !== null || $numberMax !== null) && is_numeric($answer)
-			&& (($numberMin !== null && +$answer < $numberMin) || ($numberMax !== null && +$answer > $numberMax))) {
-			throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be a number from %s to %s.', $question['text'], $numberMin ?? '-∞', $numberMax ?? '∞'));
+		if (($numberMin !== null || $numberMax !== null) && is_numeric($answer)) {
+			$inRange = ($numberMin === null || +$answer >= $numberMin) && ($numberMax === null || +$answer <= $numberMax);
+			$exclude = ($question['extraSettings']['numberExclude'] ?? false) === true;
+			if ($numberMin !== null && $numberMax !== null && $numberMin == $numberMax && $inRange === $exclude) {
+				throw new \InvalidArgumentException(sprintf($exclude ? 'The answer for question "%s" must not be %s.' : 'The answer for question "%s" must be %s.', $question['text'], $numberMin));
+			}
+			if ($exclude) {
+				if ($inRange) {
+					throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be a number outside %s to %s.', $question['text'], $numberMin, $numberMax));
+				}
+			} elseif (!$inRange) {
+				throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be a number from %s to %s.', $question['text'], $numberMin ?? '-∞', $numberMax ?? '∞'));
+			}
+		}
+
+		$textContains = $question['extraSettings']['textContains'] ?? null;
+		if ($textContains !== null && mb_stripos($answer, $textContains) === false) {
+			throw new \InvalidArgumentException(sprintf('The answer for question "%s" must contain "%s".', $question['text'], $textContains));
+		}
+		$textNotContains = $question['extraSettings']['textNotContains'] ?? null;
+		if ($textNotContains !== null && mb_stripos($answer, $textNotContains) !== false) {
+			throw new \InvalidArgumentException(sprintf('The answer for question "%s" must not contain "%s".', $question['text'], $textNotContains));
 		}
 	}
 

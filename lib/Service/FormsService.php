@@ -1096,6 +1096,8 @@ class FormsService {
 	 * A length limit is allowed on plain text answers only, a number range only
 	 * on answers validated as number. Lengths are counted in characters from 1
 	 * up to the stored answer length, and a minimum must not exceed its maximum.
+	 * A required text must fit the maximum length and must not contain the
+	 * excluded text.
 	 *
 	 * @param array $extraSettings the extra settings of the question
 	 * @return bool true if the limits are valid or not set
@@ -1106,6 +1108,18 @@ class FormsService {
 		$lengthMax = $extraSettings['lengthMax'] ?? null;
 		$numberMin = $extraSettings['numberMin'] ?? null;
 		$numberMax = $extraSettings['numberMax'] ?? null;
+		$numberExclude = $extraSettings['numberExclude'] ?? null;
+
+		foreach (['textContains', 'textNotContains'] as $key) {
+			$text = $extraSettings[$key] ?? null;
+			if ($text !== null && ($validationType !== null || $text === '' || mb_strlen($text) > Constants::MAX_STRING_LENGTHS['answerText'])) {
+				return false;
+			}
+		}
+
+		if ($numberExclude !== null && ($numberExclude !== true || $numberMin === null || $numberMax === null)) {
+			return false;
+		}
 
 		if ($lengthMin !== null || $lengthMax !== null) {
 			if ($validationType !== null) {
@@ -1119,6 +1133,15 @@ class FormsService {
 			if ($lengthMin !== null && $lengthMax !== null && $lengthMin > $lengthMax) {
 				return false;
 			}
+		}
+
+		$textContains = $extraSettings['textContains'] ?? null;
+		$textNotContains = $extraSettings['textNotContains'] ?? null;
+		if (is_string($textContains) && is_string($textNotContains) && mb_stripos($textContains, $textNotContains) !== false) {
+			return false;
+		}
+		if (is_string($textContains) && $lengthMax !== null && mb_strlen($textContains) > $lengthMax) {
+			return false;
 		}
 
 		if ($numberMin !== null || $numberMax !== null) {

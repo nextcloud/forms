@@ -546,6 +546,9 @@
                         "type": "integer",
                         "format": "int64"
                     },
+                    "numberExclude": {
+                        "type": "boolean"
+                    },
                     "numberMax": {
                         "anyOf": [
                             {
@@ -617,6 +620,12 @@
                     },
                     "shuffleOptions": {
                         "type": "boolean"
+                    },
+                    "textContains": {
+                        "type": "string"
+                    },
+                    "textNotContains": {
+                        "type": "string"
                     },
                     "timeMax": {
                         "type": "string"

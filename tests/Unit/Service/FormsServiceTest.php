@@ -1787,6 +1787,76 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_LONG,
 				'expected' => false
 			],
+			'valid-url-type' => [
+				'extraSettings' => ['validationType' => 'url'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-number-not-between' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberExclude' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-number-not-equal' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 5, 'numberMax' => 5, 'numberExclude' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-number-exclude-false' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberExclude' => false],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-exclude-one-bound' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberExclude' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-exclude-not-boolean' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberExclude' => 'yes'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'valid-text-contains' => [
+				'extraSettings' => ['textContains' => 'Nextcloud', 'textNotContains' => 'spam', 'lengthMax' => 70],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-text-contains-empty' => [
+				'extraSettings' => ['textContains' => ''],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-text-contains-too-long' => [
+				'extraSettings' => ['textNotContains' => str_repeat('a', 4097)],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-text-contains-not-string' => [
+				'extraSettings' => ['textContains' => 42],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-text-contains-with-validation-type' => [
+				'extraSettings' => ['validationType' => 'email', 'textContains' => '@nextcloud.com'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-text-contains-excluded-text' => [
+				'extraSettings' => ['textContains' => 'Nextcloud GmbH', 'textNotContains' => 'gmbh'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-text-contains-longer-than-length-max' => [
+				'extraSettings' => ['textContains' => 'GmbH', 'lengthMax' => 3],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-text-contains-on-long' => [
+				'extraSettings' => ['textContains' => 'Nextcloud'],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => false
+			],
 			'valid-custom-regex' => [
 				'extraSettings' => [
 					'validationType' => 'regex',
