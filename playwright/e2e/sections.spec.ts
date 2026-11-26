@@ -17,7 +17,7 @@ import { api } from '../support/helpers.ts'
 const test = mergeTests(randomUserTest, submitTest)
 
 /**
- * Create a form with a radio question "Do you have a pet?" (Yes, No), a section "About the pet", a short question "Which pet?" and a short question "Comments"
+ * Create a form with a section without title, a radio question "Do you have a pet?" (Yes, No), a section "About the pet", a short question "Which pet?" and a short question "Comments"
  *
  * @param request the request context of the page
  */
@@ -25,6 +25,10 @@ async function createSectionForm(request: APIRequestContext) {
 	const form = await api(request, 'POST', '/forms')
 	await api(request, 'PATCH', `/forms/${form.id}`, {
 		keyValuePairs: { title: 'Section form' },
+	})
+	await api(request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'section',
+		text: '',
 	})
 	const pet = await api(request, 'POST', `/forms/${form.id}/questions`, {
 		type: 'multiple_unique',
@@ -59,7 +63,7 @@ test.describe('Sections', () => {
 		await page.goto(`apps/forms/${form.hash}/edit`)
 
 		await expect(
-			page.getByRole('listitem', { name: 'Section number 1' }),
+			page.getByRole('listitem', { name: 'Section number 2' }),
 		).toBeVisible()
 		await expect(
 			page
@@ -85,7 +89,7 @@ test.describe('Sections', () => {
 
 		await expect(page.getByRole('option')).toHaveText([
 			'Next question',
-			'Section 1: About the pet',
+			'Section 2: About the pet',
 			'Question 2: Which pet?',
 			'Question 3: Comments',
 			'End of the form',
@@ -150,6 +154,7 @@ test.describe('Sections', () => {
 	}) => {
 		const form = await api(page.request, 'POST', '/forms')
 		for (const [type, text, description] of [
+			['section', ''],
 			['short', 'Intro'],
 			['section', 'Part one'],
 			['short', 'First'],
@@ -187,5 +192,173 @@ test.describe('Sections', () => {
 		])
 		await expect(questions).toContainText('Only a note')
 		await expect(questions.locator(':scope > ul > li')).toHaveCount(6)
+	})
+
+	test('Adding a section below questions puts them into a section "Untitled section"', async ({
+		page,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		for (const [type, text] of [
+			['short', 'First'],
+			['long', 'Second'],
+		]) {
+			await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+				type,
+				text,
+			})
+		}
+		await page.goto(`apps/forms/${form.hash}/edit`)
+
+		await page.getByRole('button', { name: 'Add a question' }).click()
+		await page.getByRole('menuitem', { name: 'Section' }).click()
+
+		const items = page.locator('main li.question')
+		await expect(items).toHaveCount(4)
+		await expect(
+			page.getByRole('textbox', { name: 'Title of section number 1' }),
+		).toHaveValue('Untitled section')
+		await expect(
+			page.getByRole('textbox', { name: 'Title of section number 2' }),
+		).toHaveValue('')
+		await expect(items.nth(1)).toHaveAccessibleName('Question number 1')
+		await expect(items.nth(2)).toHaveAccessibleName('Question number 2')
+		await expect(items.nth(3)).toHaveAccessibleName('Section number 2')
+
+		const questions = await api(
+			page.request,
+			'GET',
+			`/forms/${form.id}/questions`,
+		)
+		expect(
+			questions.map(({ type, text }: { type: string; text: string }) => [
+				type,
+				text,
+			]),
+		).toEqual([
+			['section', 'Untitled section'],
+			['short', 'First'],
+			['long', 'Second'],
+			['section', ''],
+		])
+	})
+
+	test('Inserting a section between questions splits them into two sections', async ({
+		page,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		for (const [type, text] of [
+			['short', 'First'],
+			['long', 'Second'],
+		]) {
+			await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+				type,
+				text,
+			})
+		}
+		await page.goto(`apps/forms/${form.hash}/edit`)
+
+		await page.getByRole('listitem', { name: 'Question number 1' }).hover()
+		await page
+			.getByRole('button', { name: 'Insert question after question 1' })
+			.click()
+		await page.getByRole('menuitem', { name: 'Section' }).click()
+
+		await expect(page.locator('main li.question')).toHaveCount(4)
+		const questions = await api(
+			page.request,
+			'GET',
+			`/forms/${form.id}/questions`,
+		)
+		expect(
+			questions.map(({ type, text }: { type: string; text: string }) => [
+				type,
+				text,
+			]),
+		).toEqual([
+			['section', 'Untitled section'],
+			['short', 'First'],
+			['section', ''],
+			['long', 'Second'],
+		])
+	})
+
+	test('The server keeps questions out of the space before the first section', async ({
+		page,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		const first = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'short',
+				text: 'First',
+			},
+		)
+		const response = await page.request.post(
+			`../ocs/v2.php/apps/forms/api/v3/forms/${form.id}/questions`,
+			{
+				headers: { 'OCS-APIRequest': 'true', Accept: 'application/json' },
+				data: { type: 'section', text: 'Below' },
+			},
+		)
+		expect(response.status()).toBe(400)
+		const section = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{
+				type: 'section',
+				text: 'Top',
+				position: 1,
+			},
+		)
+		const reorder = await page.request.patch(
+			`../ocs/v2.php/apps/forms/api/v3/forms/${form.id}/questions`,
+			{
+				headers: { 'OCS-APIRequest': 'true', Accept: 'application/json' },
+				data: { newOrder: [first.id, section.id] },
+			},
+		)
+		expect(reorder.status()).toBe(400)
+	})
+
+	test('Deleting the first section moves its questions into the next section', async ({
+		page,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		for (const [type, text] of [
+			['section', 'Start'],
+			['short', 'First'],
+			['section', 'Next'],
+			['long', 'Second'],
+		]) {
+			await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+				type,
+				text,
+			})
+		}
+		await page.goto(`apps/forms/${form.hash}/edit`)
+
+		const start = page.getByRole('listitem', { name: 'Section number 1' })
+		await start.getByRole('button', { name: 'Actions', exact: true }).click()
+		await page.getByRole('menuitem', { name: 'Delete question' }).click()
+
+		await expect(
+			page.getByRole('textbox', { name: 'Title of section number 1' }),
+		).toHaveValue('Next')
+		await expect(page.locator('main li.question').first()).toHaveAccessibleName(
+			'Section number 1',
+		)
+		const questions = await api(
+			page.request,
+			'GET',
+			`/forms/${form.id}/questions`,
+		)
+		expect(questions.map(({ text }: { text: string }) => text)).toEqual([
+			'Next',
+			'First',
+			'Second',
+		])
 	})
 })

@@ -2622,7 +2622,7 @@
             "delete": {
                 "operationId": "api-delete-question",
                 "summary": "Delete a question",
-                "description": "This endpoint allows CORS requests",
+                "description": "Deleting the first section moves the next section up to its place, so its questions stay in a section; jumps that become backward are removed, and the header `X-Forms-Adjusted` then holds `removed-jumps` with the ids of their questions\nThis endpoint allows CORS requests",
                 "tags": [
                     "api"
                 ],
@@ -2666,6 +2666,18 @@
                 "responses": {
                     "200": {
                         "description": "the id of the deleted question",
+                        "headers": {
+                            "X-Forms-Adjusted": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            },
+                            "Access-Control-Expose-Headers": {
+                                "schema": {
+                                    "type": "string"
+                                }
+                            }
+                        },
                         "content": {
                             "application/json": {
                                 "schema": {

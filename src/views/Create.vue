@@ -177,10 +177,11 @@
 							:class="sectionFrames[index]"
 							v-bind="form.questions[index]"
 							:canMoveDown="
-								!isChangingQuestions
-								&& index < form.questions.length - 1
+								!isChangingQuestions && canSwapWithNext(index)
 							"
-							:canMoveUp="!isChangingQuestions && index > 0"
+							:canMoveUp="
+								!isChangingQuestions && canSwapWithNext(index - 1)
+							"
 							:answerType="answerTypes[question.type]"
 							:index="questionNumbers.get(question.id)"
 							:maxStringLengths="maxStringLengths"
@@ -325,9 +326,11 @@ import {
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import {
+	countQuestionsOutsideSections,
 	getNumbers,
 	QUESTION_TYPE_SECTION,
 	STUCK_SECTION_KEY,
+	withNextSectionMovedUp,
 } from '../utils/Sections.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
@@ -1019,15 +1022,30 @@ export default defineComponent({
 			onQuestionOrderChange(questions, moved)
 		}
 
+		/**
+		 * Whether the question at a position can swap with the one after it: both exist, and the swap moves no question before the first section
+		 *
+		 * @param index the position of the question
+		 */
+		const canSwapWithNext = (index: number): boolean => {
+			const questions = props.form.questions
+			return (
+				index >= 0
+				&& index < questions.length - 1
+				&& (index !== countQuestionsOutsideSections(questions)
+					|| questions[index].type !== QUESTION_TYPE_SECTION
+					|| questions[index + 1].type === QUESTION_TYPE_SECTION)
+			)
+		}
+
 		const onMoveUp = (index: number): void => {
-			if (index > 0) {
+			if (canSwapWithNext(index - 1)) {
 				swapWithPrevious(index, props.form.questions[index])
 			}
 		}
 
 		const onMoveDown = (index: number): void => {
-			// only if not the last one
-			if (index < props.form.questions.length - 1) {
+			if (canSwapWithNext(index)) {
 				swapWithPrevious(index + 1, props.form.questions[index])
 			}
 		}
@@ -1120,6 +1138,36 @@ export default defineComponent({
 			startChangingQuestions(formId)
 
 			try {
+				if (
+					type === QUESTION_TYPE_SECTION
+					&& props.form.questions.length > 0
+					&& props.form.questions[0].type !== QUESTION_TYPE_SECTION
+				) {
+					const sectionText = t('forms', 'Untitled section')
+					const implicitResponse = await queueQuestionRequest(
+						props.form.questions.map(({ id }) => id),
+						() =>
+							axios.post(
+								generateOcsUrl(
+									'apps/forms/api/v3/forms/{id}/questions',
+									{ id: props.form.id },
+								),
+								{ type, text: sectionText, subtype, position: 1 },
+							),
+					)
+					if (props.form.id !== formId) {
+						return
+					}
+					insertQuestion(
+						OcsResponse2Data<FormsQuestion>(implicitResponse),
+						{ text: sectionText, type, answers: [] },
+						0,
+					)
+					if (position !== null) {
+						position += 1
+					}
+				}
+
 				const body: {
 					type: string
 					text: string
@@ -1193,9 +1241,20 @@ export default defineComponent({
 				if (props.form.id !== formId) {
 					return
 				}
-				const questions = props.form.questions.filter(
+				const position = props.form.questions.findIndex(
+					({ id }) => id === questionId,
+				)
+				const remaining = props.form.questions.filter(
 					(search: FormsQuestion) => search.id !== questionId,
 				)
+				const reordered =
+					props.form.questions[position]?.type === QUESTION_TYPE_SECTION
+						? withNextSectionMovedUp(remaining, position)
+						: remaining
+				const questions =
+					reordered === remaining
+						? remaining
+						: withoutBackwardJumps(reordered)
 				warnAboutJumpChanges(props.form.questions, questions)
 				emit('update:form', { ...props.form, questions })
 				emitEvent('forms:last-updated:set', props.form.id)
@@ -1266,6 +1325,13 @@ export default defineComponent({
 		}
 
 		const onUpdateQuestions = (questions: FormsQuestion[]): void => {
+			if (
+				countQuestionsOutsideSections(questions)
+				> countQuestionsOutsideSections(props.form.questions)
+			) {
+				showWarning(t('forms', 'Every question needs to be in a section'))
+				return
+			}
 			emit('update:form', { ...props.form, questions })
 			onQuestionOrderChange(
 				questions,
@@ -1351,6 +1417,7 @@ export default defineComponent({
 			updateQuestionName,
 			updateQuestionExtraSettings,
 			updateQuestionOptions,
+			canSwapWithNext,
 			onMoveUp,
 			onMoveDown,
 			onTitleInput,

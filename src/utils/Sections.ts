@@ -93,3 +93,41 @@ export function getQuestionIdsInSections(
 			.map((question) => question.id),
 	)
 }
+
+/**
+ * The number of questions before the first section, 0 for a form without sections
+ *
+ * @param questions the questions and sections in their order
+ */
+export function countQuestionsOutsideSections(
+	questions: Array<{ type: string }>,
+): number {
+	return Math.max(
+		0,
+		questions.findIndex((question) => question.type === QUESTION_TYPE_SECTION),
+	)
+}
+
+/**
+ * The questions after deleting a section: when it was the first section, the next section moves up to its place, so its questions stay in a section
+ *
+ * @param questions the remaining questions and sections in their order
+ * @param position the position of the deleted section
+ */
+export function withNextSectionMovedUp<T extends { type: string }>(
+	questions: T[],
+	position: number,
+): T[] {
+	const first = questions.findIndex(
+		(question) => question.type === QUESTION_TYPE_SECTION,
+	)
+	if (first <= position) {
+		return questions
+	}
+	return [
+		...questions.slice(0, position),
+		questions[first],
+		...questions.slice(position, first),
+		...questions.slice(first + 1),
+	]
+}

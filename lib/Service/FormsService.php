@@ -1148,6 +1148,17 @@ class FormsService {
 	}
 
 	/**
+	 * The number of questions before the first section, 0 for a form without sections
+	 *
+	 * @param list<string> $types the question types of the form in their order
+	 * @return int the number of questions outside any section
+	 */
+	public static function countQuestionsOutsideSections(array $types): int {
+		$first = array_search(Constants::ANSWER_TYPE_SECTION, $types, true);
+		return $first === false ? 0 : $first;
+	}
+
+	/**
 	 * Get list of forms
 	 *
 	 * @param ISearchQuery $query the query to search the forms

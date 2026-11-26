@@ -551,6 +551,7 @@ class ApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_CREATED, FormsQuestion, array{X-Forms-Adjusted?: string, Access-Control-Expose-Headers?: string}>
 	 * @throws OCSBadRequestException Invalid type
 	 * @throws OCSBadRequestException Invalid subtype
+	 * @throws OCSBadRequestException Every question must be in a section
 	 * @throws OCSBadRequestException Datetime question type no longer supported
 	 * @throws OCSForbiddenException User has no permissions to get this form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
@@ -605,6 +606,7 @@ class ApiController extends OCSController {
 
 			// Retrieve all active questions sorted by Order.
 			$questions = $this->questionMapper->findByForm($formId);
+			self::checkInsertKeepsSections($questions, (string)$type, $position);
 
 			if ($position !== null) {
 				$position = $this->shiftQuestionsForInsert($questions, $position);
@@ -655,6 +657,7 @@ class ApiController extends OCSController {
 			}
 
 			$allQuestions = $this->questionMapper->findByForm($formId);
+			self::checkInsertKeepsSections($allQuestions, $sourceQuestion->getType(), $position);
 
 			$questionData = $sourceQuestion->read();
 			unset($questionData['id']);
@@ -833,9 +836,11 @@ class ApiController extends OCSController {
 	/**
 	 * Delete a question
 	 *
+	 * Deleting the first section moves the next section up to its place, so its questions stay in a section; jumps that become backward are removed, and the header `X-Forms-Adjusted` then holds `removed-jumps` with the ids of their questions
+	 *
 	 * @param int $formId the form id
 	 * @param int $questionId the question id
-	 * @return DataResponse<Http::STATUS_OK, int, array{}>
+	 * @return DataResponse<Http::STATUS_OK, int, array{X-Forms-Adjusted?: string, Access-Control-Expose-Headers?: string}>
 	 * @throws OCSBadRequestException Question doesn\'t belong to given Form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException User has no permissions to get this form
@@ -874,6 +879,7 @@ class ApiController extends OCSController {
 
 		// Store Order of deleted Question
 		$deletedOrder = $question->getOrder();
+		$deletedType = $question->getType();
 
 		// Mark question as deleted
 		$question->setOrder(0);
@@ -897,13 +903,15 @@ class ApiController extends OCSController {
 			}
 		}
 
+		$headers = $deletedType === Constants::ANSWER_TYPE_SECTION ? $this->moveNextSectionUp($formQuestions, $deletedOrder) : [];
+
 		if ($form->getConfirmationEmailQuestionId() === $questionId) {
 			$form->setConfirmationEmailQuestionId(null);
 		}
 
 		$this->formMapper->update($form);
 
-		return new DataResponse($questionId);
+		return new DataResponse($questionId, Http::STATUS_OK, $headers);
 	}
 
 	/**
@@ -916,6 +924,7 @@ class ApiController extends OCSController {
 	 * @return DataResponse<Http::STATUS_OK, array<string, FormsQuestionOrder>, array{X-Forms-Adjusted?: string, Access-Control-Expose-Headers?: string}>
 	 * @throws OCSBadRequestException The given array contains duplicates
 	 * @throws OCSBadRequestException The length of the given array does not match the number of stored questions
+	 * @throws OCSBadRequestException Every question must be in a section
 	 * @throws OCSBadRequestException Question doesn't belong to given Form
 	 * @throws OCSForbiddenException This form is archived and can not be modified
 	 * @throws OCSForbiddenException User has no permissions to get this form
@@ -954,6 +963,7 @@ class ApiController extends OCSController {
 			$this->logger->debug('The length of the given array does not match the number of stored questions');
 			throw new OCSBadRequestException('The length of the given array does not match the number of stored questions');
 		}
+		$typesBefore = array_map(static fn (Question $question) => $question->getType(), $questions);
 
 		$questions = []; // Clear Array of Entities
 		$response = []; // Array of ['questionId' => ['order' => newOrder]]
@@ -984,6 +994,8 @@ class ApiController extends OCSController {
 				$questions[$arrayKey]->setOrder($arrayKey + 1);
 			}
 		}
+
+		self::checkQuestionsStayInSections($typesBefore, array_map(static fn (Question $question) => $question->getType(), $questions));
 
 		$changedQuestions = JumpHelper::removeBackwardJumps($questions);
 
@@ -2339,6 +2351,63 @@ class ApiController extends OCSController {
 				'fileId' => $form->getFileId(),
 				'fileFormat' => $form->getFileFormat(),
 			]);
+		}
+	}
+
+	/**
+	 * Move the next section up to the place of a deleted section that was the first section, so the questions of the deleted section join the next section; jumps that become backward are removed
+	 *
+	 * @param list<Question> $questions the remaining questions of the form in their order
+	 * @param int $order the order of the deleted section
+	 * @return array{X-Forms-Adjusted?: string, Access-Control-Expose-Headers?: string} the header listing the questions whose jumps were removed
+	 */
+	private function moveNextSectionUp(array $questions, int $order): array {
+		$first = FormsService::countQuestionsOutsideSections(array_map(static fn (Question $question) => $question->getType(), $questions));
+		if ($first <= $order - 1) {
+			return [];
+		}
+		array_splice($questions, $order - 1, 0, array_splice($questions, $first, 1));
+		$moved = [];
+		foreach ($questions as $index => $question) {
+			if ($question->getOrder() !== $index + 1) {
+				$question->setOrder($index + 1);
+				$moved[] = $question;
+			}
+		}
+		$changed = JumpHelper::removeBackwardJumps($questions);
+		foreach ($questions as $question) {
+			if (in_array($question, $moved, true) || in_array($question, $changed, true)) {
+				$this->questionMapper->update($question);
+			}
+		}
+		return self::getRemovedJumpsHeaders(array_map(static fn (Question $question): int => $question->getId(), $changed));
+	}
+
+	/**
+	 * Throw when inserting a question would put more questions outside any section
+	 *
+	 * @param list<Question> $questions the questions of the form in their order
+	 * @param string $type the type of the new question
+	 * @param ?int $position the 1-based position of the new question, null to append it
+	 * @throws OCSBadRequestException Every question must be in a section
+	 */
+	private static function checkInsertKeepsSections(array $questions, string $type, ?int $position): void {
+		$types = array_map(static fn (Question $question) => $question->getType(), $questions);
+		$after = $types;
+		array_splice($after, $position === null ? count($types) : max(0, min($position - 1, count($types))), 0, [$type]);
+		self::checkQuestionsStayInSections($types, $after);
+	}
+
+	/**
+	 * Throw when a change puts more questions before the first section than before the change
+	 *
+	 * @param list<string> $before the question types of the form in their order before the change
+	 * @param list<string> $after the question types of the form in their order after the change
+	 * @throws OCSBadRequestException Every question must be in a section
+	 */
+	private static function checkQuestionsStayInSections(array $before, array $after): void {
+		if (FormsService::countQuestionsOutsideSections($after) > FormsService::countQuestionsOutsideSections($before)) {
+			throw new OCSBadRequestException('Every question must be in a section');
 		}
 	}
 

@@ -37,7 +37,7 @@ Some requests succeed with their usual status, and their payload keeps its shape
 
 | Key | Value | Set by | Meaning |
 |-----|-------|--------|---------|
-| `removed-jumps` | Inner list of question ids, e.g. `(3 7)` | Updating, reordering and copying questions; deleting options; changing the bounds of a linear scale | Jumps to the question itself or to an earlier question, jumps of the deleted option or of options that are not options of the question, or jumps for values outside the scale, were removed from the `extraSettings` of these questions, see [Jumps](DataStructure.md#jumps) |
+| `removed-jumps` | Inner list of question ids, e.g. `(3 7)` | Updating, reordering and copying questions; deleting the first section of a form; deleting options; changing the bounds of a linear scale | Jumps to the question itself or to an earlier question, jumps of the deleted option or of options that are not options of the question, or jumps for values outside the scale, were removed from the `extraSettings` of these questions, see [Jumps](DataStructure.md#jumps) |
 
 ```
 X-Forms-Adjusted: removed-jumps=(3 7)
@@ -395,7 +395,7 @@ Returns the questions and options of the given form (without submissions).
   | _subtype_ | String | yes | _Optional_ The sub type, stored as `extraSettings.questionType`: the cell type for `grid` (`checkbox`, `number` or `radio`), `rating` (a 1 to N scale drawn as icons) or `promoter` (a fixed 0 to 10 scale) for `linearscale`. Any other value is rejected. |
   | _text_ | String | yes | _Optional_ The text of the new question. |
   | _position_ | Integer | yes | _(optional)_ 1-based position to insert the new question. When omitted the question is appended at the end. |
-- Restrictions: A `grid` question needs its cell type as _subtype_. A _subtype_ for a question type without sub types is rejected with **400 Bad Request**.
+- Restrictions: A `grid` question needs its cell type as _subtype_. A _subtype_ for a question type without sub types is rejected with **400 Bad Request**. In a form with sections every question is in a section (see [Sections](DataStructure.md#sections)): a question or section that would add to the questions before the first section, for example a section appended below the questions of a form without sections, is rejected with **400 Bad Request** "Every question must be in a section".
 - Response: The new question object.
 
 ```
@@ -494,7 +494,7 @@ Reorders all Questions of a single form
   | Parameter | Type | Description |
   |-----------|---------|-------------|
   | _newOrder_ | Array | Array of **all** Question-IDs, ordered in the desired order |
-- Restrictions: The Array **must** contain all Question-IDs corresponding to the specified form and **must not** contain any duplicates.
+- Restrictions: The Array **must** contain all Question-IDs corresponding to the specified form and **must not** contain any duplicates. An order that puts more questions before the first section than before is rejected with **400 Bad Request** "Every question must be in a section" (see [Sections](DataStructure.md#sections)).
 - Response: Array of questionIDs and their corresponding order. Jumps that would go to the question itself or to an earlier question are removed (see [Jumps](DataStructure.md#jumps)): the questions concerned also carry their new `extraSettings`, and the response header `X-Forms-Adjusted` then lists their ids, e.g. `X-Forms-Adjusted: removed-jumps=(3 7)`, or holds `removed-jumps` alone for more than 100 questions (see [Adjustments by the server](#adjustments-by-the-server)).
   An id of a deleted question gets a **Not Found** response.
 
@@ -521,7 +521,7 @@ Reorders all Questions of a single form
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form containing the question |
   | _questionId_ | Integer | ID of the question to delete |
-- Response: **Status-Code OK**, as well as the id of the deleted question.
+- Response: **Status-Code OK**, as well as the id of the deleted question. Deleting the first section moves the next section up to its place, so its questions stay in a section (see [Sections](DataStructure.md#sections)); jumps that become backward by this are removed, and the response header `X-Forms-Adjusted` then lists their questions, e.g. `X-Forms-Adjusted: removed-jumps=(3 7)` (see [Adjustments by the server](#adjustments-by-the-server)).
 
 ```
 "data": 4

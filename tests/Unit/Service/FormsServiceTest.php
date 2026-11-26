@@ -2373,4 +2373,20 @@ class FormsServiceTest extends TestCase {
 		$this->assertSame($expected ?? $extraSettings, $question->getExtraSettings());
 	}
 
+	public static function dataCountQuestionsOutsideSections(): array {
+		return [
+			'no questions' => [[], 0],
+			'no sections' => [['short', 'long'], 0],
+			'a section first' => [['section', 'short', 'section'], 0],
+			'questions before the first section' => [['short', 'long', 'section', 'short'], 2],
+		];
+	}
+
+	/**
+	 * @dataProvider dataCountQuestionsOutsideSections
+	 */
+	public function testCountQuestionsOutsideSections(array $types, int $expected): void {
+		$this->assertSame($expected, FormsService::countQuestionsOutsideSections($types));
+	}
+
 }
