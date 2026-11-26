@@ -8,6 +8,7 @@ import type { Locator, Page } from '@playwright/test'
 export class AppNavigationSection {
 	public readonly navigationLocator: Locator
 	public readonly newFormLocator: Locator
+	public readonly filterLocator: Locator
 	public readonly ownFormsLocator: Locator
 	public readonly sharedFormsLocator: Locator
 
@@ -17,6 +18,9 @@ export class AppNavigationSection {
 		})
 		this.newFormLocator = this.navigationLocator.getByRole('button', {
 			name: 'New form',
+		})
+		this.filterLocator = this.navigationLocator.getByRole('searchbox', {
+			name: 'Filter forms',
 		})
 		this.ownFormsLocator = this.navigationLocator
 			.getByRole('list', { name: 'Your forms' })
