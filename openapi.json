@@ -549,6 +549,9 @@
                     "numberExclude": {
                         "type": "boolean"
                     },
+                    "numberInteger": {
+                        "type": "boolean"
+                    },
                     "numberMax": {
                         "anyOf": [
                             {

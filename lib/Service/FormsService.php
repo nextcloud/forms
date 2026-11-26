@@ -1094,10 +1094,13 @@ class FormsService {
 	 * Whether the length and number limits of a text answer are consistent
 	 *
 	 * A length limit is allowed on plain text answers only, a number range only
-	 * on answers validated as number. Lengths are counted in characters from 1
+	 * on answers validated as number, like whole numbers only. Excluding the
+	 * range of one bound only accepts numbers below the minimum or above the
+	 * maximum. Lengths are counted in characters from 1
 	 * up to the stored answer length, and a minimum must not exceed its maximum.
 	 * A required text must fit the maximum length and must not contain the
 	 * excluded text.
+	 * A range for whole numbers only must contain a whole number.
 	 *
 	 * @param array $extraSettings the extra settings of the question
 	 * @return bool true if the limits are valid or not set
@@ -1109,6 +1112,7 @@ class FormsService {
 		$numberMin = $extraSettings['numberMin'] ?? null;
 		$numberMax = $extraSettings['numberMax'] ?? null;
 		$numberExclude = $extraSettings['numberExclude'] ?? null;
+		$numberInteger = $extraSettings['numberInteger'] ?? null;
 
 		foreach (['textContains', 'textNotContains'] as $key) {
 			$text = $extraSettings[$key] ?? null;
@@ -1117,7 +1121,11 @@ class FormsService {
 			}
 		}
 
-		if ($numberExclude !== null && ($numberExclude !== true || $numberMin === null || $numberMax === null)) {
+		if ($numberExclude !== null && ($numberExclude !== true || ($numberMin === null && $numberMax === null))) {
+			return false;
+		}
+
+		if ($numberInteger !== null && ($numberInteger !== true || $validationType !== 'number')) {
 			return false;
 		}
 
@@ -1154,6 +1162,9 @@ class FormsService {
 				}
 			}
 			if ($numberMin !== null && $numberMax !== null && $numberMin > $numberMax) {
+				return false;
+			}
+			if ($numberInteger === true && $numberExclude === null && $numberMin !== null && $numberMax !== null && ceil((float)$numberMin) > $numberMax) {
 				return false;
 			}
 		}

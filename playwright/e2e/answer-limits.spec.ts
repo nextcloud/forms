@@ -82,6 +82,49 @@ const QUESTIONS = [
 		valid: '12',
 	},
 	{
+		key: 'price',
+		type: 'short',
+		text: 'Price',
+		extraSettings: {
+			validationType: 'number',
+			numberMax: 0,
+			numberExclude: true,
+		},
+		hint: 'Enter a number greater than 0',
+		invalid: '0',
+		error: 'Enter a number greater than 0',
+		valid: '9.99',
+	},
+	{
+		key: 'temperature',
+		type: 'short',
+		text: 'Temperature',
+		extraSettings: {
+			validationType: 'number',
+			numberMin: 100,
+			numberExclude: true,
+		},
+		hint: 'Enter a number less than 100',
+		invalid: '100',
+		error: 'Enter a number less than 100',
+		valid: '99.5',
+	},
+	{
+		key: 'guests',
+		type: 'short',
+		text: 'Guests',
+		extraSettings: {
+			validationType: 'number',
+			numberMin: 0,
+			numberMax: 10,
+			numberInteger: true,
+		},
+		hint: 'Enter a number from 0 to 10 · Enter a whole number',
+		invalid: '2.5',
+		error: 'Enter a whole number',
+		valid: '2',
+	},
+	{
 		key: 'company',
 		type: 'short',
 		text: 'Company',
@@ -228,7 +271,7 @@ test.describe('Answer limits', () => {
 		expect(questions[0].extraSettings.lengthMax).toBe(40)
 	})
 
-	test('The owner sets number rules, required texts and the URL type', async ({
+	test('The owner sets number rules, whole numbers, required texts and the URL type', async ({
 		page,
 	}) => {
 		const form = await api(page.request, 'POST', '/forms')
@@ -270,7 +313,7 @@ test.describe('Answer limits', () => {
 		await saving(() =>
 			page
 				.getByRole('radio', { name: 'Not between', exact: true })
-				.check({ force: true }),
+				.dispatchEvent('click'),
 		)
 		await saving(() =>
 			page.getByRole('spinbutton', { name: 'Lowest number' }).fill('1'),
@@ -286,7 +329,7 @@ test.describe('Answer limits', () => {
 		await saving(() =>
 			page
 				.getByRole('radio', { name: 'Equal to', exact: true })
-				.check({ force: true }),
+				.dispatchEvent('click'),
 		)
 		await saving(() =>
 			page.getByRole('spinbutton', { name: 'Number', exact: true }).fill('7'),
@@ -299,9 +342,43 @@ test.describe('Answer limits', () => {
 		await saving(() =>
 			page
 				.getByRole('radio', { name: 'Not equal to', exact: true })
-				.check({ force: true }),
+				.dispatchEvent('click'),
 		)
 		expect(await settings(0)).toMatchObject({ numberExclude: true })
+		await saving(() =>
+			page
+				.getByRole('radio', { name: 'Greater than', exact: true })
+				.dispatchEvent('click'),
+		)
+		await saving(() =>
+			page.getByRole('spinbutton', { name: 'Number', exact: true }).fill('0'),
+		)
+		expect(await settings(0)).toEqual({
+			validationType: 'number',
+			numberMax: 0,
+			numberExclude: true,
+		})
+		await saving(() =>
+			page
+				.getByRole('radio', { name: 'Less than', exact: true })
+				.dispatchEvent('click'),
+		)
+		await saving(() =>
+			page
+				.getByRole('spinbutton', { name: 'Number', exact: true })
+				.fill('100'),
+		)
+		expect(await settings(0)).toEqual({
+			validationType: 'number',
+			numberMin: 100,
+			numberExclude: true,
+		})
+		await saving(() =>
+			page
+				.getByRole('checkbox', { name: 'Whole numbers only' })
+				.dispatchEvent('click'),
+		)
+		expect(await settings(0)).toMatchObject({ numberInteger: true })
 		await page.keyboard.press('Escape')
 
 		await menu(1, 'Text')
@@ -321,7 +398,7 @@ test.describe('Answer limits', () => {
 		await saving(() =>
 			page
 				.getByRole('radio', { name: 'URL', exact: true })
-				.check({ force: true }),
+				.dispatchEvent('click'),
 		)
 		expect(await settings(2)).toEqual({ validationType: 'url' })
 	})
@@ -390,6 +467,12 @@ test.describe('Answer limits', () => {
 			['outside', '10'],
 			['lucky', '7.5'],
 			['unlucky', '13.0'],
+			['price', '0'],
+			['price', '-1'],
+			['temperature', '100'],
+			['temperature', '1e3'],
+			['guests', '2.5'],
+			['guests', '11'],
 			['company', 'ACME'],
 			['company', 'GmbH SPAM'],
 			['website', 'nextcloud.com'],
@@ -431,10 +514,9 @@ test.describe('Answer limits', () => {
 				{ data: { keyValuePairs: { extraSettings } }, headers: OCS_HEADERS },
 			)
 		const illegal: [number, object][] = [
-			[
-				short.id,
-				{ validationType: 'number', numberMin: 1, numberExclude: true },
-			],
+			[short.id, { validationType: 'number', numberExclude: true }],
+			[short.id, { validationType: 'number', numberInteger: false }],
+			[short.id, { numberInteger: true }],
 			[
 				short.id,
 				{
@@ -450,6 +532,17 @@ test.describe('Answer limits', () => {
 			[short.id, { textNotContains: 'x'.repeat(4097) }],
 			[short.id, { validationType: 'url', lengthMax: 20 }],
 			[short.id, { validationType: 'ftp' }],
+			[short.id, { textContains: 'GmbH', textNotContains: 'mb' }],
+			[short.id, { textContains: 'GmbH', lengthMax: 3 }],
+			[
+				short.id,
+				{
+					validationType: 'number',
+					numberInteger: true,
+					numberMin: 1.2,
+					numberMax: 1.8,
+				},
+			],
 			[long.id, { textContains: 'Nextcloud' }],
 			[long.id, { validationType: 'url' }],
 		]

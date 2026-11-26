@@ -1495,10 +1495,55 @@ file2.txt"
 				['1' => ['4']],
 				'The answer for question "q1" must be 5.',
 			],
+			'short-number-greater-than-above' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMax' => 0, 'numberExclude' => true]]],
+				['1' => ['0.01']],
+				null,
+			],
+			'short-number-greater-than-same' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMax' => 0, 'numberExclude' => true]]],
+				['1' => ['0']],
+				'The answer for question "q1" must be a number greater than 0.',
+			],
+			'short-number-less-than-below' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 10, 'numberExclude' => true]]],
+				['1' => ['9.99']],
+				null,
+			],
+			'short-number-less-than-same' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 10, 'numberExclude' => true]]],
+				['1' => ['10']],
+				'The answer for question "q1" must be a number less than 10.',
+			],
+			'short-number-integer-whole' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberInteger' => true]]],
+				['1' => ['-42']],
+				null,
+			],
+			'short-number-integer-whole-with-decimals' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberInteger' => true]]],
+				['1' => ['3.0']],
+				null,
+			],
+			'short-number-integer-fraction' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberInteger' => true]]],
+				['1' => ['3.5']],
+				'The answer for question "q1" must be a whole number.',
+			],
+			'short-number-integer-fraction-in-range' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberInteger' => true]]],
+				['1' => ['2.5']],
+				'The answer for question "q1" must be a whole number.',
+			],
 			'short-url-valid' => [
 				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
 				['1' => ['https://nextcloud.com/forms?x=1']],
 				null,
+			],
+			'short-number-less-than-zero-above' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 0, 'numberExclude' => true]]],
+				['1' => ['5']],
+				'The answer for question "q1" must be a number less than 0.',
 			],
 			'short-number-at-least-zero-below' => [
 				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 0]]],

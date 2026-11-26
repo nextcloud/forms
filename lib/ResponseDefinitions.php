@@ -32,6 +32,7 @@ namespace OCA\Forms;
  *   maxAllowedFilesCount?: int,
  *   maxFileSize?: int,
  *   numberExclude?: bool,
+ *   numberInteger?: bool,
  *   numberMax?: int|float,
  *   numberMin?: int|float,
  *   optionsHighest?: 2|3|4|5|6|7|8|9|10,

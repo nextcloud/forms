@@ -949,16 +949,18 @@ class SubmissionService {
 		if (($numberMin !== null || $numberMax !== null) && is_numeric($answer)) {
 			$inRange = ($numberMin === null || +$answer >= $numberMin) && ($numberMax === null || +$answer <= $numberMax);
 			$exclude = ($question['extraSettings']['numberExclude'] ?? false) === true;
-			if ($numberMin !== null && $numberMax !== null && $numberMin == $numberMax && $inRange === $exclude) {
-				throw new \InvalidArgumentException(sprintf($exclude ? 'The answer for question "%s" must not be %s.' : 'The answer for question "%s" must be %s.', $question['text'], $numberMin));
+			if ($inRange === $exclude) {
+				throw new \InvalidArgumentException(match (true) {
+					$numberMin !== null && $numberMax !== null && $numberMin == $numberMax => sprintf($exclude ? 'The answer for question "%s" must not be %s.' : 'The answer for question "%s" must be %s.', $question['text'], $numberMin),
+					$exclude && $numberMax === null => sprintf('The answer for question "%s" must be a number less than %s.', $question['text'], $numberMin),
+					$exclude && $numberMin === null => sprintf('The answer for question "%s" must be a number greater than %s.', $question['text'], $numberMax),
+					$exclude => sprintf('The answer for question "%s" must be a number outside %s to %s.', $question['text'], $numberMin, $numberMax),
+					default => sprintf('The answer for question "%s" must be a number from %s to %s.', $question['text'], $numberMin ?? '-∞', $numberMax ?? '∞'),
+				});
 			}
-			if ($exclude) {
-				if ($inRange) {
-					throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be a number outside %s to %s.', $question['text'], $numberMin, $numberMax));
-				}
-			} elseif (!$inRange) {
-				throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be a number from %s to %s.', $question['text'], $numberMin ?? '-∞', $numberMax ?? '∞'));
-			}
+		}
+		if (($question['extraSettings']['numberInteger'] ?? false) === true && is_numeric($answer) && floor(+$answer) != +$answer) {
+			throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be a whole number.', $question['text']));
 		}
 
 		$textContains = $question['extraSettings']['textContains'] ?? null;

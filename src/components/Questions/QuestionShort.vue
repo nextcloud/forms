@@ -171,21 +171,12 @@
 						@update:modelValue="onChangeNumberRule(rule)">
 						{{ label }}
 					</NcActionRadio>
-					<NcActionInput
+					<template
 						v-if="
-							currentNumberRule === 'equal'
-							|| currentNumberRule === 'notEqual'
-						"
-						type="number"
-						step="any"
-						:label="t('forms', 'Number')"
-						:labelOutside="false"
-						:showTrailingButton="false"
-						:modelValue="extraSettings.numberMin"
-						@update:modelValue="onChangeNumberValue" />
-					<template v-else>
+							currentNumberRule === 'between'
+							|| currentNumberRule === 'notBetween'
+						">
 						<NcActionInput
-							v-if="extraSettings.numberMin !== undefined"
 							type="number"
 							step="any"
 							:label="t('forms', 'Lowest number')"
@@ -197,7 +188,6 @@
 								(value) => onLimitChange('numberMin', value, false)
 							" />
 						<NcActionInput
-							v-if="extraSettings.numberMax !== undefined"
 							type="number"
 							step="any"
 							:label="t('forms', 'Highest number')"
@@ -209,6 +199,27 @@
 								(value) => onLimitChange('numberMax', value, false)
 							" />
 					</template>
+					<NcActionInput
+						v-else-if="currentNumberRule !== 'any'"
+						type="number"
+						step="any"
+						:label="t('forms', 'Number')"
+						:labelOutside="false"
+						:showTrailingButton="false"
+						:modelValue="
+							extraSettings.numberMin ?? extraSettings.numberMax
+						"
+						@update:modelValue="onChangeNumberValue" />
+					<NcActionCheckbox
+						:modelValue="!!extraSettings.numberInteger"
+						@update:modelValue="
+							(checked) =>
+								onExtraSettingsChange({
+									numberInteger: checked || undefined,
+								})
+						">
+						{{ t('forms', 'Whole numbers only') }}
+					</NcActionCheckbox>
 				</template>
 			</NcActions>
 			<p
@@ -437,6 +448,7 @@ export default defineComponent({
 				lengthMax: undefined,
 				lengthMin: undefined,
 				numberExclude: undefined,
+				numberInteger: undefined,
 				numberMax: undefined,
 				numberMin: undefined,
 				textContains: undefined,
@@ -464,7 +476,9 @@ export default defineComponent({
 			any: t('forms', 'Any number'),
 			between: t('forms', 'Between'),
 			notBetween: t('forms', 'Not between'),
+			greaterThan: t('forms', 'Greater than'),
 			atLeast: t('forms', 'At least'),
+			lessThan: t('forms', 'Less than'),
 			atMost: t('forms', 'At most'),
 			equal: t('forms', 'Equal to'),
 			notEqual: t('forms', 'Not equal to'),
@@ -490,16 +504,17 @@ export default defineComponent({
 		}
 
 		/**
-		 * Save the number of an equal or not equal rule
+		 * Save the number of a rule with one number, setting each bound the rule uses
 		 *
 		 * @param value the new number
 		 */
 		const onChangeNumberValue = (value: number | string | null): void => {
 			const number = Number.parseFloat(String(value ?? ''))
 			if (!isNaN(number)) {
+				const { numberMin, numberMax } = extraSettings.value
 				question.onExtraSettingsChange({
-					numberMin: number,
-					numberMax: number,
+					numberMin: numberMin === undefined ? undefined : number,
+					numberMax: numberMax === undefined ? undefined : number,
 				})
 			}
 		}

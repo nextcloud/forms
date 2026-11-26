@@ -12,6 +12,7 @@ export type AnswerLimitSettings = {
 	lengthMax?: number
 	lengthMin?: number
 	numberExclude?: boolean
+	numberInteger?: boolean
 	numberMax?: number
 	numberMin?: number
 	textContains?: string
@@ -19,7 +20,15 @@ export type AnswerLimitSettings = {
 }
 
 export type NumberRule =
-	'any' | 'between' | 'notBetween' | 'atLeast' | 'atMost' | 'equal' | 'notEqual'
+	| 'any'
+	| 'between'
+	| 'notBetween'
+	| 'greaterThan'
+	| 'atLeast'
+	| 'lessThan'
+	| 'atMost'
+	| 'equal'
+	| 'notEqual'
 
 export type AnswerLimitKey = 'lengthMax' | 'lengthMin' | 'numberMax' | 'numberMin'
 
@@ -51,9 +60,12 @@ export function numberRule(settings: AnswerLimitSettings): NumberRule {
 		return exclude ? 'notBetween' : 'between'
 	}
 	if (min !== undefined) {
-		return 'atLeast'
+		return exclude ? 'lessThan' : 'atLeast'
 	}
-	return max !== undefined ? 'atMost' : 'any'
+	if (max !== undefined) {
+		return exclude ? 'greaterThan' : 'atMost'
+	}
+	return 'any'
 }
 
 /**
@@ -113,7 +125,14 @@ export function numberRuleSettings(
 			}
 		}
 		case 'atLeast':
-			return { numberMin: low, numberMax: undefined, numberExclude: undefined }
+		case 'lessThan':
+			return {
+				numberMin: low,
+				numberMax: undefined,
+				numberExclude: rule === 'lessThan' || undefined,
+			}
+		case 'greaterThan':
+			return { numberMin: undefined, numberMax: low, numberExclude: true }
 		case 'atMost':
 			return {
 				numberMin: undefined,
@@ -202,7 +221,11 @@ function numberRangeRule(settings: AnswerLimitSettings): AnswerRule | null {
 			min,
 			max,
 		}),
+		greaterThan: t('forms', 'Enter a number greater than {number}', {
+			number: max,
+		}),
 		atLeast: t('forms', 'Enter a number of at least {min}', { min }),
+		lessThan: t('forms', 'Enter a number less than {number}', { number: min }),
 		atMost: t('forms', 'Enter a number of at most {max}', { max }),
 		equal: t('forms', 'Enter the number {number}', { number: min }),
 		notEqual: t('forms', 'Enter any number except {number}', { number: min }),
@@ -222,6 +245,24 @@ function numberRangeRule(settings: AnswerLimitSettings): AnswerRule | null {
 				(numberMin === undefined || number >= numberMin)
 				&& (numberMax === undefined || number <= numberMax)
 			return settings.numberExclude ? !inRange : inRange
+		},
+	}
+}
+
+/**
+ * The rule that a number answer must be a whole number
+ *
+ * @param integer whether only whole numbers are accepted
+ */
+function wholeNumberRule(integer?: boolean): AnswerRule | null {
+	if (!integer) {
+		return null
+	}
+	return {
+		hint: t('forms', 'Enter a whole number'),
+		isValid: (answer) => {
+			const number = Number(answer)
+			return answer.trim() === '' || isNaN(number) || Number.isInteger(number)
 		},
 	}
 }
@@ -269,6 +310,7 @@ export function useAnswerLimits(
 		[
 			lengthRule(extraSettings.value.lengthMin, extraSettings.value.lengthMax),
 			numberRangeRule(extraSettings.value),
+			wholeNumberRule(extraSettings.value.numberInteger),
 			containsRule(extraSettings.value.textContains, true),
 			containsRule(extraSettings.value.textNotContains, false),
 		].filter((rule): rule is AnswerRule => rule !== null),

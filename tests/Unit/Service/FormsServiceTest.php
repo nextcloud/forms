@@ -1807,8 +1807,53 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'expected' => false
 			],
-			'invalid-number-exclude-one-bound' => [
+			'valid-number-less-than' => [
 				'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberExclude' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-number-greater-than' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMax' => 0, 'numberExclude' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-number-exclude-without-bound' => [
+				'extraSettings' => ['validationType' => 'number', 'numberExclude' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'valid-number-integer' => [
+				'extraSettings' => ['validationType' => 'number', 'numberInteger' => true, 'numberMin' => 1],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-number-integer-range-without-whole-number' => [
+				'extraSettings' => ['validationType' => 'number', 'numberInteger' => true, 'numberMin' => 1.2, 'numberMax' => 1.8],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-integer-equal-to-decimal' => [
+				'extraSettings' => ['validationType' => 'number', 'numberInteger' => true, 'numberMin' => 2.5, 'numberMax' => 2.5],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'valid-number-integer-not-between-decimals' => [
+				'extraSettings' => ['validationType' => 'number', 'numberInteger' => true, 'numberMin' => 1.2, 'numberMax' => 1.8, 'numberExclude' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-number-integer-false' => [
+				'extraSettings' => ['validationType' => 'number', 'numberInteger' => false],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-integer-without-number-type' => [
+				'extraSettings' => ['numberInteger' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-integer-not-boolean' => [
+				'extraSettings' => ['validationType' => 'number', 'numberInteger' => 1],
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'expected' => false
 			],

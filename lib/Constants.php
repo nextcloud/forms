@@ -208,6 +208,7 @@ class Constants {
 		'lengthMax' => ['integer'],
 		'lengthMin' => ['integer'],
 		'numberExclude' => ['boolean'],
+		'numberInteger' => ['boolean'],
 		'numberMax' => ['integer', 'double'],
 		'numberMin' => ['integer', 'double'],
 		'textContains' => ['string'],
