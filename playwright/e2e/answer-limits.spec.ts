@@ -42,6 +42,26 @@ const QUESTIONS = [
 		valid: '7',
 	},
 	{
+		key: 'adults',
+		type: 'short',
+		text: 'Age',
+		extraSettings: { validationType: 'number', numberMin: 18 },
+		hint: 'Enter a number of at least 18',
+		invalid: '17',
+		error: 'Enter a number of at least 18',
+		valid: '18',
+	},
+	{
+		key: 'discount',
+		type: 'short',
+		text: 'Discount in percent',
+		extraSettings: { validationType: 'number', numberMax: 50 },
+		hint: 'Enter a number of at most 50',
+		invalid: '50.5',
+		error: 'Enter a number of at most 50',
+		valid: '50',
+	},
+	{
 		key: 'outside',
 		type: 'short',
 		text: 'Outside the usual range',
@@ -133,6 +153,16 @@ const QUESTIONS = [
 		invalid: 'Spam GmbH',
 		error: 'Do not include “spam”',
 		valid: 'ACME gmbh',
+	},
+	{
+		key: 'reference',
+		type: 'short',
+		text: 'Reference',
+		extraSettings: { textContains: 'REF-' },
+		hint: 'Include “REF-”',
+		invalid: 'ACME 42',
+		error: 'Include “REF-”',
+		valid: 'ref-42',
 	},
 	{
 		key: 'website',
@@ -271,9 +301,7 @@ test.describe('Answer limits', () => {
 		expect(questions[0].extraSettings.lengthMax).toBe(40)
 	})
 
-	test('The owner sets number rules, whole numbers, required texts and the URL type', async ({
-		page,
-	}) => {
+	test('The owner sets each rule in the input type menu', async ({ page }) => {
 		const form = await api(page.request, 'POST', '/forms')
 		const create = async (text: string, extraSettings: object) => {
 			const created = await api(
@@ -375,6 +403,48 @@ test.describe('Answer limits', () => {
 		})
 		await saving(() =>
 			page
+				.getByRole('radio', { name: 'At least', exact: true })
+				.dispatchEvent('click'),
+		)
+		await saving(() =>
+			page.getByRole('spinbutton', { name: 'Number', exact: true }).fill('18'),
+		)
+		expect(await settings(0)).toEqual({
+			validationType: 'number',
+			numberMin: 18,
+		})
+		await saving(() =>
+			page
+				.getByRole('radio', { name: 'At most', exact: true })
+				.dispatchEvent('click'),
+		)
+		await saving(() =>
+			page.getByRole('spinbutton', { name: 'Number', exact: true }).fill('50'),
+		)
+		expect(await settings(0)).toEqual({
+			validationType: 'number',
+			numberMax: 50,
+		})
+		await saving(() =>
+			page
+				.getByRole('radio', { name: 'Between', exact: true })
+				.dispatchEvent('click'),
+		)
+		expect(await settings(0)).toEqual({
+			validationType: 'number',
+			numberMin: 0,
+			numberMax: 50,
+		})
+		await saving(() =>
+			page.getByRole('spinbutton', { name: 'Lowest number' }).fill('1'),
+		)
+		expect(await settings(0)).toEqual({
+			validationType: 'number',
+			numberMin: 1,
+			numberMax: 50,
+		})
+		await saving(() =>
+			page
 				.getByRole('checkbox', { name: 'Whole numbers only' })
 				.dispatchEvent('click'),
 		)
@@ -392,6 +462,23 @@ test.describe('Answer limits', () => {
 			textContains: 'GmbH',
 			textNotContains: 'spam',
 		})
+		await saving(() =>
+			page
+				.getByRole('checkbox', { name: 'Require a minimum length' })
+				.dispatchEvent('click'),
+		)
+		await saving(() =>
+			page.getByRole('spinbutton', { name: 'Minimum characters' }).fill('3'),
+		)
+		await saving(() =>
+			page
+				.getByRole('checkbox', { name: 'Limit the maximum length' })
+				.dispatchEvent('click'),
+		)
+		await saving(() =>
+			page.getByRole('spinbutton', { name: 'Maximum characters' }).fill('12'),
+		)
+		expect(await settings(1)).toMatchObject({ lengthMin: 3, lengthMax: 12 })
 		await page.keyboard.press('Escape')
 
 		await menu(2, 'Text')
@@ -463,6 +550,8 @@ test.describe('Answer limits', () => {
 			['nickname', 'abcdefghijklm'],
 			['rating', '0.99'],
 			['rating', '10.01'],
+			['adults', '17.99'],
+			['discount', '50.01'],
 			['outside', '1'],
 			['outside', '10'],
 			['lucky', '7.5'],
@@ -475,6 +564,7 @@ test.describe('Answer limits', () => {
 			['guests', '11'],
 			['company', 'ACME'],
 			['company', 'GmbH SPAM'],
+			['reference', 'RE-42'],
 			['website', 'nextcloud.com'],
 			['website', 'ftp://nextcloud.com'],
 			['website', 'javascript://alert(1)'],

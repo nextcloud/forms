@@ -1767,6 +1767,21 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'expected' => true
 			],
+			'valid-number-at-least' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 18],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-number-at-most' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMax' => 50],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-number-equal' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 7, 'numberMax' => 7],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
 			'invalid-number-min-above-max' => [
 				'extraSettings' => ['validationType' => 'number', 'numberMin' => 11, 'numberMax' => 10],
 				'questionType' => Constants::ANSWER_TYPE_SHORT,

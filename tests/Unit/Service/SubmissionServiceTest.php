@@ -1440,6 +1440,21 @@ file2.txt"
 				['1' => ['abcd']],
 				'The answer for question "q1" must be from 1 to 3 characters long.',
 			],
+			'short-length-too-long' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMin' => 2, 'lengthMax' => 4]]],
+				['1' => ['abcde']],
+				'The answer for question "q1" must be from 2 to 4 characters long.',
+			],
+			'long-length-within-limits' => [
+				[['id' => 1, 'type' => 'long', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMin' => 3, 'lengthMax' => 5]]],
+				['1' => ['abc']],
+				null,
+			],
+			'long-length-too-short' => [
+				[['id' => 1, 'type' => 'long', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMin' => 3, 'lengthMax' => 5]]],
+				['1' => ['ab']],
+				'The answer for question "q1" must be from 3 to 5 characters long.',
+			],
 			'long-length-empty-optional-answer' => [
 				[['id' => 1, 'type' => 'long', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMin' => 3]]],
 				['1' => ['']],
@@ -1474,6 +1489,41 @@ file2.txt"
 				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberExclude' => true]]],
 				['1' => ['1']],
 				'The answer for question "q1" must be a number outside 1 to 10.',
+			],
+			'short-number-between-upper-bound' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10]]],
+				['1' => ['10']],
+				null,
+			],
+			'short-number-at-least-bound' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1]]],
+				['1' => ['1']],
+				null,
+			],
+			'short-number-at-most-bound' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMax' => 10]]],
+				['1' => ['10']],
+				null,
+			],
+			'short-number-at-most-above' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMax' => 10]]],
+				['1' => ['10.5']],
+				'The answer for question "q1" must be a number from -∞ to 10.',
+			],
+			'short-number-not-between-upper-bound' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberExclude' => true]]],
+				['1' => ['10']],
+				'The answer for question "q1" must be a number outside 1 to 10.',
+			],
+			'short-number-greater-than-below' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMax' => 0, 'numberExclude' => true]]],
+				['1' => ['-1']],
+				'The answer for question "q1" must be a number greater than 0.',
+			],
+			'short-number-less-than-above' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 10, 'numberExclude' => true]]],
+				['1' => ['1e3']],
+				'The answer for question "q1" must be a number less than 10.',
 			],
 			'short-number-not-equal-other' => [
 				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 5, 'numberMax' => 5, 'numberExclude' => true]]],
@@ -1574,6 +1624,11 @@ file2.txt"
 				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
 				['1' => ['https://exa mple.com']],
 				'Invalid input for question "q1".',
+			],
+			'short-url-http' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
+				['1' => ['http://localhost:8080/apps/forms']],
+				null,
 			],
 			'short-url-without-scheme' => [
 				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
