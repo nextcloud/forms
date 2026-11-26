@@ -460,3 +460,27 @@ test('Enter with the IME key code 229 keeps the focus in the answer', async ({
 		submitView.getQuestion('Country').getByRole('textbox'),
 	).toBeFocused()
 })
+
+test('A corrected answer submits right away', async ({ page, submitView }) => {
+	const form = await api(page.request, 'POST', '/forms')
+	const question = await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+		type: 'short',
+		text: 'Email',
+	})
+	await api(page.request, 'PATCH', `/forms/${form.id}/questions/${question.id}`, {
+		keyValuePairs: { extraSettings: { validationType: 'email' } },
+	})
+	await page.goto(`apps/forms/${form.hash}/submit`)
+
+	await submitView.fillText('Email', 'not an email')
+	await submitView.submitButton.click()
+	await expect(
+		submitView
+			.getQuestion('Email')
+			.getByText('The input is not a valid email address'),
+	).toBeVisible()
+
+	await submitView.fillText('Email', 'jane@example.com')
+	await submitView.submit()
+	await expect(submitView.successMessage).toBeVisible()
+})
