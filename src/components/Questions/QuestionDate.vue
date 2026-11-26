@@ -89,6 +89,7 @@
 			:aria-labelledby="readOnly ? titleId : undefined"
 			:aria-describedby="readOnly && description ? descriptionId : undefined">
 			<NcDateTimePicker
+				:class="{ 'question__date-picker--preview': !readOnly }"
 				:modelValue="time"
 				:disabled="!readOnly"
 				:format="stringify"
@@ -503,16 +504,8 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
-.mx-datepicker {
-	width: 100%;
-	max-width: 300px;
-
-	&.disabled {
-		inset-inline-start: -12px;
-	}
-
-	:deep(.mx-input) {
-		height: var(--default-clickable-area) !important;
-	}
+.question__date-picker--preview {
+	width: calc(100% - var(--default-clickable-area));
+	margin-inline-start: -12px;
 }
 </style>
