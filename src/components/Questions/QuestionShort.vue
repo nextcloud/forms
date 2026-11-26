@@ -229,6 +229,7 @@ export default defineComponent({
 			if (!field) {
 				return
 			}
+			field.setCustomValidity('')
 			emit('update:values', [field.value])
 			void debounceValidate()
 		}
