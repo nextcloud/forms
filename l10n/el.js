@@ -151,8 +151,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Πρέπει να επιλέξετε τουλάχιστον μία επιλογή","Πρέπει να επιλέξετε τουλάχιστον %n επιλογές"],
     "Columns" : "Στήλες",
     "Rows" : "Γραμμές",
+    "Icon" : "Εικονίδιο",
     "Highest value" : "Υψηλότερη τιμή",
     "Lowest value" : "Χαμηλότερη τιμή",
+    "Rating" : "Βαθμολογία",
     "Label for lowest value" : "Ετικέτα για χαμηλότερη τιμή",
     "Label (optional)" : "Ετικέτα (προαιρετικά)",
     "From {firstOption} to {lastOption}" : "Από {firstOption} έως {lastOption}",
@@ -181,6 +183,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Τύποι εισόδου (τρέχων: {type})",
     "Regular expression for input validation" : "Κανονική έκφραση για επικύρωση εισόδου",
     "No response" : "Καμία απάντηση",
+    "Answers" : "Απαντήσεις",
+    "Average" : "Μέσος όρος",
     "Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred." : "Κατάταξη με βάση την καταμέτρηση Borda: κάθε 1η θέση λαμβάνει {n} πόντους, η 2η θέση {n1} πόντους και ούτω καθεξής. Υψηλότερη βαθμολογία σημαίνει μεγαλύτερη προτίμηση.",
     "avg. rank {average}" : "μέσος όρος κατάταξης {average}",
     "Edit this response" : "Επεξεργασία αυτής της απάντησης",
@@ -338,7 +342,6 @@ OC.L10N.register(
     "Leave form" : "Αποχώρηση από φόρμα",
     "You have unsaved changes! Do you still want to leave?" : "Έχετε μη αποθηκευμένες αλλαγές! Θέλετε ακόμα να αποχωρήσετε;",
     "Do you want to clear all answers?" : "Θέλετε να εκκαθαρίσετε όλες τις απαντήσεις;",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Η φόρμα έχει αλλάξει από την τελευταία σας επίσκεψη. Θέλετε να εκκαθαρίσετε όλες τις απαντήσεις;",
     "Error while saving question" : "Σφάλμα κατά την αποθήκευση ερώτησης",
     "Error while saving question options" : "Σφάλμα κατά την αποθήκευση επιλογών ερώτησης",
     "There was an issue deleting this option" : "Υπήρξε πρόβλημα κατά τη διαγραφή αυτής της επιλογής",
@@ -415,6 +418,7 @@ OC.L10N.register(
     "People can enter a number" : "Οι χρήστες μπορούν να εισαγάγουν έναν αριθμό",
     "Enter a number" : "Πληκτρολογήστε έναν αριθμό",
     "Custom regular expression" : "Προσαρμοσμένη κανονική έκφραση",
-    "The input does not match the required pattern" : "Η καταχώρηση δεν ταιριάζει με το απαιτούμενο μοτίβο"
+    "The input does not match the required pattern" : "Η καταχώρηση δεν ταιριάζει με το απαιτούμενο μοτίβο",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Η φόρμα έχει αλλάξει από την τελευταία σας επίσκεψη. Θέλετε να εκκαθαρίσετε όλες τις απαντήσεις;"
 },
 "nplurals=2; plural=(n != 1);");

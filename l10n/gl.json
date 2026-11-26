@@ -137,8 +137,10 @@
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Debe escoller polo menos unha opción","Debe escoller polo menos %n opcións"],
     "Columns" : "Columnas",
     "Rows" : "Filas",
+    "Icon" : "Icona",
     "Highest value" : "Valor máis alto",
     "Lowest value" : "Valor máis baixo",
+    "Rating" : "Valoración",
     "Label for lowest value" : "Etiqueta para o valor máis baixo",
     "Label (optional)" : "Etiqueta (opcional)",
     "From {firstOption} to {lastOption}" : "Desde {firstOption} ata {lastOption}",
@@ -156,6 +158,8 @@
     "Input types (currently: {type})" : "Tipos de entrada (actualmente: {type})",
     "Regular expression for input validation" : "Expresión regular para validación de entrada",
     "No response" : "Sen resposta",
+    "Answers" : "Respostas",
+    "Average" : "Media",
     "Edit this response" : "Editar esta resposta",
     "Delete this response" : "Eliminar resta resposta",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Non é posíbel controlar isto se o formulario ten unha ligazón pública ou almacena respostas anonimamente.",
@@ -275,7 +279,6 @@
     "Leave form" : "Abandonar formulario",
     "You have unsaved changes! Do you still want to leave?" : "Ten cambios sen gardar. Está seguro de querer marchar?",
     "Do you want to clear all answers?" : "Quere limpar todas as respostas?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "O formulario cambiou desde a súa última visita. Quere limpar todas as respostas?",
     "Error while saving question" : "Produciuse un erro ao gardar a pregunta",
     "Error while saving question options" : "Produciuse un erro ao gardar as opcións da pregunta",
     "There was an issue deleting this option" : "Houbo un problema ao eliminar esta opción",
@@ -348,6 +351,7 @@
     "People can enter a number" : "A xente pode introducir un número",
     "Enter a number" : "Introduza un número",
     "Custom regular expression" : "Expresión regular personalizada",
-    "The input does not match the required pattern" : "A entrada non coincide co patrón requirido"
+    "The input does not match the required pattern" : "A entrada non coincide co patrón requirido",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "O formulario cambiou desde a súa última visita. Quere limpar todas as respostas?"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

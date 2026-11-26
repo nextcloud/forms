@@ -148,8 +148,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Потрібно вибрати щонайменше 1 варіант","Потрібно вибрати не менше %n варіантів","Потрібно вибрати не менше %n варіантів","Потрібно вибрати не менше %n варіантів"],
     "Columns" : "Стовпців",
     "Rows" : "Рядків",
+    "Icon" : "Значок",
     "Highest value" : "Найбільше значення",
     "Lowest value" : "Найнижче значення",
+    "Rating" : "Оцінка",
     "Label for lowest value" : "Мітка для найменшого значення",
     "Label (optional)" : "Етикетка (необов'язково)",
     "From {firstOption} to {lastOption}" : "З {firstOption} на {lastOption}",
@@ -174,6 +176,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Тип поля (вибрано: {type})",
     "Regular expression for input validation" : "Регулярний вираз для перевірки поля",
     "No response" : "Без відповіді",
+    "Answers" : "Відповіді",
+    "Average" : "Середній показник",
     "Edit this response" : "Відредагуйте цю відповідь",
     "Delete this response" : "Вилучити цю відповідь",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Це не можна контролювати, якщо форма має публічне посилання або зберігає відповіді анонімно.",
@@ -325,7 +329,6 @@ OC.L10N.register(
     "Leave form" : "Залишити форму",
     "You have unsaved changes! Do you still want to leave?" : "Наявні незбережені зміни! Ви справді хочете залишити сторінку?",
     "Do you want to clear all answers?" : "Дійсно очистити всі відповіді?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Цю форму було змінено після вашого останнього відвідування. Дійсно очистити всі відповіді?",
     "Error while saving question" : "Помилка при збереженні запитання",
     "Error while saving question options" : "Помилка під час збереження опцій запитань",
     "There was an issue deleting this option" : "Під час вилучення цього варіанту виникла проблема",
@@ -402,6 +405,7 @@ OC.L10N.register(
     "People can enter a number" : "Респондент може ввести число",
     "Enter a number" : "Введіть число",
     "Custom regular expression" : "Регулярний вираз",
-    "The input does not match the required pattern" : "Поле не відповідає визначеному шаблону"
+    "The input does not match the required pattern" : "Поле не відповідає визначеному шаблону",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Цю форму було змінено після вашого останнього відвідування. Дійсно очистити всі відповіді?"
 },
 "nplurals=4; plural=(n % 1 == 0 && n % 10 == 1 && n % 100 != 11 ? 0 : n % 1 == 0 && n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : n % 1 == 0 && (n % 10 ==0 || (n % 10 >=5 && n % 10 <=9) || (n % 100 >=11 && n % 100 <=14 )) ? 2: 3);");

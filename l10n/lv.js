@@ -28,7 +28,10 @@ OC.L10N.register(
     "Text" : "Teksts",
     "Columns" : "Kolonnas",
     "Rows" : "Rindas",
+    "Icon" : "Ikona",
+    "Rating" : "Vērtējums",
     "Other" : "Cits",
+    "Average" : "Vidējais",
     "never" : "nekad",
     "Set expiration date" : "Iestatīt derīguma beigu datumu",
     "Expiration date" : "Derīguma beigu datums",
@@ -53,7 +56,6 @@ OC.L10N.register(
     "Sharing" : "Koplietošana",
     "Settings" : "Iestatījumi",
     "Clear" : "Notīrīt",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Veidlapa kopš pēdējā apmeklējuma ir mainījusies. Vai notīrīt visas atbildes?",
     "No recommendations. Start typing." : "Nav ieteikumu. Jāsāk rakstīt.",
     "No elements found." : "Elementi netika atrasti.",
     "File" : "Datne",
@@ -67,6 +69,7 @@ OC.L10N.register(
     "Presentation" : "Prezentācija",
     "Spreadsheet" : "Izklājlapa",
     "Phone number" : "Tālruņa numurs",
-    "Email address" : "E-pasta adrese"
+    "Email address" : "E-pasta adrese",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Veidlapa kopš pēdējā apmeklējuma ir mainījusies. Vai notīrīt visas atbildes?"
 },
 "nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n != 0 ? 1 : 2);");

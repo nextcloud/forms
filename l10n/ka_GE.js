@@ -15,6 +15,8 @@ OC.L10N.register(
     "Delete" : "წაშლა",
     "Checkbox" : "ჩექბოქსი",
     "Text" : "ტექსტი",
+    "Icon" : "პიქტოგრამა",
+    "Rating" : "რეიტინგი",
     "Other" : "სხვა",
     "never" : "არასდროს",
     "Set expiration date" : "მიუთითეთ ვადის გასვლის დრო",

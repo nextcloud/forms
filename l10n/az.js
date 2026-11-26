@@ -10,6 +10,7 @@ OC.L10N.register(
     "Comments" : "Şərhlər",
     "Cancel" : "Cancel",
     "Delete" : "Sil",
+    "Rating" : "Reytinq",
     "Other" : "Digər",
     "never" : "heç vaxt",
     "Expiration date" : "Expiration date",

@@ -122,6 +122,8 @@
     "_You must choose at least one option_::_You must choose at least %n options_" : ["يجب أن تختار كحد أدنى %n خياراً","يجب أن تختار كحد أدنى خياراً واحداً","يجب أن تختار كحد أدنى %n خيارين","يجب أن تختار كحد أدنى %n خيارات","يجب أن تختار كحد أدنى %n خياراً","يجب أن تختار كحد أدنى %n خياراً"],
     "Columns" : "الأعمدة",
     "Rows" : "الصفوف",
+    "Icon" : "الأيقونة",
+    "Rating" : "تقييم",
     "Upper options limit must be greater than the lower limit" : "خيارات الحد الأعلى يجب أن تكون أكبر  من خيارات الحد الأدنى",
     "Lower options limit must be smaller than the upper limit" : "خيارات الحد الأدنى يجب أن تكون أصغر من خيارات الحد الأعلى",
     "Add \"other\"" : "أضِف \"أخرى\"",
@@ -135,6 +137,8 @@
     "Input types (currently: {type})" : "أنواع المُدخلات (حاليّاً: {type})",
     "Regular expression for input validation" : "التعبير النمطي RE للتحقُّق من صحة المُدخلات",
     "No response" : "لا رد ",
+    "Answers" : "الإجابات",
+    "Average" : "متوسط",
     "Delete this response" : "حذف هذا الرد ",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "هذا لا يمكن السيطرة عليه؛ إذا كان للنماذج روابط عمومية أو كانت الإجابات محفوظة غُفْلاً من أسماء أصحابها.",
     "Expired on {date}" : "انتهى بتاريخ {date}",
@@ -243,7 +247,6 @@
     "Leave form" : "نموذج إجازة",
     "You have unsaved changes! Do you still want to leave?" : "لديك تغييرات غير محفوظة! هل مازلت تريد الخروج؟",
     "Do you want to clear all answers?" : "هل ترغب في محو كل الإجابات؟",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "النموذج أجريت عليه تغييرات منذ آخر زيارة لك. هل ترغب في محو كل الإجابات؟",
     "Error while saving question" : "حدث خطأ أثناء حفظ السؤال ",
     "Error while saving question options" : "حدث خطأ أثناء حفظ خيارات إجابة السؤال",
     "There was an issue deleting this option" : "حدث خطأ أثناء إزالة هذا الخيار",
@@ -301,6 +304,7 @@
     "People can enter a number" : "يمكن للأشخاص إدخال عدد",
     "Enter a number" : "أدخِل عدداً",
     "Custom regular expression" : "تعبير نمطي مخصص",
-    "The input does not match the required pattern" : "البيان المُدخل لا يتطابق مع النمط المطلوب"
+    "The input does not match the required pattern" : "البيان المُدخل لا يتطابق مع النمط المطلوب",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "النموذج أجريت عليه تغييرات منذ آخر زيارة لك. هل ترغب في محو كل الإجابات؟"
 },"pluralForm" :"nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 && n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;"
 }

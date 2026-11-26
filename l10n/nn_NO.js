@@ -17,6 +17,7 @@ OC.L10N.register(
     "Columns" : "Kolonnar",
     "Rows" : "Rader",
     "Other" : "Anna",
+    "Average" : "Gjennomsnitt",
     "never" : "aldri",
     "Set expiration date" : "Set utløpsdato",
     "Expiration date" : "Utløpsdato",

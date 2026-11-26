@@ -141,7 +141,9 @@ OC.L10N.register(
     "Text" : "Texto",
     "Columns" : "Colunas",
     "Rows" : "Linhas",
+    "Icon" : "Ícone",
     "Lowest value" : "Valor mais baixo",
+    "Rating" : "Avaliação",
     "Label for lowest value" : "Rótulo para valor mais baixo",
     "Label (optional)" : "Rótulo (opcional)",
     "From {firstOption} to {lastOption}" : "De {firstOption} a {lastOption}",
@@ -165,6 +167,8 @@ OC.L10N.register(
     "Invalid regular expression" : "Expressão regular inválida",
     "Regular expression for input validation" : "Expressão regular para validação de entrada",
     "No response" : "Nenhuma resposta",
+    "Answers" : "Respostas",
+    "Average" : "Média",
     "Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred." : "Classificação pelo método de Borda: cada 1º lugar recebe {n} pontos, o 2º lugar {n1} pontos e assim por diante. Uma pontuação mais alta significa maior preferência.",
     "avg. rank {average}" : "classificação média {average}",
     "Edit this response" : "Editar esta resposta",
@@ -312,7 +316,6 @@ OC.L10N.register(
     "Leave form" : "Sair do formulário",
     "You have unsaved changes! Do you still want to leave?" : "Existem alterações que não estão guardadas. Tem a certeza que quer sair?",
     "Do you want to clear all answers?" : "Você deseja limpar todas as respostas?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "O formulário foi alterado desde sua última visita. Deseja apagar todas as respostas?",
     "Error while saving question" : "Erro ao guardar a pergunta",
     "Error while saving question options" : "Erro ao salvar opções de perguntas",
     "There was an issue deleting this option" : "Ocorreu um problema no apagar desta opção",
@@ -387,6 +390,7 @@ OC.L10N.register(
     "People can enter a number" : "As pessoas podem inserir um número",
     "Enter a number" : "Insira um número",
     "Custom regular expression" : "Expressão regular personalizada",
-    "The input does not match the required pattern" : "A entrada não corresponde ao padrão exigido"
+    "The input does not match the required pattern" : "A entrada não corresponde ao padrão exigido",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "O formulário foi alterado desde sua última visita. Deseja apagar todas as respostas?"
 },
 "nplurals=3; plural=(n == 0 || n == 1) ? 0 : n != 0 && n % 1000000 == 0 ? 1 : 2;");

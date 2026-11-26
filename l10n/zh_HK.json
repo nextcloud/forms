@@ -164,8 +164,10 @@
     "_You must choose at least one option_::_You must choose at least %n options_" : ["您必須選擇至少 %n 個選項"],
     "Columns" : "直欄",
     "Rows" : "行",
+    "Icon" : "圖示",
     "Highest value" : "最高值",
     "Lowest value" : "最低值",
+    "Rating" : "評價",
     "Label for lowest value" : "最低值的標籤",
     "Label (optional)" : "標籤（非強制的）",
     "From {firstOption} to {lastOption}" : "從 {firstOption} 到 {lastOption}",
@@ -195,6 +197,8 @@
     "Input types (currently: {type})" : "輸入類型（目前：{type}）",
     "Regular expression for input validation" : "輸入驗證的正規表示式",
     "No response" : "無回應",
+    "Answers" : "答案",
+    "Average" : "平均測光",
     "Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred." : "採用 Borda 計分法排序：第 1 名獲得 {n} 分，第 2 名獲得 {n1} 分，如此類推。分數越高代表越受偏好。",
     "avg. rank {average}" : "平均排名 {average}",
     "Edit this response" : "編輯此回應",
@@ -359,7 +363,6 @@
     "Leave form" : "離開表格",
     "You have unsaved changes! Do you still want to leave?" : "您有未保存的更改！你還要離開嗎？",
     "Do you want to clear all answers?" : "您想要清除所有答案嗎？",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "自您上次造訪以後，表單已變更。您想要清除所有答案嗎？",
     "Error while saving question" : "儲存問題時發生錯誤",
     "Error while saving question options" : "儲存問題選項時發生錯誤",
     "There was an issue deleting this option" : "刪除此選項時發生問題",
@@ -436,6 +439,7 @@
     "People can enter a number" : "人們可以輸入數字",
     "Enter a number" : "輸入數字",
     "Custom regular expression" : "自訂正規表示式",
-    "The input does not match the required pattern" : "輸入與所需的模式不相符"
+    "The input does not match the required pattern" : "輸入與所需的模式不相符",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "自您上次造訪以後，表單已變更。您想要清除所有答案嗎？"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

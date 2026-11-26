@@ -155,8 +155,10 @@
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Turite pasirinkti bent vieną variantą","Turite pasirinkti bent %n variantus","Turite pasirinkti bent %n variantų","Turite pasirinkti bent %n variantų"],
     "Columns" : "Stulpeliai",
     "Rows" : "Eilutės",
+    "Icon" : "Piktograma",
     "Highest value" : "Aukščiausia vertė",
     "Lowest value" : "Mažiausia vertė",
+    "Rating" : "Įvertinimas",
     "Label for lowest value" : "Mažiausios vertės etiketė",
     "Label (optional)" : "Etiketė (neprivaloma)",
     "From {firstOption} to {lastOption}" : "Nuo {firstOption} iki {lastOption}",
@@ -185,6 +187,8 @@
     "Input types (currently: {type})" : "Įvesties tipai (šiuo metu: {type})",
     "Regular expression for input validation" : "Įvesties patvirtinimo reguliarioji išraiška",
     "No response" : "Nėra atsakymo",
+    "Answers" : "Atsakymai",
+    "Average" : "Vidutinis",
     "Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred." : "Reitingas pagal Borda skaičiavimo metodą: už kiekvieną 1-ąją vietą skiriama {n} taškų, už 2-ąją vietą {n1} taškų ir t. t. Kuo aukštesnis balas, tuo labiau tai patinka.",
     "avg. rank {average}" : "vid. reitingas {average}",
     "Edit this response" : "Redaguoti šį atsakymą",
@@ -342,7 +346,6 @@
     "Leave form" : "Palikti anketą",
     "You have unsaved changes! Do you still want to leave?" : "Turite neišsaugotų pakeitimų! Ar vis dar norite išeiti?",
     "Do you want to clear all answers?" : "Ar norite išvalyti visus atsakymus?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Anketa pasikeitė nuo paskutinio jūsų apsilankymo. Ar norite išvalyti visus atsakymus?",
     "Error while saving question" : "Klaida įrašant klausimą",
     "Error while saving question options" : "Išsaugant klausimo parinktis įvyko klaida",
     "There was an issue deleting this option" : "Ištrinant šią parinktį kilo problema",
@@ -419,6 +422,7 @@
     "People can enter a number" : "Žmonės gali įvesti skaičių",
     "Enter a number" : "Įvesti skaičių",
     "Custom regular expression" : "Pasirinktinė reguliarioji išraiška",
-    "The input does not match the required pattern" : "Įvestis neatitinka reikiamo šablono"
+    "The input does not match the required pattern" : "Įvestis neatitinka reikiamo šablono",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Anketa pasikeitė nuo paskutinio jūsų apsilankymo. Ar norite išvalyti visus atsakymus?"
 },"pluralForm" :"nplurals=4; plural=(n % 10 == 1 && (n % 100 > 19 || n % 100 < 11) ? 0 : (n % 10 >= 2 && n % 10 <=9) && (n % 100 > 19 || n % 100 < 11) ? 1 : n % 1 != 0 ? 2: 3);"
 }

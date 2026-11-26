@@ -155,8 +155,10 @@
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Trebuie să alegi cel puțin o opțiune","Trebuie să alegi cel puțin %n opțiuni","Trebuie să alegi cel puțin %n de opțiuni"],
     "Columns" : "Coloane",
     "Rows" : "Rânduri",
+    "Icon" : "Pictogramă",
     "Highest value" : "Valoarea maximă",
     "Lowest value" : "Valoarea minimă",
+    "Rating" : "Evaluare",
     "Label for lowest value" : "Eticheta pentru valoarea minimă",
     "Label (optional)" : "Etichetă (opțional)",
     "From {firstOption} to {lastOption}" : "De la {firstOption} la {lastOption}",
@@ -185,6 +187,8 @@
     "Input types (currently: {type})" : "Tipul datelor introduse (în prezent: {type})",
     "Regular expression for input validation" : "Expresie regulată pentru validarea intrării",
     "No response" : "Fără răspuns",
+    "Answers" : "Răspunsuri",
+    "Average" : "Medie",
     "Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred." : "Ordonat prin metoda Borda: fiecare loc 1 primește {n} puncte, locul 2 primește {n1} puncte și așa mai departe. Un punctaj mai mare înseamnă o preferință mai mare.",
     "avg. rank {average}" : "loc mediu {average}",
     "Edit this response" : "Editează acest răspuns",
@@ -342,7 +346,6 @@
     "Leave form" : "Părăsește formularul",
     "You have unsaved changes! Do you still want to leave?" : "Ai modificări nesalvate! Sigur vrei să părăsești pagina?",
     "Do you want to clear all answers?" : "Vrei să ștergi toate răspunsurile?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Formularul s-a modificat de la ultima ta vizită. Vrei să ștergi toate răspunsurile?",
     "Error while saving question" : "Eroare la salvarea întrebării",
     "Error while saving question options" : "Eroare la salvarea opțiunilor întrebării",
     "There was an issue deleting this option" : "A apărut o eroare la ștergerea acestei opțiuni",
@@ -419,6 +422,7 @@
     "People can enter a number" : "Se poate introduce un număr",
     "Enter a number" : "Introdu un număr",
     "Custom regular expression" : "Expresie regulată personalizată",
-    "The input does not match the required pattern" : "Textul introdus nu corespunde modelului necesar"
+    "The input does not match the required pattern" : "Textul introdus nu corespunde modelului necesar",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Formularul s-a modificat de la ultima ta vizită. Vrei să ștergi toate răspunsurile?"
 },"pluralForm" :"nplurals=3; plural=(n==1?0:(((n%100>19)||((n%100==0)&&(n!=0)))?2:1));"
 }

@@ -166,8 +166,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["You must choose at least one option","You must choose at least %n options"],
     "Columns" : "Columns",
     "Rows" : "Rows",
+    "Icon" : "Icon",
     "Highest value" : "Highest value",
     "Lowest value" : "Lowest value",
+    "Rating" : "Rating",
     "Label for lowest value" : "Label for lowest value",
     "Label (optional)" : "Label (optional)",
     "From {firstOption} to {lastOption}" : "From {firstOption} to {lastOption}",
@@ -197,6 +199,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Input types (currently: {type})",
     "Regular expression for input validation" : "Regular expression for input validation",
     "No response" : "No response",
+    "Answers" : "Answers",
+    "Average" : "Average",
     "Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred." : "Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred.",
     "avg. rank {average}" : "avg. rank {average}",
     "Edit this response" : "Edit this response",
@@ -361,7 +365,6 @@ OC.L10N.register(
     "Leave form" : "Leave form",
     "You have unsaved changes! Do you still want to leave?" : "You have unsaved changes! Do you still want to leave?",
     "Do you want to clear all answers?" : "Do you want to clear all answers?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "The form has changed since your last visit. Do you want to clear all answers?",
     "Error while saving question" : "Error while saving question",
     "Error while saving question options" : "Error while saving question options",
     "There was an issue deleting this option" : "There was an issue deleting this option",
@@ -438,6 +441,7 @@ OC.L10N.register(
     "People can enter a number" : "People can enter a number",
     "Enter a number" : "Enter a number",
     "Custom regular expression" : "Custom regular expression",
-    "The input does not match the required pattern" : "The input does not match the required pattern"
+    "The input does not match the required pattern" : "The input does not match the required pattern",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "The form has changed since your last visit. Do you want to clear all answers?"
 },
 "nplurals=2; plural=(n != 1);");

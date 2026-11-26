@@ -165,8 +165,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Sa pead valima vähemalt ühe valiku","Sa pead valima vähemalt %n valikut"],
     "Columns" : "Veerud",
     "Rows" : "Read",
+    "Icon" : "Ikoon",
     "Highest value" : "Suurim väärtus",
     "Lowest value" : "Väikseim väärtus",
+    "Rating" : "Hinnang",
     "Label for lowest value" : "Väikseima väärtuse silt",
     "Label (optional)" : "Silt (valikuline)",
     "From {firstOption} to {lastOption}" : "Alates {firstOption} kuni {lastOption}",
@@ -196,6 +198,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Sisendi tüübid (hetkel: {type})",
     "Regular expression for input validation" : "Regulaaravaldis sisendi kontrollimiseks",
     "No response" : "Vastust pole",
+    "Answers" : "Vastused",
+    "Average" : "Keskmine",
     "Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred." : "Järjestatud Borda meetodi alusel: iga esimene koht saab {n} punkti, teine koht {n1} punkti ja nii edasi. Suurem punktisumma tähendab ka suuremat eelistust.",
     "avg. rank {average}" : "Keskmine järjestus: {average}",
     "Edit this response" : "Muuda seda vastust",
@@ -360,7 +364,6 @@ OC.L10N.register(
     "Leave form" : "Lahku vormilt",
     "You have unsaved changes! Do you still want to leave?" : "Sul on salvestamata muudatusi! Kas oled kindel et soovid lahkuda?",
     "Do you want to clear all answers?" : "Kas sa soovid kõik vastused eemaldada?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Vorm on peale sinu viimast külastust muutunud. Kas sa sooviksid kõik vastused eemaldada?",
     "Error while saving question" : "Viga küsimuse salvestamisel",
     "Error while saving question options" : "Viga küsimuste valiku salvestamisel",
     "There was an issue deleting this option" : "Selle valiku kustutamisel tekkis viga",
@@ -437,6 +440,7 @@ OC.L10N.register(
     "People can enter a number" : "Vastajad saavad sisestada numbri",
     "Enter a number" : "Sisesta number",
     "Custom regular expression" : "Sinu loodud regulaaravaldis",
-    "The input does not match the required pattern" : "Sisend ei vasta etteantud nõutavale mustrlile"
+    "The input does not match the required pattern" : "Sisend ei vasta etteantud nõutavale mustrlile",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Vorm on peale sinu viimast külastust muutunud. Kas sa sooviksid kõik vastused eemaldada?"
 },
 "nplurals=2; plural=(n != 1);");

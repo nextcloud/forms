@@ -95,8 +95,10 @@
     "Text" : "テキスト",
     "Columns" : "列",
     "Rows" : "行",
+    "Icon" : "アイコン",
     "Highest value" : "最大値",
     "Lowest value" : "最小値",
+    "Rating" : "評価",
     "Label for lowest value" : "最低値のラベル",
     "Label (optional)" : "ラベル (任意)",
     "Label for highest value" : "最高値のラベル",
@@ -108,6 +110,8 @@
     "Other:" : "その他:",
     "Other" : "その他",
     "No response" : "返信なし",
+    "Answers" : "回答",
+    "Average" : "平均",
     "Delete this response" : "この返信を削除",
     "Expired on {date}" : "{date} に有効期限が切れました",
     "Expires on {date}" : "{date} に有効期限が切れます",
@@ -185,7 +189,6 @@
     "Clear form" : "フォームをクリア",
     "Leave form" : "フォームから出る",
     "You have unsaved changes! Do you still want to leave?" : "保存されていない変更があります！離れるつもりですか？",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "前回のアクセス以降、フォームは変更されています。すべての回答をクリアしますか？",
     "Error while saving question" : "質問の保存中にエラーが発生しました",
     "There was an issue deleting this option" : "このオプションの削除中に問題が発生しました",
     "Form link copied" : "フォームのリンクをコピーしました",
@@ -238,6 +241,7 @@
     "Email address" : "メールアドレス",
     "The input is not a valid email address" : "入力されたメールアドレスは無効です。",
     "Enter an email address" : "メールアドレスを入力",
-    "Enter a number" : "数値を入力"
+    "Enter a number" : "数値を入力",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "前回のアクセス以降、フォームは変更されています。すべての回答をクリアしますか？"
 },"pluralForm" :"nplurals=1; plural=0;"
 }

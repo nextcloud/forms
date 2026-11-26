@@ -165,8 +165,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Ní mór duit rogha amháin ar a laghad a roghnú","Caithfidh tú %n rogha ar a laghad a roghnú","Caithfidh tú %n rogha ar a laghad a roghnú","Caithfidh tú %n rogha ar a laghad a roghnú","Caithfidh tú %n rogha ar a laghad a roghnú"],
     "Columns" : "Colúin",
     "Rows" : "Sraitheanna",
+    "Icon" : "Deilbhín",
     "Highest value" : "An luach is airde",
     "Lowest value" : "An luach is ísle",
+    "Rating" : "Rátáil",
     "Label for lowest value" : "Lipéad don luach is ísle",
     "Label (optional)" : "Lipéad (roghnach)",
     "From {firstOption} to {lastOption}" : "Ó {firstOption} go {lastOption}",
@@ -196,6 +198,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Cineálacha ionchuir (faoi láthair: {type})",
     "Regular expression for input validation" : "Slonn rialta le haghaidh bailíochtú ionchuir",
     "No response" : "Gan freagra",
+    "Answers" : "Freagraí",
+    "Average" : "Meán",
     "Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred." : "Rangaithe de réir comhaireamh Borda: faigheann gach 1ú háit {n} pointe, gach 2ú háit {n1} pointe, agus mar sin de. Ciallaíonn scór níos airde níos mó rogha.",
     "avg. rank {average}" : "meánrang {average}",
     "Edit this response" : "Cuir an freagra seo in eagar",
@@ -360,7 +364,6 @@ OC.L10N.register(
     "Leave form" : "Fág an fhoirm",
     "You have unsaved changes! Do you still want to leave?" : "Tá athruithe gan sábháil agat! Ar mhaith leat imeacht fós?",
     "Do you want to clear all answers?" : "Ar mhaith leat gach freagra a ghlanadh?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Tá an fhoirm athraithe ó do chuairt dheireanach. Ar mhaith leat gach freagra a ghlanadh?",
     "Error while saving question" : "Earráid agus an cheist á sábháil",
     "Error while saving question options" : "Earráid agus roghanna ceiste á sábháil",
     "There was an issue deleting this option" : "Bhí fadhb ann agus an rogha seo á scriosadh",
@@ -437,6 +440,7 @@ OC.L10N.register(
     "People can enter a number" : "Is féidir le daoine uimhir a chur isteach",
     "Enter a number" : "Cuir isteach uimhir",
     "Custom regular expression" : "Sloinneadh rialta saincheaptha",
-    "The input does not match the required pattern" : "Ní mheaitseálann an t-ionchur an patrún riachtanach"
+    "The input does not match the required pattern" : "Ní mheaitseálann an t-ionchur an patrún riachtanach",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Tá an fhoirm athraithe ó do chuairt dheireanach. Ar mhaith leat gach freagra a ghlanadh?"
 },
 "nplurals=5; plural=(n==1 ? 0 : n==2 ? 1 : n<7 ? 2 : n<11 ? 3 : 4);");

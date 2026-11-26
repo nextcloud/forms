@@ -15,6 +15,7 @@ OC.L10N.register(
     "Delete" : "Läschen",
     "Checkbox" : "Checkbox",
     "Text" : "Text",
+    "Rating" : "Bewäertung",
     "Other" : "Aner",
     "never" : "Ni",
     "Set expiration date" : "Verfallsdatum setzen",

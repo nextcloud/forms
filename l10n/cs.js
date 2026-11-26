@@ -140,8 +140,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Je třeba zvolit alespoň jednu možnost","Je třeba zvolit alespoň %n možnosti","Je třeba zvolit alespoň %n možností","Je třeba zvolit alespoň %n možnosti"],
     "Columns" : "Sloupce",
     "Rows" : "Řádky",
+    "Icon" : "Ikona",
     "Highest value" : "Nejvyšší hodnota",
     "Lowest value" : "Nejnižší hodnota",
+    "Rating" : "Hodnocení",
     "Label for lowest value" : "Popisek pro nejnižší hodnotu",
     "Label (optional)" : "Popisek (volitelné)",
     "From {firstOption} to {lastOption}" : "Od {firstOption} do {lastOption}",
@@ -160,6 +162,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Typy vstupu (nyní: {type})",
     "Regular expression for input validation" : "Regulární výraz pro ověření správnosti vstupu",
     "No response" : "Žádná odpověď",
+    "Answers" : "Odpovědi",
+    "Average" : "Poměrové",
     "Edit this response" : "Upravit tuto odpověď",
     "Delete this response" : "Smazat tuto odpověď",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Pokud má formulář veřejný odkaz nebo ukládá odpovědi anonymně, není možné toto ovládat.",
@@ -303,7 +307,6 @@ OC.L10N.register(
     "Leave form" : "Opustit formulář",
     "You have unsaved changes! Do you still want to leave?" : "Jsou zde neuložené změny! Opravdu chcete odejít?",
     "Do you want to clear all answers?" : "Opravdu chcete veškeré odpovědi vymazat?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Formulář byl od vaší poslední návštěvy změněn. Chcete vyčistit veškeré odpovědi?",
     "Error while saving question" : "Chyba při ukládání otázky",
     "Error while saving question options" : "Chyba při ukládání možností otázky",
     "There was an issue deleting this option" : "Při mazání této volby došlo k problému",
@@ -377,6 +380,7 @@ OC.L10N.register(
     "People can enter a number" : "Lidé mohou zadat číslo",
     "Enter a number" : "Zadat číslo",
     "Custom regular expression" : "Uživatelsky určený regulární výraz",
-    "The input does not match the required pattern" : "Zadání neodpovídá požadovanému vzoru"
+    "The input does not match the required pattern" : "Zadání neodpovídá požadovanému vzoru",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Formulář byl od vaší poslední návštěvy změněn. Chcete vyčistit veškeré odpovědi?"
 },
 "nplurals=4; plural=(n == 1 && n % 1 == 0) ? 0 : (n >= 2 && n <= 4 && n % 1 == 0) ? 1: (n % 1 != 0 ) ? 2 : 3;");

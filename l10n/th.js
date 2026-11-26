@@ -47,6 +47,8 @@ OC.L10N.register(
     "Delete" : "ลบ",
     "Checkbox" : "กล่องกาเครื่องหมาย",
     "Text" : "ข้อความ",
+    "Icon" : "ไอคอน",
+    "Rating" : "คะแนน",
     "Other" : "อื่น ๆ",
     "No response" : "ไม่มีการตอบกลับ",
     "Delete this response" : "ลบการตอบกลับนี้",

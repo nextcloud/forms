@@ -44,6 +44,8 @@ OC.L10N.register(
     "Delete" : "מחיקה",
     "Checkbox" : "תיבת סימון",
     "Text" : "טקסט",
+    "Icon" : "סמל",
+    "Rating" : "דירוג",
     "Other" : "אחר",
     "No response" : "אין תגובה",
     "Delete this response" : "מחיקת התגובה הזאת",

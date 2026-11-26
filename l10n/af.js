@@ -11,6 +11,7 @@ OC.L10N.register(
     "Required" : "Vereis",
     "Delete" : "Skrap",
     "Text" : "Teks",
+    "Icon" : "Ikoon",
     "Other" : "Ander",
     "Set expiration date" : "Stel vervaldatum",
     "Expiration date" : "Vervaldatum",

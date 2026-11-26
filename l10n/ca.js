@@ -148,8 +148,10 @@ OC.L10N.register(
     "_You must choose at least one option_::_You must choose at least %n options_" : ["Heu de triar com a mínim una opció","Heu de triar com a mínim %n opcions"],
     "Columns" : "Columnes",
     "Rows" : "Files",
+    "Icon" : "Icona",
     "Highest value" : "Valor més alt",
     "Lowest value" : "Valor més baix",
+    "Rating" : "Valoració",
     "Label for lowest value" : "Etiqueta per al valor més baix",
     "Label (optional)" : "Etiqueta (opcional)",
     "From {firstOption} to {lastOption}" : "De {firstOption} a {lastOption}",
@@ -178,6 +180,8 @@ OC.L10N.register(
     "Input types (currently: {type})" : "Tipus d'entrada (actualment: {type})",
     "Regular expression for input validation" : "Expressió regular per a la validació d'entrada",
     "No response" : "Sense resposta",
+    "Answers" : "Respostes",
+    "Average" : "Mitjana",
     "Ranked by Borda count: each 1st place receives {n} points, 2nd place {n1} points, and so on. Higher score means more preferred." : "Classificació per Borda: cada primer lloc rep {n} punts, segon lloc {n1}, i així successivament. Una puntuació més alta vol dir més preferit.",
     "avg. rank {average}" : "posició mitjana {average}",
     "Edit this response" : "Edita aquesta resposta",
@@ -335,7 +339,6 @@ OC.L10N.register(
     "Leave form" : "Abandona el formulari",
     "You have unsaved changes! Do you still want to leave?" : "Teniu canvis no desats! Encara vols marxar?",
     "Do you want to clear all answers?" : "Voleu esborrar totes les respostes?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "El formulari ha canviat des de la teva última visita. Vols esborrar totes les respostes?",
     "Error while saving question" : "S'ha produït un error en desar la pregunta",
     "Error while saving question options" : "S'ha produït un error en desar les opcions de la pregunta",
     "There was an issue deleting this option" : "Hi ha hagut un problema en suprimir aquesta opció",
@@ -412,6 +415,7 @@ OC.L10N.register(
     "People can enter a number" : "Els usuaris podenintroduir un número",
     "Enter a number" : "Introduïu un número",
     "Custom regular expression" : "Expresión regular personalizada",
-    "The input does not match the required pattern" : "L'entrada no coincideix amb el patró requerit"
+    "The input does not match the required pattern" : "L'entrada no coincideix amb el patró requerit",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "El formulari ha canviat des de la teva última visita. Vols esborrar totes les respostes?"
 },
 "nplurals=2; plural=(n != 1);");

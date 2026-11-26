@@ -14,6 +14,8 @@ OC.L10N.register(
     "Delete" : "Borrar",
     "Checkbox" : "Casilla de verificación",
     "Text" : "Texto",
+    "Icon" : "Ícono",
+    "Rating" : "Calificación",
     "never" : "nunca",
     "Set expiration date" : "Establecer fecha de expiración",
     "Expiration date" : "Fecha de expiración",

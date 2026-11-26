@@ -129,8 +129,10 @@
     "_You must choose at least one option_::_You must choose at least %n options_" : ["You must choose at least one option","Unalazimika kuchagua angalau %nya machaguo"],
     "Columns" : "Safu wima",
     "Rows" : "Safu mlalo",
+    "Icon" : "Aikoni",
     "Highest value" : "Thamani ya juu zaidi",
     "Lowest value" : "Thamani ya chini zaidi",
+    "Rating" : "Ukadiriaji",
     "Label for lowest value" : "Weka lebo kwa thamani ya chini zaidi",
     "Label (optional)" : "Lebo (chaguo)",
     "From {firstOption} to {lastOption}" : "Fomu {firstOption} kwenda {lastOption}",
@@ -148,6 +150,8 @@
     "Input types (currently: {type})" : "Aina za ingizo (kwa sasa: {type})",
     "Regular expression for input validation" : "Usemi wa kawaida wa uthibitishaji wa ingizo",
     "No response" : "Hakuna jibu",
+    "Answers" : "Majibu",
+    "Average" : "Wastani",
     "Edit this response" : "Hariri jibu hili",
     "Delete this response" : "Futa jibu hili",
     "This can not be controlled, if the form has a public link or stores responses anonymously." : "Hii haiwezi kudhibitiwa, kama fomu ina kiungio cha umma au huhifadhi majibu bila kujulikana",
@@ -267,7 +271,6 @@
     "Leave form" : "Ondoka katika fomu",
     "You have unsaved changes! Do you still want to leave?" : "Una mabadiliko ambayo hayajahifadhiwa! Bado unataka kuondoka?",
     "Do you want to clear all answers?" : "Je, unataka kufuta majibu yote?",
-    "The form has changed since your last visit. Do you want to clear all answers?" : "Fomu imebadilika tangu ulipotembelea mara ya mwisho. Je unataka kufuta majibu yote?",
     "Error while saving question" : "Hitilafu wakati wa kuhifadhi swali",
     "Error while saving question options" : "Hitilafu wakati wa kuhifadhi machaguo ya swali",
     "There was an issue deleting this option" : "Kulikuwa na jambo kufuta chaguo hili",
@@ -338,6 +341,7 @@
     "People can enter a number" : "Watu wanaweza kuingiza namba",
     "Enter a number" : "Ingiza namba",
     "Custom regular expression" : "Maelezo ya wateja ya mara kwa mara",
-    "The input does not match the required pattern" : "Ingizo halilingani na mchoro unaohitajika"
+    "The input does not match the required pattern" : "Ingizo halilingani na mchoro unaohitajika",
+    "The form has changed since your last visit. Do you want to clear all answers?" : "Fomu imebadilika tangu ulipotembelea mara ya mwisho. Je unataka kufuta majibu yote?"
 },"pluralForm" :"nplurals=2; plural=(n != 1);"
 }

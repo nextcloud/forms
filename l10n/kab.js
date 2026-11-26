@@ -25,6 +25,8 @@ OC.L10N.register(
     "Text" : "Aḍris",
     "Columns" : "Ijga",
     "Rows" : "Aduren",
+    "Icon" : "Tignit",
+    "Rating" : "Tazmilt",
     "Other" : "Wayeḍ",
     "No response" : "No response",
     "never" : "werjin",

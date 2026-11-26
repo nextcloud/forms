@@ -17,6 +17,8 @@ OC.L10N.register(
     "Delete" : "Forigi",
     "Checkbox" : "Markobutono",
     "Text" : "Teksto",
+    "Icon" : "Piktogramo",
+    "Rating" : "Pritakso",
     "Other" : "Alia",
     "never" : "neniam",
     "Set expiration date" : "Uzi limdaton",

@@ -21,6 +21,8 @@ OC.L10N.register(
     "Text" : "Văn bản",
     "Columns" : "Các cột",
     "Rows" : "Các hàng",
+    "Icon" : "Biểu tượng",
+    "Rating" : "Đánh giá",
     "Other" : "Khác",
     "never" : "không thay đổi",
     "Set expiration date" : "Đặt ngày hết hạn",

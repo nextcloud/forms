@@ -10,6 +10,7 @@ OC.L10N.register(
     "Delete" : "Dilemel",
     "Checkbox" : "Log-askañ",
     "Text" : "Testenn",
+    "Icon" : "Skeudennig",
     "never" : "james",
     "Set expiration date" : "Lakaat un deizat termen",
     "Expiration date" : "Deizat termen",
