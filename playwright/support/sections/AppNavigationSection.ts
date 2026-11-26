@@ -26,7 +26,7 @@ export class AppNavigationSection {
 			.getByRole('list', { name: 'Your forms' })
 			.getByRole('listitem')
 		this.sharedFormsLocator = this.navigationLocator
-			.getByRole('button', { name: 'Shared forms' })
+			.getByRole('list', { name: 'Shared with you' })
 			.getByRole('listitem')
 	}
 
