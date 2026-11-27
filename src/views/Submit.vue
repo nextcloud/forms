@@ -1370,14 +1370,12 @@ export default defineComponent({
 	// Title & description header
 	header {
 		margin-block-end: 24px;
-		margin-inline-start: var(--default-clickable-area);
+		padding-inline-start: calc(var(--default-clickable-area) / 2);
 
 		.form-title,
 		.form-desc,
 		.info-message {
-			width: calc(
-				100% - 58px
-			); // margin of header, needed if screen is < 806px (max-width + margin-left)
+			width: calc(100% - 58px + var(--default-clickable-area) / 2);
 			font-size: 100%;
 			padding-block: 0;
 			padding-inline: 18px;
