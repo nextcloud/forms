@@ -5,6 +5,18 @@
 
 # Changelog
 
+## v5.4.5 - 2026-11-27
+
+[Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.4...v5.4.5)
+
+### Fixed
+
+- [stable5.4] fix(editor): keep the form header inside narrow screens by @backportbot[bot] in [\#4046](https://github.com/nextcloud/forms/pull/4046)
+- [stable5.4] fix(submit): keep the form header inside narrow screens by @backportbot[bot] in [\#4044](https://github.com/nextcloud/forms/pull/4044)
+- [stable5.4] fix(questions): let a corrected short answer submit right away by @backportbot[bot] in [\#4040](https://github.com/nextcloud/forms/pull/4040)
+- [stable5.4] fix(date): align the answer preview with the other answer inputs by @backportbot[bot] in [\#4039](https://github.com/nextcloud/forms/pull/4039)
+- [stable5.4] fix(forms): make the full file upload field clickable by @backportbot[bot] in [\#4047](https://github.com/nextcloud/forms/pull/4047)
+
 ## v5.4.4 - 2026-11-24
 
 [Full Changelog](https://github.com/nextcloud/forms/compare/v5.4.3...v5.4.4)
