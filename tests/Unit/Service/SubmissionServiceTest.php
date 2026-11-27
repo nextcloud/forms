@@ -394,6 +394,31 @@ class SubmissionServiceTest extends TestCase {
 	// Data for SubmissionCsv
 	public static function dataGetSubmissionsData() {
 		return [
+			'display-only-blocks-are-not-exported' => [
+				// Questions
+				[
+					['id' => 1, 'text' => 'Question 1'],
+					['id' => 2, 'text' => 'Picture', 'type' => 'image'],
+					['id' => 3, 'text' => 'Clip', 'type' => 'video'],
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 1, 'text' => 'Q1A1'],
+						]
+					],
+				],
+				// Expected CSV-Result
+				'
+				"Submission ID","User ID","User display name","Timestamp","Question 1"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","Q1A1"
+				'
+			],
 			'two-basic-submissions' => [
 				// Questions
 				[

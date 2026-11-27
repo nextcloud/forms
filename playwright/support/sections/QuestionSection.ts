@@ -51,6 +51,18 @@ export class QuestionSection {
 		await saved
 	}
 
+	/**
+	 * Fill a text field of an image or video block and wait until it is saved.
+	 *
+	 * @param label the label of the field, e.g. "Address" or "Link text"
+	 * @param value the new value of the field
+	 */
+	async fillMediaField(label: string, value: string): Promise<void> {
+		const saved = waitForApiResponse(this.page, 'PATCH')
+		await this.section.getByRole('textbox', { name: label }).fill(value)
+		await saved
+	}
+
 	async addAnswer(text: string): Promise<void> {
 		const saved = waitForApiResponse(this.page, 'POST')
 		await this.newAnswerInput.fill(text)

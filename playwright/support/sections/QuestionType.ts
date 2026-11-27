@@ -10,11 +10,13 @@ export enum QuestionType {
 	Dropdown = 'Dropdown',
 	File = 'File',
 	Grid = 'Grid',
+	Image = 'Image',
 	LinearScale = 'Linear scale',
 	LongAnswer = 'Long text',
 	Ranking = 'Ranking',
 	RadioButtons = 'Radio buttons',
 	ShortAnswer = 'Short answer',
+	Video = 'Video',
 }
 
 /**
