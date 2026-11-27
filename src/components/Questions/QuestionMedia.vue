@@ -203,6 +203,15 @@ export default defineComponent({
 		}
 
 		/**
+		 * Display-only blocks take no answer, so they are always valid.
+		 *
+		 * @return true
+		 */
+		async function validate(): Promise<boolean> {
+			return true
+		}
+
+		/**
 		 * @param value the new description or link text
 		 */
 		function onAltChange(value: string): void {
@@ -220,6 +229,7 @@ export default defineComponent({
 			playerLoaded,
 			t,
 			url,
+			validate,
 		}
 	},
 })
