@@ -896,8 +896,7 @@ export default defineComponent({
 		flex-direction: column;
 		margin: 0;
 		margin-block-end: 24px;
-		padding-inline-start: 32px;
-		margin-inline-end: -24px;
+		padding-inline-start: 44px;
 
 		.form-title {
 			font-size: 28px;
@@ -910,9 +909,7 @@ export default defineComponent({
 			padding-inline: 10px;
 			margin-block: 22px 14px;
 			margin-inline: 0;
-			width: calc(
-				100% - 58px
-			); // margin of header, needed if screen is < 806px (max-width + margin-left)
+			width: calc(100% - 46px);
 			overflow: hidden;
 			text-overflow: ellipsis;
 			resize: none;
@@ -928,7 +925,7 @@ export default defineComponent({
 			min-height: unset;
 			padding-block: 0px 20px;
 			padding-inline: 12px;
-			width: calc(100% - 58px);
+			width: calc(100% - 46px);
 		}
 
 		.form-desc {
