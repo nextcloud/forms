@@ -8,23 +8,31 @@
 		<NcAppNavigation
 			v-if="canCreateForms || hasForms"
 			:aria-label="t('forms', 'Forms navigation')">
-			<NcAppNavigationNew
-				v-if="canCreateForms"
-				:text="t('forms', 'New form')"
-				@click="onNewForm">
-				<template #icon>
-					<NcIconSvgWrapper :svg="IconPlus" />
-				</template>
-			</NcAppNavigationNew>
+			<template #search>
+				<NcAppNavigationSearch
+					v-model="filterText"
+					:label="t('forms', 'Filter forms')" />
+			</template>
 
 			<!-- Form-Owner-->
-			<template v-if="ownedForms.length > 0">
+			<template v-if="canCreateForms || ownedForms.length > 0">
 				<NcAppNavigationCaption
 					isHeading
 					class="forms-navigation__list-heading"
 					headingId="forms-navigation-your-forms"
-					:name="t('forms', 'Your forms')" />
-				<ul aria-labelledby="forms-navigation-your-forms">
+					:name="t('forms', 'Your forms')">
+					<template v-if="canCreateForms" #actions>
+						<NcActionButton @click="onNewForm">
+							<template #icon>
+								<NcIconSvgWrapper :svg="IconPlus" />
+							</template>
+							{{ t('forms', 'New form') }}
+						</NcActionButton>
+					</template>
+				</NcAppNavigationCaption>
+				<ul
+					v-if="ownedForms.length > 0"
+					aria-labelledby="forms-navigation-your-forms">
 					<AppNavigationForm
 						v-for="form in ownedForms"
 						:key="form.id"
@@ -54,6 +62,12 @@
 						@mobileCloseNavigation="mobileCloseNavigation" />
 				</ul>
 			</template>
+
+			<p role="status" class="forms-navigation__no-results">
+				<template v-if="hasNoFilterResults">
+					{{ t('forms', 'No forms match your filter') }}
+				</template>
+			</p>
 
 			<template #footer>
 				<div v-if="archivedForms.length > 0" class="forms-navigation-footer">
@@ -162,10 +176,11 @@ import { useIsMobile } from '@nextcloud/vue'
 import { defineComponent } from 'vue'
 import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import NcActionButton from '@nextcloud/vue/components/NcActionButton'
 import NcAppContent from '@nextcloud/vue/components/NcAppContent'
 import NcAppNavigation from '@nextcloud/vue/components/NcAppNavigation'
 import NcAppNavigationCaption from '@nextcloud/vue/components/NcAppNavigationCaption'
-import NcAppNavigationNew from '@nextcloud/vue/components/NcAppNavigationNew'
+import NcAppNavigationSearch from '@nextcloud/vue/components/NcAppNavigationSearch'
 import NcButton from '@nextcloud/vue/components/NcButton'
 import NcContent from '@nextcloud/vue/components/NcContent'
 import NcEmptyContent from '@nextcloud/vue/components/NcEmptyContent'
@@ -190,10 +205,11 @@ export default defineComponent({
 		AppNavigationForm,
 		ArchivedFormsModal,
 		NcIconSvgWrapper,
+		NcActionButton,
 		NcAppContent,
 		NcAppNavigation,
 		NcAppNavigationCaption,
-		NcAppNavigationNew,
+		NcAppNavigationSearch,
 		NcButton,
 		NcContent,
 		NcEmptyContent,
@@ -212,6 +228,7 @@ export default defineComponent({
 		const forms = ref<FormsForm[]>([])
 		const allSharedForms = ref<FormsForm[]>([])
 		const showArchivedForms = ref(false)
+		const filterText = ref('')
 		const appConfig = loadState(formsAppName, 'appConfig') as {
 			canCreateForms?: boolean
 			allowComments?: boolean
@@ -301,17 +318,45 @@ export default defineComponent({
 			return allSharedForms.value.length > 0 || forms.value.length > 0
 		})
 
-		const ownedForms = computed(() => {
-			return forms.value.filter(
-				(form) => form.state !== FormState.FormArchived,
-			)
-		})
+		/**
+		 * Fold a text to lower case without diacritics for comparison.
+		 *
+		 * @param text The text to fold.
+		 * @return The folded text.
+		 */
+		const foldText = (text: string): string =>
+			text
+				.normalize('NFD')
+				.replace(/\p{Diacritic}/gu, '')
+				.toLowerCase()
 
-		const sharedForms = computed(() => {
-			return allSharedForms.value.filter(
-				(form) => form.state !== FormState.FormArchived,
+		const filterQuery = computed(() => foldText(filterText.value.trim()))
+
+		/**
+		 * Filter the forms that are not archived and whose title contains the navigation filter text.
+		 *
+		 * @param list The forms to filter.
+		 * @return The matching forms.
+		 */
+		const filterActiveForms = (list: FormsForm[]): FormsForm[] =>
+			list.filter(
+				(form) =>
+					form.state !== FormState.FormArchived
+					&& foldText(form.title || t('forms', 'New form')).includes(
+						filterQuery.value,
+					),
 			)
-		})
+
+		const ownedForms = computed(() => filterActiveForms(forms.value))
+
+		const sharedForms = computed(() => filterActiveForms(allSharedForms.value))
+
+		const hasNoFilterResults = computed(
+			() =>
+				filterQuery.value !== ''
+				&& ownedForms.value.length === 0
+				&& sharedForms.value.length === 0,
+		)
 
 		const archivedForms = computed(() => {
 			return [...forms.value, ...allSharedForms.value].filter(
@@ -480,6 +525,7 @@ export default defineComponent({
 				)
 				const newForm = OcsResponse2Data<FormsForm>(response)
 				forms.value.unshift(newForm)
+				filterText.value = ''
 				router.push({
 					name: 'edit',
 					params: { hash: newForm.hash },
@@ -500,6 +546,7 @@ export default defineComponent({
 				)
 				const newForm = OcsResponse2Data<FormsForm>(response)
 				forms.value.unshift(newForm)
+				filterText.value = ''
 				router.push({
 					name: 'edit',
 					params: { hash: newForm.hash },
@@ -601,6 +648,8 @@ export default defineComponent({
 			forms,
 			allSharedForms,
 			showArchivedForms,
+			filterText,
+			hasNoFilterResults,
 			canCreateForms,
 			allowComments,
 			isMobile,
@@ -644,6 +693,12 @@ export default defineComponent({
 		// Make the list more condensed
 		margin-block: 0;
 	}
+}
+
+.forms-navigation__no-results {
+	padding-inline: calc(var(--default-grid-baseline) * 4);
+	margin: 0;
+	color: var(--color-text-maxcontrast);
 }
 
 .forms-emptycontent {
