@@ -9,25 +9,49 @@
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
 		v-on="commonListeners">
-		<div class="question-media">
+		<div class="question-media" :class="{ 'question-media--edit': !readOnly }">
 			<img
-				v-if="isImage && url"
+				v-if="isImage && url && !isExternal"
 				:src="url"
 				:alt="alt"
 				class="question-media__image"
 				referrerpolicy="no-referrer"
 				loading="lazy" />
 
-			<a
-				v-else-if="!isImage && url"
-				:href="url"
-				class="question-media__link"
-				target="_blank"
-				rel="noopener noreferrer external">
-				{{ alt || url }}
-			</a>
+			<template v-else-if="!isImage && url">
+				<div v-if="player" class="question-media__player">
+					<iframe
+						v-if="playerLoaded"
+						:src="player.src"
+						:title="alt || player.provider"
+						allow="autoplay; fullscreen; picture-in-picture"
+						referrerpolicy="strict-origin"
+						sandbox="allow-scripts allow-same-origin allow-presentation allow-popups" />
+					<div v-else class="question-media__consent">
+						<p>
+							{{
+								t(
+									'forms',
+									'This video is hosted by {provider}. Playing it here lets {provider} see your IP address and may set cookies.',
+									{ provider: player.provider },
+								)
+							}}
+						</p>
+						<NcButton variant="primary" @click="playerLoaded = true">
+							{{ t('forms', 'Play video') }}
+						</NcButton>
+					</div>
+				</div>
+				<a
+					:href="url"
+					class="question-media__link"
+					target="_blank"
+					rel="noopener noreferrer external">
+					{{ alt || url }}
+				</a>
+			</template>
 
-			<p v-else class="question-media__empty">
+			<p v-else-if="!url" class="question-media__empty">
 				{{
 					isImage
 						? t('forms', 'No image address set yet.')
@@ -49,11 +73,11 @@
 					"
 					:modelValue="alt"
 					@update:modelValue="onAltChange" />
-				<NcNoteCard v-if="isExternal" type="warning">
+				<NcNoteCard v-if="isImage && isExternal" type="error">
 					{{
 						t(
 							'forms',
-							'This address is on another site. Loading it tells that site the IP address of everyone who opens the form.',
+							'This image is on another site and will not be shown. Only images stored on this Nextcloud can be shown, for example through a public share link.',
 						)
 					}}
 				</NcNoteCard>
@@ -64,7 +88,8 @@
 
 <script lang="ts">
 import { t } from '@nextcloud/l10n'
-import { computed, defineComponent } from 'vue'
+import { computed, defineComponent, ref, watch } from 'vue'
+import NcButton from '@nextcloud/vue/components/NcButton'
 import NcNoteCard from '@nextcloud/vue/components/NcNoteCard'
 import NcTextField from '@nextcloud/vue/components/NcTextField'
 import Question from './Question.vue'
@@ -74,10 +99,55 @@ import {
 	useQuestion,
 } from '../../composables/useQuestion.ts'
 
+/**
+ * Get the privacy-friendly player of a YouTube or Vimeo video address
+ *
+ * @param address the address of the video
+ * @return the player's provider name and source, or null for any other address
+ */
+function toPlayer(address: string): { provider: string; src: string } | null {
+	let parsed: URL
+	try {
+		parsed = new URL(address)
+	} catch {
+		return null
+	}
+	const host = parsed.hostname.replace(/^(www|m)\./, '')
+
+	if (['youtube.com', 'youtube-nocookie.com', 'youtu.be'].includes(host)) {
+		const id =
+			host === 'youtu.be'
+				? parsed.pathname.split('/')[1]
+				: (parsed.searchParams.get('v')
+					?? parsed.pathname.match(
+						/^\/(?:embed|shorts|live)\/([^/]+)/,
+					)?.[1])
+		return id && /^[\w-]{11}$/.test(id)
+			? {
+					provider: 'YouTube',
+					src: `https://www.youtube-nocookie.com/embed/${id}?autoplay=1`,
+				}
+			: null
+	}
+
+	if (['vimeo.com', 'player.vimeo.com'].includes(host)) {
+		const id = parsed.pathname.match(/^\/(?:video\/)?(\d+)/)?.[1]
+		return id
+			? {
+					provider: 'Vimeo',
+					src: `https://player.vimeo.com/video/${id}?dnt=1&autoplay=1`,
+				}
+			: null
+	}
+
+	return null
+}
+
 export default defineComponent({
 	name: 'QuestionMedia',
 
 	components: {
+		NcButton,
 		NcNoteCard,
 		NcTextField,
 		Question,
@@ -102,8 +172,8 @@ export default defineComponent({
 		const alt = computed<string>(() => (extraSettings.value.alt as string) || '')
 
 		/**
-		 * Whether the address points somewhere other than this instance, which is worth
-		 * warning about because loading it discloses the respondent to that host.
+		 * Whether the address points somewhere other than this instance; such images
+		 * are blocked by the content security policy.
 		 */
 		const isExternal = computed<boolean>(() => {
 			if (!url.value) {
@@ -115,9 +185,14 @@ export default defineComponent({
 					!== window.location.origin
 				)
 			} catch {
-				// An address that cannot be parsed is not yet worth warning about.
 				return false
 			}
+		})
+
+		const player = computed(() => toPlayer(url.value))
+		const playerLoaded = ref(false)
+		watch(url, () => {
+			playerLoaded.value = false
 		})
 
 		/**
@@ -141,6 +216,8 @@ export default defineComponent({
 			isImage,
 			onAltChange,
 			onUrlChange,
+			player,
+			playerLoaded,
 			t,
 			url,
 		}
@@ -154,11 +231,47 @@ export default defineComponent({
 	flex-direction: column;
 	gap: 8px;
 
+	&--edit {
+		width: calc(100% - var(--default-clickable-area));
+		margin-inline-start: -12px;
+	}
+
 	&__image {
+		align-self: flex-start;
 		border-radius: var(--border-radius);
 		max-height: 400px;
 		max-width: 100%;
 		object-fit: contain;
+	}
+
+	&__player {
+		aspect-ratio: 16 / 9;
+		max-width: 100%;
+		border-radius: var(--border-radius-large);
+		overflow: hidden;
+		background-color: var(--color-background-dark);
+
+		iframe {
+			width: 100%;
+			height: 100%;
+			border: none;
+		}
+	}
+
+	&__consent {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+		gap: 12px;
+		height: 100%;
+		padding: 16px;
+		text-align: center;
+	}
+
+	&__link {
+		align-self: flex-start;
+		text-decoration: underline;
 	}
 
 	&__empty {

@@ -87,6 +87,33 @@ class PageControllerTest extends TestCase {
 		TestCase::invokePrivate($this->pageController, 'setEmbeddedCSP', [$response]);
 	}
 
+	public function testEmbeddedCSPAllowsVideoPlayers() {
+		$response = new TemplateResponse('forms', 'main');
+		TestCase::invokePrivate($this->pageController, 'setEmbeddedCSP', [$response]);
+
+		$policy = $response->getContentSecurityPolicy()->buildPolicy();
+		$this->assertMatchesRegularExpression('/frame-ancestors[^;]* \*/', $policy);
+		foreach (Constants::VIDEO_PLAYER_ORIGINS as $origin) {
+			$this->assertMatchesRegularExpression('/frame-src[^;]* ' . preg_quote($origin, '/') . '/', $policy);
+		}
+	}
+
+	public function testPublicSubmitViewAllowsVideoPlayers() {
+		$form = new Form();
+		$this->formsService->method('hasFormExpired')->willReturn(false);
+		$this->formsService->method('hasFormOpened')->with($form)->willReturn(true);
+		$this->formsService->method('getPublicForm')->willReturn([]);
+		$this->userSession->method('isLoggedIn')->willReturn(true);
+
+		/** @var TemplateResponse $response */
+		$response = TestCase::invokePrivate($this->pageController, 'createPublicSubmitView', [$form, 'hash']);
+
+		$policy = $response->getContentSecurityPolicy()->buildPolicy();
+		foreach (Constants::VIDEO_PLAYER_ORIGINS as $origin) {
+			$this->assertMatchesRegularExpression('/frame-src[^;]* ' . preg_quote($origin, '/') . '/', $policy);
+		}
+	}
+
 	/**
 	 * Render the public submit view of the form
 	 *

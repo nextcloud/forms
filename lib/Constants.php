@@ -269,6 +269,14 @@ class Constants {
 	];
 
 	/**
+	 * Origins of the video players a video block may load after the respondent agrees.
+	 */
+	public const VIDEO_PLAYER_ORIGINS = [
+		'https://www.youtube-nocookie.com',
+		'https://player.vimeo.com',
+	];
+
+	/**
 	 * Question types that are shown but never answered, so they are skipped when
 	 * validating a submission and left out of exports.
 	 */
