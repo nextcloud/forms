@@ -136,6 +136,7 @@
 								@input="onFileInput" />
 						</label>
 						<NcButton
+							class="question__upload-button"
 							:aria-label="uploadButtonLabel"
 							:disabled="
 								!readOnly || values.length >= maxAllowedFilesCount
@@ -603,13 +604,20 @@ export default defineComponent({
 		height: var(--default-clickable-area);
 		width: 100%;
 		max-width: 300px;
+		position: relative;
 
 		label {
 			color: var(--color-text-maxcontrast);
-			position: relative;
 
 			&:has(input:disabled) {
 				cursor: default;
+			}
+
+			&:has(input:enabled)::after {
+				content: '';
+				position: absolute;
+				inset: 0;
+				cursor: pointer;
 			}
 		}
 
@@ -623,6 +631,11 @@ export default defineComponent({
 				)
 				0;
 		}
+	}
+
+	&__upload-button {
+		position: relative;
+		z-index: 1;
 	}
 
 	&__file-input {
