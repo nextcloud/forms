@@ -30,7 +30,22 @@ export type NumberRule =
 	| 'equal'
 	| 'notEqual'
 
-export type AnswerLimitKey = 'lengthMax' | 'lengthMin' | 'numberMax' | 'numberMin'
+export type AnswerRuleKind =
+	'length' | 'contains' | 'notContains' | 'number' | 'whole'
+
+/**
+ * The extra settings of all answer rules, each removed
+ */
+export const NO_ANSWER_RULES: Record<keyof AnswerLimitSettings, undefined> = {
+	lengthMax: undefined,
+	lengthMin: undefined,
+	numberExclude: undefined,
+	numberInteger: undefined,
+	numberMax: undefined,
+	numberMin: undefined,
+	textContains: undefined,
+	textNotContains: undefined,
+}
 
 type AnswerRule = {
 	hint: string
@@ -153,6 +168,48 @@ export function numberRuleSettings(
 				numberExclude: undefined,
 			}
 	}
+}
+
+/**
+ * Whether any answer rule is set
+ *
+ * @param settings the extra settings of the question
+ */
+export function hasAnswerRules(settings: AnswerLimitSettings): boolean {
+	return Object.keys(NO_ANSWER_RULES).some(
+		(key) => settings[key as keyof AnswerLimitSettings] !== undefined,
+	)
+}
+
+/**
+ * Why answer rules of different kinds contradict each other, so that no
+ * answer can meet them all; null if they do not
+ *
+ * @param settings the extra settings of the question
+ */
+export function rulesConflict(settings: AnswerLimitSettings): string | null {
+	const { textContains, textNotContains, lengthMax } = settings
+	if (
+		textContains
+		&& textNotContains
+		&& textContains.toLowerCase().includes(textNotContains.toLowerCase())
+	) {
+		return t('forms', 'The required text contains the excluded text')
+	}
+	if (textContains && lengthMax && answerLength(textContains) > lengthMax) {
+		return t('forms', 'The required text is longer than the maximum length')
+	}
+	const { numberInteger, numberExclude, numberMin, numberMax } = settings
+	if (
+		numberInteger
+		&& !numberExclude
+		&& numberMin !== undefined
+		&& numberMax !== undefined
+		&& Math.ceil(numberMin) > numberMax
+	) {
+		return t('forms', 'No whole number is in this range')
+	}
+	return null
 }
 
 /**
@@ -345,105 +402,30 @@ export function useAnswerLimits(
 	}
 
 	/**
-	 * Why the value last entered for a limit was not saved, by limit
+	 * Whether the answer rules are switched on in the editor, initially when any is set
 	 */
-	const limitErrors = ref<Partial<Record<AnswerLimitKey, string>>>({})
+	const rulesSwitchedOn = ref(hasAnswerRules(extraSettings.value))
 
 	/**
-	 * A limit value as entered, as whole number for lengths
-	 *
-	 * @param input the entered value
-	 * @param integer whether only whole numbers are allowed
+	 * Whether the editor shows the answer rules: when switched on or any is set
 	 */
-	const parseLimit = (input: number | string, integer: boolean): number =>
-		integer
-			? Number.parseInt(input.toString(), 10)
-			: Number.parseFloat(input.toString())
+	const showRules = computed(
+		() => rulesSwitchedOn.value || hasAnswerRules(extraSettings.value),
+	)
 
 	/**
-	 * Why a limit cannot be set to a value: a length below 1 or above the stored
-	 * answer length, or a minimum above its maximum; null if it can
+	 * Show or hide the answer rules in the editor, removing them all when hidden
 	 *
-	 * @param key the limit
-	 * @param value the new value
-	 */
-	const limitProblem = (key: AnswerLimitKey, value: number): string | null => {
-		if (key.startsWith('length') && value < 1) {
-			return t('forms', 'Enter a number of at least {min}', { min: 1 })
-		}
-		if (key.startsWith('length') && value > answerLengthMax) {
-			return n(
-				'forms',
-				'An answer can have at most %n character',
-				'An answer can have at most %n characters',
-				answerLengthMax,
-			)
-		}
-		const settings = { ...extraSettings.value, [key]: value }
-		const [min, max] = key.startsWith('length')
-			? [settings.lengthMin, settings.lengthMax]
-			: [settings.numberMin, settings.numberMax]
-		if (min !== undefined && max !== undefined && min > max) {
-			return t('forms', 'The minimum must not be greater than the maximum')
-		}
-		return null
-	}
-
-	/**
-	 * Save one limit while it is typed, if the value fits; a value that does
-	 * not fit is left unsaved and reported when its field loses focus
-	 *
-	 * @param key the limit to change
-	 * @param input the new value, null to remove the limit; an empty value is not saved
-	 * @param integer whether only whole numbers from 1 are allowed
+	 * @param shown whether to show the rules
 	 * @param onExtraSettingsChange saves changed extra settings of the question
 	 */
-	const saveLimit = (
-		key: AnswerLimitKey,
-		input: number | string | null,
-		integer: boolean,
+	const toggleRules = (
+		shown: boolean,
 		onExtraSettingsChange: (settings: Record<string, unknown>) => void,
 	): void => {
-		if (input === '') {
-			return
-		}
-		let value: number | undefined
-		if (input !== null) {
-			value = parseLimit(input, integer)
-			if (isNaN(value) || limitProblem(key, value)) {
-				return
-			}
-		}
-		limitErrors.value = { ...limitErrors.value, [key]: undefined }
-		onExtraSettingsChange({ [key]: value })
-	}
-
-	/**
-	 * The error state of the editor field of a limit, and the check when the
-	 * field loses focus: a value that was not saved is reported and replaced by
-	 * the saved one
-	 *
-	 * @param key the limit
-	 */
-	const limitFieldState = (key: AnswerLimitKey) => {
-		const error = limitErrors.value[key]
-		return {
-			error: !!error,
-			helperText: error,
-			'aria-invalid': error ? ('true' as const) : undefined,
-			onBlur: (event: FocusEvent): void => {
-				const field = event.target as HTMLInputElement
-				const saved = extraSettings.value[key]
-				const parsed = parseLimit(field.value, key.startsWith('length'))
-				if (parsed === saved) {
-					return
-				}
-				const problem = isNaN(parsed) ? null : limitProblem(key, parsed)
-				if (problem) {
-					limitErrors.value = { ...limitErrors.value, [key]: problem }
-				}
-				field.value = saved === undefined ? '' : String(saved)
-			},
+		rulesSwitchedOn.value = shown
+		if (!shown) {
+			onExtraSettingsChange({ ...NO_ANSWER_RULES })
 		}
 	}
 
@@ -477,8 +459,8 @@ export function useAnswerLimits(
 		lengthCounter,
 		fitLength,
 		limitError,
-		limitFieldState,
 		limitHint,
-		saveLimit,
+		showRules,
+		toggleRules,
 	}
 }

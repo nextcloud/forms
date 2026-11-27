@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import type { APIRequestContext, Page } from '@playwright/test'
+import type { APIRequestContext, Locator, Page } from '@playwright/test'
 
 import { expect, mergeTests } from '@playwright/test'
 import { test as formTest } from '../support/fixtures/form.ts'
@@ -285,13 +285,17 @@ test.describe('Answer limits', () => {
 		await question.fillTitle('Bio')
 
 		await question.openActionsMenu()
-		const saved = waitForApiResponse(page, 'PATCH')
 		await page
-			.getByRole('checkbox', { name: 'Limit the maximum length' })
-			.click({ force: true })
-		await saved
+			.getByRole('checkbox', { name: 'Answer rules' })
+			.dispatchEvent('click')
+		await page.keyboard.press('Escape')
+		const rules = page.getByRole('group', { name: 'Answer rules' })
+		await rules.getByRole('button', { name: 'Add rule' }).click()
+		await expect(rules).toContainText('Length')
 		const updated = waitForApiResponse(page, 'PATCH')
-		await page.getByRole('spinbutton', { name: 'Maximum characters' }).fill('40')
+		await rules
+			.getByRole('spinbutton', { name: 'Maximum characters' })
+			.fill('40')
 		await updated
 
 		const formId = page.url().match(/apps\/forms\/(\w+)/)![1]
@@ -301,7 +305,9 @@ test.describe('Answer limits', () => {
 		expect(questions[0].extraSettings.lengthMax).toBe(40)
 	})
 
-	test('The owner sets each rule in the input type menu', async ({ page }) => {
+	test('The owner sets each rule in the rules row of the question', async ({
+		page,
+	}) => {
 		const form = await api(page.request, 'POST', '/forms')
 		const create = async (text: string, extraSettings: object) => {
 			const created = await api(
@@ -323,171 +329,203 @@ test.describe('Answer limits', () => {
 		const settings = async (index: number) =>
 			(await api(page.request, 'GET', `/forms/${form.id}`)).questions[index]
 				.extraSettings
-		const saving = (action: () => Promise<void>) =>
+		const saving = (action: () => Promise<unknown>) =>
 			Promise.all([waitForApiResponse(page, 'PATCH'), action()])
 
 		await page.goto(`apps/forms/${form.hash}/edit`)
 		const items = page.getByRole('listitem', { name: /Question number \d+/ })
-		const menu = (index: number, type: string) =>
-			items
-				.nth(index)
-				.getByRole('button', {
-					name: `Input types (currently: ${type})`,
-				})
-				.click()
+		const showRules = async (index: number) => {
+			await items.nth(index).getByRole('button', { name: 'Actions' }).click()
+			await page
+				.getByRole('checkbox', { name: 'Answer rules' })
+				.dispatchEvent('click')
+			await page.keyboard.press('Escape')
+			return items.nth(index).getByRole('group', { name: 'Answer rules' })
+		}
+		const choose = async (combobox: Locator, option: string) => {
+			await combobox.click()
+			await page.getByRole('option', { name: option, exact: true }).click()
+		}
 
-		await menu(0, 'Number')
-		await page.getByRole('menuitem', { name: /^Number rule/ }).click()
+		const amount = await showRules(0)
+		await saving(() => amount.getByRole('button', { name: 'Add rule' }).click())
+		expect(await settings(0)).toEqual({
+			validationType: 'number',
+			numberMin: 0,
+			numberMax: 100,
+		})
+		const condition = amount.getByRole('combobox', { name: 'Condition' })
+		await saving(() => choose(condition, 'Not between'))
 		await saving(() =>
-			page
-				.getByRole('radio', { name: 'Not between', exact: true })
-				.dispatchEvent('click'),
+			amount.getByRole('spinbutton', { name: 'Lowest number' }).fill('1'),
 		)
 		await saving(() =>
-			page.getByRole('spinbutton', { name: 'Lowest number' }).fill('1'),
-		)
-		await saving(() =>
-			page.getByRole('spinbutton', { name: 'Highest number' }).fill('10'),
+			amount.getByRole('spinbutton', { name: 'Highest number' }).fill('10'),
 		)
 		expect(await settings(0)).toMatchObject({
 			numberMin: 1,
 			numberMax: 10,
 			numberExclude: true,
 		})
-		await saving(() =>
-			page
-				.getByRole('radio', { name: 'Equal to', exact: true })
-				.dispatchEvent('click'),
-		)
-		await saving(() =>
-			page.getByRole('spinbutton', { name: 'Number', exact: true }).fill('7'),
-		)
+		const number = amount.getByRole('spinbutton', {
+			name: 'Number',
+			exact: true,
+		})
+		await saving(() => choose(condition, 'Equal to'))
+		await saving(() => number.fill('7'))
 		expect(await settings(0)).toEqual({
 			validationType: 'number',
 			numberMin: 7,
 			numberMax: 7,
 		})
-		await saving(() =>
-			page
-				.getByRole('radio', { name: 'Not equal to', exact: true })
-				.dispatchEvent('click'),
-		)
+		await saving(() => choose(condition, 'Not equal to'))
 		expect(await settings(0)).toMatchObject({ numberExclude: true })
-		await saving(() =>
-			page
-				.getByRole('radio', { name: 'Greater than', exact: true })
-				.dispatchEvent('click'),
-		)
-		await saving(() =>
-			page.getByRole('spinbutton', { name: 'Number', exact: true }).fill('0'),
-		)
+		await saving(() => choose(condition, 'Greater than'))
+		await saving(() => number.fill('0'))
 		expect(await settings(0)).toEqual({
 			validationType: 'number',
 			numberMax: 0,
 			numberExclude: true,
 		})
-		await saving(() =>
-			page
-				.getByRole('radio', { name: 'Less than', exact: true })
-				.dispatchEvent('click'),
-		)
-		await saving(() =>
-			page
-				.getByRole('spinbutton', { name: 'Number', exact: true })
-				.fill('100'),
-		)
+		await saving(() => choose(condition, 'Less than'))
+		await saving(() => number.fill('100'))
 		expect(await settings(0)).toEqual({
 			validationType: 'number',
 			numberMin: 100,
 			numberExclude: true,
 		})
-		await saving(() =>
-			page
-				.getByRole('radio', { name: 'At least', exact: true })
-				.dispatchEvent('click'),
-		)
-		await saving(() =>
-			page.getByRole('spinbutton', { name: 'Number', exact: true }).fill('18'),
-		)
+		await saving(() => choose(condition, 'At least'))
+		await saving(() => number.fill('18'))
 		expect(await settings(0)).toEqual({
 			validationType: 'number',
 			numberMin: 18,
 		})
-		await saving(() =>
-			page
-				.getByRole('radio', { name: 'At most', exact: true })
-				.dispatchEvent('click'),
-		)
-		await saving(() =>
-			page.getByRole('spinbutton', { name: 'Number', exact: true }).fill('50'),
-		)
+		await saving(() => choose(condition, 'At most'))
+		await saving(() => number.fill('50'))
 		expect(await settings(0)).toEqual({
 			validationType: 'number',
 			numberMax: 50,
 		})
-		await saving(() =>
-			page
-				.getByRole('radio', { name: 'Between', exact: true })
-				.dispatchEvent('click'),
-		)
+		await saving(() => choose(condition, 'Between'))
 		expect(await settings(0)).toEqual({
 			validationType: 'number',
 			numberMin: 0,
 			numberMax: 50,
 		})
 		await saving(() =>
-			page.getByRole('spinbutton', { name: 'Lowest number' }).fill('1'),
+			amount.getByRole('spinbutton', { name: 'Lowest number' }).fill('1'),
 		)
+		await saving(() => amount.getByRole('button', { name: 'Add rule' }).click())
 		expect(await settings(0)).toEqual({
 			validationType: 'number',
 			numberMin: 1,
 			numberMax: 50,
+			numberInteger: true,
 		})
 		await saving(() =>
-			page
-				.getByRole('checkbox', { name: 'Whole numbers only' })
-				.dispatchEvent('click'),
+			amount.getByRole('spinbutton', { name: 'Lowest number' }).fill('1.2'),
 		)
-		expect(await settings(0)).toMatchObject({ numberInteger: true })
-		await page.keyboard.press('Escape')
+		const highest = amount.getByRole('spinbutton', { name: 'Highest number' })
+		await highest.fill('1.8')
+		await highest.blur()
+		await expect(amount).toContainText('No whole number is in this range')
+		expect(await settings(0)).toMatchObject({ numberMax: 50 })
 
-		await menu(1, 'Text')
+		const company = await showRules(1)
+		await company.getByRole('button', { name: 'Add rule' }).click()
 		await saving(() =>
-			page.getByRole('textbox', { name: 'Must contain' }).fill('GmbH'),
+			company
+				.getByRole('spinbutton', { name: 'Maximum characters' })
+				.fill('12'),
 		)
+		await choose(company.getByRole('combobox', { name: 'Condition' }), 'Between')
 		await saving(() =>
-			page.getByRole('textbox', { name: 'Must not contain' }).fill('spam'),
+			company
+				.getByRole('spinbutton', { name: 'Minimum characters' })
+				.fill('3'),
+		)
+		await company.getByRole('button', { name: 'Add rule' }).click()
+		await saving(() =>
+			company.getByRole('textbox', { name: 'Required text' }).fill('GmbH'),
+		)
+		await company.getByRole('button', { name: 'Add rule' }).click()
+		await saving(() =>
+			company.getByRole('textbox', { name: 'Excluded text' }).fill('spam'),
 		)
 		expect(await settings(1)).toEqual({
+			lengthMin: 3,
+			lengthMax: 12,
 			textContains: 'GmbH',
 			textNotContains: 'spam',
 		})
-		await saving(() =>
-			page
-				.getByRole('checkbox', { name: 'Require a minimum length' })
-				.dispatchEvent('click'),
+		await expect(company.getByRole('button', { name: 'Add rule' })).toBeHidden()
+		const maximum = company.getByRole('spinbutton', {
+			name: 'Maximum characters',
+		})
+		await maximum.fill('3')
+		await maximum.blur()
+		await expect(company).toContainText(
+			'The required text is longer than the maximum length',
 		)
+		expect(await settings(1)).toMatchObject({ lengthMax: 12 })
 		await saving(() =>
-			page.getByRole('spinbutton', { name: 'Minimum characters' }).fill('3'),
+			company
+				.getByRole('button', { name: 'Remove rule Must not contain' })
+				.click(),
 		)
-		await saving(() =>
-			page
-				.getByRole('checkbox', { name: 'Limit the maximum length' })
-				.dispatchEvent('click'),
-		)
-		await saving(() =>
-			page.getByRole('spinbutton', { name: 'Maximum characters' }).fill('12'),
-		)
-		expect(await settings(1)).toMatchObject({ lengthMin: 3, lengthMax: 12 })
-		await page.keyboard.press('Escape')
+		expect(await settings(1)).not.toHaveProperty('textNotContains')
 
-		await menu(2, 'Text')
+		await items
+			.nth(2)
+			.getByRole('button', { name: 'Input types (currently: Text)' })
+			.click()
 		await saving(() =>
 			page
 				.getByRole('radio', { name: 'URL', exact: true })
 				.dispatchEvent('click'),
 		)
 		expect(await settings(2)).toEqual({ validationType: 'url' })
+	})
+
+	test('The owner changes and removes a saved rule with the keyboard', async ({
+		page,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		const created = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions`,
+			{ type: 'short', text: 'Company' },
+		)
+		await api(
+			page.request,
+			'PATCH',
+			`/forms/${form.id}/questions/${created.id}`,
+			{ keyValuePairs: { extraSettings: { textContains: 'GmbH' } } },
+		)
+
+		await page.goto(`apps/forms/${form.hash}/edit`)
+		const rules = page.getByRole('group', { name: 'Answer rules' })
+		const kind = rules.getByRole('combobox', { name: 'Rule' })
+		await kind.focus()
+		const last = page.getByRole('option', { name: 'Must not contain' })
+		await expect(async () => {
+			await page.keyboard.press('ArrowDown')
+			await expect(last).toHaveClass(/vs__dropdown-option--highlight/, {
+				timeout: 200,
+			})
+		}).toPass()
+		await Promise.all([
+			waitForApiResponse(page, 'PATCH'),
+			page.keyboard.press('Enter'),
+		])
+		await expect(rules).toContainText('Must not contain')
+		await expect(kind).toBeFocused()
+
+		await rules
+			.getByRole('button', { name: 'Remove rule Must not contain' })
+			.press('Enter')
+		await expect(rules.getByRole('button', { name: 'Add rule' })).toBeFocused()
 	})
 
 	test('A respondent in the app sees the rules and cannot break them', async ({

@@ -14,46 +14,12 @@
 		v-on="commonListeners">
 		<template #actions>
 			<NcActionCheckbox
-				:modelValue="!!extraSettings.lengthMin"
+				:modelValue="showRules"
 				@update:modelValue="
-					(checked) => onLimitChange('lengthMin', checked ? 1 : null, true)
+					(shown) => toggleRules(shown, onExtraSettingsChange)
 				">
-				{{ t('forms', 'Require a minimum length') }}
+				{{ t('forms', 'Answer rules') }}
 			</NcActionCheckbox>
-			<NcActionInput
-				v-if="extraSettings.lengthMin"
-				type="number"
-				:label="t('forms', 'Minimum characters')"
-				:labelOutside="false"
-				:showTrailingButton="false"
-				:modelValue="extraSettings.lengthMin"
-				v-bind="limitFieldState('lengthMin')"
-				@update:modelValue="
-					(value) => onLimitChange('lengthMin', value, true)
-				" />
-			<NcActionCheckbox
-				:modelValue="!!extraSettings.lengthMax"
-				@update:modelValue="
-					(checked) =>
-						onLimitChange(
-							'lengthMax',
-							checked ? answerLengthMax : null,
-							true,
-						)
-				">
-				{{ t('forms', 'Limit the maximum length') }}
-			</NcActionCheckbox>
-			<NcActionInput
-				v-if="extraSettings.lengthMax"
-				type="number"
-				:label="t('forms', 'Maximum characters')"
-				:labelOutside="false"
-				:showTrailingButton="false"
-				:modelValue="extraSettings.lengthMax"
-				v-bind="limitFieldState('lengthMax')"
-				@update:modelValue="
-					(value) => onLimitChange('lengthMax', value, true)
-				" />
 		</template>
 		<div class="question__content">
 			<textarea
@@ -81,6 +47,12 @@
 				{{ lengthCounter }}
 			</p>
 		</div>
+		<AnswerRules
+			v-if="!readOnly && showRules"
+			:kinds="['length']"
+			:extraSettings="extraSettings"
+			:answerLengthMax="answerLengthMax"
+			@change="onExtraSettingsChange" />
 		<template #insert>
 			<slot name="insert" />
 		</template>
@@ -88,16 +60,13 @@
 </template>
 
 <script lang="ts">
-import type {
-	AnswerLimitKey,
-	AnswerLimitSettings,
-} from '../../composables/useAnswerLimits.ts'
+import type { AnswerLimitSettings } from '../../composables/useAnswerLimits.ts'
 
 import { t } from '@nextcloud/l10n'
 import debounce from 'debounce'
 import { computed, defineComponent, nextTick, ref, watch } from 'vue'
 import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
-import NcActionInput from '@nextcloud/vue/components/NcActionInput'
+import AnswerRules from './AnswerRules.vue'
 import Question from './Question.vue'
 import { useAnswerLimits } from '../../composables/useAnswerLimits.ts'
 import {
@@ -111,8 +80,8 @@ export default defineComponent({
 	name: 'QuestionLong',
 
 	components: {
+		AnswerRules,
 		NcActionCheckbox,
-		NcActionInput,
 		Question,
 	},
 
@@ -139,12 +108,6 @@ export default defineComponent({
 			infoMessage: limits.limitHint,
 			rootElement,
 		})
-		const onLimitChange = (
-			key: AnswerLimitKey,
-			input: number | string | null,
-			integer: boolean,
-		): void =>
-			limits.saveLimit(key, input, integer, question.onExtraSettingsChange)
 
 		const submissionInputPlaceholder = computed(() => {
 			if (props.readOnly) {
@@ -220,7 +183,6 @@ export default defineComponent({
 			...question,
 			...limits,
 			answerLengthMax,
-			onLimitChange,
 			t,
 			extraSettings,
 			rootElement,
