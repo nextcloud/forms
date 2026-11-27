@@ -316,7 +316,7 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		await expect(page.locator('#q1_desc')).toContainText('Upload your file')
 	})
 
-	test('File question upload button has an accessible name', async ({
+	test('File question opens the picker from the field and its named button', async ({
 		appNavigation,
 		form,
 		topBar,
@@ -328,13 +328,37 @@ test.describe('Accessibility: aria attributes on question inputs', () => {
 		await form.addQuestion(QuestionType.File)
 		const questions = await form.getQuestions()
 		await questions[0].fillTitle('My file question')
+		await expect(
+			questions[0].section.getByText('Add new file as answer', {
+				exact: true,
+			}),
+		).toHaveCSS('cursor', 'default')
 
 		await topBar.toggleView(FormsView.View)
 
+		let fileChooserCount = 0
+		page.on('filechooser', () => fileChooserCount++)
+
 		const question = page.getByRole('listitem', { name: /Question number 1/ })
-		await expect(
-			question.getByRole('button', { name: 'Upload a file' }),
-		).toBeVisible()
+		const button = question.getByRole('button', { name: 'Upload a file' })
+		const label = question.getByText('Add new file as answer', { exact: true })
+		const labelBox = await label.boundingBox()
+		const buttonBox = await button.boundingBox()
+		if (!labelBox || !buttonBox) {
+			throw new Error('Expected the upload label and button to be visible')
+		}
+
+		const gapStart = labelBox.x + labelBox.width
+		expect(buttonBox.x).toBeGreaterThan(gapStart)
+		await Promise.all([
+			page.waitForEvent('filechooser'),
+			page.mouse.click(
+				(gapStart + buttonBox.x) / 2,
+				buttonBox.y + buttonBox.height / 2,
+			),
+		])
+		await Promise.all([page.waitForEvent('filechooser'), button.press('Enter')])
+		expect(fileChooserCount).toBe(2)
 	})
 
 	test('Color question with description has aria-labelledby and aria-describedby', async ({
