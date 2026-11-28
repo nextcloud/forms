@@ -9,6 +9,7 @@ import { expect, mergeTests } from '@playwright/test'
 import {
 	getQuestionIdsInSections,
 	isEmptySection,
+	reorderSections,
 } from '../../src/utils/Sections.ts'
 import { test as randomUserTest } from '../support/fixtures/random-user.ts'
 import { test as submitTest } from '../support/fixtures/submit.ts'
@@ -637,6 +638,170 @@ test.describe('Sections', () => {
 		).toHaveCount(0)
 		const { questions } = await api(page.request, 'GET', `/forms/${form.id}`)
 		expect(questions).toEqual([])
+	})
+
+	test('Sections are reordered with their questions', () => {
+		const items = [
+			{ id: 1, type: 'short' },
+			{ id: 2, type: 'section' },
+			{ id: 3, type: 'short' },
+			{ id: 4, type: 'section' },
+			{ id: 5, type: 'short' },
+			{ id: 6, type: 'short' },
+			{ id: 7, type: 'section' },
+		]
+		const ids = (questions: typeof items) => questions.map(({ id }) => id)
+		expect(ids(reorderSections(items, [4, 7, 2]))).toEqual([1, 4, 5, 6, 7, 2, 3])
+		expect(ids(reorderSections(items, [7, 2]))).toEqual([1, 7, 2, 3, 4, 5, 6])
+		expect(ids(reorderSections(items.slice(0, 1), [2]))).toEqual([1])
+	})
+
+	test('The reorder sections dialog moves sections with their questions on save, by button or by dragging', async ({
+		page,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		const ids: number[] = []
+		for (const [type, text] of [
+			['section', 'Part one'],
+			['short', 'First'],
+			['section', 'Part two'],
+			['short', 'Second'],
+			['short', 'Third'],
+		]) {
+			ids.push(
+				(
+					await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+						type,
+						text,
+					})
+				).id,
+			)
+		}
+		await page.goto(`apps/forms/${form.hash}/edit`)
+
+		const firstSection = page.getByRole('listitem', { name: 'Section number 1' })
+		await expect(
+			firstSection.getByRole('button', { name: /^Move/ }),
+		).toHaveCount(0)
+		await firstSection
+			.getByRole('button', { name: 'Actions', exact: true })
+			.click()
+		await page.getByRole('menuitem', { name: 'Move section' }).click()
+
+		const dialog = page.getByRole('dialog', { name: 'Reorder sections' })
+		const items = dialog.getByRole('listitem')
+		await expect(items).toHaveText([
+			/Part one\s*Section 1 of 2/,
+			/Part two\s*Section 2 of 2/,
+		])
+		const save = dialog.getByRole('button', { name: 'Save' })
+		await expect(save).toBeDisabled()
+		await expect(
+			dialog.getByRole('button', { name: 'Move section Part one up' }),
+		).toBeDisabled()
+
+		const down = dialog.getByRole('button', {
+			name: 'Move section Part one down',
+		})
+		await down.click()
+		await expect(items).toHaveText([/Part two/, /Part one/])
+		await expect(
+			dialog.getByRole('button', { name: 'Move section Part one up' }),
+		).toBeFocused()
+		await dialog.getByRole('button', { name: 'Cancel' }).click()
+		await expect(dialog).toHaveCount(0)
+		await expect(
+			firstSection.getByRole('textbox', { name: 'Title of section number 1' }),
+		).toHaveValue('Part one')
+
+		await firstSection
+			.getByRole('button', { name: 'Actions', exact: true })
+			.click()
+		await page.getByRole('menuitem', { name: 'Move section' }).click()
+		await expect(items).toHaveText([/Part one/, /Part two/])
+		await items
+			.nth(1)
+			.locator('.reorder-sections__handle')
+			.dragTo(items.nth(0), { targetPosition: { x: 20, y: 5 } })
+		await expect(items).toHaveText([/Part two/, /Part one/])
+		const order = page.waitForResponse(
+			(response) =>
+				response.request().method() === 'PATCH'
+				&& response.url().endsWith(`/forms/${form.id}/questions`),
+		)
+		await save.click()
+		await order
+
+		const { questions } = await api(page.request, 'GET', `/forms/${form.id}`)
+		expect(questions.map(({ id }: { id: number }) => id)).toEqual([
+			ids[2],
+			ids[3],
+			ids[4],
+			ids[0],
+			ids[1],
+		])
+		await expect(
+			page.getByRole('textbox', { name: 'Title of section number 1' }),
+		).toHaveValue('Part two')
+	})
+
+	test('Reordering sections names the moved section when a jump would go back', async ({
+		page,
+	}) => {
+		const form = await api(page.request, 'POST', '/forms')
+		const ids: Record<string, number> = {}
+		for (const [type, text] of [
+			['section', 'Part one'],
+			['multiple_unique', 'Skip ahead?'],
+			['section', 'Part two'],
+			['short', 'Second'],
+		]) {
+			ids[text] = (
+				await api(page.request, 'POST', `/forms/${form.id}/questions`, {
+					type,
+					text,
+				})
+			).id
+		}
+		const options = await api(
+			page.request,
+			'POST',
+			`/forms/${form.id}/questions/${ids['Skip ahead?']}/options`,
+			{ optionTexts: ['Yes', 'No'] },
+		)
+		await api(
+			page.request,
+			'PATCH',
+			`/forms/${form.id}/questions/${ids['Skip ahead?']}`,
+			{
+				keyValuePairs: {
+					extraSettings: {
+						goTo: [{ optionId: options[0].id, target: ids['Part two'] }],
+					},
+				},
+			},
+		)
+		await page.goto(`apps/forms/${form.hash}/edit`)
+
+		await page
+			.getByRole('listitem', { name: 'Section number 1' })
+			.getByRole('button', { name: 'Actions', exact: true })
+			.click()
+		await page.getByRole('menuitem', { name: 'Move section' }).click()
+		const reorder = page.getByRole('dialog', { name: 'Reorder sections' })
+		await reorder
+			.getByRole('button', { name: 'Move section Part two up' })
+			.click()
+		await reorder.getByRole('button', { name: 'Save' }).click()
+
+		const dialog = page.getByRole('dialog', { name: 'Jumps cannot go back' })
+		await expect(dialog).toContainText(
+			'Move the section "Part two" back, or remove these jumps?',
+		)
+		await dialog.getByRole('button', { name: 'Move back' }).click()
+		await expect(
+			page.getByRole('textbox', { name: 'Title of section number 1' }),
+		).toHaveValue('Part one')
 	})
 
 	test('Each page checks its required questions, an empty section is an info page', async ({

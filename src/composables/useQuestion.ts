@@ -31,6 +31,7 @@ export const QUESTION_EMITS = [
 	'clone',
 	'moveDown',
 	'moveUp',
+	'moveSection',
 ]
 
 export const QUESTION_PROPS = {
@@ -445,6 +446,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 			'update:name': onNameChange,
 			moveDown: (...args: unknown[]) => options.emit('moveDown', ...args),
 			moveUp: (...args: unknown[]) => options.emit('moveUp', ...args),
+			moveSection: () => options.emit('moveSection'),
 		}
 	})
 
