@@ -244,7 +244,7 @@ class ApiControllerTest extends TestCase {
 				'submissions' => [
 					['userId' => 'anon-user-1']
 				],
-				'questions' => [['id' => 1, 'name' => 'questions']],
+				'questions' => [['id' => 1, 'name' => 'questions', 'type' => Constants::ANSWER_TYPE_SHORT]],
 				'expected' => [
 					'submissions' => [
 						[
@@ -256,6 +256,7 @@ class ApiControllerTest extends TestCase {
 						[
 							'id' => 1,
 							'name' => 'questions',
+							'type' => Constants::ANSWER_TYPE_SHORT,
 							'extraSettings' => new \stdClass(),
 						],
 					],
@@ -266,7 +267,7 @@ class ApiControllerTest extends TestCase {
 				'submissions' => [
 					['userId' => 'jdoe']
 				],
-				'questions' => [['id' => 1, 'name' => 'questions']],
+				'questions' => [['id' => 1, 'name' => 'questions', 'type' => Constants::ANSWER_TYPE_SHORT]],
 				'expected' => [
 					'submissions' => [
 						[
@@ -278,6 +279,33 @@ class ApiControllerTest extends TestCase {
 						[
 							'id' => 1,
 							'name' => 'questions',
+							'type' => Constants::ANSWER_TYPE_SHORT,
+							'extraSettings' => new \stdClass(),
+						],
+					],
+					'filteredSubmissionsCount' => 1,
+				]
+			],
+			'sections are filtered out' => [
+				'submissions' => [
+					['userId' => 'jdoe']
+				],
+				'questions' => [
+					['id' => 1, 'name' => 'questions', 'type' => Constants::ANSWER_TYPE_SHORT],
+					['id' => 2, 'name' => 'section', 'type' => Constants::ANSWER_TYPE_SECTION],
+				],
+				'expected' => [
+					'submissions' => [
+						[
+							'userId' => 'jdoe',
+							'userDisplayName' => 'jdoe',
+						]
+					],
+					'questions' => [
+						[
+							'id' => 1,
+							'name' => 'questions',
+							'type' => Constants::ANSWER_TYPE_SHORT,
 							'extraSettings' => new \stdClass(),
 						],
 					],
@@ -2260,6 +2288,140 @@ class ApiControllerTest extends TestCase {
 
 		$this->assertSame($expectedSettings, $stored->getExtraSettings());
 		$this->assertSame($expectedSettings, $response->getData()['extraSettings']);
+	}
+
+	/**
+	 * @param list<string> $types
+	 * @return list<Question>
+	 */
+	private static function questionsOfTypes(array $types): array {
+		return array_map(static function (string $type, int $index): Question {
+			$question = new Question();
+			$question->setId($index + 1);
+			$question->setFormId(1);
+			$question->setOrder($index + 1);
+			$question->setType($type);
+			$question->setExtraSettings([]);
+			return $question;
+		}, $types, array_keys($types));
+	}
+
+	private function allowEditingForm(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->formsService->method('areExtraSettingsValid')->willReturn(true);
+	}
+
+	public static function dataNewQuestionOutsideSections(): array {
+		return [
+			'section appended below questions' => [['short', 'long'], 'section', null],
+			'section between questions' => [['short', 'long'], 'section', 2],
+			'question above the first section' => [['section', 'short'], 'short', 1],
+			'question before the first section of a form with a question outside' => [['short', 'section'], 'long', 1],
+		];
+	}
+
+	/**
+	 * @dataProvider dataNewQuestionOutsideSections
+	 */
+	public function testNewQuestionRejectsQuestionsOutsideSections(array $types, string $type, ?int $position): void {
+		$this->allowEditingForm();
+		$this->questionMapper->method('findByForm')->with(1)->willReturn(self::questionsOfTypes($types));
+		$this->questionMapper->expects($this->never())->method('insert');
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Every question must be in a section');
+		$this->apiController->newQuestion(1, $type, null, '', null, $position);
+	}
+
+	public static function dataNewQuestionKeepingSections(): array {
+		return [
+			'section on top of questions' => [['short', 'long'], 'section', 1],
+			'question in a section' => [['section', 'short'], 'short', 2],
+			'question appended to a form with a question outside sections' => [['short', 'section'], 'long', null],
+			'section in a form without questions' => [[], 'section', null],
+		];
+	}
+
+	/**
+	 * @dataProvider dataNewQuestionKeepingSections
+	 */
+	public function testNewQuestionKeepsQuestionsInSections(array $types, string $type, ?int $position): void {
+		$this->allowEditingForm();
+		$this->questionMapper->method('findByForm')->with(1)->willReturn(self::questionsOfTypes($types));
+		$stored = null;
+		$this->questionMapper->expects($this->once())
+			->method('insert')
+			->willReturnCallback(function (Question $question) use (&$stored) {
+				$question->setId(9);
+				$stored = $question;
+				return $question;
+			});
+		$this->formsService->method('getQuestion')->with(9)->willReturnCallback(function () use (&$stored) {
+			return $stored->read();
+		});
+
+		$response = $this->apiController->newQuestion(1, $type, null, '', null, $position);
+
+		$this->assertSame(Http::STATUS_CREATED, $response->getStatus());
+	}
+
+	public function testCloneQuestionRejectsCloneAboveTheFirstSection(): void {
+		$this->allowEditingForm();
+		$questions = self::questionsOfTypes(['section', 'short']);
+		$this->questionMapper->method('findById')->with(2)->willReturn($questions[1]);
+		$this->questionMapper->method('findByForm')->with(1)->willReturn($questions);
+		$this->questionMapper->expects($this->never())->method('insert');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Every question must be in a section');
+		$this->apiController->newQuestion(1, null, null, '', 2, 1);
+	}
+
+	public function testReorderQuestionsRejectsQuestionsAboveTheFirstSection(): void {
+		$this->allowEditingForm();
+		$questions = self::questionsOfTypes(['section', 'short', 'long']);
+		$this->questionMapper->method('findByForm')->with(1)->willReturn($questions);
+		$this->questionMapper->method('findById')->willReturnCallback(fn (int $id): Question => $questions[$id - 1]);
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->expectExceptionMessage('Every question must be in a section');
+		$this->apiController->reorderQuestions(1, [2, 1, 3]);
+	}
+
+	public static function dataDeleteSection(): array {
+		return [
+			'the first section: its questions join the next section' => [1, [2 => 2, 3 => 3, 4 => 1, 5 => 4], 'removed-jumps=(2)'],
+			'a later section: its questions join the section before' => [4, [1 => 1, 2 => 2, 3 => 3, 5 => 4], null],
+		];
+	}
+
+	/**
+	 * @dataProvider dataDeleteSection
+	 */
+	public function testDeleteSectionKeepsQuestionsInSections(int $deletedId, array $expectedOrders, ?string $header): void {
+		$this->allowEditingForm();
+		$questions = self::questionsOfTypes(['section', 'short', 'long', 'section', 'short']);
+		$questions[1]->setExtraSettings(['next' => 4]);
+		$remaining = array_values(array_filter($questions, static fn (Question $question): bool => $question->getId() !== $deletedId));
+		$this->questionMapper->method('findById')->with($deletedId)->willReturn($questions[$deletedId - 1]);
+		$this->questionMapper->method('findByForm')->with(1)->willReturn($remaining);
+
+		$response = $this->apiController->deleteQuestion(1, $deletedId);
+
+		$orders = [];
+		foreach ($remaining as $question) {
+			$orders[$question->getId()] = $question->getOrder();
+		}
+		ksort($orders);
+		$this->assertSame($expectedOrders, $orders);
+		$this->assertSame($header, $response->getHeaders()['X-Forms-Adjusted'] ?? null);
+		$this->assertSame($header === null ? ['next' => 4] : [], $questions[1]->getExtraSettings());
 	}
 
 	public function testCloneFormWithConfirmationEmailQuestionId(): void {

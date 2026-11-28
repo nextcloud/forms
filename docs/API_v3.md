@@ -37,7 +37,7 @@ Some requests succeed with their usual status, and their payload keeps its shape
 
 | Key | Value | Set by | Meaning |
 |-----|-------|--------|---------|
-| `removed-jumps` | Inner list of question ids, e.g. `(3 7)` | Updating, reordering and copying questions; deleting options; changing the bounds of a linear scale | Jumps to the question itself or to an earlier question, jumps of the deleted option or of options that are not options of the question, or jumps for values outside the scale, were removed from the `extraSettings` of these questions, see [Jumps](DataStructure.md#jumps) |
+| `removed-jumps` | Inner list of question ids, e.g. `(3 7)` | Updating, reordering and copying questions; deleting the first section of a form; deleting options; changing the bounds of a linear scale | Jumps to the question itself or to an earlier question, jumps of the deleted option or of options that are not options of the question, or jumps for values outside the scale, were removed from the `extraSettings` of these questions, see [Jumps](DataStructure.md#jumps) |
 
 ```
 X-Forms-Adjusted: removed-jumps=(3 7)
@@ -395,7 +395,7 @@ Returns the questions and options of the given form (without submissions).
   | _subtype_ | String | yes | _Optional_ The sub type, stored as `extraSettings.questionType`: the cell type for `grid` (`checkbox`, `number` or `radio`), `rating` (a 1 to N scale drawn as icons) or `promoter` (a fixed 0 to 10 scale) for `linearscale`. Any other value is rejected. |
   | _text_ | String | yes | _Optional_ The text of the new question. |
   | _position_ | Integer | yes | _(optional)_ 1-based position to insert the new question. When omitted the question is appended at the end. |
-- Restrictions: A `grid` question needs its cell type as _subtype_. A _subtype_ for a question type without sub types is rejected with **400 Bad Request**.
+- Restrictions: A `grid` question needs its cell type as _subtype_. A _subtype_ for a question type without sub types is rejected with **400 Bad Request**. In a form with sections every question is in a section (see [Sections](DataStructure.md#sections)): a question or section that would add to the questions before the first section, for example a section appended below the questions of a form without sections, is rejected with **400 Bad Request** "Every question must be in a section".
 - Response: The new question object.
 
 ```
@@ -494,7 +494,7 @@ Reorders all Questions of a single form
   | Parameter | Type | Description |
   |-----------|---------|-------------|
   | _newOrder_ | Array | Array of **all** Question-IDs, ordered in the desired order |
-- Restrictions: The Array **must** contain all Question-IDs corresponding to the specified form and **must not** contain any duplicates.
+- Restrictions: The Array **must** contain all Question-IDs corresponding to the specified form and **must not** contain any duplicates. An order that puts more questions before the first section than before is rejected with **400 Bad Request** "Every question must be in a section" (see [Sections](DataStructure.md#sections)).
 - Response: Array of questionIDs and their corresponding order. Jumps that would go to the question itself or to an earlier question are removed (see [Jumps](DataStructure.md#jumps)): the questions concerned also carry their new `extraSettings`, and the response header `X-Forms-Adjusted` then lists their ids, e.g. `X-Forms-Adjusted: removed-jumps=(3 7)`, or holds `removed-jumps` alone for more than 100 questions (see [Adjustments by the server](#adjustments-by-the-server)).
   An id of a deleted question gets a **Not Found** response.
 
@@ -521,7 +521,7 @@ Reorders all Questions of a single form
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form containing the question |
   | _questionId_ | Integer | ID of the question to delete |
-- Response: **Status-Code OK**, as well as the id of the deleted question.
+- Response: **Status-Code OK**, as well as the id of the deleted question. Deleting the first section moves the next section up to its place, so its questions stay in a section (see [Sections](DataStructure.md#sections)); jumps that become backward by this are removed, and the response header `X-Forms-Adjusted` then lists their questions, e.g. `X-Forms-Adjusted: removed-jumps=(3 7)` (see [Adjustments by the server](#adjustments-by-the-server)).
 
 ```
 "data": 4
@@ -740,7 +740,7 @@ Get all Submissions to a Form
   | _query_ | String | Phrase for full text search |
   | _limit_ | Integer | How many items to get |
   | _offset_ | Integer | How many items to skip for a pagination |
-- Response: An Array of all submissions, sorted as newest first, as well as an array of the corresponding questions.
+- Response: An Array of all submissions, sorted as newest first, as well as an array of the corresponding questions, without sections.
   Answers to deleted questions are left out, and the search does not match them.
 
 ```
@@ -845,7 +845,7 @@ Returns all submissions to the form in form of a csv-file.
   |--------------|---------|-------------|
   | _formId_ | Integer | Id of the form to get the submissions for |
   | _fileFormat_ | String | `csv|ods|xlsx` |
-- Response: A Data Download Response containing the headers `Content-Disposition: attachment; filename="Form 1 (responses).csv"` and `Content-Type: text/csv;charset=UTF-8`. The actual data contains all submissions to the referred form, without answers to deleted questions, formatted as comma separated and escaped csv. For file format `ods` or `xlsx` the Download Response contains an Open Document Spreadsheet or an Office Open XML Spreadsheet file.
+- Response: A Data Download Response containing the headers `Content-Disposition: attachment; filename="Form 1 (responses).csv"` and `Content-Type: text/csv;charset=UTF-8`. The actual data contains all submissions to the referred form, without answers to deleted questions, formatted as comma separated and escaped csv. For file format `ods` or `xlsx` the Download Response contains an Open Document Spreadsheet or an Office Open XML Spreadsheet file. There is one column per question; sections have no column.
 
 ```
 "User display name","Timestamp","Question 1","Question 2"
@@ -981,6 +981,7 @@ Store Submission to Database
     - For File-Uploads, the array contains objects with `uploadedFileId` and `uploadToken` (both from the [Upload a file] endpoint for the same `questionId`).
     - Answers to questions that the [jumps](DataStructure.md#jumps) of the answers skip are ignored, and a skipped required question needs no answer. The path ends at a question that has no answer and a jump per answer past the following question, so the questions after an optional one left empty need no answer either.
     - An answer "Other" is `system-other-answer:` followed by its text. The text must not be empty where the question has a jump for the answer "Other", as the answer decides the path there.
+    - A `section` takes no answer: a non-empty array of values for a section on the respondent's path, even `[""]`, is rejected with **400 Bad Request** "Section "…" cannot have answers." An answer that is not an array of values gets the usual "Invalid answer for question "…".", and answers to sections the jumps skip are ignored like those to skipped questions.
 
 ```
   {

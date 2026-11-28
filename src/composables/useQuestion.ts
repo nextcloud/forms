@@ -17,6 +17,7 @@ import { computed, nextTick, onDeactivated, ref, toRaw, watch } from 'vue'
 import { INPUT_DEBOUNCE_MS } from '../models/Constants.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
+import { getIdPrefix } from '../utils/Sections.ts'
 import { useJumps } from './useJumps.ts'
 
 export const QUESTION_EMITS = [
@@ -56,6 +57,10 @@ export const QUESTION_PROPS = {
 	index: {
 		type: Number,
 		required: true,
+	},
+	headingLevel: {
+		type: Number,
+		default: 3,
 	},
 	name: {
 		type: String,
@@ -160,11 +165,13 @@ interface QuestionPropsLike {
 	id: number
 	formId: number | null
 	index: number
+	headingLevel: number
 	text: string
 	description: string
 	isRequired: boolean
 	readOnly: boolean
 	name: string
+	type: string | null
 	maxStringLengths: Record<string, number>
 	canMoveUp: boolean
 	canMoveDown: boolean
@@ -176,12 +183,14 @@ interface QuestionPropsLike {
 
 interface QuestionForwardedProps {
 	index: number
+	headingLevel: number
 	text: string
 	description: string
 	isRequired: boolean
 	readOnly: boolean
 	maxStringLengths: Record<string, number>
 	name: string
+	type: string | null
 	canMoveUp: boolean
 	canMoveDown: boolean
 	jumps: Jumps
@@ -241,24 +250,24 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 
 	const questionProps = computed<QuestionForwardedProps>(() => ({
 		index: props.index,
+		headingLevel: props.headingLevel,
 		text: props.text,
 		description: props.description,
 		isRequired: props.isRequired,
 		readOnly: props.readOnly,
 		maxStringLengths: props.maxStringLengths,
 		name: props.name,
+		type: props.type,
 		canMoveUp: props.canMoveUp,
 		canMoveDown: props.canMoveDown,
 		jumps,
 	}))
 
-	const titleId = computed(() => {
-		return 'q' + props.index + '_title'
-	})
+	const idPrefix = computed(() => getIdPrefix(String(props.type), props.index))
 
-	const descriptionId = computed(() => {
-		return 'q' + props.index + '_desc'
-	})
+	const titleId = computed(() => idPrefix.value + '_title')
+
+	const descriptionId = computed(() => idPrefix.value + '_desc')
 
 	const hasError = computed(() => {
 		return !!errorMessage.value
@@ -268,13 +277,9 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		return !!options.infoMessage?.value
 	})
 
-	const errorId = computed(() => {
-		return `q${props.index}_error`
-	})
+	const errorId = computed(() => `${idPrefix.value}_error`)
 
-	const infoId = computed(() => {
-		return `q${props.index}_info`
-	})
+	const infoId = computed(() => `${idPrefix.value}_info`)
 
 	const onTitleChange = debounce(function (text: string) {
 		options.emit('update:text', text)

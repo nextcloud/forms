@@ -240,6 +240,15 @@ Currently supported Question-Types are:
 | `linearscale`     | A linear or Likert scale question where you choose an option that best fits your opinion                                                                                          |
 | `color`           | A color answer, hex string representation (e. g. `#123456`)                                                                                                                       |
 | `ranking`         | Using pre-defined options, the user ranks them from most to least preferred. Needs at least one option available. Answers are stored in ranked order (one answer row per option). |
+| `section`         | A structural element to group questions into sections. It cannot be answered and has no options.                                                                               |
+
+### Sections
+
+Once a form has a section, every question is in a section: the form starts with a section, and each question belongs to the section before it.
+
+- A request that would put more questions before the first section is rejected, see [Create a new question](API_v3.md#create-a-new-question) and [Reorder questions](API_v3.md#reorder-questions). To add the first section below existing questions, first insert a section at position 1, so that it holds them. The editor does this by itself, with the title "Untitled section" filled in; the title can be changed or cleared like any other.
+- Deleting the first section moves the next section up to its place, so the questions of the deleted section join the next section. Deleting any other section lets its questions join the section before it. Deleting the only section leaves a form without sections.
+- A form whose questions were stored before the first section by an earlier version keeps them there, and requests that do not add to them keep working.
 
 ## Extra Settings
 

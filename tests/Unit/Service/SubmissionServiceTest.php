@@ -429,6 +429,32 @@ class SubmissionServiceTest extends TestCase {
 				"1","user1","User 1","1973-11-29T22:33:09+01:00","Q1A1","Q2A1"
 				'
 			],
+			'section-without-column' => [
+				// Questions
+				[
+					['id' => 1, 'text' => 'Question 1'],
+					['id' => 2, 'type' => 'section', 'text' => 'Section 1'],
+					['id' => 3, 'text' => 'Question 2'],
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 1, 'text' => 'Q1A1'],
+							['questionId' => 3, 'text' => 'Q2A1']
+						]
+					],
+				],
+				// Expected CSV-Result
+				'
+				"Submission ID","User ID","User display name","Timestamp","Question 1","Question 2"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1","question-id-3"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","Q1A1","Q2A1"
+				'
+			],
 			'checkbox-multi-answers' => [
 				// Questions
 				[
@@ -1951,6 +1977,53 @@ file2.txt"
 				[],
 				// Expected Result – required question must be answered
 				'Question "Rank these" is required.',
+			],
+			'invalid-section-with-answer' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'section', 'text' => 'My section', 'isRequired' => false]
+				],
+				// Answers – sections cannot have answers
+				[
+					'1' => ['some answer']
+				],
+				// Expected Result
+				'Section "My section" cannot have answers.',
+			],
+			'invalid-section-with-empty-answers' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'section', 'text' => 'My section', 'isRequired' => false]
+				],
+				// Answers – values that look empty are answers as well
+				[
+					'1' => ['', '0']
+				],
+				// Expected Result
+				'Section "My section" cannot have answers.',
+			],
+			'valid-section-without-answer' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'section', 'text' => 'My section', 'isRequired' => false],
+					['id' => 2, 'type' => 'short', 'text' => 'A question', 'isRequired' => false]
+				],
+				// Answers
+				[
+					'2' => ['an answer']
+				],
+				// Expected Result – no error
+				null,
+			],
+			'valid-section-required-unanswered' => [
+				// Questions – a required section still cannot be answered and must not block submission
+				[
+					['id' => 1, 'type' => 'section', 'text' => 'My section', 'isRequired' => true]
+				],
+				// Answers
+				[],
+				// Expected Result – no error
+				null,
 			],
 		];
 	}

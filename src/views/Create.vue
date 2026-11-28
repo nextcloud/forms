@@ -134,6 +134,25 @@
 			</header>
 
 			<section>
+				<div ref="sectionSticky" class="section-sticky">
+					<div v-show="stuckSection" class="section-sticky__bar">
+						<span class="section-sticky__label" aria-hidden="true">
+							{{
+								t('forms', 'Section {index} of {total}', {
+									index: stuckSectionNumber ?? '',
+									total: sectionCount,
+								})
+							}}
+						</span>
+						<span
+							class="section-sticky__title"
+							:title="stuckSection?.text"
+							aria-hidden="true">
+							{{ stuckSection?.text }}
+						</span>
+						<div id="section-sticky-menu" />
+					</div>
+				</div>
 				<!-- Questions list -->
 				<Draggable
 					:modelValue="form.questions"
@@ -155,14 +174,16 @@
 							v-for="(question, index) in form.questions"
 							:key="question.id"
 							:ref="registerQuestionRef(question)"
+							:class="sectionFrames[index]"
 							v-bind="form.questions[index]"
 							:canMoveDown="
-								!isChangingQuestions
-								&& index < form.questions.length - 1
+								!isChangingQuestions && canSwapWithNext(index)
 							"
-							:canMoveUp="!isChangingQuestions && index > 0"
+							:canMoveUp="
+								!isChangingQuestions && canSwapWithNext(index - 1)
+							"
 							:answerType="answerTypes[question.type]"
-							:index="index + 1"
+							:index="questionNumbers.get(question.id)"
 							:maxStringLengths="maxStringLengths"
 							@update:text="updateQuestionText(index, $event)"
 							@update:description="
@@ -196,11 +217,27 @@
 									]">
 									<AddQuestionMenu
 										:aria-label="
-											t(
-												'forms',
-												'Insert question after question {index}',
-												{ index: index + 1 },
-											)
+											question.type === QUESTION_TYPE_SECTION
+												? t(
+														'forms',
+														'Insert question after section {index}',
+														{
+															index:
+																questionNumbers.get(
+																	question.id,
+																) ?? '',
+														},
+													)
+												: t(
+														'forms',
+														'Insert question after question {index}',
+														{
+															index:
+																questionNumbers.get(
+																	question.id,
+																) ?? '',
+														},
+													)
 										"
 										variant="tertiary"
 										:position="index"
@@ -256,6 +293,7 @@ import {
 	computed,
 	defineComponent,
 	nextTick,
+	onBeforeUnmount,
 	onMounted,
 	provide,
 	ref,
@@ -287,6 +325,13 @@ import {
 } from '../utils/Jumps.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
+import {
+	countQuestionsOutsideSections,
+	getNumbers,
+	QUESTION_TYPE_SECTION,
+	STUCK_SECTION_KEY,
+	withNextSectionMovedUp,
+} from '../utils/Sections.ts'
 import SetWindowTitle from '../utils/SetWindowTitle.ts'
 
 const formsAppName = 'forms'
@@ -336,7 +381,45 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const formQuestions = computed(() => props.form.questions)
+		const questionNumbers = computed(() => getNumbers(formQuestions.value))
+		const sectionFrames = computed(() => {
+			let inSection = false
+			return formQuestions.value.map((question, index) => {
+				if (question.type === QUESTION_TYPE_SECTION) {
+					inSection = true
+				}
+				if (!inSection) {
+					return undefined
+				}
+				const next = formQuestions.value[index + 1]
+				return {
+					'section-frame': true,
+					'section-frame--start': question.type === QUESTION_TYPE_SECTION,
+					'section-frame--end':
+						next === undefined || next.type === QUESTION_TYPE_SECTION,
+				}
+			})
+		})
+		const sectionCount = computed(
+			() =>
+				formQuestions.value.filter(
+					(question) => question.type === QUESTION_TYPE_SECTION,
+				).length,
+		)
+		const sectionSticky = ref<HTMLElement | null>(null)
+		const stuckSectionId = ref<number | null>(null)
+		const stuckSection = computed(() =>
+			formQuestions.value.find(
+				(question) => question.id === stuckSectionId.value,
+			),
+		)
+		const stuckSectionNumber = computed(() =>
+			stuckSection.value
+				? (questionNumbers.value.get(stuckSection.value.id) ?? null)
+				: null,
+		)
 		provide(FORM_QUESTIONS_KEY, formQuestions)
+		provide(STUCK_SECTION_KEY, stuckSectionNumber)
 		provide(
 			FORM_JUMP_ISSUES_KEY,
 			computed(() => getJumpIssues(formQuestions.value ?? [])),
@@ -411,6 +494,49 @@ export default defineComponent({
 		}
 
 		/**
+		 * Find the section whose own bar has scrolled under the sticky section bar while its questions are still visible
+		 */
+		const updateStuckSection = (): void => {
+			const line = sectionSticky.value?.getBoundingClientRect().top
+			const elementOf = (question: FormsQuestion) =>
+				questionRefsMap.value[question.id]?.$el as HTMLElement | undefined
+			let current: number | undefined
+			formQuestions.value.forEach((question, index) => {
+				if (line === undefined || question.type !== QUESTION_TYPE_SECTION) {
+					return
+				}
+				const bar = elementOf(question)?.querySelector(
+					'.question__section-bar',
+				)
+				if (bar && bar.getBoundingClientRect().bottom <= line) {
+					current = index
+				}
+			})
+			if (current === undefined || line === undefined) {
+				stuckSectionId.value = null
+				return
+			}
+			let last = current
+			while (
+				formQuestions.value[last + 1]
+				&& formQuestions.value[last + 1].type !== QUESTION_TYPE_SECTION
+			) {
+				last++
+			}
+			const end = elementOf(formQuestions.value[last])?.getBoundingClientRect()
+				.bottom
+			stuckSectionId.value =
+				end !== undefined && end > line
+					? formQuestions.value[current].id
+					: null
+		}
+		let stuckSectionFrame = 0
+		const onScroll = (): void => {
+			cancelAnimationFrame(stuckSectionFrame)
+			stuckSectionFrame = requestAnimationFrame(updateStuckSection)
+		}
+
+		/**
 		 * Auto adjust the title height based its scroll height
 		 */
 		const resizeTitle = (): void => {
@@ -458,7 +584,9 @@ export default defineComponent({
 		const isRequiredUsed = computed<boolean>(() =>
 			props.form.questions.reduce(
 				(isUsed: boolean, question: FormsQuestion) =>
-					isUsed || Boolean(question.isRequired),
+					isUsed
+					|| (Boolean(question.isRequired)
+						&& question.type !== QUESTION_TYPE_SECTION),
 				false,
 			),
 		)
@@ -560,13 +688,17 @@ export default defineComponent({
 		 * @param questions the questions of the form in their order
 		 * @param ids the ids of the questions
 		 */
-		const numbersOf = (questions: FormsQuestion[], ids: number[]): string =>
-			formatList(
-				questions.flatMap((question, position) =>
-					ids.includes(question.id) ? [String(position + 1)] : [],
+		const numbersOf = (questions: FormsQuestion[], ids: number[]): string => {
+			const numbers = getNumbers(questions)
+			return formatList(
+				questions.flatMap((question) =>
+					ids.includes(question.id)
+						? [String(numbers.get(question.id))]
+						: [],
 				),
 				getLanguage(),
 			)
+		}
 
 		/**
 		 * Show a warning when a change breaks jumps, makes questions unreachable or lets jumps skip more questions
@@ -582,28 +714,47 @@ export default defineComponent({
 		): void => {
 			const before = getJumpIssues(oldQuestions)
 			const after = getJumpIssues(newQuestions)
+			const questionIds = new Set(
+				newQuestions
+					.filter((question) => question.type !== QUESTION_TYPE_SECTION)
+					.map((question) => question.id),
+			)
 
-			const broken = getNewlyBrokenQuestions(before, after)
+			const broken = getNewlyBrokenQuestions(before, after).filter((id) =>
+				questionIds.has(id),
+			)
 			const unreachable = [...after.unreachable].filter(
-				(id) => !before.unreachable.has(id),
+				(id) => !before.unreachable.has(id) && questionIds.has(id),
 			)
 			const skipped = reportSkippable
-				? [...after.skippable].filter((id) => !before.skippable.has(id))
+				? [...after.skippable].filter(
+						(id) => !before.skippable.has(id) && questionIds.has(id),
+					)
 				: []
 
+			const newIds = new Set(newQuestions.map((question) => question.id))
+			const deletedSection = oldQuestions.some(
+				(question) =>
+					question.type === QUESTION_TYPE_SECTION
+					&& !newIds.has(question.id),
+			)
 			const messages = [
-				broken.length === 1
-					&& t(
-						'forms',
-						'Question {questions} jumped to the deleted question, so respondents now go to the next question instead.',
-						{ questions: numbersOf(newQuestions, broken) },
-					),
-				broken.length > 1
-					&& t(
-						'forms',
-						'Questions {questions} jumped to the deleted question, so respondents now go to the next question instead.',
-						{ questions: numbersOf(newQuestions, broken) },
-					),
+				broken.length > 0
+					&& (deletedSection
+						? n(
+								'forms',
+								'Question {questions} jumped to the deleted section, so respondents now go to the next question instead.',
+								'Questions {questions} jumped to the deleted section, so respondents now go to the next question instead.',
+								broken.length,
+								{ questions: numbersOf(newQuestions, broken) },
+							)
+						: n(
+								'forms',
+								'Question {questions} jumped to the deleted question, so respondents now go to the next question instead.',
+								'Questions {questions} jumped to the deleted question, so respondents now go to the next question instead.',
+								broken.length,
+								{ questions: numbersOf(newQuestions, broken) },
+							)),
 				unreachable.length === 1
 					&& t(
 						'forms',
@@ -871,15 +1022,30 @@ export default defineComponent({
 			onQuestionOrderChange(questions, moved)
 		}
 
+		/**
+		 * Whether the question at a position can swap with the one after it: both exist, and the swap moves no question before the first section
+		 *
+		 * @param index the position of the question
+		 */
+		const canSwapWithNext = (index: number): boolean => {
+			const questions = props.form.questions
+			return (
+				index >= 0
+				&& index < questions.length - 1
+				&& (index !== countQuestionsOutsideSections(questions)
+					|| questions[index].type !== QUESTION_TYPE_SECTION
+					|| questions[index + 1].type === QUESTION_TYPE_SECTION)
+			)
+		}
+
 		const onMoveUp = (index: number): void => {
-			if (index > 0) {
+			if (canSwapWithNext(index - 1)) {
 				swapWithPrevious(index, props.form.questions[index])
 			}
 		}
 
 		const onMoveDown = (index: number): void => {
-			// only if not the last one
-			if (index < props.form.questions.length - 1) {
+			if (canSwapWithNext(index)) {
 				swapWithPrevious(index + 1, props.form.questions[index])
 			}
 		}
@@ -972,6 +1138,36 @@ export default defineComponent({
 			startChangingQuestions(formId)
 
 			try {
+				if (
+					type === QUESTION_TYPE_SECTION
+					&& props.form.questions.length > 0
+					&& props.form.questions[0].type !== QUESTION_TYPE_SECTION
+				) {
+					const sectionText = t('forms', 'Untitled section')
+					const implicitResponse = await queueQuestionRequest(
+						props.form.questions.map(({ id }) => id),
+						() =>
+							axios.post(
+								generateOcsUrl(
+									'apps/forms/api/v3/forms/{id}/questions',
+									{ id: props.form.id },
+								),
+								{ type, text: sectionText, subtype, position: 1 },
+							),
+					)
+					if (props.form.id !== formId) {
+						return
+					}
+					insertQuestion(
+						OcsResponse2Data<FormsQuestion>(implicitResponse),
+						{ text: sectionText, type, answers: [] },
+						0,
+					)
+					if (position !== null) {
+						position += 1
+					}
+				}
+
 				const body: {
 					type: string
 					text: string
@@ -1045,9 +1241,20 @@ export default defineComponent({
 				if (props.form.id !== formId) {
 					return
 				}
-				const questions = props.form.questions.filter(
+				const position = props.form.questions.findIndex(
+					({ id }) => id === questionId,
+				)
+				const remaining = props.form.questions.filter(
 					(search: FormsQuestion) => search.id !== questionId,
 				)
+				const reordered =
+					props.form.questions[position]?.type === QUESTION_TYPE_SECTION
+						? withNextSectionMovedUp(remaining, position)
+						: remaining
+				const questions =
+					reordered === remaining
+						? remaining
+						: withoutBackwardJumps(reordered)
 				warnAboutJumpChanges(props.form.questions, questions)
 				emit('update:form', { ...props.form, questions })
 				emitEvent('forms:last-updated:set', props.form.id)
@@ -1118,6 +1325,13 @@ export default defineComponent({
 		}
 
 		const onUpdateQuestions = (questions: FormsQuestion[]): void => {
+			if (
+				countQuestionsOutsideSections(questions)
+				> countQuestionsOutsideSections(props.form.questions)
+			) {
+				showWarning(t('forms', 'Every question needs to be in a section'))
+				return
+			}
 			emit('update:form', { ...props.form, questions })
 			onQuestionOrderChange(
 				questions,
@@ -1157,7 +1371,18 @@ export default defineComponent({
 		onMounted(() => {
 			viewForm.fetchFullForm(props.form.id)
 			SetWindowTitle(viewForm.formTitle.value)
+			document.addEventListener('scroll', onScroll, {
+				capture: true,
+				passive: true,
+			})
+			window.addEventListener('resize', onScroll)
 		})
+		onBeforeUnmount(() => {
+			document.removeEventListener('scroll', onScroll, { capture: true })
+			window.removeEventListener('resize', onScroll)
+			cancelAnimationFrame(stuckSectionFrame)
+		})
+		watch(formQuestions, onScroll, { deep: true, flush: 'post' })
 
 		return {
 			...viewForm,
@@ -1192,6 +1417,7 @@ export default defineComponent({
 			updateQuestionName,
 			updateQuestionExtraSettings,
 			updateQuestionOptions,
+			canSwapWithNext,
 			onMoveUp,
 			onMoveDown,
 			onTitleInput,
@@ -1202,6 +1428,13 @@ export default defineComponent({
 			deleteQuestion,
 			insertQuestion,
 			cloneQuestion,
+			questionNumbers,
+			sectionFrames,
+			sectionCount,
+			sectionSticky,
+			stuckSection,
+			stuckSectionNumber,
+			QUESTION_TYPE_SECTION,
 			onUpdateQuestions,
 			onQuestionOrderChange,
 			IconLock,
@@ -1288,6 +1521,7 @@ export default defineComponent({
 	// Questions container
 	section {
 		position: relative;
+		container-type: inline-size;
 		display: flex;
 		flex-direction: column;
 		margin-block-end: 250px;
@@ -1324,6 +1558,96 @@ export default defineComponent({
    animations can be calculated correctly. */
 .question-list-leave-active {
 	position: absolute;
+}
+
+.section-frame,
+.section-sticky {
+	--section-frame-inset-start: 0px;
+	--section-frame-inset-end: calc(-2 * var(--default-grid-baseline));
+}
+
+@container (max-width: 749px) {
+	.section-frame,
+	.section-sticky {
+		--section-frame-inset-start: var(--default-grid-baseline);
+		--section-frame-inset-end: var(--default-grid-baseline);
+	}
+}
+
+.section-frame::before {
+	content: '';
+	position: absolute;
+	inset-block: 0 -64px;
+	inset-inline: var(--section-frame-inset-start) var(--section-frame-inset-end);
+	border-inline: 2px solid var(--color-border-dark);
+	pointer-events: none;
+}
+
+.section-sticky {
+	position: sticky;
+	z-index: 50;
+	inset-block-start: calc(
+		var(--default-clickable-area) + 2 * var(--app-navigation-padding)
+	);
+	height: 0;
+
+	&__bar {
+		position: absolute;
+		display: flex;
+		align-items: center;
+		gap: calc(2 * var(--default-grid-baseline));
+		inset-block-start: 0;
+		inset-inline: var(--section-frame-inset-start) var(--section-frame-inset-end);
+		min-height: var(--default-clickable-area);
+		padding-inline: calc(56px - var(--section-frame-inset-start))
+			var(--default-grid-baseline);
+		border: 2px solid var(--color-border-dark);
+		border-start-start-radius: var(--border-radius-large);
+		border-start-end-radius: var(--border-radius-large);
+		background-color: var(--color-primary-element-light);
+		color: var(--color-main-text);
+
+		&::before {
+			position: absolute;
+			z-index: -1;
+			inset-block-end: calc(100% - var(--border-radius-large));
+			inset-inline: -2px;
+			height: calc(
+				var(--default-clickable-area) + 2 * var(--app-navigation-padding) +
+					2px + var(--border-radius-large)
+			);
+			background-color: var(--color-main-background);
+			content: '';
+		}
+	}
+
+	&__label {
+		flex-shrink: 0;
+		white-space: nowrap;
+	}
+
+	&__title {
+		flex: 1 1 auto;
+		min-width: 0;
+		overflow: hidden;
+		font-weight: bold;
+		text-overflow: ellipsis;
+		white-space: nowrap;
+	}
+}
+
+.section-frame--start::before {
+	inset-block-start: 0;
+	border-block-start: 2px solid var(--color-border-dark);
+	border-start-start-radius: var(--border-radius-large);
+	border-start-end-radius: var(--border-radius-large);
+}
+
+.section-frame--end::before {
+	inset-block-end: calc(-2 * var(--default-grid-baseline));
+	border-block-end: 2px solid var(--color-border-dark);
+	border-end-start-radius: var(--border-radius-large);
+	border-end-end-radius: var(--border-radius-large);
 }
 
 .question-insert {

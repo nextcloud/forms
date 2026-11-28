@@ -23,6 +23,7 @@ import {
 	QUESTION_TYPES_WITH_GOTO,
 	QUESTION_TYPES_WITH_NEXT,
 } from '../utils/Jumps.ts'
+import { getNumbers, QUESTION_TYPE_SECTION } from '../utils/Sections.ts'
 
 /** The jump issues of the form, see `getJumpIssues()`, provided by the editor */
 export const FORM_JUMP_ISSUES_KEY: InjectionKey<ComputedRef<JumpIssues>> =
@@ -97,29 +98,44 @@ export function useJumps(
 	const position = computed(() =>
 		formQuestions.value.findIndex((question) => question.id === props.id),
 	)
+	const numbers = computed(() => getNumbers(formQuestions.value))
+	const number = computed(() => numbers.value.get(props.id) ?? position.value + 1)
 	const nextLabel = computed(() =>
-		t('forms', 'After question {number}', { number: position.value + 1 }),
+		t('forms', 'After question {number}', { number: number.value }),
 	)
 
 	const targetOptions = computed<JumpTargetOption[]>((previous) => {
 		const options: JumpTargetOption[] = [
 			{ id: null, label: t('forms', 'Next question') },
-			...formQuestions.value
-				.slice(position.value + 1)
-				.map((question, offset) => ({
+			...formQuestions.value.slice(position.value + 1).map((question) => {
+				const number = numbers.value.get(question.id) ?? ''
+				const title = question.text?.trim()
+				return {
 					id: question.id,
-					label: t(
-						'forms',
-						'Question {number}: {title}',
-						{
-							number: position.value + offset + 2,
-							title:
-								question.text?.trim()
-								|| t('forms', 'Untitled question'),
-						},
-						{ escape: false, sanitize: false },
-					),
-				})),
+					label:
+						question.type === QUESTION_TYPE_SECTION
+							? t(
+									'forms',
+									'Section {number}: {title}',
+									{
+										number,
+										title:
+											title || t('forms', 'Untitled section'),
+									},
+									{ escape: false, sanitize: false },
+								)
+							: t(
+									'forms',
+									'Question {number}: {title}',
+									{
+										number,
+										title:
+											title || t('forms', 'Untitled question'),
+									},
+									{ escape: false, sanitize: false },
+								),
+				}
+			}),
 			{ id: JUMP_TARGET_SUBMIT, label: t('forms', 'End of the form') },
 		]
 		return previous?.length === options.length
@@ -201,7 +217,7 @@ export function useJumps(
 				text: t(
 					'forms',
 					'Remove all jumps of question {number}? Respondents then go to the next question.',
-					{ number: position.value + 1 },
+					{ number: number.value },
 				),
 				labelConfirm: t('forms', 'Remove jumps'),
 				labelReject: t('forms', 'Keep jumps'),
@@ -227,16 +243,21 @@ export function useJumps(
 				? [
 						t(
 							'forms',
-							'A jump of this question goes to a question that was deleted or now comes before it. Respondents go to the next question instead.',
+							'A jump of this question goes to a question or section that was deleted or now comes before it. Respondents go to the next question instead.',
 						),
 					]
 				: []),
 			...(issues.unreachable.has(props.id)
 				? [
-						t(
-							'forms',
-							'No respondent reaches this question, because the jumps of the questions before it always skip it.',
-						),
+						props.type === QUESTION_TYPE_SECTION
+							? t(
+									'forms',
+									'No respondent reaches this section, because the jumps of the questions before it always skip it.',
+								)
+							: t(
+									'forms',
+									'No respondent reaches this question, because the jumps of the questions before it always skip it.',
+								),
 					]
 				: []),
 		]
