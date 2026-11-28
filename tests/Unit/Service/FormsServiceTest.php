@@ -1662,6 +1662,116 @@ class FormsServiceTest extends TestCase {
 
 	public static function dataAreExtraSettingsValid() {
 		return [
+			'jump: next to a question on a text question' => [
+				'extraSettings' => ['next' => 5],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true,
+			],
+			'jump: next to the end on a long text question' => [
+				'extraSettings' => ['next' => 'submit'],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => true,
+			],
+			'jump: next with an unknown word' => [
+				'extraSettings' => ['next' => 'end'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
+			'jump: next with a negative id' => [
+				'extraSettings' => ['next' => -1],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
+			'jump: next as numeric string' => [
+				'extraSettings' => ['next' => '5'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
+			'jump: next not offered on date questions' => [
+				'extraSettings' => ['next' => 5],
+				'questionType' => Constants::ANSWER_TYPE_DATE,
+				'expected' => false,
+			],
+			'jump: goTo per option and Other' => [
+				'extraSettings' => ['allowOtherAnswer' => true, 'goTo' => [['optionId' => 11, 'target' => 5], ['other' => true, 'target' => 'submit']]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => true,
+			],
+			'jump: goTo on a dropdown' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => true,
+			],
+			'jump: goTo for Other on a dropdown' => [
+				'extraSettings' => ['allowOtherAnswer' => true, 'goTo' => [['other' => true, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false,
+			],
+			'jump: next not offered on radio questions' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]], 'next' => 6],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: next not offered on dropdowns' => [
+				'extraSettings' => ['next' => 6],
+				'questionType' => Constants::ANSWER_TYPE_DROPDOWN,
+				'expected' => false,
+			],
+			'jump: goTo not offered on text questions' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
+			'jump: goTo not offered on checkboxes' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLE,
+				'expected' => false,
+			],
+			'jump: goTo as object' => [
+				'extraSettings' => ['goTo' => ['a' => ['optionId' => 11, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: goTo entry without target' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: goTo entry with an extra key' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5, 'foo' => 1]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: goTo entry with option id as string' => [
+				'extraSettings' => ['goTo' => [['optionId' => '11', 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: goTo entry with other false' => [
+				'extraSettings' => ['goTo' => [['other' => false, 'target' => 5]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: goTo with a scalar entry' => [
+				'extraSettings' => ['goTo' => [5]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: two jumps for one option' => [
+				'extraSettings' => ['goTo' => [['optionId' => 11, 'target' => 5], ['optionId' => 11, 'target' => 6]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: two jumps for Other' => [
+				'extraSettings' => ['goTo' => [['other' => true, 'target' => 5], ['other' => true, 'target' => 6]]],
+				'questionType' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE,
+				'expected' => false,
+			],
+			'jump: next on an empty regex short question' => [
+				'extraSettings' => ['validationType' => 'regex', 'validationRegex' => '', 'next' => 'end'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false,
+			],
 			'empty-extra-settings' => [
 				'extraSettings' => [],
 				'questionType' => Constants::ANSWER_TYPE_LONG,
@@ -2159,6 +2269,53 @@ class FormsServiceTest extends TestCase {
 		$questionEntity = $this->createMock(Question::class);
 		$questionEntity->method('read')->willReturn($data);
 		return $questionEntity;
+	}
+
+	public static function dataAreJumpsOfForm(): array {
+		return [
+			'targets of the form, a deleted one included' => [['next' => 2], true],
+			'the end of the form' => [['goTo' => [['other' => true, 'target' => 'submit']]], true],
+			'a question of another form' => [['next' => 9], false],
+			'a goTo target of another form' => [['goTo' => [['optionId' => 11, 'target' => 9]]], false],
+		];
+	}
+
+	#[DataProvider('dataAreJumpsOfForm')]
+	public function testAreJumpsOfForm(array $extraSettings, bool $expected): void {
+		$questions = [];
+		foreach ([[1, 1], [2, 0], [3, 2]] as [$id, $order]) {
+			$question = new Question();
+			$question->setId($id);
+			$question->setOrder($order);
+			$questions[] = $question;
+		}
+
+		$this->assertSame($expected, $this->formsService->areJumpsOfForm($extraSettings, $questions));
+	}
+
+	public static function dataRemoveJumpsOfMissingOptions(): array {
+		return [
+			'options of the question' => [['goTo' => [['optionId' => 11, 'target' => 3], ['other' => true, 'target' => 'submit']]], null],
+			'no jumps per option' => [['next' => 3], null],
+			'an option that no longer exists' => [
+				['allowOtherAnswer' => true, 'goTo' => [['optionId' => 13, 'target' => 3], ['optionId' => 11, 'target' => 'submit'], ['other' => true, 'target' => 3]]],
+				['allowOtherAnswer' => true, 'goTo' => [['optionId' => 11, 'target' => 'submit'], ['other' => true, 'target' => 3]]],
+			],
+			'an option of another question' => [['goTo' => [['optionId' => 12, 'target' => 3]]], ['goTo' => []]],
+		];
+	}
+
+	#[DataProvider('dataRemoveJumpsOfMissingOptions')]
+	public function testRemoveJumpsOfMissingOptions(array $extraSettings, ?array $expected): void {
+		$question = new Question();
+		$question->setId(1);
+		$question->setExtraSettings($extraSettings);
+		$option = new Option();
+		$option->setId(11);
+		$this->optionMapper->method('findByQuestion')->with(1)->willReturn([$option]);
+
+		$this->assertSame($expected !== null, $this->formsService->removeJumpsOfMissingOptions($question));
+		$this->assertSame($expected ?? $extraSettings, $question->getExtraSettings());
 	}
 
 }

@@ -20,6 +20,7 @@ use OCA\Forms\Db\Question;
 use OCA\Forms\Db\QuestionMapper;
 use OCA\Forms\Db\Submission;
 use OCA\Forms\Db\SubmissionMapper;
+use OCA\Forms\Helper\JumpHelper;
 use OCA\Forms\Service\FormsService;
 use OCA\Forms\Service\SubmissionService;
 use OCP\IL10N;
@@ -165,6 +166,8 @@ class FormsMigrator implements IMigrator {
 				$questionIdMap = [];
 				$questionTypeMap = [];
 				$optionIdMap = [];
+				$optionIdMaps = [];
+				$questions = [];
 				foreach ($formData['questions'] as $questionData) {
 					$question = new Question();
 					$question->setFormId($form->getId());
@@ -180,6 +183,7 @@ class FormsMigrator implements IMigrator {
 					// Store QuestionId to map Answers.
 					$questionIdMap[$questionData['id']] = $question->getId();
 					$questionTypeMap[$questionData['id']] = $questionData['type'];
+					$questions[] = $question;
 
 					foreach ($questionData['options'] as $optionData) {
 						$option = new Option();
@@ -192,8 +196,13 @@ class FormsMigrator implements IMigrator {
 
 						if (isset($optionData['id'])) {
 							$optionIdMap[$optionData['id']] = $option->getId();
+							$optionIdMaps[$question->getId()][$optionData['id']] = $option->getId();
 						}
 					}
+				}
+
+				foreach (JumpHelper::mapJumpsOfCopies($questions, $questionIdMap, $optionIdMaps) as $question) {
+					$this->questionMapper->update($question);
 				}
 
 				if (($formData['confirmationEmailQuestionId'] ?? null) !== null

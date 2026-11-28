@@ -84,7 +84,7 @@
 import IconRegex from '@material-symbols/svg-400/outlined/regular_expression.svg?raw'
 import { t } from '@nextcloud/l10n'
 import debounce from 'debounce'
-import { computed, defineComponent, ref } from 'vue'
+import { computed, defineComponent, onDeactivated, ref } from 'vue'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcActions from '@nextcloud/vue/components/NcActions'
@@ -223,6 +223,10 @@ export default defineComponent({
 		const debounceValidate = debounce(async () => {
 			await validate()
 		}, INPUT_DEBOUNCE_MS)
+		onDeactivated(() => {
+			debounceValidate.clear()
+			input.value?.setCustomValidity('')
+		})
 
 		const onInput = (): void => {
 			const field = input.value

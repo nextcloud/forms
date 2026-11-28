@@ -932,6 +932,11 @@ class ApiControllerTest extends TestCase {
 			->with(1)
 			->willReturn($questions);
 
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission')
+			->with($questions, $answers, 'admin', 1)
+			->willReturnArgument(1);
+
 		$this->formAccess();
 
 		$this->submissionMapper->expects($this->once())
@@ -1006,6 +1011,26 @@ class ApiControllerTest extends TestCase {
 			->willReturn($userFolder);
 
 		$this->apiController->newSubmission(1, $answers, '');
+	}
+
+	public function testNewSubmission_storesNoAnswersWhenAnOptionalQuestionWithJumpsIsLeftEmpty() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setHash('hash');
+		$form->setOwnerId('admin');
+
+		$this->formsService->method('loadFormForSubmission')->willReturn($form);
+		$this->formsService->method('getQuestions')->willReturn([
+			['id' => 1, 'type' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE, 'text' => 'q1', 'isRequired' => false, 'options' => [['id' => 10, 'text' => 'A'], ['id' => 11, 'text' => 'B']], 'extraSettings' => ['goTo' => [['optionId' => 10, 'target' => 3], ['optionId' => 11, 'target' => 'submit']]]],
+			['id' => 2, 'type' => Constants::ANSWER_TYPE_SHORT, 'text' => 'q2', 'isRequired' => true, 'options' => [], 'extraSettings' => []],
+			['id' => 3, 'type' => Constants::ANSWER_TYPE_SHORT, 'text' => 'q3', 'isRequired' => true, 'options' => [], 'extraSettings' => []],
+		]);
+		$this->formAccess();
+		$this->submissionMapper->expects($this->once())->method('insert');
+		$this->answerMapper->expects($this->never())->method('insert');
+
+		$response = $this->apiController->newSubmission(1, [2 => ['Rex']], '');
+		$this->assertSame(201, $response->getStatus());
 	}
 
 	public function testNewSubmission_formNotFound() {
@@ -1538,6 +1563,313 @@ class ApiControllerTest extends TestCase {
 		$this->apiController->updateQuestion(1, 7, ['type' => Constants::ANSWER_TYPE_LONG]);
 	}
 
+	public function testUpdateQuestionRemovesJumpsToTheQuestionItselfOrAnEarlierQuestion(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$first = new Question();
+		$first->setId(6);
+		$first->setFormId(1);
+		$first->setOrder(1);
+		$first->setType(Constants::ANSWER_TYPE_SHORT);
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setOrder(2);
+		$question->setType(Constants::ANSWER_TYPE_MULTIPLEUNIQUE);
+
+		$deleted = new Question();
+		$deleted->setId(5);
+		$deleted->setFormId(1);
+		$deleted->setOrder(0);
+		$deleted->setType(Constants::ANSWER_TYPE_SHORT);
+
+		$extraSettings = ['goTo' => [['optionId' => 1, 'target' => 'submit'], ['optionId' => 2, 'target' => 7], ['optionId' => 3, 'target' => 6], ['optionId' => 4, 'target' => 5]]];
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->formsService->method('areExtraSettingsValid')->willReturn(true);
+		$this->formsService->expects($this->once())->method('areJumpsOfForm')->with($extraSettings, [$deleted, $first, $question])->willReturn(true);
+		$this->questionMapper->method('findById')->with(7)->willReturn($question);
+		$this->questionMapper->method('findByForm')->with(1, true)->willReturn([$deleted, $first, $question]);
+		$this->questionMapper->expects($this->once())
+			->method('update')
+			->with($this->callback(fn (Question $updatedQuestion): bool => $updatedQuestion->getId() === 7
+				&& $updatedQuestion->getExtraSettings() === ['goTo' => [['optionId' => 1, 'target' => 'submit'], ['optionId' => 4, 'target' => 5]]]));
+
+		$response = $this->apiController->updateQuestion(1, 7, ['extraSettings' => $extraSettings]);
+
+		$this->assertSame(7, $response->getData());
+		$this->assertSame('removed-jumps=(7)', $response->getHeaders()['X-Forms-Adjusted']);
+	}
+
+	public function testDeleteOptionRemovesItsJumps(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setType(Constants::ANSWER_TYPE_MULTIPLEUNIQUE);
+		$question->setExtraSettings(['goTo' => [['optionId' => 3, 'target' => 'submit'], ['optionId' => 4, 'target' => 9]]]);
+
+		$option = new Option();
+		$option->setId(3);
+		$option->setQuestionId(7);
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->optionMapper->method('findById')->with(3)->willReturn($option);
+		$this->optionMapper->method('findByQuestion')->with(7)->willReturn([]);
+		$this->optionMapper->expects($this->once())->method('delete')->with($option);
+		$this->formsService->expects($this->once())
+			->method('removeJumpsOfMissingOptions')
+			->with($question)
+			->willReturnCallback(function (Question $question): bool {
+				$question->setExtraSettings(['goTo' => [['optionId' => 4, 'target' => 9]]]);
+				return true;
+			});
+		$this->questionMapper->method('findById')->with(7)->willReturn($question);
+		$this->questionMapper->expects($this->once())
+			->method('update')
+			->with($this->callback(fn (Question $updatedQuestion): bool => $updatedQuestion->getExtraSettings() === ['goTo' => [['optionId' => 4, 'target' => 9]]]));
+
+		$response = $this->apiController->deleteOption(1, 7, 3);
+
+		$this->assertSame(3, $response->getData());
+		$this->assertSame('removed-jumps=(7)', $response->getHeaders()['X-Forms-Adjusted']);
+		$this->assertSame('X-Forms-Adjusted', $response->getHeaders()['Access-Control-Expose-Headers']);
+	}
+
+	public function testDeleteOptionWithoutJumpsKeepsTheQuestion(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setType(Constants::ANSWER_TYPE_MULTIPLEUNIQUE);
+		$question->setExtraSettings(['goTo' => [['optionId' => 4, 'target' => 9]]]);
+
+		$option = new Option();
+		$option->setId(3);
+		$option->setQuestionId(7);
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->optionMapper->method('findById')->with(3)->willReturn($option);
+		$this->optionMapper->method('findByQuestion')->with(7)->willReturn([]);
+		$this->formsService->expects($this->once())->method('removeJumpsOfMissingOptions')->with($question)->willReturn(false);
+		$this->questionMapper->method('findById')->with(7)->willReturn($question);
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$response = $this->apiController->deleteOption(1, 7, 3);
+
+		$this->assertArrayNotHasKey('X-Forms-Adjusted', $response->getHeaders());
+	}
+
+	public function testUpdateQuestionRejectsJumpsToQuestionsOfOtherForms(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_SHORT);
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->formsService->method('areExtraSettingsValid')->willReturn(true);
+		$this->formsService->method('areJumpsOfForm')->with(['next' => 99], [$question])->willReturn(false);
+		$this->questionMapper->method('findById')->with(7)->willReturn($question);
+		$this->questionMapper->method('findByForm')->with(1, true)->willReturn([$question]);
+		$this->questionMapper->expects($this->never())->method('update');
+
+		$this->expectException(OCSBadRequestException::class);
+		$this->apiController->updateQuestion(1, 7, ['extraSettings' => ['next' => 99]]);
+	}
+
+	public function testUpdateQuestionRemovesJumpsOfMissingOptions(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_MULTIPLEUNIQUE);
+
+		$extraSettings = ['goTo' => [['optionId' => 1, 'target' => 'submit'], ['optionId' => 2, 'target' => 'submit']]];
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->formsService->method('areExtraSettingsValid')->willReturn(true);
+		$this->formsService->method('areJumpsOfForm')->willReturn(true);
+		$this->formsService->expects($this->once())
+			->method('removeJumpsOfMissingOptions')
+			->willReturnCallback(function (Question $updatedQuestion): bool {
+				$updatedQuestion->setExtraSettings(['goTo' => [['optionId' => 1, 'target' => 'submit']]]);
+				return true;
+			});
+		$this->questionMapper->method('findById')->with(7)->willReturn($question);
+		$this->questionMapper->method('findByForm')->with(1, true)->willReturn([$question]);
+		$this->questionMapper->expects($this->once())
+			->method('update')
+			->with($this->callback(fn (Question $updatedQuestion): bool => $updatedQuestion->getExtraSettings() === ['goTo' => [['optionId' => 1, 'target' => 'submit']]]));
+
+		$response = $this->apiController->updateQuestion(1, 7, ['extraSettings' => $extraSettings]);
+
+		$this->assertSame('removed-jumps=(7)', $response->getHeaders()['X-Forms-Adjusted']);
+	}
+
+	public function testReorderQuestionsRemovesJumpsThatWouldGoBack(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$questions = [];
+		foreach ([[6, 1, ['next' => 7]], [7, 2, []], [8, 3, ['next' => 'submit']]] as [$id, $order, $extraSettings]) {
+			$question = new Question();
+			$question->setId($id);
+			$question->setFormId(1);
+			$question->setOrder($order);
+			$question->setExtraSettings($extraSettings);
+			$questions[$id] = $question;
+		}
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->questionMapper->method('findByForm')->with(1)->willReturn(array_values($questions));
+		$this->questionMapper->method('findById')->willReturnCallback(fn (int $id): Question => $questions[$id]);
+
+		$response = $this->apiController->reorderQuestions(1, [7, 6, 8]);
+
+		$this->assertEquals([
+			'7' => ['order' => 1],
+			'6' => ['order' => 2, 'extraSettings' => new \stdClass()],
+			'8' => ['order' => 3],
+		], $response->getData());
+		$this->assertSame('removed-jumps=(6)', $response->getHeaders()['X-Forms-Adjusted']);
+		$this->assertSame('X-Forms-Adjusted', $response->getHeaders()['Access-Control-Expose-Headers']);
+	}
+
+	public static function dataReorderQuestionsReportsQuestionsWithRemovedJumps(): array {
+		return [
+			'100 questions with their ids' => [100, 'removed-jumps=(' . implode(' ', range(1, 100)) . ')'],
+			'more than 100 questions without their ids' => [101, 'removed-jumps'],
+		];
+	}
+
+	/**
+	 * @dataProvider dataReorderQuestionsReportsQuestionsWithRemovedJumps
+	 */
+	public function testReorderQuestionsReportsQuestionsWithRemovedJumps(int $changed, string $header): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$last = $changed + 1;
+		$questions = [];
+		for ($id = 1; $id <= $last; $id++) {
+			$question = new Question();
+			$question->setId($id);
+			$question->setFormId(1);
+			$question->setOrder($id);
+			$question->setExtraSettings($id < $last ? ['next' => $last] : []);
+			$questions[$id] = $question;
+		}
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->questionMapper->method('findByForm')->with(1)->willReturn(array_values($questions));
+		$this->questionMapper->method('findById')->willReturnCallback(fn (int $id): Question => $questions[$id]);
+
+		$response = $this->apiController->reorderQuestions(1, [$last, ...range(1, $changed)]);
+
+		$this->assertSame($header, $response->getHeaders()['X-Forms-Adjusted']);
+		$this->assertCount($changed, array_filter($response->getData(), static fn (array $order): bool => isset($order['extraSettings'])));
+	}
+
+	public function testCloneQuestionAtTheEndRemovesJumpsThatWouldGoBack(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$source = new Question();
+		$source->setId(7);
+		$source->setFormId(1);
+		$source->setOrder(1);
+		$source->setType(Constants::ANSWER_TYPE_SHORT);
+		$source->setExtraSettings(['next' => 9]);
+
+		$target = new Question();
+		$target->setId(9);
+		$target->setFormId(1);
+		$target->setOrder(2);
+		$target->setType(Constants::ANSWER_TYPE_SHORT);
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->questionMapper->method('findById')->with(7)->willReturn($source);
+		$this->optionMapper->method('findByQuestion')->with(7)->willReturn([]);
+		$this->questionMapper->method('insert')->willReturnCallback(function (Question $question) {
+			$question->setId(10);
+			return $question;
+		});
+		$this->questionMapper->expects($this->once())->method('findByForm')->with(1)->willReturn([$source, $target]);
+		$this->questionMapper->expects($this->once())
+			->method('update')
+			->with($this->callback(fn (Question $question): bool => $question->getId() === 10 && $question->getExtraSettings() === []));
+
+		$response = $this->apiController->newQuestion(1, null, null, '', 7);
+
+		$this->assertEquals(new \stdClass(), $response->getData()['extraSettings']);
+		$this->assertSame('removed-jumps=(10)', $response->getHeaders()['X-Forms-Adjusted']);
+	}
+
+	public function testCloneQuestionAtAPositionKeepsJumpsToTheQuestionsAfterIt(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$source = new Question();
+		$source->setId(7);
+		$source->setFormId(1);
+		$source->setOrder(1);
+		$source->setType(Constants::ANSWER_TYPE_SHORT);
+		$source->setExtraSettings(['next' => 9]);
+
+		$target = new Question();
+		$target->setId(9);
+		$target->setFormId(1);
+		$target->setOrder(2);
+		$target->setType(Constants::ANSWER_TYPE_SHORT);
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->questionMapper->method('findById')->with(7)->willReturn($source);
+		$this->optionMapper->method('findByQuestion')->with(7)->willReturn([]);
+		$this->questionMapper->method('insert')->willReturnCallback(function (Question $question) {
+			$question->setId(10);
+			return $question;
+		});
+		$this->questionMapper->expects($this->once())->method('findByForm')->with(1)->willReturn([$source, $target]);
+		$this->questionMapper->expects($this->once())
+			->method('update')
+			->with($this->callback(fn (Question $question): bool => $question->getId() === 9 && $question->getOrder() === 3));
+
+		$response = $this->apiController->newQuestion(1, null, null, '', 7, 2);
+
+		$this->assertSame(2, $response->getData()['order']);
+		$this->assertSame(['next' => 9], $response->getData()['extraSettings']);
+		$this->assertArrayNotHasKey('X-Forms-Adjusted', $response->getHeaders());
+	}
+
 	public static function dataUpdateQuestionSubtype(): array {
 		return [
 			'grid sub type changed' => [Constants::ANSWER_TYPE_GRID, ['questionType' => 'radio'], ['questionType' => 'number'], false],
@@ -1920,6 +2252,88 @@ class ApiControllerTest extends TestCase {
 
 		$this->apiController->newForm(7);
 		$this->assertEquals(11, $clonedForm->getConfirmationEmailQuestionId());
+	}
+
+	public function testCloneFormMapsJumps(): void {
+		$this->configService->method('canCreateForms')->willReturn(true);
+
+		$oldForm = Form::fromParams(['id' => 7, 'title' => 'Old Form', 'ownerId' => 'currentUser']);
+		$this->formsService->method('getFormIfAllowed')->with(7)->willReturn($oldForm);
+		$this->formsService->method('generateFormHash')->willReturn('new hash');
+
+		$trigger = new Question();
+		$trigger->setId(10);
+		$trigger->setFormId(7);
+		$trigger->setOrder(1);
+		$trigger->setType(Constants::ANSWER_TYPE_MULTIPLEUNIQUE);
+		$trigger->setExtraSettings(['goTo' => [['optionId' => 100, 'target' => 20]]]);
+		$target = new Question();
+		$target->setId(20);
+		$target->setFormId(7);
+		$target->setOrder(2);
+		$target->setType(Constants::ANSWER_TYPE_SHORT);
+		$this->questionMapper->method('findByForm')->with(7)->willReturn([$trigger, $target]);
+
+		$option = Option::fromParams(['id' => 100, 'questionId' => 10, 'text' => 'Yes']);
+		$this->optionMapper->method('findByQuestion')->willReturnCallback(fn (int $questionId) => $questionId === 10 ? [$option] : []);
+
+		$this->formMapper->method('insert')->willReturnCallback(function (Form $form) {
+			$form->setId(14);
+			return $form;
+		});
+		$newIds = [10 => 11, 20 => 21];
+		$this->questionMapper->method('insert')->willReturnCallback(function (Question $question) use (&$newIds) {
+			$question->setId(array_shift($newIds));
+			return $question;
+		});
+		$this->optionMapper->method('insert')->willReturnCallback(function (Option $option) {
+			$option->setId(101);
+			return $option;
+		});
+
+		$this->questionMapper->expects($this->once())
+			->method('update')
+			->with($this->callback(fn (Question $question) => $question->getId() === 11
+				&& $question->getExtraSettings() === ['goTo' => [['optionId' => 101, 'target' => 21]]]));
+
+		$this->apiController->newForm(7);
+	}
+
+	public function testCloneQuestionMapsOptionIdsOfJumps(): void {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('currentUser');
+
+		$question = new Question();
+		$question->setId(7);
+		$question->setFormId(1);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_MULTIPLEUNIQUE);
+		$question->setExtraSettings(['goTo' => [['optionId' => 70, 'target' => 9]]]);
+
+		$this->formsService->method('getFormIfAllowed')->with(1, Constants::PERMISSION_EDIT)->willReturn($form);
+		$this->formsService->method('isFormArchived')->with($form)->willReturn(false);
+		$this->questionMapper->method('findById')->with(7)->willReturn($question);
+		$this->questionMapper->method('findByForm')->with(1)->willReturn([$question]);
+		$this->optionMapper->method('findByQuestion')->with(7)->willReturn([Option::fromParams(['id' => 70, 'questionId' => 7, 'text' => 'Yes'])]);
+		$this->questionMapper->method('insert')->willReturnCallback(function (Question $question) {
+			$question->setId(8);
+			return $question;
+		});
+		$this->optionMapper->method('insert')->willReturnCallback(function (Option $option) {
+			$option->setId(80);
+			return $option;
+		});
+
+		$this->questionMapper->expects($this->once())
+			->method('update')
+			->with($this->callback(fn (Question $question) => $question->getId() === 8
+				&& $question->getExtraSettings() === ['goTo' => [['optionId' => 80, 'target' => 9]]]));
+
+		$response = $this->apiController->newQuestion(1, null, null, '', 7);
+
+		$this->assertSame(['goTo' => [['optionId' => 80, 'target' => 9]]], $response->getData()['extraSettings']);
+		$this->assertArrayNotHasKey('X-Forms-Adjusted', $response->getHeaders());
 	}
 
 	public function testTransferOwnerNotOwner() {
@@ -2494,7 +2908,8 @@ class ApiControllerTest extends TestCase {
 
 		$this->submissionService->expects($this->once())
 			->method('validateSubmission')
-			->with($this->anything(), $answers, 'formOwner'); // Removed ->willReturn(true)
+			->with($this->anything(), $answers, 'formOwner')
+			->willReturnArgument(1); // Removed ->willReturn(true)
 
 		$this->submissionMapper->expects($this->once())
 			->method('findById')
@@ -2525,6 +2940,46 @@ class ApiControllerTest extends TestCase {
 		$this->assertAuditLogged([
 			[Operation::SubmissionUpdated, 'Submission %s of form %s by "%s" was updated', ['submissionId' => 42, 'formId' => 1, 'submissionUserId' => 'currentUser']],
 		]);
+	}
+
+	public function testUpdateSubmission_removesAnswersToSkippedQuestions() {
+		$form = new Form();
+		$form->setId(1);
+		$form->setOwnerId('formOwner');
+		$form->setAllowEditSubmissions(true);
+
+		$submission = new Submission();
+		$submission->setId(42);
+		$submission->setFormId(1);
+		$submission->setUserId('currentUser');
+
+		$this->formsService->method('loadFormForSubmission')->willReturn($form);
+		$this->formsService->method('canDeleteResults')->willReturn(true);
+		$this->formsService->method('getPermissions')->willReturn([]);
+		$this->formsService->method('getQuestions')->willReturn([
+			['id' => 1, 'type' => Constants::ANSWER_TYPE_MULTIPLEUNIQUE, 'text' => 'q1', 'options' => [['id' => 10, 'text' => 'Done']], 'extraSettings' => ['goTo' => [['optionId' => 10, 'target' => 3]]]],
+			['id' => 2, 'type' => Constants::ANSWER_TYPE_SHORT, 'text' => 'q2', 'options' => [], 'extraSettings' => []],
+			['id' => 3, 'type' => Constants::ANSWER_TYPE_SHORT, 'text' => 'q3', 'options' => [], 'extraSettings' => []],
+		]);
+		$this->submissionService->expects($this->once())
+			->method('validateSubmission')
+			->with($this->anything(), ['1' => ['10'], '2' => ['skipped'], '3' => ['text']], 'formOwner', 1)
+			->willReturn(['1' => ['10'], '3' => ['text']]);
+		$this->submissionMapper->method('findById')->willReturn($submission);
+
+		$this->answerMapper->expects($this->once())
+			->method('deleteBySubmission')
+			->with(42);
+		$inserted = [];
+		$this->answerMapper->expects($this->exactly(2))
+			->method('insert')
+			->willReturnCallback(function ($answer) use (&$inserted) {
+				$inserted[] = $answer->getQuestionId();
+				return $answer;
+			});
+
+		$this->apiController->updateSubmission(1, 42, ['1' => ['10'], '2' => ['skipped'], '3' => ['text']]);
+		$this->assertSame([1, 3], $inserted);
 	}
 
 	public function testUpdateSubmission_noPermission() {
@@ -2617,7 +3072,8 @@ class ApiControllerTest extends TestCase {
 
 		$this->submissionService->expects($this->once())
 			->method('validateSubmission')
-			->with($this->anything(), $answers, 'formOwner');
+			->with($this->anything(), $answers, 'formOwner')
+			->willReturnArgument(1);
 
 		$this->submissionMapper->expects($this->once())
 			->method('findById')
@@ -2662,7 +3118,8 @@ class ApiControllerTest extends TestCase {
 
 		$this->submissionService->expects($this->once())
 			->method('validateSubmission')
-			->with($this->anything(), $answers, 'formOwner');
+			->with($this->anything(), $answers, 'formOwner')
+			->willReturnArgument(1);
 
 		$this->submissionMapper->expects($this->once())
 			->method('findById')
@@ -2713,7 +3170,8 @@ class ApiControllerTest extends TestCase {
 
 		$this->submissionService->expects($this->once())
 			->method('validateSubmission')
-			->with($this->anything(), $answers, 'formOwner');
+			->with($this->anything(), $answers, 'formOwner')
+			->willReturnArgument(1);
 
 		$this->submissionMapper->expects($this->once())
 			->method('findById')
@@ -2885,7 +3343,8 @@ class ApiControllerTest extends TestCase {
 
 		$this->submissionService->expects($this->once())
 			->method('validateSubmission')
-			->with($this->anything(), $answers, 'otherUser');
+			->with($this->anything(), $answers, 'otherUser')
+			->willReturnArgument(1);
 
 		$this->submissionMapper->expects($this->once())
 			->method('findById')
@@ -2980,7 +3439,8 @@ class ApiControllerTest extends TestCase {
 			->willReturn([['id' => 'q1', 'type' => Constants::ANSWER_TYPE_SHORT, 'options' => []]]);
 
 		$this->submissionService->expects($this->once())
-			->method('validateSubmission');
+			->method('validateSubmission')
+			->willReturnArgument(1);
 
 		$this->submissionMapper->expects($this->once())
 			->method('findById')
@@ -3118,7 +3578,8 @@ class ApiControllerTest extends TestCase {
 
 		$this->submissionService->expects($this->once())
 			->method('validateSubmission')
-			->with($this->anything(), $answers, 'currentUser');
+			->with($this->anything(), $answers, 'currentUser')
+			->willReturnArgument(1);
 
 		$this->submissionMapper->expects($this->once())
 			->method('findById')
@@ -3184,7 +3645,8 @@ class ApiControllerTest extends TestCase {
 
 		$this->submissionService->expects($this->once())
 			->method('validateSubmission')
-			->with($this->anything(), $answers, 'formOwner');
+			->with($this->anything(), $answers, 'formOwner')
+			->willReturnArgument(1);
 
 		$this->submissionMapper->expects($this->once())
 			->method('findById')

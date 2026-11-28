@@ -15,8 +15,10 @@ import { generateOcsUrl } from '@nextcloud/router'
 import debounce from 'debounce'
 import { computed, nextTick, ref, watch } from 'vue'
 import { INPUT_DEBOUNCE_MS, OptionType } from '../models/Constants.ts'
+import { getJumps, isJumpOf } from '../utils/Jumps.ts'
 import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
+import { queueQuestionRequest } from './useQuestion.ts'
 
 export const QUESTION_MULTIPLE_EMITS = ['update:options']
 
@@ -335,8 +337,8 @@ export function useQuestionMultiple(
 		const optionIndex = props.options.findIndex((opt) => opt.id === option.id)
 
 		if (!option.local) {
-			axios
-				.delete(
+			queueQuestionRequest([props.id], () =>
+				axios.delete(
 					generateOcsUrl(
 						'apps/forms/api/v3/forms/{id}/questions/{questionId}/options/{optionId}',
 						{
@@ -345,7 +347,20 @@ export function useQuestionMultiple(
 							optionId: option.id,
 						},
 					),
-				)
+				),
+			)
+				.then(() => {
+					const goTo = getJumps(props.extraSettings)
+					const kept = goTo.filter(
+						(jump) => !isJumpOf(jump, { optionId: option.id }),
+					)
+					if (kept.length !== goTo.length) {
+						options.emit('update:extraSettings', {
+							...props.extraSettings,
+							goTo: kept,
+						})
+					}
+				})
 				.catch((error) => {
 					logger.error('Error while deleting an option', {
 						error,

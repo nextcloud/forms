@@ -48,6 +48,12 @@ SPDX-FileCopyrightText = "2019 Nextcloud GmbH and Nextcloud contributors"
 SPDX-License-Identifier = "AGPL-3.0-or-later"
 
 [[annotations]]
+path = ["tests/fixtures/jump-paths.json"]
+precedence = "aggregate"
+SPDX-FileCopyrightText = "2026 Nextcloud GmbH and Nextcloud contributors"
+SPDX-License-Identifier = "AGPL-3.0-or-later"
+
+[[annotations]]
 path = ["img/*"]
 precedence = "aggregate"
 SPDX-FileCopyrightText = "2018-2026 Google LLC, 2016-2024 Nextcloud GmbH and Nextcloud contributors"

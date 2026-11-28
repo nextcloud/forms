@@ -61,7 +61,19 @@ export interface FormsQuestionExtraSettings {
 	fileFormats?: string[]
 	fileMaxFiles?: number
 	fileMaxSize?: number
+	goTo?: FormsJump[]
+	next?: FormsJumpTarget
 	[key: string]: unknown
+}
+
+/** A later question by id, or the end of the form */
+export type FormsJumpTarget = number | 'submit'
+
+/** Where an answer leads: an option or the answer "Other" */
+export interface FormsJump {
+	optionId?: number
+	other?: true
+	target: FormsJumpTarget
 }
 
 export interface FormsQuestion {
