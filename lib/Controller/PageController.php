@@ -85,10 +85,13 @@ class PageController extends Controller {
 			}
 		}
 
-		return new TemplateResponse($this->appName, self::TEMPLATE_MAIN, [
+		$response = new TemplateResponse($this->appName, self::TEMPLATE_MAIN, [
 			'id-app-content' => '#app-content-vue',
 			'id-app-navigation' => '#app-navigation-vue',
 		]);
+		$response->setContentSecurityPolicy($this->createPolicy());
+
+		return $response;
 	}
 
 	/**
@@ -219,7 +222,10 @@ class PageController extends Controller {
 		$this->initialState->provideInitialState('isLoggedIn', $this->userSession->isLoggedIn());
 		$this->initialState->provideInitialState('shareHash', $hash);
 		$this->initialState->provideInitialState('maxStringLengths', Constants::MAX_STRING_LENGTHS);
-		return $this->provideTemplate(self::TEMPLATE_MAIN, $form, ['id-app-navigation' => null]);
+		$response = $this->provideTemplate(self::TEMPLATE_MAIN, $form, ['id-app-navigation' => null]);
+		$response->setContentSecurityPolicy($this->createPolicy());
+
+		return $response;
 	}
 
 	/**
@@ -294,12 +300,24 @@ class PageController extends Controller {
 	}
 
 	/**
+	 * Create the CSP for pages showing a form, allowing the players of video blocks as frames
+	 */
+	protected function createPolicy(): ContentSecurityPolicy {
+		$policy = new ContentSecurityPolicy();
+		foreach (Constants::VIDEO_PLAYER_ORIGINS as $origin) {
+			$policy->addAllowedFrameDomain($origin);
+		}
+
+		return $policy;
+	}
+
+	/**
 	 * Set CSP options to allow the page be embedded using <iframe>
 	 *
 	 * @return TemplateResponse
 	 */
 	protected function setEmbeddedCSP(TemplateResponse $response): TemplateResponse {
-		$policy = new ContentSecurityPolicy();
+		$policy = $this->createPolicy();
 		$policy->addAllowedFrameAncestorDomain('*');
 
 		$response->addHeader('X-Frame-Options', 'ALLOW');

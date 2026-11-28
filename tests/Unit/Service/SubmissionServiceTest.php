@@ -394,6 +394,31 @@ class SubmissionServiceTest extends TestCase {
 	// Data for SubmissionCsv
 	public static function dataGetSubmissionsData() {
 		return [
+			'display-only-blocks-are-not-exported' => [
+				// Questions
+				[
+					['id' => 1, 'text' => 'Question 1'],
+					['id' => 2, 'text' => 'Picture', 'type' => 'image'],
+					['id' => 3, 'text' => 'Clip', 'type' => 'video'],
+				],
+				// Array of Submissions incl. Answers
+				[
+					[
+						'id' => 1,
+						'userId' => 'user1',
+						'timestamp' => 123456789,
+						'answers' => [
+							['questionId' => 1, 'text' => 'Q1A1'],
+						]
+					],
+				],
+				// Expected CSV-Result
+				'
+				"Submission ID","User ID","User display name","Timestamp","Question 1"
+				"submission_id","user_id","user_display_name","timestamp","question-id-1"
+				"1","user1","User 1","1973-11-29T22:33:09+01:00","Q1A1"
+				'
+			],
 			'two-basic-submissions' => [
 				// Questions
 				[
@@ -1135,6 +1160,54 @@ file2.txt"
 				],
 				// Expected Result
 				null,
+			],
+			'display-only-block-not-answered' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'image', 'text' => 'picture', 'isRequired' => false],
+					['id' => 2, 'type' => 'short', 'text' => 'q2', 'isRequired' => true],
+				],
+				// Answers
+				[
+					'2' => ['answer'],
+				],
+				// Expected Result
+				null,
+			],
+			'display-only-block-marked-required' => [
+				// Questions -- a block can never be answered, so a stray required flag must
+				// not make the whole form impossible to submit.
+				[
+					['id' => 1, 'type' => 'video', 'text' => 'clip', 'isRequired' => true],
+				],
+				// Answers
+				[],
+				// Expected Result
+				null,
+			],
+			'display-only-image-answered' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'image', 'text' => 'picture', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['anything'],
+				],
+				// Expected Result
+				'Question "picture" does not take an answer.',
+			],
+			'display-only-video-answered' => [
+				// Questions
+				[
+					['id' => 1, 'type' => 'video', 'text' => 'clip', 'isRequired' => false],
+				],
+				// Answers
+				[
+					'1' => ['anything'],
+				],
+				// Expected Result
+				'Question "clip" does not take an answer.',
 			],
 			'required-not-answered' => [
 				// Questions
