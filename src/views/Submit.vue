@@ -156,7 +156,7 @@
 						<component
 							:is="answerTypes[question.type].component"
 							v-if="
-								visibleQuestionIds.has(question.id)
+								pageQuestionIds.has(question.id)
 								&& !isEmptySection(question)
 							"
 							ref="questionRefs"
@@ -193,6 +193,16 @@
 						{{ t('forms', 'Clear form') }}
 					</NcButton>
 					<NcButton
+						v-if="pageIndex > 0"
+						class="submit-button back-button"
+						type="button"
+						@click="goToPage(pageIndex - 1)">
+						<template #icon>
+							<NcIconSvgWrapper directional :svg="IconArrowBackSvg" />
+						</template>
+						{{ t('forms', 'Back') }}
+					</NcButton>
+					<NcButton
 						alignment="center-reverse"
 						class="submit-button"
 						aria-keyshortcuts="Control+Enter Meta+Enter"
@@ -200,9 +210,13 @@
 						type="submit"
 						variant="primary">
 						<template #icon>
-							<NcIconSvgWrapper :svg="IconSendSvg" />
+							<NcIconSvgWrapper
+								:directional="!isLastPage"
+								:svg="
+									isLastPage ? IconSendSvg : IconArrowForwardSvg
+								" />
 						</template>
-						{{ t('forms', 'Submit') }}
+						{{ isLastPage ? t('forms', 'Submit') : t('forms', 'Next') }}
 					</NcButton>
 				</div>
 			</form>
@@ -285,6 +299,8 @@ import type {
 	GridQuestionValues,
 } from '../types/Entities.d.ts'
 
+import IconArrowBack from '@material-symbols/svg-400/outlined/arrow_back.svg?raw'
+import IconArrowForward from '@material-symbols/svg-400/outlined/arrow_forward.svg?raw'
 import IconCancel from '@material-symbols/svg-400/outlined/block.svg?raw'
 import IconCheck from '@material-symbols/svg-400/outlined/check.svg?raw'
 import IconRefresh from '@material-symbols/svg-400/outlined/refresh.svg?raw'
@@ -339,6 +355,7 @@ import logger from '../utils/Logger.ts'
 import OcsResponse2Data from '../utils/OcsResponse2Data.ts'
 import {
 	getNumbers,
+	getPages,
 	getQuestionIdsInSections,
 	isEmptySection,
 	QUESTION_TYPE_SECTION,
@@ -552,6 +569,27 @@ export default defineComponent({
 		)
 
 		const shownNumbers = computed(() => getNumbers(shownQuestions.value))
+
+		const pages = computed<SubmitQuestion[][]>(() =>
+			getPages(shownQuestions.value).filter(
+				(page) => !page.every(isEmptySection),
+			),
+		)
+		const currentPage = ref(0)
+		const pageIndex = computed<number>(() =>
+			Math.max(0, Math.min(currentPage.value, pages.value.length - 1)),
+		)
+		const pageQuestionIds = computed<Set<number>>(
+			() =>
+				new Set(
+					(pages.value[pageIndex.value] ?? []).map(
+						(question) => question.id,
+					),
+				),
+		)
+		const isLastPage = computed<boolean>(
+			() => pageIndex.value >= pages.value.length - 1,
+		)
 
 		const submittedAnswers = computed<AnswersMap>(() => {
 			return Object.fromEntries(
@@ -1257,12 +1295,18 @@ export default defineComponent({
 		 * Focus the first shown question whose earlier answer the form no longer offers
 		 */
 		async function focusAnswerToChooseAgain(): Promise<void> {
-			const index = shownQuestions.value.findIndex((question) =>
-				answersToChooseAgain.value.has(question.id),
+			const page = pages.value.findIndex((questions) =>
+				questions.some((question) =>
+					answersToChooseAgain.value.has(question.id),
+				),
 			)
-			if (index === -1) {
+			if (page === -1) {
 				return
 			}
+			currentPage.value = page
+			const index = pages.value[page].findIndex((question) =>
+				answersToChooseAgain.value.has(question.id),
+			)
 			await nextTick()
 			formElement.value
 				?.querySelectorAll(':scope > ul > li')
@@ -1342,12 +1386,31 @@ export default defineComponent({
 					(input) =>
 						!(input instanceof HTMLFieldSetElement)
 						&& (input as HTMLButtonElement).type !== 'reset'
+						&& !input.classList.contains('back-button')
 						&& !(
 							target.type === 'radio'
 							&& (input as HTMLInputElement).name === target.name
 						),
 				)
 				?.focus()
+		}
+
+		/**
+		 * Show a page of the path and move the focus to the heading of its first question or section
+		 *
+		 * @param index the index of the page
+		 */
+		async function goToPage(index: number): Promise<void> {
+			currentPage.value = index
+			await nextTick()
+			const heading = formElement.value?.querySelector<HTMLElement>(
+				':scope > ul > li :is(h3, h4)',
+			)
+			if (heading) {
+				heading.tabIndex = -1
+				heading.focus({ preventScroll: true })
+				heading.closest('li')?.scrollIntoView({ block: 'start' })
+			}
 		}
 
 		let invalidShown = false
@@ -1442,6 +1505,11 @@ export default defineComponent({
 				const result = await Promise.all(validation)
 				if (result.some((v) => !v)) {
 					throw new Error('One question did not validate sucessfully')
+				}
+
+				if (!isLastPage.value) {
+					await goToPage(pageIndex.value + 1)
+					return
 				}
 
 				// in case no answer is set or all are empty show the confirmation dialog
@@ -1553,6 +1621,7 @@ export default defineComponent({
 		 */
 		function resetData(): void {
 			answers.value = {}
+			currentPage.value = 0
 			clearPathAnnouncement()
 			loading.value = false
 			showConfirmLeaveDialog.value = false
@@ -1723,6 +1792,12 @@ export default defineComponent({
 			validQuestions,
 			visibleQuestionIds,
 			title,
+			goToPage,
+			isLastPage,
+			pageIndex,
+			pageQuestionIds,
+			IconArrowBackSvg: IconArrowBack,
+			IconArrowForwardSvg: IconArrowForward,
 			IconCheckSvg: IconCheck,
 			IconScheduleSvg: IconSchedule,
 			IconRefreshSvg: IconRefresh,

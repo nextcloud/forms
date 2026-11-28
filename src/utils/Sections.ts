@@ -131,3 +131,20 @@ export function withNextSectionMovedUp<T extends { type: string }>(
 		...questions.slice(first + 1),
 	]
 }
+
+/**
+ * The pages of the questions on a path: a page starts at each section, questions before the first section form the first page
+ *
+ * @param questions the questions and sections on the path, in their order
+ */
+export function getPages<T extends { type: string }>(questions: T[]): T[][] {
+	const pages: T[][] = []
+	for (const question of questions) {
+		if (question.type === QUESTION_TYPE_SECTION || pages.length === 0) {
+			pages.push([question])
+		} else {
+			pages[pages.length - 1].push(question)
+		}
+	}
+	return pages
+}

@@ -6,12 +6,16 @@
 import type { Locator, Page, Response } from '@playwright/test'
 
 export class SubmitSection {
+	public readonly backButton: Locator
 	public readonly clearFormButton: Locator
+	public readonly nextButton: Locator
 	public readonly submitButton: Locator
 	public readonly successMessage: Locator
 
 	constructor(public readonly page: Page) {
+		this.backButton = this.page.getByRole('button', { name: 'Back' })
 		this.clearFormButton = this.page.getByRole('button', { name: 'Clear form' })
+		this.nextButton = this.page.getByRole('button', { name: 'Next' })
 		this.submitButton = this.page.getByRole('button', { name: 'Submit' })
 		this.successMessage = this.page
 			.getByRole('main')
