@@ -431,5 +431,70 @@
 		],
 		"answers": {},
 		"visible": [1]
+	},
+	{
+		"name": "leaving a section goes to the next target of the section",
+		"questions": [
+			{ "id": 1, "type": "section", "extraSettings": { "next": 5 } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "section", "extraSettings": {} },
+			{ "id": 4, "type": "short", "extraSettings": {} },
+			{ "id": 5, "type": "section", "extraSettings": {} },
+			{ "id": 6, "type": "short", "extraSettings": {} }
+		],
+		"answers": {},
+		"visible": [1, 2, 5, 6]
+	},
+	{
+		"name": "an answer that jumps out of the section wins over the next target of the section",
+		"questions": [
+			{ "id": 1, "type": "section", "extraSettings": { "next": 5 } },
+			{ "id": 2, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 21, "target": 3 }] } },
+			{ "id": 3, "type": "section", "extraSettings": {} },
+			{ "id": 4, "type": "short", "extraSettings": {} },
+			{ "id": 5, "type": "section", "extraSettings": {} },
+			{ "id": 6, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "2": ["21"] },
+		"visible": [1, 2, 3, 4, 5, 6]
+	},
+	{
+		"name": "a jump inside a section still leaves it through the next target of the section",
+		"questions": [
+			{ "id": 1, "type": "section", "extraSettings": { "next": 7 } },
+			{ "id": 2, "type": "multiple_unique", "extraSettings": { "goTo": [{ "optionId": 21, "target": 4 }] } },
+			{ "id": 3, "type": "short", "extraSettings": {} },
+			{ "id": 4, "type": "short", "extraSettings": {} },
+			{ "id": 5, "type": "section", "extraSettings": {} },
+			{ "id": 6, "type": "short", "extraSettings": {} },
+			{ "id": 7, "type": "section", "extraSettings": {} },
+			{ "id": 8, "type": "short", "extraSettings": {} }
+		],
+		"answers": { "2": ["21"] },
+		"visible": [1, 2, 4, 7, 8]
+	},
+	{
+		"name": "the next target of a section can end the form",
+		"questions": [
+			{ "id": 1, "type": "section", "extraSettings": { "next": "submit" } },
+			{ "id": 2, "type": "short", "extraSettings": {} },
+			{ "id": 3, "type": "section", "extraSettings": {} },
+			{ "id": 4, "type": "short", "extraSettings": {} }
+		],
+		"answers": {},
+		"visible": [1, 2]
+	},
+	{
+		"name": "an empty section goes to its next target",
+		"questions": [
+			{ "id": 1, "type": "short", "extraSettings": {} },
+			{ "id": 2, "type": "section", "extraSettings": { "next": 5 } },
+			{ "id": 3, "type": "section", "extraSettings": {} },
+			{ "id": 4, "type": "short", "extraSettings": {} },
+			{ "id": 5, "type": "section", "extraSettings": {} },
+			{ "id": 6, "type": "short", "extraSettings": {} }
+		],
+		"answers": {},
+		"visible": [1, 2, 5, 6]
 	}
 ]

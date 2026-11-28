@@ -909,6 +909,7 @@ class FormsService {
 			Constants::ANSWER_TYPE_COLOR => Constants::EXTRA_SETTINGS_COLOR,
 			Constants::ANSWER_TYPE_TIME => Constants::EXTRA_SETTINGS_TIME,
 			Constants::ANSWER_TYPE_LINEARSCALE => Constants::EXTRA_SETTINGS_LINEARSCALE,
+			Constants::ANSWER_TYPE_SECTION => Constants::EXTRA_SETTINGS_SECTION,
 			default => [],
 		};
 	}

@@ -75,8 +75,10 @@ export function useJumps(
 	const canGoTo = computed(() =>
 		QUESTION_TYPES_WITH_GOTO.includes(String(props.type)),
 	)
-	const canNext = computed(() =>
-		QUESTION_TYPES_WITH_NEXT.includes(String(props.type)),
+	const isSection = computed(() => props.type === QUESTION_TYPE_SECTION)
+	const canNext = computed(
+		() =>
+			isSection.value || QUESTION_TYPES_WITH_NEXT.includes(String(props.type)),
 	)
 
 	watch(
@@ -97,7 +99,7 @@ export function useJumps(
 		() => !props.readOnly && canGoTo.value && enabled.value,
 	)
 	const showNext = computed(
-		() => !props.readOnly && canNext.value && enabled.value,
+		() => !props.readOnly && canNext.value && (enabled.value || isSection.value),
 	)
 
 	const position = computed(() =>
@@ -107,12 +109,47 @@ export function useJumps(
 	const sections = computed(() => getSectionIndexes(formQuestions.value))
 	const number = computed(() => numbers.value.get(props.id) ?? position.value + 1)
 	const nextLabel = computed(() =>
-		t('forms', 'After question {number}', { number: number.value }),
+		isSection.value
+			? t('forms', 'After section {number} go to', { number: number.value })
+			: t('forms', 'After question {number}', { number: number.value }),
+	)
+	const hasLaterSection = computed(() =>
+		formQuestions.value
+			.slice(position.value + 1)
+			.some((question) => question.type === QUESTION_TYPE_SECTION),
+	)
+	const endsForm = computed(() => isSection.value && !hasLaterSection.value)
+	const shownNext = computed(() =>
+		endsForm.value && next.value === JUMP_TARGET_SUBMIT ? null : next.value,
+	)
+	const fallbackLabel = computed(() =>
+		!isSection.value
+			? undefined
+			: endsForm.value
+				? t(
+						'forms',
+						'End of the form (the chosen section was deleted or moved up)',
+					)
+				: t(
+						'forms',
+						'Next section (the chosen section was deleted or moved up)',
+					),
 	)
 
 	const targetOptions = computed<JumpTargetOption[]>((previous) => {
+		const submitOption: JumpTargetOption = {
+			id: JUMP_TARGET_SUBMIT,
+			label: t('forms', 'End of the form'),
+		}
 		const options: JumpTargetOption[] = [
-			{ id: null, label: t('forms', 'Next question') },
+			{
+				id: null,
+				label: !isSection.value
+					? t('forms', 'Next question')
+					: endsForm.value
+						? t('forms', 'End of the form')
+						: t('forms', 'Next section'),
+			},
 			...formQuestions.value
 				.filter((question, targetPosition) =>
 					isAllowedTarget(
@@ -153,7 +190,7 @@ export function useJumps(
 									),
 					}
 				}),
-			{ id: JUMP_TARGET_SUBMIT, label: t('forms', 'End of the form') },
+			...(endsForm.value ? [] : [submitOption]),
 		]
 		return previous?.length === options.length
 			&& previous.every(
@@ -264,6 +301,14 @@ export function useJumps(
 						),
 					]
 				: []),
+			...(issues.leavingSection.has(props.id)
+				? [
+						t(
+							'forms',
+							'Other questions of this section jump out of it as well. Respondents follow the first of these jumps on their path.',
+						),
+					]
+				: []),
 			...(issues.unreachable.has(props.id)
 				? [
 						props.type === QUESTION_TYPE_SECTION
@@ -316,7 +361,8 @@ export function useJumps(
 		nextLabel,
 		warnings,
 		hint,
-		next,
+		next: shownNext,
+		fallbackLabel,
 		targetOptions,
 		getTarget,
 		getTargetLabel,

@@ -319,6 +319,73 @@ test('jumps: in a form with sections, a jump into the middle of another section 
 	])
 })
 
+test('jumps: a section jumps only to a later section or the end of the form', () => {
+	const section = (
+		id: number,
+		extraSettings: FormsQuestion['extraSettings'] = {},
+	): FormsQuestion => ({ ...short(id, extraSettings), type: 'section' })
+	const allowed = withoutDisallowedJumps([
+		section(1, { next: 2 }),
+		short(2),
+		section(3, { next: 5 }),
+		short(4),
+		section(5, { next: 'submit' }),
+		short(6),
+	])
+	expect(allowed.map((question) => question.extraSettings)).toEqual([
+		{},
+		{},
+		{ next: 5 },
+		{},
+		{ next: 'submit' },
+		{},
+	])
+})
+
+test('jumps: questions skipped by the next target of a section are unreachable', () => {
+	const section = (
+		id: number,
+		extraSettings: FormsQuestion['extraSettings'] = {},
+	): FormsQuestion => ({ ...short(id, extraSettings), type: 'section' })
+	expect([
+		...getJumpIssues([
+			section(1, { next: 5 }),
+			short(2),
+			section(3),
+			short(4),
+			section(5),
+			short(6),
+		]).unreachable,
+	]).toEqual([3, 4])
+})
+
+test('jump issues: two questions of a section that jump out of it are both named', () => {
+	const section = (id: number): FormsQuestion => ({
+		...short(id),
+		type: 'section',
+	})
+	expect([
+		...getJumpIssues([
+			section(1),
+			radio(2, { goTo: [{ optionId: 11, target: 6 }] }),
+			short(3, { next: 'submit' }),
+			short(4, { next: 5 }),
+			short(5),
+			section(6),
+			short(7),
+		]).leavingSection,
+	]).toEqual([2, 3])
+	expect([
+		...getJumpIssues([
+			section(1),
+			radio(2, { goTo: [{ optionId: 11, target: 4 }] }),
+			short(3),
+			section(4),
+			short(5),
+		]).leavingSection,
+	]).toEqual([])
+})
+
 test('jumps: only the jumps a reorder removed are removed from newer extra settings', () => {
 	const before = {
 		goTo: [

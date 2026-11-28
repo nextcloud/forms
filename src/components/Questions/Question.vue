@@ -130,7 +130,11 @@
 							{{ t('forms', 'Required') }}
 						</NcActionCheckbox>
 						<NcActionCheckbox
-							v-if="jumps && (jumps.canGoTo || jumps.canNext)"
+							v-if="
+								jumps
+								&& !isSection
+								&& (jumps.canGoTo || jumps.canNext)
+							"
 							:modelValue="jumps.enabled"
 							@update:modelValue="onJumpsEnabledChange">
 							{{
@@ -233,6 +237,7 @@
 				:modelValue="jumps.next"
 				:options="jumps.targetOptions"
 				:inputLabel="jumps.nextLabel"
+				:fallbackLabel="jumps.fallbackLabel"
 				@update:modelValue="jumps.setNext" />
 		</div>
 		<!-- Insert question menu -->

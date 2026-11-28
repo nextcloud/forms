@@ -287,6 +287,10 @@ class Constants {
 		'next' => ['integer', 'string'],
 	];
 
+	public const EXTRA_SETTINGS_SECTION = [
+		'next' => ['integer', 'string'],
+	];
+
 	public const EXTRA_SETTINGS_GRID_QUESTION_TYPE = [
 		self::ANSWER_GRID_TYPE_CHECKBOX,
 		self::ANSWER_GRID_TYPE_NUMBER,
