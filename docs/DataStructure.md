@@ -273,7 +273,7 @@ Optional extra settings for some [Question Types](#question-types)
 | `questionType`          | `linearscale`                                  | String           | `rating`, `promoter`                        | Sub type, fixed at creation; `rating` is a 1 to N scale drawn as icons, `promoter` is a 0 to 10 scale whose results show the promoter score; absent for a plain scale |
 | `ratingIcon`            | `linearscale` with `questionType` `rating`     | string           | `'star', 'heart', 'thumb'`                  | Set the icon of the rating, default: `'star'`                               |
 | `goTo`                  | `dropdown, multiple_unique`                    | Array            | see [Jumps](#jumps)                         | Where to go next for an answer                                              |
-| `next`                  | `color, file, grid, long, multiple, ranking, short` | Integer / string | question id, `'submit'`                | Where to go after the question, see [Jumps](#jumps)                         |
+| `next`                  | `color, date, file, grid, long, multiple, ranking, short, time` | Integer / string | question id, `'submit'` | Where to go after the question, see [Jumps](#jumps) |
 
 ### Jumps
 
