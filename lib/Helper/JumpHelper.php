@@ -50,7 +50,7 @@ final class JumpHelper {
 	}
 
 	/**
-	 * The answer of a jump per answer with one answer key and a target: `option:<id>` for an option, `other` for the answer "Other" of a radio question
+	 * The answer of a jump per answer with one answer key and a target: `value:<value>` for a value from 0 to 10 of a linear scale, `option:<id>` for an option, `other` for the answer "Other" of a radio question
 	 *
 	 * @param mixed $jump the jump
 	 * @param string $questionType the question type
@@ -59,6 +59,9 @@ final class JumpHelper {
 	private static function getJumpAnswer(mixed $jump, string $questionType): ?string {
 		if (!is_array($jump) || count($jump) !== 2 || !self::isJumpTarget($jump['target'] ?? null)) {
 			return null;
+		}
+		if ($questionType === Constants::ANSWER_TYPE_LINEARSCALE) {
+			return is_int($jump['value'] ?? null) && $jump['value'] >= 0 && $jump['value'] <= 10 ? 'value:' . $jump['value'] : null;
 		}
 		if (is_int($jump['optionId'] ?? null) && $jump['optionId'] > 0) {
 			return 'option:' . $jump['optionId'];
@@ -150,6 +153,7 @@ final class JumpHelper {
 					$extraSettings['goTo'] = array_values($goTo);
 				}
 				$question->setExtraSettings($extraSettings);
+				self::removeJumpsOutsideScale($question);
 				$copiesWithJumps[] = $question;
 			}
 		}
@@ -194,5 +198,29 @@ final class JumpHelper {
 		}
 
 		return $changed;
+	}
+
+	/**
+	 * Remove the jumps of a linear scale for values outside its bounds
+	 *
+	 * @param Question $question the question
+	 * @return bool whether jumps were removed, with the new extra settings set
+	 */
+	public static function removeJumpsOutsideScale(Question $question): bool {
+		$extraSettings = $question->getExtraSettings();
+		if ($question->getType() !== Constants::ANSWER_TYPE_LINEARSCALE || !is_array($extraSettings['goTo'] ?? null)) {
+			return false;
+		}
+
+		$lowest = $extraSettings['optionsLowest'] ?? 1;
+		$highest = $extraSettings['optionsHighest'] ?? 5;
+		$goTo = array_values(array_filter($extraSettings['goTo'], static fn (mixed $jump): bool => !is_int(is_array($jump) ? ($jump['value'] ?? null) : null) || ($jump['value'] >= $lowest && $jump['value'] <= $highest)));
+		if (count($goTo) === count($extraSettings['goTo'])) {
+			return false;
+		}
+
+		$extraSettings['goTo'] = $goTo;
+		$question->setExtraSettings($extraSettings);
+		return true;
 	}
 }

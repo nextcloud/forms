@@ -39,6 +39,13 @@ class JumpHelperTest extends TestCase {
 		], JumpHelper::mapJumps($extraSettings, [2 => 20, 3 => 30], [11 => 110, 12 => 120]));
 	}
 
+	public function testMapJumpsKeepsScaleValues(): void {
+		$this->assertSame(
+			['optionsHighest' => 7, 'goTo' => [['value' => 7, 'target' => 20], ['value' => 1, 'target' => 'submit']]],
+			JumpHelper::mapJumps(['optionsHighest' => 7, 'goTo' => [['value' => 7, 'target' => 2], ['value' => 1, 'target' => 'submit'], ['value' => 3, 'target' => 9]]], [2 => 20], []),
+		);
+	}
+
 	public function testMapJumpsKeepsTargetsWithoutQuestionMap(): void {
 		$this->assertSame(
 			['next' => 3, 'goTo' => [['optionId' => 110, 'target' => 2]]],
@@ -95,6 +102,18 @@ class JumpHelperTest extends TestCase {
 		$this->assertSame([], $questions[0]->getExtraSettings());
 		$this->assertSame(['goTo' => [['optionId' => 70, 'target' => 30], ['other' => true, 'target' => 20]]], $questions[1]->getExtraSettings());
 		$this->assertSame(['shuffleOptions' => true], $questions[2]->getExtraSettings());
+	}
+
+	public function testMapJumpsOfCopiesRemovesJumpsOutsideTheScale(): void {
+		$question = new Question();
+		$question->setId(10);
+		$question->setOrder(1);
+		$question->setType(Constants::ANSWER_TYPE_LINEARSCALE);
+		$question->setExtraSettings(['optionsLowest' => 1, 'optionsHighest' => 3, 'goTo' => [['value' => 0, 'target' => 'submit'], ['value' => 3, 'target' => 'submit'], ['value' => 4, 'target' => 'submit']]]);
+
+		JumpHelper::mapJumpsOfCopies([$question], [], []);
+
+		$this->assertSame(['optionsLowest' => 1, 'optionsHighest' => 3, 'goTo' => [['value' => 3, 'target' => 'submit']]], $question->getExtraSettings());
 	}
 
 	public function testMapJumpsOfCopiesWithoutJumpsLeavesTheCopiesAlone(): void {
