@@ -320,7 +320,8 @@ import {
 	formatList,
 	getJumpIssues,
 	getNewlyBrokenQuestions,
-	withoutBackwardJumps,
+	getQuestionsWithDisallowedJumps,
+	withoutDisallowedJumps,
 	withoutRemovedJumps,
 } from '../utils/Jumps.ts'
 import logger from '../utils/Logger.ts'
@@ -842,33 +843,61 @@ export default defineComponent({
 		}
 
 		/**
-		 * The closing question of a move confirmation, naming the moved question
+		 * The closing question of a move confirmation, naming the moved question or section
 		 *
-		 * @param moved the moved question
+		 * @param moved the moved question or section
 		 */
 		const moveBackText = (moved: FormsQuestion | undefined): string =>
-			t(
-				'forms',
-				'Move the question "{title}" back, or remove these jumps?',
-				{ title: moved?.text || t('forms', 'Untitled question') },
-				undefined,
-				{ escape: false, sanitize: false },
-			)
+			moved?.type === QUESTION_TYPE_SECTION
+				? t(
+						'forms',
+						'Move the section "{title}" back, or remove these jumps?',
+						{ title: moved.text || t('forms', 'Untitled section') },
+						undefined,
+						{ escape: false, sanitize: false },
+					)
+				: t(
+						'forms',
+						'Move the question "{title}" back, or remove these jumps?',
+						{ title: moved?.text || t('forms', 'Untitled question') },
+						undefined,
+						{ escape: false, sanitize: false },
+					)
 
 		/**
-		 * Ask whether to remove the jumps that a new order of the questions would turn into jumps to an earlier question, or to move the moved question back
+		 * Ask whether to remove the jumps that a new order of the questions would turn into jumps to an earlier question or into the middle of another section, or to move the moved question back
 		 *
 		 * @param questions the questions in the new order
-		 * @param ids the ids of the questions with such jumps
-		 * @param moved the moved question
+		 * @param ids the ids of the questions with jumps to an earlier question
+		 * @param intoSectionIds the ids of the other questions with jumps into the middle of another section
+		 * @param moved the moved question or section
 		 * @return whether to remove the jumps
 		 */
 		const confirmRemovingBackwardJumps = async (
 			questions: FormsQuestion[],
 			ids: number[],
+			intoSectionIds: number[],
 			moved: FormsQuestion | undefined,
 		): Promise<boolean> => {
 			try {
+				if (ids.length === 0) {
+					return await showConfirmation({
+						name: t('forms', 'Jumps go to the start of a section'),
+						text: [
+							n(
+								'forms',
+								'After this move, question {questions} would jump into the middle of another section.',
+								'After this move, questions {questions} would jump into the middle of other sections.',
+								intoSectionIds.length,
+								{ questions: numbersOf(questions, intoSectionIds) },
+							),
+							moveBackText(moved),
+						].join(' '),
+						labelConfirm: t('forms', 'Remove jumps'),
+						labelReject: t('forms', 'Move back'),
+						severity: 'warning',
+					})
+				}
 				return await showConfirmation({
 					name: t('forms', 'Jumps cannot go back'),
 					text: [
@@ -907,11 +936,18 @@ export default defineComponent({
 				getJumpIssues(oldQuestions),
 				getJumpIssues(questions),
 			)
+			const disallowedBefore = new Set(
+				getQuestionsWithDisallowedJumps(oldQuestions),
+			)
+			const intoSection = getQuestionsWithDisallowedJumps(questions).filter(
+				(id) => !backward.includes(id) && !disallowedBefore.has(id),
+			)
 			let order = questions
-			if (backward.length > 0) {
+			if (backward.length > 0 || intoSection.length > 0) {
 				const removeJumps = await confirmRemovingBackwardJumps(
 					questions,
 					backward,
+					intoSection,
 					moved,
 				)
 				if (!removeJumps) {
@@ -958,7 +994,7 @@ export default defineComponent({
 				if (props.form.id !== formId) {
 					return
 				}
-				const adjustedOrder = withoutBackwardJumps(order)
+				const adjustedOrder = withoutDisallowedJumps(order)
 				warnAboutJumpChanges(oldQuestions, adjustedOrder)
 				const changes = new Map(
 					order.flatMap((question, position) =>
@@ -1120,6 +1156,29 @@ export default defineComponent({
 		}
 
 		/**
+		 * Remove the jumps into the middle of a section that a new section split off, as the server does when it inserts the section
+		 */
+		const removeJumpsIntoNewSection = (): void => {
+			const questions = withoutDisallowedJumps(props.form.questions)
+			const changed = props.form.questions
+				.filter((question, position) => questions[position] !== question)
+				.map((question) => question.id)
+			if (changed.length === 0) {
+				return
+			}
+			emit('update:form', { ...props.form, questions })
+			showWarning(
+				n(
+					'forms',
+					'Question {questions} jumped into the part of a section that is now a new section, so its jumps there were removed. Please review the jumps.',
+					'Questions {questions} jumped into the part of a section that is now a new section, so their jumps there were removed. Please review the jumps.',
+					changed.length,
+					{ questions: numbersOf(questions, changed) },
+				),
+			)
+		}
+
+		/**
 		 * Add a new question to the current form
 		 *
 		 * @param type the question type, see AnswerTypes
@@ -1199,6 +1258,10 @@ export default defineComponent({
 
 				// Delegate insertion & focus handling to helper
 				insertQuestion(question, { text, type, answers: [] }, position)
+				if (type === QUESTION_TYPE_SECTION) {
+					await nextTick()
+					removeJumpsIntoNewSection()
+				}
 			} catch (error) {
 				logger.error('Error while adding new question', { error })
 				showError(
@@ -1254,7 +1317,7 @@ export default defineComponent({
 				const questions =
 					reordered === remaining
 						? remaining
-						: withoutBackwardJumps(reordered)
+						: withoutDisallowedJumps(reordered)
 				warnAboutJumpChanges(props.form.questions, questions)
 				emit('update:form', { ...props.form, questions })
 				emitEvent('forms:last-updated:set', props.form.id)

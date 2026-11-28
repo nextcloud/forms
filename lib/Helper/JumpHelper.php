@@ -122,7 +122,7 @@ final class JumpHelper {
 	}
 
 	/**
-	 * Point the jumps of copied questions at the copied questions and options, and remove the jumps that go to the question itself or to an earlier question, jumps per answer with an invalid structure or for an answer with a jump already, and `goTo` or `next` on question types without it
+	 * Point the jumps of copied questions at the copied questions and options, and remove the jumps that go to the question itself, to an earlier question or into the middle of another section, jumps per answer with an invalid structure or for an answer with a jump already, and `goTo` or `next` on question types without it
 	 *
 	 * @param list<Question> $questions the copied questions
 	 * @param array<int, int> $questionIdMap the ids of the copied questions by original id
@@ -160,32 +160,42 @@ final class JumpHelper {
 
 		if ($copiesWithJumps !== []) {
 			usort($questions, static fn (Question $a, Question $b): int => $a->getOrder() <=> $b->getOrder());
-			self::removeBackwardJumps($questions);
+			self::removeDisallowedJumps($questions);
 		}
 
 		return $copiesWithJumps;
 	}
 
 	/**
-	 * Remove the jumps that go to the question itself or to an earlier question, keeping the jumps to the end of the form, to later questions and to questions that are not in the list
+	 * Remove the jumps that go to the question itself, to an earlier question or into the middle of another section, keeping the jumps to the end of the form, to later questions of the same section, to later sections and to questions that are not in the list
 	 *
 	 * @param list<Question> $questions the questions of the form in their order
 	 * @return list<Question> the questions whose jumps were removed, with their new extra settings set
 	 */
-	public static function removeBackwardJumps(array $questions): array {
+	public static function removeDisallowedJumps(array $questions): array {
 		$positions = array_flip(array_map(static fn (Question $question): int => $question->getId(), $questions));
+		$sections = [];
+		$section = 0;
+		foreach ($questions as $position => $question) {
+			if ($question->getType() === Constants::ANSWER_TYPE_SECTION) {
+				$section++;
+			}
+			$sections[$position] = $section;
+		}
 		$changed = [];
 
 		foreach ($questions as $position => $question) {
-			$isBackward = static fn (mixed $target): bool => is_int($target) && isset($positions[$target]) && $positions[$target] <= $position;
+			$isDisallowed = static fn (mixed $target): bool => is_int($target) && isset($positions[$target])
+				&& ($positions[$target] <= $position
+					|| ($questions[$positions[$target]]->getType() !== Constants::ANSWER_TYPE_SECTION && $sections[$positions[$target]] !== $sections[$position]));
 			$extraSettings = $question->getExtraSettings();
 			$newSettings = $extraSettings;
 
-			if ($isBackward($extraSettings['next'] ?? null)) {
+			if ($isDisallowed($extraSettings['next'] ?? null)) {
 				unset($newSettings['next']);
 			}
 			if (is_array($extraSettings['goTo'] ?? null)) {
-				$goTo = array_values(array_filter($extraSettings['goTo'], static fn (mixed $jump): bool => !$isBackward(is_array($jump) ? ($jump['target'] ?? null) : null)));
+				$goTo = array_values(array_filter($extraSettings['goTo'], static fn (mixed $jump): bool => !$isDisallowed(is_array($jump) ? ($jump['target'] ?? null) : null)));
 				if (count($goTo) !== count($extraSettings['goTo'])) {
 					$newSettings['goTo'] = $goTo;
 				}

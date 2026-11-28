@@ -23,7 +23,12 @@ import {
 	QUESTION_TYPES_WITH_GOTO,
 	QUESTION_TYPES_WITH_NEXT,
 } from '../utils/Jumps.ts'
-import { getNumbers, QUESTION_TYPE_SECTION } from '../utils/Sections.ts'
+import {
+	getNumbers,
+	getSectionIndexes,
+	isAllowedTarget,
+	QUESTION_TYPE_SECTION,
+} from '../utils/Sections.ts'
 
 /** The jump issues of the form, see `getJumpIssues()`, provided by the editor */
 export const FORM_JUMP_ISSUES_KEY: InjectionKey<ComputedRef<JumpIssues>> =
@@ -99,6 +104,7 @@ export function useJumps(
 		formQuestions.value.findIndex((question) => question.id === props.id),
 	)
 	const numbers = computed(() => getNumbers(formQuestions.value))
+	const sections = computed(() => getSectionIndexes(formQuestions.value))
 	const number = computed(() => numbers.value.get(props.id) ?? position.value + 1)
 	const nextLabel = computed(() =>
 		t('forms', 'After question {number}', { number: number.value }),
@@ -107,35 +113,46 @@ export function useJumps(
 	const targetOptions = computed<JumpTargetOption[]>((previous) => {
 		const options: JumpTargetOption[] = [
 			{ id: null, label: t('forms', 'Next question') },
-			...formQuestions.value.slice(position.value + 1).map((question) => {
-				const number = numbers.value.get(question.id) ?? ''
-				const title = question.text?.trim()
-				return {
-					id: question.id,
-					label:
-						question.type === QUESTION_TYPE_SECTION
-							? t(
-									'forms',
-									'Section {number}: {title}',
-									{
-										number,
-										title:
-											title || t('forms', 'Untitled section'),
-									},
-									{ escape: false, sanitize: false },
-								)
-							: t(
-									'forms',
-									'Question {number}: {title}',
-									{
-										number,
-										title:
-											title || t('forms', 'Untitled question'),
-									},
-									{ escape: false, sanitize: false },
-								),
-				}
-			}),
+			...formQuestions.value
+				.filter((question, targetPosition) =>
+					isAllowedTarget(
+						formQuestions.value,
+						sections.value,
+						position.value,
+						targetPosition,
+					),
+				)
+				.map((question) => {
+					const number = numbers.value.get(question.id) ?? ''
+					const title = question.text?.trim()
+					return {
+						id: question.id,
+						label:
+							question.type === QUESTION_TYPE_SECTION
+								? t(
+										'forms',
+										'Section {number}: {title}',
+										{
+											number,
+											title:
+												title
+												|| t('forms', 'Untitled section'),
+										},
+										{ escape: false, sanitize: false },
+									)
+								: t(
+										'forms',
+										'Question {number}: {title}',
+										{
+											number,
+											title:
+												title
+												|| t('forms', 'Untitled question'),
+										},
+										{ escape: false, sanitize: false },
+									),
+					}
+				}),
 			{ id: JUMP_TARGET_SUBMIT, label: t('forms', 'End of the form') },
 		]
 		return previous?.length === options.length

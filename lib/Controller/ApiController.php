@@ -540,7 +540,8 @@ class ApiController extends OCSController {
 	/**
 	 * Add a new question
 	 *
-	 * A clone loses its jumps to itself or to an earlier question, and the header `X-Forms-Adjusted` then holds `removed-jumps` with its id
+	 * A clone loses its jumps to itself, to an earlier question or into the middle of another section, and the header `X-Forms-Adjusted` then holds `removed-jumps` with its id.
+	 * A section inserted or cloned at a position removes the jumps of other questions that would go into its middle, and the header then holds `removed-jumps` with their ids.
 	 *
 	 * @param int $formId the form id
 	 * @param FormsQuestionType $type the new question type
@@ -694,13 +695,23 @@ class ApiController extends OCSController {
 				$newQuestion->setExtraSettings(JumpHelper::mapJumps($extraSettings, null, $optionIdMap));
 				$formQuestions = [...$allQuestions, $newQuestion];
 				usort($formQuestions, static fn (Question $a, Question $b): int => $a->getOrder() <=> $b->getOrder());
-				if (in_array($newQuestion, JumpHelper::removeBackwardJumps($formQuestions), true)) {
+				if (in_array($newQuestion, JumpHelper::removeDisallowedJumps($formQuestions), true)) {
 					$headers = self::getRemovedJumpsHeaders([$newQuestion->getId()]);
 				}
 				if ($newQuestion->getExtraSettings() !== $extraSettings) {
 					$this->questionMapper->update($newQuestion);
 					$response['extraSettings'] = $newQuestion->getExtraSettings();
 				}
+			}
+		}
+
+		if (($response['type'] ?? null) === Constants::ANSWER_TYPE_SECTION && $position !== null) {
+			$changedQuestions = JumpHelper::removeDisallowedJumps($this->questionMapper->findByForm($formId));
+			foreach ($changedQuestions as $changedQuestion) {
+				$this->questionMapper->update($changedQuestion);
+			}
+			if ($changedQuestions !== []) {
+				$headers = self::getRemovedJumpsHeaders(array_map(static fn (Question $changedQuestion): int => $changedQuestion->getId(), $changedQuestions));
 			}
 		}
 
@@ -717,7 +728,7 @@ class ApiController extends OCSController {
 	 * Writes the given key-value pairs into Database
 	 * Key `order` should only be changed by reorderQuestions() and is not allowed here
 	 *
-	 * Jumps to the question itself or to an earlier question, and jumps of a linear scale for values outside its bounds, are removed before saving, and the header `X-Forms-Adjusted` then holds `removed-jumps` with the id of the question.
+	 * Jumps to the question itself, to an earlier question or into the middle of another section, and jumps of a linear scale for values outside its bounds, are removed before saving, and the header `X-Forms-Adjusted` then holds `removed-jumps` with the id of the question.
 	 * Jumps for options that are not options of the question are removed as well, with the same header. Jumps to questions of other forms are rejected as invalid `extraSettings`.
 	 *
 	 * @param int $formId the form id
@@ -811,7 +822,7 @@ class ApiController extends OCSController {
 			if (JumpHelper::removeJumpsOutsideScale($updatedQuestion)) {
 				$removedJumps = true;
 			}
-			if (in_array($updatedQuestion, JumpHelper::removeBackwardJumps($formQuestions), true)) {
+			if (in_array($updatedQuestion, JumpHelper::removeDisallowedJumps($formQuestions), true)) {
 				$removedJumps = true;
 			}
 			$keyValuePairs['extraSettings'] = $updatedQuestion->getExtraSettings();
@@ -917,7 +928,7 @@ class ApiController extends OCSController {
 	/**
 	 * Updates the Order of all Questions of a Form
 	 *
-	 * Jumps that would go to the question itself or to an earlier question are removed: the new extra settings of these questions are returned, and the header `X-Forms-Adjusted` holds `removed-jumps` with their ids, or alone for more than 100 questions
+	 * Jumps that would go to the question itself, to an earlier question or into the middle of another section are removed: the new extra settings of these questions are returned, and the header `X-Forms-Adjusted` holds `removed-jumps` with their ids, or alone for more than 100 questions
 	 *
 	 * @param int $formId Id of the form to reorder
 	 * @param list<int> $newOrder Array of Question-Ids in new order.
@@ -997,7 +1008,7 @@ class ApiController extends OCSController {
 
 		self::checkQuestionsStayInSections($typesBefore, array_map(static fn (Question $question) => $question->getType(), $questions));
 
-		$changedQuestions = JumpHelper::removeBackwardJumps($questions);
+		$changedQuestions = JumpHelper::removeDisallowedJumps($questions);
 
 		// Write to Database
 		foreach ($questions as $question) {
@@ -2374,7 +2385,7 @@ class ApiController extends OCSController {
 				$moved[] = $question;
 			}
 		}
-		$changed = JumpHelper::removeBackwardJumps($questions);
+		$changed = JumpHelper::removeDisallowedJumps($questions);
 		foreach ($questions as $question) {
 			if (in_array($question, $moved, true) || in_array($question, $changed, true)) {
 				$this->questionMapper->update($question);

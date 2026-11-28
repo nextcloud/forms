@@ -37,7 +37,7 @@ Some requests succeed with their usual status, and their payload keeps its shape
 
 | Key | Value | Set by | Meaning |
 |-----|-------|--------|---------|
-| `removed-jumps` | Inner list of question ids, e.g. `(3 7)` | Updating, reordering and copying questions; deleting the first section of a form; deleting options; changing the bounds of a linear scale | Jumps to the question itself or to an earlier question, jumps of the deleted option or of options that are not options of the question, or jumps for values outside the scale, were removed from the `extraSettings` of these questions, see [Jumps](DataStructure.md#jumps) |
+| `removed-jumps` | Inner list of question ids, e.g. `(3 7)` | Updating, reordering and copying questions; inserting a section; deleting the first section of a form; deleting options; changing the bounds of a linear scale | Jumps to the question itself, to an earlier question or into the middle of another section, jumps of the deleted option or of options that are not options of the question, or jumps for values outside the scale, were removed from the `extraSettings` of these questions, see [Jumps](DataStructure.md#jumps) |
 
 ```
 X-Forms-Adjusted: removed-jumps=(3 7)
@@ -64,7 +64,7 @@ When more than 100 questions lost jumps, which only a reorder can cause, `remove
 
 ### Other API changes
 
-- Questions can jump to a later question or to the end of the form with the extra settings `goTo` (per answer, on dropdown, radio and linear scale questions) or `next` (after the question, on the other types with jumps), never both (see [Jumps](DataStructure.md#jumps)). Jumps to questions of other forms are rejected, jumps for options that are not options of the question are removed, deleting an option removes its jumps, and narrowing a linear scale removes the jumps of the values that are gone. Submissions and submission updates ignore answers to the questions the jumps skip and do not require them, the path ends at an unanswered question with a jump per answer past the following question, and an answer "Other" needs a text where the question has a jump for "Other". Updating, reordering and copying questions removes jumps to the question itself or to an earlier question; the response header `X-Forms-Adjusted` then lists the questions concerned under `removed-jumps` (see [Adjustments by the server](#adjustments-by-the-server)). Copying or importing a form drops such jumps as well, without the header, as these create a new form.
+- Questions can jump to a later question or to the end of the form with the extra settings `goTo` (per answer, on dropdown, radio and linear scale questions) or `next` (after the question, on the other types with jumps), never both (see [Jumps](DataStructure.md#jumps)). Jumps to questions of other forms are rejected, jumps for options that are not options of the question are removed, deleting an option removes its jumps, and narrowing a linear scale removes the jumps of the values that are gone. Submissions and submission updates ignore answers to the questions the jumps skip and do not require them, the path ends at an unanswered question with a jump per answer past the following question, and an answer "Other" needs a text where the question has a jump for "Other". Updating, reordering and copying questions removes jumps to the question itself, to an earlier question or into the middle of another section; the response header `X-Forms-Adjusted` then lists the questions concerned under `removed-jumps` (see [Adjustments by the server](#adjustments-by-the-server)). Copying or importing a form drops such jumps as well, without the header, as these create a new form.
 - In API version 3.0 the following endpoints were introduced/changed:
     - `GET /api/v3/forms/{formId}/questions` to get all questions of a form
     - `GET /api/v3/forms/{formId}/questions/{questionId}` to get a single question
@@ -276,7 +276,7 @@ Creates a clone of a form (without submissions).
   | Parameter | Type | Description |
   |-----------|---------|-------------|
   | _formId_ | Integer | ID of the form to clone |
-- Response: Returns the full object of the new form. See [Request full data of a Form](#request-full-data-of-a-form). The jumps of the copied questions point at the copied questions and options; jumps whose target or option was not copied, jumps that would go to the question itself or to an earlier question, and `goTo` or `next` on a question type without it, are dropped, without the header `X-Forms-Adjusted` (see [Jumps](DataStructure.md#jumps)).
+- Response: Returns the full object of the new form. See [Request full data of a Form](#request-full-data-of-a-form). The jumps of the copied questions point at the copied questions and options; jumps whose target or option was not copied, jumps that would go to the question itself, to an earlier question or into the middle of another section, and `goTo` or `next` on a question type without it, are dropped, without the header `X-Forms-Adjusted` (see [Jumps](DataStructure.md#jumps)).
 
 ```
 See section 'Request full data of a form'.
@@ -396,7 +396,7 @@ Returns the questions and options of the given form (without submissions).
   | _text_ | String | yes | _Optional_ The text of the new question. |
   | _position_ | Integer | yes | _(optional)_ 1-based position to insert the new question. When omitted the question is appended at the end. |
 - Restrictions: A `grid` question needs its cell type as _subtype_. A _subtype_ for a question type without sub types is rejected with **400 Bad Request**. In a form with sections every question is in a section (see [Sections](DataStructure.md#sections)): a question or section that would add to the questions before the first section, for example a section appended below the questions of a form without sections, is rejected with **400 Bad Request** "Every question must be in a section".
-- Response: The new question object.
+- Response: The new question object. A `section` inserted or cloned at a _position_ removes the jumps of other questions that would go into its middle (see [Jumps](DataStructure.md#jumps)), and the response header `X-Forms-Adjusted` then lists them under `removed-jumps` (see [Adjustments by the server](#adjustments-by-the-server)).
 
 ```
 "data": {
@@ -474,7 +474,7 @@ Update a single or multiple properties of a question-object.
     - It is **not allowed** to update one of the following key-value pairs: _id, formId, order, type_.
     - The sub type `extraSettings.questionType` is fixed when the question is created. An `extraSettings` value that adds, removes or changes `questionType` is rejected with **403 Forbidden**, so send the stored `questionType` with every `extraSettings` update.
     - A promoter score question (`questionType` `promoter`) keeps `optionsLowest` at `0` and `optionsHighest` at `10`; send both with every `extraSettings` update, or it is rejected with **400 Bad Request**.
-- Response: **Status-Code OK**, as well as the id of the updated question. Jumps in `extraSettings` that go to the question itself or to an earlier question, and jumps of a linear scale for values outside its bounds, are removed before saving (see [Jumps](DataStructure.md#jumps)), and the response header `X-Forms-Adjusted` then holds `removed-jumps=(<question id>)` (see [Adjustments by the server](#adjustments-by-the-server)). Jumps with an invalid structure, `goTo` or `next` on a question type without it, and ids of questions of other forms are rejected with **Status-Code Bad Request** "Invalid extraSettings, will not update." Jumps for options that are not options of the question are removed before saving, with the same header.
+- Response: **Status-Code OK**, as well as the id of the updated question. Jumps in `extraSettings` that go to the question itself, to an earlier question or into the middle of another section, and jumps of a linear scale for values outside its bounds, are removed before saving (see [Jumps](DataStructure.md#jumps)), and the response header `X-Forms-Adjusted` then holds `removed-jumps=(<question id>)` (see [Adjustments by the server](#adjustments-by-the-server)). Jumps with an invalid structure, `goTo` or `next` on a question type without it, and ids of questions of other forms are rejected with **Status-Code Bad Request** "Invalid extraSettings, will not update." Jumps for options that are not options of the question are removed before saving, with the same header.
 
 ```
 "data": 1
@@ -495,7 +495,7 @@ Reorders all Questions of a single form
   |-----------|---------|-------------|
   | _newOrder_ | Array | Array of **all** Question-IDs, ordered in the desired order |
 - Restrictions: The Array **must** contain all Question-IDs corresponding to the specified form and **must not** contain any duplicates. An order that puts more questions before the first section than before is rejected with **400 Bad Request** "Every question must be in a section" (see [Sections](DataStructure.md#sections)).
-- Response: Array of questionIDs and their corresponding order. Jumps that would go to the question itself or to an earlier question are removed (see [Jumps](DataStructure.md#jumps)): the questions concerned also carry their new `extraSettings`, and the response header `X-Forms-Adjusted` then lists their ids, e.g. `X-Forms-Adjusted: removed-jumps=(3 7)`, or holds `removed-jumps` alone for more than 100 questions (see [Adjustments by the server](#adjustments-by-the-server)).
+- Response: Array of questionIDs and their corresponding order. Jumps that would go to the question itself, to an earlier question or into the middle of another section are removed (see [Jumps](DataStructure.md#jumps)): the questions concerned also carry their new `extraSettings`, and the response header `X-Forms-Adjusted` then lists their ids, e.g. `X-Forms-Adjusted: removed-jumps=(3 7)`, or holds `removed-jumps` alone for more than 100 questions (see [Adjustments by the server](#adjustments-by-the-server)).
   An id of a deleted question gets a **Not Found** response.
 
 ```
@@ -542,7 +542,7 @@ Creates a clone of a question with all its options.
   | Parameter | Type | Optional | Description |
   |-----------|---------|----------|-------------|
   | _position_ | Integer | yes | _(optional)_ 1-based position to insert the cloned question. When omitted the clone is appended at the end. |
-- Response: Returns cloned question object with the new ID set. Jumps that would go to the clone itself or to an earlier question, for example when it is appended at the end, are removed from its `extraSettings` (see [Jumps](DataStructure.md#jumps)), and the response header `X-Forms-Adjusted` then holds `removed-jumps=(<clone id>)` (see [Adjustments by the server](#adjustments-by-the-server)).
+- Response: Returns cloned question object with the new ID set. Jumps that would go to the clone itself, to an earlier question or into the middle of another section, for example when it is appended at the end, are removed from its `extraSettings` (see [Jumps](DataStructure.md#jumps)), and the response header `X-Forms-Adjusted` then holds `removed-jumps=(<clone id>)` (see [Adjustments by the server](#adjustments-by-the-server)).
 
 ```
 See section 'Create a new question'.
