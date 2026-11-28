@@ -148,7 +148,9 @@ export default defineComponent({
 		const rootElement = ref<{ $el?: HTMLElement } | null>(null)
 		const question = useQuestion(props, { emit, rootElement })
 		const values = computed<Array<number | string>>(() => {
-			return Array.isArray(props.values) ? props.values : []
+			return Array.isArray(props.values)
+				? (props.values as Array<number | string>)
+				: []
 		})
 		const input = ref<
 			Array<{

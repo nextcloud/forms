@@ -274,12 +274,12 @@ export default defineComponent({
 		},
 
 		errorMessage: {
-			type: String,
+			type: String as PropType<string | null>,
 			default: null,
 		},
 
 		infoMessage: {
-			type: String,
+			type: String as PropType<string | null>,
 			default: null,
 		},
 	},
