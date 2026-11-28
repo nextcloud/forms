@@ -45,7 +45,7 @@
     "@nextcloud/router": "^3.1.0",
     "@nextcloud/typings": "^1.10.0",
     "@nextcloud/vue": "^9.14.1",
-    "debounce": "^3.0.0",
+    "debounce": "^4.0.0",
     "markdown-it": "^15.0.2",
     "p-queue": "^10.0.0",
     "qrcode": "^1.5.4",
