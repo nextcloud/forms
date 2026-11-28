@@ -169,7 +169,11 @@
 							<template #icon>
 								<NcIconSvgWrapper :svg="IconDelete" />
 							</template>
-							{{ t('forms', 'Delete question') }}
+							{{
+								isSection
+									? t('forms', 'Delete section')
+									: t('forms', 'Delete question')
+							}}
 						</NcActionButton>
 					</NcActions>
 				</Teleport>

@@ -198,7 +198,7 @@
 							"
 							@update:options="updateQuestionOptions(index, $event)"
 							@clone="cloneQuestion(question, index)"
-							@delete="deleteQuestion(question.id)"
+							@delete="onDelete(question.id)"
 							@moveDown="onMoveDown(index)"
 							@moveUp="onMoveUp(index)">
 							<template
@@ -1320,65 +1320,141 @@ export default defineComponent({
 		}
 
 		/**
-		 * Delete a question
+		 * Delete questions one after the other, one request each, and warn once about the jumps this changes; a failed request keeps the remaining questions. Deleting the first section moves the next section up to its place, as the server does
 		 *
-		 * @param questionId the question id to delete
+		 * @param questionIds the ids of the questions to delete
 		 */
-		const deleteQuestion = async (questionId: number): Promise<void> => {
-			if (deletingQuestionIds.has(questionId)) {
+		const deleteQuestions = async (questionIds: number[]): Promise<void> => {
+			const ids = questionIds.filter((id) => !deletingQuestionIds.has(id))
+			if (ids.length === 0) {
 				return
 			}
-			deletingQuestionIds.add(questionId)
+			ids.forEach((id) => deletingQuestionIds.add(id))
 			const formId = props.form.id
+			const oldQuestions = props.form.questions
 			isLoadingQuestions.value = true
 			startChangingQuestions(formId)
 
+			const deleted = new Set<number>()
 			try {
-				await queueQuestionRequest(
-					props.form.questions.map(({ id }) => id),
-					() =>
-						axios.delete(
-							generateOcsUrl(
-								'apps/forms/api/v3/forms/{id}/questions/{questionId}',
-								{
-									id: props.form.id,
-									questionId,
-								},
+				for (const questionId of ids) {
+					await queueQuestionRequest(
+						props.form.questions.map(({ id }) => id),
+						() =>
+							axios.delete(
+								generateOcsUrl(
+									'apps/forms/api/v3/forms/{id}/questions/{questionId}',
+									{
+										id: props.form.id,
+										questionId,
+									},
+								),
 							),
-						),
-				)
-				if (props.form.id !== formId) {
-					return
+					)
+					deleted.add(questionId)
 				}
-				const position = props.form.questions.findIndex(
-					({ id }) => id === questionId,
-				)
-				const remaining = props.form.questions.filter(
-					(search: FormsQuestion) => search.id !== questionId,
-				)
-				const reordered =
-					props.form.questions[position]?.type === QUESTION_TYPE_SECTION
-						? withNextSectionMovedUp(remaining, position)
-						: remaining
-				const questions =
-					reordered === remaining
-						? remaining
-						: withoutDisallowedJumps(reordered)
-				warnAboutJumpChanges(props.form.questions, questions)
-				emit('update:form', { ...props.form, questions })
-				emitEvent('forms:last-updated:set', props.form.id)
 			} catch (error) {
-				logger.error(`Error while removing question ${questionId}`, {
-					error,
-				})
+				logger.error('Error while removing questions', { error, ids })
 				showError(
 					t('forms', 'There was an error while removing the question'),
 				)
 			} finally {
+				if (props.form.id === formId && deleted.size > 0) {
+					let questions = props.form.questions
+					let moved = false
+					for (const id of deleted) {
+						const position = questions.findIndex(
+							(question) => question.id === id,
+						)
+						const remaining = questions.filter(
+							(question) => question.id !== id,
+						)
+						const next =
+							questions[position]?.type === QUESTION_TYPE_SECTION
+								? withNextSectionMovedUp(remaining, position)
+								: remaining
+						moved = moved || next !== remaining
+						questions = next
+					}
+					if (moved) {
+						questions = withoutDisallowedJumps(questions)
+					}
+					warnAboutJumpChanges(oldQuestions, questions)
+					emit('update:form', { ...props.form, questions })
+					emitEvent('forms:last-updated:set', props.form.id)
+				}
 				isLoadingQuestions.value = false
 				endChangingQuestions(formId)
-				deletingQuestionIds.delete(questionId)
+				ids.forEach((id) => deletingQuestionIds.delete(id))
 			}
+		}
+
+		/**
+		 * Delete a question; for a section with questions, ask whether to delete only the section, so its questions join the section before it, the next section or, for the only section, the form without sections, or the section with its questions, deleting the section last
+		 *
+		 * @param questionId the id of the question or section
+		 */
+		const onDelete = async (questionId: number): Promise<void> => {
+			const position = props.form.questions.findIndex(
+				({ id }) => id === questionId,
+			)
+			if (props.form.questions[position]?.type !== QUESTION_TYPE_SECTION) {
+				await deleteQuestions([questionId])
+				return
+			}
+			const end = props.form.questions.findIndex(
+				(question, index) =>
+					index > position && question.type === QUESTION_TYPE_SECTION,
+			)
+			const sectionQuestions = props.form.questions.slice(
+				position + 1,
+				end === -1 ? undefined : end,
+			)
+			if (sectionQuestions.length === 0) {
+				await deleteQuestions([questionId])
+				return
+			}
+			const isFirst = !props.form.questions
+				.slice(0, position)
+				.some((question) => question.type === QUESTION_TYPE_SECTION)
+			let text = n(
+				'forms',
+				'Delete only the section, so its question joins the part before it, or delete the section with its question?',
+				'Delete only the section, so its %n questions join the part before it, or delete the section with its %n questions?',
+				sectionQuestions.length,
+			)
+			if (isFirst && end !== -1) {
+				text = n(
+					'forms',
+					'Delete only the section, so its question joins the next section, or delete the section with its question?',
+					'Delete only the section, so its %n questions join the next section, or delete the section with its %n questions?',
+					sectionQuestions.length,
+				)
+			} else if (isFirst) {
+				text = n(
+					'forms',
+					'Delete only the section, so its question stays in a form without sections, or delete the section with its question?',
+					'Delete only the section, so its %n questions stay in a form without sections, or delete the section with its %n questions?',
+					sectionQuestions.length,
+				)
+			}
+			let withQuestions: boolean
+			try {
+				withQuestions = await showConfirmation({
+					name: t('forms', 'Delete section'),
+					text,
+					labelConfirm: t('forms', 'Delete questions'),
+					labelReject: t('forms', 'Keep questions'),
+					severity: 'warning',
+				})
+			} catch {
+				return
+			}
+			await deleteQuestions(
+				withQuestions
+					? [...sectionQuestions.map(({ id }) => id), questionId]
+					: [questionId],
+			)
 		}
 
 		/**
@@ -1534,7 +1610,7 @@ export default defineComponent({
 			resizeTitle,
 			resizeDescription,
 			addQuestion,
-			deleteQuestion,
+			onDelete,
 			insertQuestion,
 			cloneQuestion,
 			questionNumbers,
