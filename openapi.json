@@ -530,6 +530,14 @@
                     "dateRange": {
                         "type": "boolean"
                     },
+                    "lengthMax": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
+                    "lengthMin": {
+                        "type": "integer",
+                        "format": "int64"
+                    },
                     "maxAllowedFilesCount": {
                         "type": "integer",
                         "format": "int64"
@@ -537,6 +545,36 @@
                     "maxFileSize": {
                         "type": "integer",
                         "format": "int64"
+                    },
+                    "numberExclude": {
+                        "type": "boolean"
+                    },
+                    "numberInteger": {
+                        "type": "boolean"
+                    },
+                    "numberMax": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            {
+                                "type": "number",
+                                "format": "double"
+                            }
+                        ]
+                    },
+                    "numberMin": {
+                        "anyOf": [
+                            {
+                                "type": "integer",
+                                "format": "int64"
+                            },
+                            {
+                                "type": "number",
+                                "format": "double"
+                            }
+                        ]
                     },
                     "optionsHighest": {
                         "type": "integer",
@@ -585,6 +623,12 @@
                     },
                     "shuffleOptions": {
                         "type": "boolean"
+                    },
+                    "textContains": {
+                        "type": "string"
+                    },
+                    "textNotContains": {
+                        "type": "string"
                     },
                     "timeMax": {
                         "type": "string"

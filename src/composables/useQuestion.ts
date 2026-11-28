@@ -193,6 +193,16 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		return `q${props.index}_info`
 	})
 
+	const describedBy = computed(
+		() =>
+			[
+				props.readOnly && props.description ? descriptionId.value : '',
+				hasInfo.value && !hasError.value ? infoId.value : '',
+			]
+				.filter(Boolean)
+				.join(' ') || undefined,
+	)
+
 	const onTitleChange = debounce(function (text: string) {
 		options.emit('update:text', text)
 		saveQuestionProperty('text', text)
@@ -371,6 +381,7 @@ export function useQuestion(props: QuestionPropsLike, options: UseQuestionOption
 		hasInfo,
 		errorId,
 		infoId,
+		describedBy,
 		commonListeners,
 		onTitleChange,
 		onDescriptionChange,

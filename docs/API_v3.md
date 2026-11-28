@@ -458,6 +458,7 @@ Update a single or multiple properties of a question-object.
     - It is **not allowed** to update one of the following key-value pairs: _id, formId, order, type_.
     - The sub type `extraSettings.questionType` is fixed when the question is created. An `extraSettings` value that adds, removes or changes `questionType` is rejected with **403 Forbidden**, so send the stored `questionType` with every `extraSettings` update.
     - A promoter score question (`questionType` `promoter`) keeps `optionsLowest` at `0` and `optionsHighest` at `10`; send both with every `extraSettings` update, or it is rejected with **400 Bad Request**.
+    - Answer rules in `extraSettings` (`lengthMin`, `lengthMax`, `numberMin`, `numberMax`, `numberExclude`, `numberInteger`, `textContains`, `textNotContains`) that do not fit the question or each other are rejected with **400 Bad Request**: a length on a short answer with a `validationType`, a required text on a long answer or on a short answer with a `validationType`, a number setting without `validationType` `number`, a minimum above its maximum, a required text longer than `lengthMax` or containing `textNotContains`, and a range without a whole number while `numberInteger` is set. The allowed values are listed in [Extra Settings](DataStructure.md#extra-settings).
 - Response: **Status-Code OK**, as well as the id of the updated question.
 
 ```

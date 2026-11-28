@@ -1727,6 +1727,196 @@ class FormsServiceTest extends TestCase {
 				'questionType' => Constants::ANSWER_TYPE_SHORT,
 				'expected' => false
 			],
+			'valid-length-short' => [
+				'extraSettings' => ['lengthMin' => 3, 'lengthMax' => 70],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-length-long' => [
+				'extraSettings' => ['lengthMax' => 4096],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => true
+			],
+			'invalid-length-min-above-max' => [
+				'extraSettings' => ['lengthMin' => 80, 'lengthMax' => 70],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => false
+			],
+			'invalid-length-zero' => [
+				'extraSettings' => ['lengthMin' => 0],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-length-above-stored-length' => [
+				'extraSettings' => ['lengthMax' => 4097],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => false
+			],
+			'invalid-length-not-integer' => [
+				'extraSettings' => ['lengthMax' => 7.5],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => false
+			],
+			'invalid-length-with-validation-type' => [
+				'extraSettings' => ['validationType' => 'email', 'lengthMax' => 70],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'valid-number-range' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => -1.5, 'numberMax' => 10],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-number-at-least' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 18],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-number-at-most' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMax' => 50],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-number-equal' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 7, 'numberMax' => 7],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-number-min-above-max' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 11, 'numberMax' => 10],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-infinite' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => INF],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-range-without-number-type' => [
+				'extraSettings' => ['numberMin' => 1],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-range-on-long' => [
+				'extraSettings' => ['numberMax' => 1],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => false
+			],
+			'valid-url-type' => [
+				'extraSettings' => ['validationType' => 'url'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-number-not-between' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberExclude' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-number-not-equal' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 5, 'numberMax' => 5, 'numberExclude' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-number-exclude-false' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberExclude' => false],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'valid-number-less-than' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberExclude' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'valid-number-greater-than' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMax' => 0, 'numberExclude' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-number-exclude-without-bound' => [
+				'extraSettings' => ['validationType' => 'number', 'numberExclude' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'valid-number-integer' => [
+				'extraSettings' => ['validationType' => 'number', 'numberInteger' => true, 'numberMin' => 1],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-number-integer-range-without-whole-number' => [
+				'extraSettings' => ['validationType' => 'number', 'numberInteger' => true, 'numberMin' => 1.2, 'numberMax' => 1.8],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-integer-equal-to-decimal' => [
+				'extraSettings' => ['validationType' => 'number', 'numberInteger' => true, 'numberMin' => 2.5, 'numberMax' => 2.5],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'valid-number-integer-not-between-decimals' => [
+				'extraSettings' => ['validationType' => 'number', 'numberInteger' => true, 'numberMin' => 1.2, 'numberMax' => 1.8, 'numberExclude' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-number-integer-false' => [
+				'extraSettings' => ['validationType' => 'number', 'numberInteger' => false],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-integer-without-number-type' => [
+				'extraSettings' => ['numberInteger' => true],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-integer-not-boolean' => [
+				'extraSettings' => ['validationType' => 'number', 'numberInteger' => 1],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-number-exclude-not-boolean' => [
+				'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberExclude' => 'yes'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'valid-text-contains' => [
+				'extraSettings' => ['textContains' => 'Nextcloud', 'textNotContains' => 'spam', 'lengthMax' => 70],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => true
+			],
+			'invalid-text-contains-empty' => [
+				'extraSettings' => ['textContains' => ''],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-text-contains-too-long' => [
+				'extraSettings' => ['textNotContains' => str_repeat('a', 4097)],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-text-contains-not-string' => [
+				'extraSettings' => ['textContains' => 42],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-text-contains-with-validation-type' => [
+				'extraSettings' => ['validationType' => 'email', 'textContains' => '@nextcloud.com'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-text-contains-excluded-text' => [
+				'extraSettings' => ['textContains' => 'Nextcloud GmbH', 'textNotContains' => 'gmbh'],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-text-contains-longer-than-length-max' => [
+				'extraSettings' => ['textContains' => 'GmbH', 'lengthMax' => 3],
+				'questionType' => Constants::ANSWER_TYPE_SHORT,
+				'expected' => false
+			],
+			'invalid-text-contains-on-long' => [
+				'extraSettings' => ['textContains' => 'Nextcloud'],
+				'questionType' => Constants::ANSWER_TYPE_LONG,
+				'expected' => false
+			],
 			'valid-custom-regex' => [
 				'extraSettings' => [
 					'validationType' => 'regex',

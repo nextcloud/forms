@@ -243,7 +243,7 @@ Currently supported Question-Types are:
 
 ## Extra Settings
 
-Optional extra settings for some [Question Types](#question-types)
+Optional extra settings for some [Question Types](#question-types). How the answer rules (lengths, number rules, required texts) behave for form owners and respondents is described in [Answer rules](./AnswerRules.md).
 
 | Extra Setting           | Question Type                                  | Type             | Values                                      | Description                                                                 |
 | ----------------------- | ---------------------------------------------- | ---------------- | ------------------------------------------- | --------------------------------------------------------------------------- |
@@ -251,8 +251,16 @@ Optional extra settings for some [Question Types](#question-types)
 | `shuffleOptions`        | `dropdown, multiple, multiple_unique, ranking` | Boolean          | `true/false`                                | The list of options should be shuffled                                      |
 | `optionsLimitMax`       | `multiple`                                     | Integer          | -                                           | Maximum number of options that can be selected                              |
 | `optionsLimitMin`       | `multiple`                                     | Integer          | -                                           | Minimum number of options that must be selected                             |
-| `validationType`        | `short`                                        | string           | `null, 'phone', 'email', 'regex', 'number'` | Custom validation for checking a submission                                 |
+| `validationType`        | `short`                                        | string           | `null, 'phone', 'email', 'url', 'regex', 'number'` | Custom validation for checking a submission; `url` accepts `http` and `https` addresses |
 | `validationRegex`       | `short`                                        | string           | regular expression                          | if `validationType` is 'regex' this defines the regular expression to apply |
+| `lengthMin`             | `short, long`                                  | Integer          | `1` to `4096`                               | Minimum number of characters of the answer; for `short` only without `validationType` |
+| `lengthMax`             | `short, long`                                  | Integer          | `1` to `4096`                               | Maximum number of characters of the answer, not below `lengthMin`; for `short` only without `validationType` |
+| `numberMin`             | `short`                                        | Number           | -                                           | Lowest number accepted, only with `validationType` 'number'                 |
+| `numberMax`             | `short`                                        | Number           | -                                           | Highest number accepted, not below `numberMin`, only with `validationType` 'number' |
+| `numberExclude`         | `short`                                        | Boolean          | `true`                                      | Reject the numbers from `numberMin` to `numberMax` instead of accepting only them (*not between*, or *not equal* if both are the same); with `numberMin` only it accepts numbers less than it, with `numberMax` only numbers greater than it; needs at least one |
+| `numberInteger`         | `short`                                        | Boolean          | `true`                                      | Accept whole numbers only, only with `validationType` 'number'; a range from `numberMin` to `numberMax` must then contain a whole number |
+| `textContains`          | `short`                                        | string           | `1` to `4096` characters                    | Text the answer must contain, ignoring case; only without `validationType`, not longer than `lengthMax` and not containing `textNotContains` |
+| `textNotContains`       | `short`                                        | string           | `1` to `4096` characters                    | Text the answer must not contain, ignoring case; only without `validationType`, not part of `textContains` |
 | `allowedFileTypes`      | `file`                                         | Array of strings | `'image', 'x-office/document'`              | Allowed file types for file upload                                          |
 | `allowedFileExtensions` | `file`                                         | Array of strings | `'jpg', 'png'`                              | Allowed file extensions for file upload                                     |
 | `maxAllowedFilesCount`  | `file`                                         | Integer          | -                                           | Maximum number of files that can be uploaded, 0 means no limit              |

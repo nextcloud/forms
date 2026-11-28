@@ -905,6 +905,7 @@ class FormsService {
 			Constants::ANSWER_TYPE_DROPDOWN => Constants::EXTRA_SETTINGS_DROPDOWN,
 			Constants::ANSWER_TYPE_MULTIPLE, Constants::ANSWER_TYPE_MULTIPLEUNIQUE => Constants::EXTRA_SETTINGS_MULTIPLE,
 			Constants::ANSWER_TYPE_SHORT => Constants::EXTRA_SETTINGS_SHORT,
+			Constants::ANSWER_TYPE_LONG => Constants::EXTRA_SETTINGS_LONG,
 			Constants::ANSWER_TYPE_FILE => Constants::EXTRA_SETTINGS_FILE,
 			Constants::ANSWER_TYPE_DATE => Constants::EXTRA_SETTINGS_DATE,
 			Constants::ANSWER_TYPE_GRID => Constants::EXTRA_SETTINGS_GRID,
@@ -925,6 +926,10 @@ class FormsService {
 				// Not allowed type
 				return false;
 			}
+		}
+
+		if (!$this->areAnswerLimitsValid($extraSettings)) {
+			return false;
 		}
 
 		// Validate extraSettings for specific question types
@@ -1082,6 +1087,88 @@ class FormsService {
 				return false;
 			}
 		}
+		return true;
+	}
+
+	/**
+	 * Whether the length and number limits of a text answer are consistent
+	 *
+	 * A length limit is allowed on plain text answers only, a number range only
+	 * on answers validated as number, like whole numbers only. Excluding the
+	 * range of one bound only accepts numbers below the minimum or above the
+	 * maximum. Lengths are counted in characters from 1
+	 * up to the stored answer length, and a minimum must not exceed its maximum.
+	 * A required text must fit the maximum length and must not contain the
+	 * excluded text.
+	 * A range for whole numbers only must contain a whole number.
+	 *
+	 * @param array $extraSettings the extra settings of the question
+	 * @return bool true if the limits are valid or not set
+	 */
+	private function areAnswerLimitsValid(array $extraSettings): bool {
+		$validationType = $extraSettings['validationType'] ?? null;
+		$lengthMin = $extraSettings['lengthMin'] ?? null;
+		$lengthMax = $extraSettings['lengthMax'] ?? null;
+		$numberMin = $extraSettings['numberMin'] ?? null;
+		$numberMax = $extraSettings['numberMax'] ?? null;
+		$numberExclude = $extraSettings['numberExclude'] ?? null;
+		$numberInteger = $extraSettings['numberInteger'] ?? null;
+
+		foreach (['textContains', 'textNotContains'] as $key) {
+			$text = $extraSettings[$key] ?? null;
+			if ($text !== null && ($validationType !== null || $text === '' || mb_strlen($text) > Constants::MAX_STRING_LENGTHS['answerText'])) {
+				return false;
+			}
+		}
+
+		if ($numberExclude !== null && ($numberExclude !== true || ($numberMin === null && $numberMax === null))) {
+			return false;
+		}
+
+		if ($numberInteger !== null && ($numberInteger !== true || $validationType !== 'number')) {
+			return false;
+		}
+
+		if ($lengthMin !== null || $lengthMax !== null) {
+			if ($validationType !== null) {
+				return false;
+			}
+			foreach ([$lengthMin, $lengthMax] as $length) {
+				if ($length !== null && ($length < 1 || $length > Constants::MAX_STRING_LENGTHS['answerText'])) {
+					return false;
+				}
+			}
+			if ($lengthMin !== null && $lengthMax !== null && $lengthMin > $lengthMax) {
+				return false;
+			}
+		}
+
+		$textContains = $extraSettings['textContains'] ?? null;
+		$textNotContains = $extraSettings['textNotContains'] ?? null;
+		if (is_string($textContains) && is_string($textNotContains) && mb_stripos($textContains, $textNotContains) !== false) {
+			return false;
+		}
+		if (is_string($textContains) && $lengthMax !== null && mb_strlen($textContains) > $lengthMax) {
+			return false;
+		}
+
+		if ($numberMin !== null || $numberMax !== null) {
+			if ($validationType !== 'number') {
+				return false;
+			}
+			foreach ([$numberMin, $numberMax] as $number) {
+				if ($number !== null && !is_finite((float)$number)) {
+					return false;
+				}
+			}
+			if ($numberMin !== null && $numberMax !== null && $numberMin > $numberMax) {
+				return false;
+			}
+			if ($numberInteger === true && $numberExclude === null && $numberMin !== null && $numberMax !== null && ceil((float)$numberMin) > $numberMax) {
+				return false;
+			}
+		}
+
 		return true;
 	}
 

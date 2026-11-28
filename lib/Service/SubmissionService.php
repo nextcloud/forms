@@ -769,6 +769,11 @@ class SubmissionService {
 				throw new \InvalidArgumentException(sprintf('Invalid input for question "%s".', $question['text']));
 			}
 
+			if (in_array($question['type'], [Constants::ANSWER_TYPE_SHORT, Constants::ANSWER_TYPE_LONG], true)
+				&& $answers[$questionId][0] !== '') {
+				$this->validateAnswerLimits($question, $answers[$questionId][0]);
+			}
+
 			// Handle ranking questions: answers must be a permutation of all option IDs
 			if ($question['type'] === Constants::ANSWER_TYPE_RANKING) {
 				$optionIds = array_map(intval(...), array_column($question['options'] ?? [], 'id'));
@@ -897,6 +902,11 @@ class SubmissionService {
 				return $this->emailValidator->isValid($data);
 			case 'number':
 				return is_numeric($data);
+			case 'url':
+				$url = parse_url($data);
+				return is_array($url)
+					&& in_array(strtolower($url['scheme'] ?? ''), ['http', 'https'], true)
+					&& preg_match('/^\S+$/u', $url['host'] ?? '') === 1;
 			case 'phone':
 				// some special characters are used (depending on the locale)
 				$sanitized = str_replace([' ', '(', ')', '.', '/', '-', 'x'], '', $data);
@@ -915,6 +925,51 @@ class SubmissionService {
 				$this->logger->error('Invalid input type for question detected, please report this issue!', ['validationType' => $question['extraSettings']['validationType']]);
 				// The result is just a non-validated text on the results, but not a fully declined submission. So no need to throw but simply return false here.
 				return false;
+		}
+	}
+
+	/**
+	 * Check a text answer against the length limits, the number rule and the
+	 * required or forbidden text of its question
+	 *
+	 * @param array $question the question
+	 * @param string $answer the answer text
+	 * @throws \InvalidArgumentException if the answer breaks one of the rules
+	 */
+	private function validateAnswerLimits(array $question, string $answer): void {
+		$lengthMin = $question['extraSettings']['lengthMin'] ?? null;
+		$lengthMax = $question['extraSettings']['lengthMax'] ?? null;
+		$length = mb_strlen($answer);
+		if (($lengthMin !== null && $length < $lengthMin) || ($lengthMax !== null && $length > $lengthMax)) {
+			throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be from %d to %d characters long.', $question['text'], $lengthMin ?? 1, $lengthMax ?? Constants::MAX_STRING_LENGTHS['answerText']));
+		}
+
+		$numberMin = $question['extraSettings']['numberMin'] ?? null;
+		$numberMax = $question['extraSettings']['numberMax'] ?? null;
+		if (($numberMin !== null || $numberMax !== null) && is_numeric($answer)) {
+			$inRange = ($numberMin === null || +$answer >= $numberMin) && ($numberMax === null || +$answer <= $numberMax);
+			$exclude = ($question['extraSettings']['numberExclude'] ?? false) === true;
+			if ($inRange === $exclude) {
+				throw new \InvalidArgumentException(match (true) {
+					$numberMin !== null && $numberMax !== null && $numberMin == $numberMax => sprintf($exclude ? 'The answer for question "%s" must not be %s.' : 'The answer for question "%s" must be %s.', $question['text'], $numberMin),
+					$exclude && $numberMax === null => sprintf('The answer for question "%s" must be a number less than %s.', $question['text'], $numberMin),
+					$exclude && $numberMin === null => sprintf('The answer for question "%s" must be a number greater than %s.', $question['text'], $numberMax),
+					$exclude => sprintf('The answer for question "%s" must be a number outside %s to %s.', $question['text'], $numberMin, $numberMax),
+					default => sprintf('The answer for question "%s" must be a number from %s to %s.', $question['text'], $numberMin ?? '-∞', $numberMax ?? '∞'),
+				});
+			}
+		}
+		if (($question['extraSettings']['numberInteger'] ?? false) === true && is_numeric($answer) && floor(+$answer) != +$answer) {
+			throw new \InvalidArgumentException(sprintf('The answer for question "%s" must be a whole number.', $question['text']));
+		}
+
+		$textContains = $question['extraSettings']['textContains'] ?? null;
+		if ($textContains !== null && mb_stripos($answer, $textContains) === false) {
+			throw new \InvalidArgumentException(sprintf('The answer for question "%s" must contain "%s".', $question['text'], $textContains));
+		}
+		$textNotContains = $question['extraSettings']['textNotContains'] ?? null;
+		if ($textNotContains !== null && mb_stripos($answer, $textNotContains) !== false) {
+			throw new \InvalidArgumentException(sprintf('The answer for question "%s" must not contain "%s".', $question['text'], $textNotContains));
 		}
 	}
 

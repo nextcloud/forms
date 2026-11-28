@@ -5,6 +5,7 @@
 
 import IconNumeric from '@material-symbols/svg-400/outlined/123.svg?raw'
 import IconPhone from '@material-symbols/svg-400/outlined/call.svg?raw'
+import IconLink from '@material-symbols/svg-400/outlined/link.svg?raw'
 import IconEMail from '@material-symbols/svg-400/outlined/mail.svg?raw'
 import IconRegex from '@material-symbols/svg-400/outlined/regular_expression.svg?raw'
 import IconTextShort from '@material-symbols/svg-400/outlined/short_text.svg?raw'
@@ -71,6 +72,28 @@ const validationTypes: Record<string, ValidationType> = {
 		errorMessage: t('forms', 'The input is not a valid email address'),
 		createPlaceholder: t('forms', 'People can enter an email address'),
 		submitPlaceholder: t('forms', 'Enter an email address'),
+	},
+
+	/**
+	 * Web address validation, http and https only, written with `//` before the host
+	 */
+	url: {
+		icon: IconLink,
+		inputType: 'url',
+		label: t('forms', 'URL'),
+		validate: (input: string) => {
+			try {
+				return (
+					/^https?:\/\/[^\s/?#\\]/i.test(input)
+					&& new URL(input).hostname !== ''
+				)
+			} catch {
+				return false
+			}
+		},
+		errorMessage: t('forms', 'The input is not a valid URL'),
+		createPlaceholder: t('forms', 'People can enter a URL'),
+		submitPlaceholder: t('forms', 'Enter a URL, like https://example.com'),
 	},
 
 	/**

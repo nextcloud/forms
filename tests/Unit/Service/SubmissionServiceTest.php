@@ -1425,6 +1425,251 @@ file2.txt"
 				// Expected Result
 				'Invalid input for question "q1".',
 			],
+			'short-length-within-limits' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMin' => 2, 'lengthMax' => 4]]],
+				['1' => ['äöü€']],
+				null,
+			],
+			'short-length-too-short' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMin' => 2, 'lengthMax' => 4]]],
+				['1' => ['a']],
+				'The answer for question "q1" must be from 2 to 4 characters long.',
+			],
+			'long-length-too-long' => [
+				[['id' => 1, 'type' => 'long', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMax' => 3]]],
+				['1' => ['abcd']],
+				'The answer for question "q1" must be from 1 to 3 characters long.',
+			],
+			'short-length-too-long' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMin' => 2, 'lengthMax' => 4]]],
+				['1' => ['abcde']],
+				'The answer for question "q1" must be from 2 to 4 characters long.',
+			],
+			'long-length-within-limits' => [
+				[['id' => 1, 'type' => 'long', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMin' => 3, 'lengthMax' => 5]]],
+				['1' => ['abc']],
+				null,
+			],
+			'long-length-too-short' => [
+				[['id' => 1, 'type' => 'long', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMin' => 3, 'lengthMax' => 5]]],
+				['1' => ['ab']],
+				'The answer for question "q1" must be from 3 to 5 characters long.',
+			],
+			'long-length-empty-optional-answer' => [
+				[['id' => 1, 'type' => 'long', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['lengthMin' => 3]]],
+				['1' => ['']],
+				null,
+			],
+			'short-number-within-range' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => -1.5, 'numberMax' => 10]]],
+				['1' => ['-1.5']],
+				null,
+			],
+			'short-number-below-range' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1]]],
+				['1' => ['0.5']],
+				'The answer for question "q1" must be a number from 1 to ∞.',
+			],
+			'short-number-above-range' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10]]],
+				['1' => ['10.01']],
+				'The answer for question "q1" must be a number from 1 to 10.',
+			],
+			'short-number-not-between-below' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberExclude' => true]]],
+				['1' => ['0.5']],
+				null,
+			],
+			'short-number-not-between-above' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberExclude' => true]]],
+				['1' => ['11']],
+				null,
+			],
+			'short-number-not-between-inside' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberExclude' => true]]],
+				['1' => ['1']],
+				'The answer for question "q1" must be a number outside 1 to 10.',
+			],
+			'short-number-between-upper-bound' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10]]],
+				['1' => ['10']],
+				null,
+			],
+			'short-number-at-least-bound' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1]]],
+				['1' => ['1']],
+				null,
+			],
+			'short-number-at-most-bound' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMax' => 10]]],
+				['1' => ['10']],
+				null,
+			],
+			'short-number-at-most-above' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMax' => 10]]],
+				['1' => ['10.5']],
+				'The answer for question "q1" must be a number from -∞ to 10.',
+			],
+			'short-number-not-between-upper-bound' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberExclude' => true]]],
+				['1' => ['10']],
+				'The answer for question "q1" must be a number outside 1 to 10.',
+			],
+			'short-number-greater-than-below' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMax' => 0, 'numberExclude' => true]]],
+				['1' => ['-1']],
+				'The answer for question "q1" must be a number greater than 0.',
+			],
+			'short-number-less-than-above' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 10, 'numberExclude' => true]]],
+				['1' => ['1e3']],
+				'The answer for question "q1" must be a number less than 10.',
+			],
+			'short-number-not-equal-other' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 5, 'numberMax' => 5, 'numberExclude' => true]]],
+				['1' => ['5.5']],
+				null,
+			],
+			'short-number-not-equal-same' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 5, 'numberMax' => 5, 'numberExclude' => true]]],
+				['1' => ['5.0']],
+				'The answer for question "q1" must not be 5.',
+			],
+			'short-number-equal-same' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 5, 'numberMax' => 5]]],
+				['1' => ['5']],
+				null,
+			],
+			'short-number-equal-other' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 5, 'numberMax' => 5]]],
+				['1' => ['4']],
+				'The answer for question "q1" must be 5.',
+			],
+			'short-number-greater-than-above' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMax' => 0, 'numberExclude' => true]]],
+				['1' => ['0.01']],
+				null,
+			],
+			'short-number-greater-than-same' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMax' => 0, 'numberExclude' => true]]],
+				['1' => ['0']],
+				'The answer for question "q1" must be a number greater than 0.',
+			],
+			'short-number-less-than-below' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 10, 'numberExclude' => true]]],
+				['1' => ['9.99']],
+				null,
+			],
+			'short-number-less-than-same' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 10, 'numberExclude' => true]]],
+				['1' => ['10']],
+				'The answer for question "q1" must be a number less than 10.',
+			],
+			'short-number-integer-whole' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberInteger' => true]]],
+				['1' => ['-42']],
+				null,
+			],
+			'short-number-integer-whole-with-decimals' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberInteger' => true]]],
+				['1' => ['3.0']],
+				null,
+			],
+			'short-number-integer-fraction' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberInteger' => true]]],
+				['1' => ['3.5']],
+				'The answer for question "q1" must be a whole number.',
+			],
+			'short-number-integer-fraction-in-range' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 1, 'numberMax' => 10, 'numberInteger' => true]]],
+				['1' => ['2.5']],
+				'The answer for question "q1" must be a whole number.',
+			],
+			'short-url-valid' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
+				['1' => ['https://nextcloud.com/forms?x=1']],
+				null,
+			],
+			'short-number-less-than-zero-above' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 0, 'numberExclude' => true]]],
+				['1' => ['5']],
+				'The answer for question "q1" must be a number less than 0.',
+			],
+			'short-number-at-least-zero-below' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'number', 'numberMin' => 0]]],
+				['1' => ['-3']],
+				'The answer for question "q1" must be a number from 0 to ∞.',
+			],
+			'short-url-international-domain' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
+				['1' => ['https://münchen.de']],
+				null,
+			],
+			'short-url-space-in-path' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
+				['1' => ['https://example.com/a b']],
+				null,
+			],
+			'short-url-underscore-in-host' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
+				['1' => ['http://my_host.example.com/']],
+				null,
+			],
+			'short-url-umlaut-in-path' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
+				['1' => ['https://example.com/ä']],
+				null,
+			],
+			'short-url-space-in-host' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
+				['1' => ['https://exa mple.com']],
+				'Invalid input for question "q1".',
+			],
+			'short-url-http' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
+				['1' => ['http://localhost:8080/apps/forms']],
+				null,
+			],
+			'short-url-without-scheme' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
+				['1' => ['nextcloud.com']],
+				'Invalid input for question "q1".',
+			],
+			'short-url-without-slashes' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
+				['1' => ['https:nextcloud.com']],
+				'Invalid input for question "q1".',
+			],
+			'short-url-other-scheme' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
+				['1' => ['javascript://alert(1)']],
+				'Invalid input for question "q1".',
+			],
+			'short-url-not-a-url' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['validationType' => 'url']]],
+				['1' => ['not a url']],
+				'Invalid input for question "q1".',
+			],
+			'short-text-contains-ignoring-case' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['textContains' => 'Nextcloud', 'textNotContains' => 'spam']]],
+				['1' => ['I use NEXTCLOUD']],
+				null,
+			],
+			'short-text-contains-missing' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['textContains' => 'Nextcloud', 'textNotContains' => 'spam']]],
+				['1' => ['I use something else']],
+				'The answer for question "q1" must contain "Nextcloud".',
+			],
+			'short-text-not-contains-present' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['textContains' => 'Nextcloud', 'textNotContains' => 'spam']]],
+				['1' => ['Nextcloud SPAM']],
+				'The answer for question "q1" must not contain "spam".',
+			],
+			'short-text-contains-multibyte' => [
+				[['id' => 1, 'type' => 'short', 'text' => 'q1', 'isRequired' => false, 'extraSettings' => ['textContains' => 'Ä']]],
+				['1' => ['Bär']],
+				null,
+			],
 			'invalid-date-question' => [
 				// Questions
 				[

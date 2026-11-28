@@ -10,14 +10,22 @@
 		:titlePlaceholder="answerType.titlePlaceholder"
 		:warningInvalid="answerType.warningInvalid"
 		:errorMessage="errorMessage"
+		:infoMessage="hasError ? undefined : (limitHint ?? undefined)"
 		v-on="commonListeners">
+		<template v-if="ruleKinds.length" #actions>
+			<NcActionCheckbox
+				:modelValue="showRules"
+				@update:modelValue="
+					(shown) => toggleRules(shown, onExtraSettingsChange)
+				">
+				{{ t('forms', 'Answer rules') }}
+			</NcActionCheckbox>
+		</template>
 		<div class="question__content">
 			<input
 				ref="input"
 				:aria-labelledby="readOnly ? titleId : undefined"
-				:aria-describedby="
-					readOnly && description ? descriptionId : undefined
-				"
+				:aria-describedby="describedBy"
 				:aria-errormessage="hasError ? errorId : undefined"
 				:aria-invalid="hasError ? 'true' : undefined"
 				:placeholder="submissionInputPlaceholder"
@@ -27,12 +35,14 @@
 				:value="inputValue"
 				class="question__input"
 				dir="auto"
-				:maxlength="maxStringLengths.answerText"
-				minlength="1"
+				:minlength="extraSettings.lengthMin || 1"
+				:min="hasNumberRange ? extraSettings.numberMin : undefined"
+				:max="hasNumberRange ? extraSettings.numberMax : undefined"
 				:type="validationObject.inputType"
 				:step="validationObject.inputType === 'number' ? 'any' : undefined"
 				@invalid.prevent="validate"
-				@input="onInput" />
+				@input="onInput"
+				@compositionend="onInput" />
 			<NcActions
 				v-if="!readOnly"
 				:id="validationTypeMenuId"
@@ -73,7 +83,19 @@
 					<!-- ^ Some example RegExp for the placeholder text -->
 				</NcActionInput>
 			</NcActions>
+			<p
+				v-if="readOnly && hasLengthLimit"
+				class="question__counter"
+				aria-hidden="true">
+				{{ lengthCounter }}
+			</p>
 		</div>
+		<AnswerRules
+			v-if="!readOnly && ruleKinds.length && showRules"
+			:kinds="ruleKinds"
+			:extraSettings="extraSettings"
+			:answerLengthMax="answerLengthMax"
+			@change="onExtraSettingsChange" />
 		<template #insert>
 			<slot name="insert" />
 		</template>
@@ -81,15 +103,26 @@
 </template>
 
 <script lang="ts">
+import type {
+	AnswerLimitSettings,
+	AnswerRuleKind,
+} from '../../composables/useAnswerLimits.ts'
+
 import IconRegex from '@material-symbols/svg-400/outlined/regular_expression.svg?raw'
 import { t } from '@nextcloud/l10n'
 import debounce from 'debounce'
 import { computed, defineComponent, ref } from 'vue'
+import NcActionCheckbox from '@nextcloud/vue/components/NcActionCheckbox'
 import NcActionInput from '@nextcloud/vue/components/NcActionInput'
 import NcActionRadio from '@nextcloud/vue/components/NcActionRadio'
 import NcActions from '@nextcloud/vue/components/NcActions'
 import NcIconSvgWrapper from '@nextcloud/vue/components/NcIconSvgWrapper'
+import AnswerRules from './AnswerRules.vue'
 import Question from './Question.vue'
+import {
+	NO_ANSWER_RULES,
+	useAnswerLimits,
+} from '../../composables/useAnswerLimits.ts'
 import {
 	QUESTION_EMITS,
 	QUESTION_PROPS,
@@ -99,7 +132,7 @@ import { INPUT_DEBOUNCE_MS } from '../../models/Constants.ts'
 import validationTypes from '../../models/ValidationTypes.ts'
 import { splitRegex, validateExpression } from '../../utils/RegularExpression.ts'
 
-type QuestionShortExtraSettings = {
+type QuestionShortExtraSettings = AnswerLimitSettings & {
 	validationRegex?: string
 	validationType?: string
 }
@@ -108,8 +141,10 @@ export default defineComponent({
 	name: 'QuestionShort',
 
 	components: {
+		AnswerRules,
 		NcIconSvgWrapper,
 		NcActions,
+		NcActionCheckbox,
 		NcActionInput,
 		NcActionRadio,
 		Question,
@@ -120,7 +155,6 @@ export default defineComponent({
 
 	setup(props, { emit }) {
 		const rootElement = ref<{ $el?: HTMLElement } | null>(null)
-		const question = useQuestion(props, { emit, rootElement })
 		const input = ref<HTMLInputElement | null>(null)
 		const regexInput = ref<{
 			$el: {
@@ -138,7 +172,15 @@ export default defineComponent({
 				(props.extraSettings as QuestionShortExtraSettings | undefined) ?? {}
 			)
 		})
-
+		const answer = computed(() => String(values.value[0] ?? ''))
+		const answerLengthMax = (props.maxStringLengths as Record<string, number>)
+			.answerText
+		const limits = useAnswerLimits(extraSettings, answer, answerLengthMax)
+		const question = useQuestion(props, {
+			emit,
+			infoMessage: limits.limitHint,
+			rootElement,
+		})
 		/**
 		 * Name of the current validation type, fallsback to 'text'
 		 */
@@ -203,6 +245,13 @@ export default defineComponent({
 				return false
 			}
 
+			const limitError = limits.limitError(value)
+			if (limitError) {
+				field.setCustomValidity(limitError)
+				question.errorMessage.value = limitError
+				return false
+			}
+
 			const isCustomValid =
 				!value
 				|| validationObject.value.validate(
@@ -224,12 +273,16 @@ export default defineComponent({
 			await validate()
 		}, INPUT_DEBOUNCE_MS)
 
-		const onInput = (): void => {
+		const onInput = (event: Event): void => {
 			const field = input.value
 			if (!field) {
 				return
 			}
+			if ((event as InputEvent).isComposing) {
+				return
+			}
 			field.setCustomValidity('')
+			limits.fitLength(field)
 			emit('update:values', [field.value])
 			void debounceValidate()
 		}
@@ -243,6 +296,7 @@ export default defineComponent({
 			if (validationType === 'regex') {
 				// Make sure to also submit a regex (even if empty)
 				question.onExtraSettingsChange({
+					...NO_ANSWER_RULES,
 					validationType,
 					validationRegex: validationRegex.value,
 				})
@@ -250,11 +304,28 @@ export default defineComponent({
 				// For all other types except regex we close the menu (for regex we keep it open to allow entering a regex)
 				isValidationTypeMenuOpen.value = false
 				question.onExtraSettingsChange({
+					...NO_ANSWER_RULES,
 					validationType:
 						validationType === 'text' ? undefined : validationType,
 				})
 			}
 		}
+
+		/**
+		 * The kinds of answer rules the current input type offers
+		 */
+		const ruleKinds = computed((): AnswerRuleKind[] => {
+			if (validationType.value === 'text') {
+				return ['length', 'contains', 'notContains']
+			}
+			return validationType.value === 'number' ? ['number', 'whole'] : []
+		})
+
+		const hasNumberRange = computed(
+			() =>
+				validationType.value === 'number'
+				&& !extraSettings.value.numberExclude,
+		)
 
 		/**
 		 * Validate and save regex if valid
@@ -303,9 +374,13 @@ export default defineComponent({
 
 		return {
 			...question,
+			...limits,
+			answerLengthMax,
+			extraSettings,
 			rootElement,
 			IconRegex,
 			t,
+			ruleKinds,
 			validationTypes,
 			isValidationTypeMenuOpen,
 			submissionInputPlaceholder,
@@ -319,6 +394,7 @@ export default defineComponent({
 			validate,
 			onInput,
 			onChangeValidationType,
+			hasNumberRange,
 			onInputRegex,
 			onSubmitRegex,
 		}
@@ -327,6 +403,11 @@ export default defineComponent({
 </script>
 
 <style lang="scss" scoped>
+.question__counter {
+	color: var(--color-text-maxcontrast);
+	text-align: end;
+}
+
 .question__input {
 	width: 100%;
 	min-height: var(--default-clickable-area);
