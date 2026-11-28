@@ -3,8 +3,13 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-import type { Ref } from 'vue'
-import type { FormsOption } from '../types/Entities.d.ts'
+import type { PropType, Ref } from 'vue'
+import type { AnswerTypeConfig } from '../models/AnswerTypes.ts'
+import type {
+	FormsOption,
+	FormsQuestionExtraSettings,
+	MaxStringLengths,
+} from '../types/Entities.d.ts'
 
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
@@ -59,7 +64,7 @@ export const QUESTION_PROPS = {
 		default: '',
 	},
 	values: {
-		type: [Array, Object],
+		type: [Array, Object] as PropType<unknown[] | Record<string, unknown>>,
 		default() {
 			return []
 		},
@@ -77,7 +82,7 @@ export const QUESTION_PROPS = {
 		default: null,
 	},
 	answerType: {
-		type: Object,
+		type: Object as PropType<AnswerTypeConfig>,
 		required: true,
 	},
 	readOnly: {
@@ -85,11 +90,11 @@ export const QUESTION_PROPS = {
 		default: false,
 	},
 	maxStringLengths: {
-		type: Object,
+		type: Object as PropType<MaxStringLengths>,
 		required: true,
 	},
 	extraSettings: {
-		default: () => {
+		default: (): FormsQuestionExtraSettings => {
 			return {}
 		},
 	},
@@ -107,7 +112,7 @@ export const QUESTION_PROPS = {
 		type: Boolean,
 		default: false,
 	},
-}
+} as const
 
 interface RootElementLike {
 	$el?: HTMLElement
@@ -128,7 +133,7 @@ interface QuestionPropsLike {
 	isRequired: boolean
 	readOnly: boolean
 	name: string
-	maxStringLengths: Record<string, number>
+	maxStringLengths: MaxStringLengths
 	canMoveUp: boolean
 	canMoveDown: boolean
 	extraSettings: Record<string, unknown>
@@ -142,7 +147,7 @@ interface QuestionForwardedProps {
 	description: string
 	isRequired: boolean
 	readOnly: boolean
-	maxStringLengths: Record<string, number>
+	maxStringLengths: MaxStringLengths
 	name: string
 	canMoveUp: boolean
 	canMoveDown: boolean

@@ -5,7 +5,8 @@
 /* eslint-disable jsdoc/require-jsdoc */
 
 import type { Ref } from 'vue'
-import type { FormsOption } from '../types/Entities.d.ts'
+import type { AnswerTypeConfig } from '../models/AnswerTypes.ts'
+import type { FormsOption, FormsQuestion } from '../types/Entities.d.ts'
 
 import axios from '@nextcloud/axios'
 import { showError } from '@nextcloud/dialogs'
@@ -31,15 +32,10 @@ interface UseQuestionMultipleOptions {
 	isLoading?: Ref<boolean>
 }
 
-interface AnswerTypeLike {
-	validate: (ctx: unknown) => boolean
-	[key: string]: unknown
-}
-
 export interface QuestionMultiplePropsLike {
 	options: FormsOption[]
 	values?: unknown[] | Record<string, unknown> | null
-	answerType?: AnswerTypeLike | Record<string, unknown>
+	answerType?: AnswerTypeConfig
 	readOnly?: boolean
 	extraSettings?: Record<string, unknown> | null
 	formId?: number | null
@@ -64,13 +60,7 @@ export function useQuestionMultiple(
 	})
 
 	const contentValid = computed(() => {
-		if (
-			props.answerType
-			&& typeof (props.answerType as AnswerTypeLike).validate === 'function'
-		) {
-			return (props.answerType as AnswerTypeLike).validate(props)
-		}
-		return true
+		return props.answerType?.validate?.(props as FormsQuestion) ?? true
 	})
 
 	const isLastEmpty = computed(() => {
